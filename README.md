@@ -1,42 +1,39 @@
-﻿# UnlearnLoop
+# UnlearnLoop
 
 **Learn from mistakes. Verify real understanding.**
 
-UnlearnLoop is an AI-assisted learning system focused on diagnosing misconceptions, selecting targeted practice, and verifying whether learners can transfer their understanding to new problems.
+UnlearnLoop 是一个以错误诊断为核心的 AI 学习系统。它不把一次错误直接等同于某个结论，而是记录多个可能原因、支持证据和不确定性，再选择能够区分这些原因的追问或练习，并在新的应用场景中验证学习是否迁移。
 
-## Vision
+## 当前状态
 
-Instead of treating a wrong answer as a complete diagnosis, UnlearnLoop maintains competing explanations for errors, gathers additional evidence, chooses targeted interventions, and checks learning progress through new tasks.
+项目处于第一阶段的正式规划期。当前仓库已完成基础目录和项目说明，产品需求、设计规范、系统架构与开发路线图正在建立。
 
-## Planned Features
+当前没有已完成的学习页面、后端 API、数据库模型或 AI 调用实现；本文档不将计划功能表述为已实现功能。
 
-- Learning workspace and learning materials
-- Question answering and feedback
-- Evidence-based misconception diagnosis
-- Adaptive follow-up questions and targeted exercises
-- Transfer verification
-- Error history and review planning
-- Learning progress and knowledge-state tracking
-- Configurable AI model providers
+## 第一阶段目标
 
-## Planned Technology Stack
+以通用知识学习为产品方向，先用 Python 作为首个内容包建立一条可测试的最小闭环：学习材料 → 问题与作答 → 基于证据的错误假设 → 区分性诊断 → 针对性干预 → 迁移验证 → 学习状态与复习记录。引导式工作流、诊断逻辑和学习状态模型不应绑定某一学科。
 
-- Frontend: React, TypeScript, Vite
-- Backend: Python, FastAPI
-- Database: SQLite, SQLAlchemy
-- AI: DeepSeek API, with planned Ollama compatibility
-- Testing: pytest and frontend automated tests
+完整产品愿景与第一阶段边界见 [产品需求文档](docs/product/PRD.md)。界面规则见 [设计系统](docs/design/DESIGN_SYSTEM.md)，技术边界见 [系统架构](docs/architecture/ARCHITECTURE.md)，实施顺序见 [开发路线图](docs/development/ROADMAP.md)。
 
-## Development Principles
+## 计划技术栈
 
-- Evidence before conclusions
-- Explicit and testable decision logic
-- Modular, maintainable architecture
-- Privacy-conscious data handling
-- Incremental implementation with documented verification
+- 前端：React、TypeScript、Vite、Tailwind CSS
+- 后端：Python、FastAPI
+- 数据库：SQLite、SQLAlchemy；预留 Alembic 迁移
+- AI：先接入 DeepSeek API；通过模型服务抽象预留 Ollama
+- 测试与质量：pytest、前端自动化测试、TypeScript 类型检查、代码规范检查
+- 工程：Git、GitHub、后续 CI 检查
 
-## Project Status
+## 设计与工程原则
 
-Early project setup. Product specifications, design guidelines, architecture, and implementation are being developed.
+- 证据先于结论：诊断结论必须能回溯到学习者作答、追问或练习证据。
+- 不确定性显式化：系统可以保留多个候选错误原因，不强迫模型伪装成确定判断。
+- 决策可测试：诊断和干预选择使用明确的状态、输入、输出和转移条件。
+- 学习空间优先：学习、诊断、复习是不同工作空间，而不是单一聊天界面。
+- 增量交付：先验证一个窄而完整的 Python 内容包，再扩展题型、学科和模型提供商；产品流程保持内容无关。
+- 隐私优先：学习内容、答案和模型配置按最小必要原则保存，密钥不进入数据库或日志。
 
-No application features are claimed to be complete at this stage.
+## 开发约定
+
+本阶段只维护规划文档，不安装依赖、不部署、不提交或推送。后续编码前需先完成产品范围和视觉方案评审，并以路线图中的验收标准作为进入下一阶段的条件。
