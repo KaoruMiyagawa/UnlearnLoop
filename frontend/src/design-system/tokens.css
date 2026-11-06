@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * UnlearnLoop Design System Tokens
+ * Aligned with docs/design/DESIGN_SYSTEM.md Section 2.1 & 2.2
+ */
+:root {
+  --surface-page: #F7F8FA;
+  --surface-raised: #FFFFFF;
+  --surface-subtle: #F0F2F5;
+  --text-primary: #1F2937;
+  --text-secondary: #667085;
+  --border-default: #E4E7EC;
+  --action-primary: #2563EB;
+  --action-primary-hover: #1D4ED8;
+  --feedback-success: #15803D;
+  --feedback-warning: #B45309;
+  --feedback-error: #B42318;
+  --feedback-info: #475467;
+}
+
+@layer base {
+  body {
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
