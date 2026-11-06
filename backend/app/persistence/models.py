@@ -1,0 +1,823 @@
+"""SQLAlchemy 2.x ORM models for UnlearnLoop Stage 2.
+
+Subject-agnostic schema covering:
+- KnowledgeTopic & KnowledgeTopicDependency
+- LearningMaterial
+- Question
+- LearningSession
+- Attempt (immutable raw answer snapshot)
+- DiagnosticCase
+- Hypothesis (supports multiple competing hypotheses & insufficient_evidence)
+- DecisionEvent (strictly append-only immutable audit trail)
+- EvidenceLink (immutable evidence record with mandatory source tracking)
+- KnowledgeState (traceable mastery status requiring transfer verification for 'stable')
+- ReviewItem
+"""
+
+from datetime import datetime, timezone
+from typing import Any
+from uuid import uuid4
+
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    event,
+    inspect,
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.domain.enums import (
+    AttemptEvaluationStatus,
+    DiagnosticCaseStatus,
+    EvidenceRelation,
+    EvidenceSourceType,
+    HypothesisStatus,
+    KnowledgeMasteryStatus,
+    QuestionRole,
+    QuestionType,
+    ReviewStatus,
+    SessionStatus,
+    UncertaintyLevel,
+)
+from app.domain.exceptions import ImmutableRecordError
+from app.persistence.database import Base
+
+
+def utc_now() -> datetime:
+    """Return timezone-aware UTC datetime."""
+    return datetime.now(timezone.utc)
+
+
+def new_id(prefix: str) -> str:
+    """Generate a readable prefixed unique identifier."""
+    return f"{prefix}_{uuid4().hex[:16]}"
+
+
+class KnowledgeTopicDependency(Base):
+    """Prerequisite relationship between two KnowledgeTopics."""
+
+    __tablename__ = "knowledge_topic_dependencies"
+    __table_args__ = (
+        CheckConstraint(
+            "topic_id != prerequisite_topic_id",
+            name="ck_topic_dependency_not_self",
+        ),
+    )
+
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        primary_key=True,
+    )
+    prerequisite_topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        primary_key=True,
+    )
+
+
+class KnowledgeTopic(Base):
+    """Subject-agnostic knowledge topic entity."""
+
+    __tablename__ = "knowledge_topics"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("topic"),
+    )
+    slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    domain_code: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    summary: Mapped[str] = mapped_column(Text, nullable=False)
+    difficulty_level: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    common_error_patterns: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=False,
+        default=list,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    materials: Mapped[list["LearningMaterial"]] = relationship(
+        back_populates="topic",
+        cascade="save-update, merge",
+    )
+    questions: Mapped[list["Question"]] = relationship(
+        back_populates="topic",
+        cascade="save-update, merge",
+    )
+    prerequisites: Mapped[list["KnowledgeTopic"]] = relationship(
+        secondary="knowledge_topic_dependencies",
+        primaryjoin=id == KnowledgeTopicDependency.topic_id,
+        secondaryjoin=id == KnowledgeTopicDependency.prerequisite_topic_id,
+        viewonly=False,
+    )
+
+
+class LearningMaterial(Base):
+    """Short study material associated with a KnowledgeTopic."""
+
+    __tablename__ = "learning_materials"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("mat"),
+    )
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    summary: Mapped[str] = mapped_column(Text, nullable=False)
+    content_body: Mapped[str] = mapped_column(Text, nullable=False)
+    content_format: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default="markdown",
+    )
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    topic: Mapped["KnowledgeTopic"] = relationship(back_populates="materials")
+    questions: Mapped[list["Question"]] = relationship(back_populates="material")
+
+
+class Question(Base):
+    """Question item supporting initial, diagnostic_followup, targeted_practice, and transfer_check."""
+
+    __tablename__ = "questions"
+    __table_args__ = (
+        CheckConstraint("version >= 1", name="ck_questions_version_positive"),
+        CheckConstraint("difficulty >= 1", name="ck_questions_difficulty_positive"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("q"),
+    )
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    material_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("learning_materials.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    parent_question_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("questions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    question_role: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=QuestionRole.INITIAL.value,
+        index=True,
+    )
+    question_type: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=QuestionType.SHORT_TEXT.value,
+    )
+    prompt_text: Mapped[str] = mapped_column(Text, nullable=False)
+    context_snippet: Mapped[str | None] = mapped_column(Text, nullable=True)
+    standard_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    answer_explanation: Mapped[str] = mapped_column(Text, nullable=False)
+    evaluation_rubric: Mapped[dict[str, Any]] = mapped_column(
+        JSON,
+        nullable=False,
+        default=dict,
+    )
+    difficulty: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    topic: Mapped["KnowledgeTopic"] = relationship(back_populates="questions")
+    material: Mapped["LearningMaterial | None"] = relationship(
+        back_populates="questions"
+    )
+    attempts: Mapped[list["Attempt"]] = relationship(back_populates="question")
+
+
+class LearningSession(Base):
+    """Learner session tracking attempts, diagnostic cases, and decision events."""
+
+    __tablename__ = "learning_sessions"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("sess"),
+    )
+    learner_id: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        default="local_default_learner",
+        index=True,
+    )
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    current_question_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("questions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=SessionStatus.ACTIVE.value,
+    )
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    topic: Mapped["KnowledgeTopic"] = relationship()
+    current_question: Mapped["Question | None"] = relationship()
+    attempts: Mapped[list["Attempt"]] = relationship(
+        back_populates="session",
+        order_by="Attempt.submitted_at",
+    )
+    diagnostic_cases: Mapped[list["DiagnosticCase"]] = relationship(
+        back_populates="session",
+        order_by="DiagnosticCase.created_at",
+    )
+    decision_events: Mapped[list["DecisionEvent"]] = relationship(
+        back_populates="session",
+        order_by="DecisionEvent.created_at",
+    )
+
+
+class Attempt(Base):
+    """Immutable learner attempt snapshot associated with a Question and LearningSession."""
+
+    __tablename__ = "attempts"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("att"),
+    )
+    session_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("learning_sessions.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    question_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("questions.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    question_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    question_snapshot_json: Mapped[dict[str, Any]] = mapped_column(
+        JSON,
+        nullable=False,
+        default=dict,
+    )
+    attempt_role: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=QuestionRole.INITIAL.value,
+    )
+    submitted_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    is_correct: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    evaluation_status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=AttemptEvaluationStatus.PENDING.value,
+    )
+    evaluation_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(128),
+        unique=True,
+        nullable=True,
+    )
+    submitted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+
+    session: Mapped["LearningSession"] = relationship(back_populates="attempts")
+    question: Mapped["Question"] = relationship(back_populates="attempts")
+
+
+class DiagnosticCase(Base):
+    """Error diagnosis case holding competing hypotheses and uncertainty state."""
+
+    __tablename__ = "diagnostic_cases"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("diag"),
+    )
+    session_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("learning_sessions.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    trigger_attempt_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("attempts.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    current_followup_question_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("questions.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=DiagnosticCaseStatus.COLLECTING_ATTEMPT.value,
+    )
+    uncertainty_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    selected_intervention: Mapped[str | None] = mapped_column(
+        String(32),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    session: Mapped["LearningSession"] = relationship(
+        back_populates="diagnostic_cases"
+    )
+    trigger_attempt: Mapped["Attempt"] = relationship()
+    topic: Mapped["KnowledgeTopic"] = relationship()
+    hypotheses: Mapped[list["Hypothesis"]] = relationship(
+        back_populates="diagnostic_case",
+        order_by="Hypothesis.created_at",
+    )
+    decision_events: Mapped[list["DecisionEvent"]] = relationship(
+        back_populates="diagnostic_case",
+        order_by="DecisionEvent.created_at",
+    )
+
+
+class Hypothesis(Base):
+    """Candidate error hypothesis within a DiagnosticCase.
+
+    Multiple competing hypotheses may coexist for the same DiagnosticCase.
+    """
+
+    __tablename__ = "hypotheses"
+    __table_args__ = (
+        CheckConstraint(
+            "confidence >= 0.0 AND confidence <= 1.0",
+            name="ck_hypotheses_confidence_range",
+        ),
+        UniqueConstraint(
+            "diagnostic_case_id",
+            "error_code",
+            name="uq_hypothesis_case_error_code",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("hyp"),
+    )
+    diagnostic_case_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("diagnostic_cases.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    error_code: Mapped[str] = mapped_column(String(64), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.5)
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=HypothesisStatus.CANDIDATE.value,
+    )
+    missing_evidence_desc: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    diagnostic_case: Mapped["DiagnosticCase"] = relationship(
+        back_populates="hypotheses"
+    )
+    evidence_links: Mapped[list["EvidenceLink"]] = relationship(
+        back_populates="hypothesis",
+        order_by="EvidenceLink.created_at",
+    )
+
+
+class DecisionEvent(Base):
+    """Strictly append-only domain decision event (ARCHITECTURE.md Section 3 & 6)."""
+
+    __tablename__ = "decision_events"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("evt"),
+    )
+    session_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("learning_sessions.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    diagnostic_case_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("diagnostic_cases.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+    event_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    from_state: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    to_state: Mapped[str] = mapped_column(String(64), nullable=False)
+    action: Mapped[str] = mapped_column(String(64), nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    uncertainty_level: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=UncertaintyLevel.MEDIUM.value,
+    )
+    payload_json: Mapped[dict[str, Any]] = mapped_column(
+        JSON,
+        nullable=False,
+        default=dict,
+    )
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(128),
+        unique=True,
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+
+    session: Mapped["LearningSession"] = relationship(
+        back_populates="decision_events"
+    )
+    diagnostic_case: Mapped["DiagnosticCase | None"] = relationship(
+        back_populates="decision_events"
+    )
+
+
+class EvidenceLink(Base):
+    """Immutable evidence record linking a source observation to a Hypothesis."""
+
+    __tablename__ = "evidence_links"
+    __table_args__ = (
+        CheckConstraint(
+            "length(trim(source_ref)) > 0",
+            name="ck_evidence_links_source_ref_nonempty",
+        ),
+        CheckConstraint(
+            "length(trim(summary)) > 0",
+            name="ck_evidence_links_summary_nonempty",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("evi"),
+    )
+    hypothesis_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("hypotheses.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    attempt_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("attempts.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    decision_event_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("decision_events.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    source_type: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=EvidenceSourceType.INITIAL_ATTEMPT.value,
+    )
+    source_ref: Mapped[str] = mapped_column(String(128), nullable=False)
+    relation: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=EvidenceRelation.SUPPORTS.value,
+    )
+    summary: Mapped[str] = mapped_column(Text, nullable=False)
+    reliability_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+
+    hypothesis: Mapped["Hypothesis"] = relationship(back_populates="evidence_links")
+    attempt: Mapped["Attempt | None"] = relationship()
+    decision_event: Mapped["DecisionEvent | None"] = relationship()
+
+
+class KnowledgeState(Base):
+    """Topic-level knowledge mastery state with mandatory decision traceability."""
+
+    __tablename__ = "knowledge_states"
+    __table_args__ = (
+        UniqueConstraint(
+            "learner_id",
+            "topic_id",
+            name="uq_knowledge_state_learner_topic",
+        ),
+        CheckConstraint(
+            "length(trim(transition_reason)) > 0",
+            name="ck_knowledge_states_reason_nonempty",
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("kst"),
+    )
+    learner_id: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        default="local_default_learner",
+        index=True,
+    )
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=KnowledgeMasteryStatus.INSUFFICIENT_EVIDENCE.value,
+    )
+    unresolved_error_codes: Mapped[list[str]] = mapped_column(
+        JSON,
+        nullable=False,
+        default=list,
+    )
+    last_evidence_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("evidence_links.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    last_decision_event_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("decision_events.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    last_transfer_attempt_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("attempts.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    transition_reason: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+        onupdate=utc_now,
+    )
+
+    topic: Mapped["KnowledgeTopic"] = relationship()
+    last_evidence: Mapped["EvidenceLink | None"] = relationship()
+    last_decision_event: Mapped["DecisionEvent"] = relationship()
+    last_transfer_attempt: Mapped["Attempt | None"] = relationship()
+
+
+class ReviewItem(Base):
+    """Scheduled review task tied to unresolved error patterns or transfer results."""
+
+    __tablename__ = "review_items"
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("rev"),
+    )
+    learner_id: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        default="local_default_learner",
+        index=True,
+    )
+    topic_id: Mapped[str] = mapped_column(
+        String(64),
+        ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    session_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("learning_sessions.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    hypothesis_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("hypotheses.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    trigger_reason: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=ReviewStatus.PENDING.value,
+    )
+    scheduled_for: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    review_outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+
+    topic: Mapped["KnowledgeTopic"] = relationship()
+    session: Mapped["LearningSession | None"] = relationship()
+    hypothesis: Mapped["Hypothesis | None"] = relationship()
+
+
+# ---------------------------------------------------------------------------
+# ORM Immutability & Append-Only Guards (ARCHITECTURE.md Section 3)
+# ---------------------------------------------------------------------------
+
+
+@event.listens_for(DecisionEvent, "before_update")
+def _prevent_decision_event_update(
+    _mapper: Any, _connection: Any, _target: DecisionEvent
+) -> None:
+    raise ImmutableRecordError(
+        "DecisionEvent is strictly append-only and cannot be modified after creation."
+    )
+
+
+@event.listens_for(DecisionEvent, "before_delete")
+def _prevent_decision_event_delete(
+    _mapper: Any, _connection: Any, _target: DecisionEvent
+) -> None:
+    raise ImmutableRecordError(
+        "DecisionEvent is strictly append-only and cannot be deleted."
+    )
+
+
+@event.listens_for(EvidenceLink, "before_update")
+def _prevent_evidence_link_update(
+    _mapper: Any, _connection: Any, _target: EvidenceLink
+) -> None:
+    raise ImmutableRecordError(
+        "EvidenceLink is immutable diagnostic evidence and cannot be overwritten."
+    )
+
+
+@event.listens_for(EvidenceLink, "before_delete")
+def _prevent_evidence_link_delete(
+    _mapper: Any, _connection: Any, _target: EvidenceLink
+) -> None:
+    raise ImmutableRecordError(
+        "EvidenceLink is immutable diagnostic evidence and cannot be deleted."
+    )
+
+
+@event.listens_for(Attempt, "before_delete")
+def _prevent_attempt_delete(
+    _mapper: Any, _connection: Any, _target: Attempt
+) -> None:
+    raise ImmutableRecordError(
+        "Attempt records raw learner answers and cannot be deleted."
+    )
+
+
+@event.listens_for(Attempt, "before_update")
+def _prevent_attempt_snapshot_mutation(
+    _mapper: Any, _connection: Any, target: Attempt
+) -> None:
+    state = inspect(target)
+    immutable_fields = (
+        "submitted_answer",
+        "question_id",
+        "session_id",
+        "question_version",
+        "question_snapshot_json",
+        "attempt_role",
+        "submitted_at",
+        "idempotency_key",
+    )
+    for field_name in immutable_fields:
+        hist = state.attrs[field_name].history
+        if hist.has_changes():
+            raise ImmutableRecordError(
+                f"Attempt.{field_name} is an immutable snapshot field and cannot be overwritten."
+            )
+
+    eval_status_hist = state.attrs["evaluation_status"].history
+    old_statuses = eval_status_hist.deleted or [target.evaluation_status]
+    if old_statuses and old_statuses[0] == AttemptEvaluationStatus.EVALUATED.value:
+        for eval_field in ("evaluation_status", "is_correct", "evaluation_summary"):
+            if state.attrs[eval_field].history.has_changes():
+                raise ImmutableRecordError(
+                    f"Attempt.{eval_field} cannot be overwritten once evaluation_status is 'evaluated'."
+                )

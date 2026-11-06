@@ -1,9 +1,56 @@
-"""Persistence layer: SQLAlchemy foundation and migration hooks.
+"""Persistence layer: SQLAlchemy 2.x ORM models, repositories, migrations, and seeding."""
 
-Note: Business tables (KnowledgeTopic, LearningSession, DiagnosticCase, etc.)
-are intentionally deferred to Stage 2 per ROADMAP.md.
-"""
+from app.persistence.database import (
+    Base,
+    create_db_engine,
+    create_session_factory,
+    transactional_session,
+)
+from app.persistence.migrations_runner import get_alembic_config, upgrade_database
+from app.persistence.models import (
+    Attempt,
+    DecisionEvent,
+    DiagnosticCase,
+    EvidenceLink,
+    Hypothesis,
+    KnowledgeState,
+    KnowledgeTopic,
+    KnowledgeTopicDependency,
+    LearningMaterial,
+    LearningSession,
+    Question,
+    ReviewItem,
+)
+from app.persistence.repositories import LearningRepository
+from app.persistence.seed import (
+    DEFAULT_PYTHON_PACK_PATH,
+    SeedSummary,
+    import_content_pack,
+    load_content_pack_file,
+)
 
-from app.persistence.database import Base, create_db_engine, create_session_factory
-
-__all__ = ["Base", "create_db_engine", "create_session_factory"]
+__all__ = [
+    "Attempt",
+    "Base",
+    "DEFAULT_PYTHON_PACK_PATH",
+    "DecisionEvent",
+    "DiagnosticCase",
+    "EvidenceLink",
+    "Hypothesis",
+    "KnowledgeState",
+    "KnowledgeTopic",
+    "KnowledgeTopicDependency",
+    "LearningMaterial",
+    "LearningRepository",
+    "LearningSession",
+    "Question",
+    "ReviewItem",
+    "SeedSummary",
+    "create_db_engine",
+    "create_session_factory",
+    "get_alembic_config",
+    "import_content_pack",
+    "load_content_pack_file",
+    "transactional_session",
+    "upgrade_database",
+]

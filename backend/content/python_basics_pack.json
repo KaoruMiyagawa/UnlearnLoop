@@ -1,0 +1,593 @@
+{
+  "pack_id": "python_basics_v1",
+  "domain_code": "python",
+  "version": 1,
+  "title": "Python 3 基础核心概念与错误诊断内容包",
+  "topics": [
+    {
+      "id": "topic_py_var_assign",
+      "slug": "py-variable-assignment",
+      "domain_code": "python",
+      "title": "变量赋值与引用绑定",
+      "summary": "理解 Python 中 `=` 是按顺序求值右侧表达式并绑定名称，而非建立数学恒等式或双向联动。",
+      "difficulty_level": 1,
+      "prerequisites": [],
+      "common_error_patterns": [
+        {
+          "error_code": "var_assign_reactive_formula",
+          "name": "将赋值误解为电子表格联动公式",
+          "description": "认为执行 `b = a + 1` 后，后续修改 `a` 会自动改变 `b` 的值。",
+          "evidence_clues": [
+            "学习者回答 `b` 随 `a` 的二次赋值一起变化",
+            "解释中出现“因为 b 等于 a+1，所以 a 变了 b 也变”"
+          ]
+        },
+        {
+          "error_code": "var_assign_reverse_direction",
+          "name": "混淆赋值方向（右值覆盖左值）",
+          "description": "在 `a = b` 中误以为把 `a` 的原值赋给了 `b`。",
+          "evidence_clues": [
+            "学习者将左右变量的值写反",
+            "在变量交换追踪中丢失被覆盖变量的原始值"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "id": "mat_py_var_assign_01",
+          "title": "Python 赋值语句的执行顺序",
+          "summary": "先计算 `=` 右侧表达式的当前值，再将结果对象绑定到左侧变量名。",
+          "content_format": "markdown",
+          "version": 1,
+          "content_body": "在 Python 3 中，赋值语句 `target = expression` 分为两步：\n1. 先根据当前环境完全计算出右侧 `expression` 的值；\n2. 将左侧名称 `target` 绑定到该结果值。\n后续对其他变量的重新绑定不会回头修改已经计算完毕的整数或字符串绑定。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_py_var_initial_01",
+          "material_id": "mat_py_var_assign_01",
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "code_trace",
+          "prompt_text": "阅读下方 Python 3 代码，写出最后一行 `print(a, b)` 的输出结果，并简述为什么 `b` 是这个值。",
+          "context_snippet": "a = 10\nb = a + 5\na = 20\nprint(a, b)",
+          "standard_answer": "20 15",
+          "answer_explanation": "第 2 行执行时 `a` 为 10，因此 `b` 绑定为 15；第 3 行将 `a` 重新绑定为 20，不会联动修改 `b`。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "20 15",
+            "candidate_error_mappings": [
+              {
+                "observed_answer_pattern": "20 25",
+                "target_error_code": "var_assign_reactive_formula",
+                "clue": "输出 25 说明把 `b = a + 5` 当成了随 `a = 20` 自动重算的公式。"
+              },
+              {
+                "observed_answer_pattern": "10 15",
+                "target_error_code": "var_assign_reverse_direction",
+                "clue": "忽略了第 3 行 `a = 20` 对变量 `a` 的重新绑定。"
+              }
+            ]
+          }
+        },
+        {
+          "id": "q_py_var_followup_01",
+          "material_id": "mat_py_var_assign_01",
+          "parent_question_id": "q_py_var_initial_01",
+          "question_role": "diagnostic_followup",
+          "question_type": "short_text",
+          "prompt_text": "如果在第 2 行 `b = a + 5` 刚刚执行完、第 3 行 `a = 20` 还没执行时立即打印 `b`，以及第 3 行执行完后再打印 `b`，两次打印的值分别是什么？",
+          "context_snippet": "a = 10\nb = a + 5\n# 位置 1: 此时 b 是多少？\na = 20\n# 位置 2: 此时 b 是多少？",
+          "standard_answer": "位置 1 是 15，位置 2 仍然是 15",
+          "answer_explanation": "通过对比第 3 行前后的 `b` 值，直接区分“算错 10+5”与“认为 `a = 20` 会自动更新 `b`”。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["var_assign_reactive_formula", "var_assign_reverse_direction"],
+            "discriminating_rationale": "若回答位置 1 为 15、位置 2 变为 25，则确诊为 `var_assign_reactive_formula`；若两处均为 15，则排除联动公式误解。"
+          }
+        },
+        {
+          "id": "q_py_var_practice_01",
+          "material_id": "mat_py_var_assign_01",
+          "parent_question_id": "q_py_var_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "逐步追踪以下代码每行执行后 `x` 和 `y` 的值，写出最终输出。",
+          "context_snippet": "x = 4\ny = x * 2\nx = x + 3\nprint(x, y)",
+          "standard_answer": "7 8",
+          "answer_explanation": "`y` 在 `x` 为 4 时计算得 8；随后 `x` 更新为 `4 + 3 = 7`，`y` 保持为 8。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["var_assign_reactive_formula"]
+          }
+        },
+        {
+          "id": "q_py_var_transfer_01",
+          "material_id": "mat_py_var_assign_01",
+          "parent_question_id": "q_py_var_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_trace",
+          "prompt_text": "【迁移验证】在购物车折扣计算场景中，阅读下方代码并写出 `print(original_price, final_price)` 的输出结果。",
+          "context_snippet": "price = 100\ndiscount = 20\nfinal_price = price - discount\ndiscount = 50\noriginal_price = price\nprint(original_price, final_price)",
+          "standard_answer": "100 80",
+          "answer_explanation": "`final_price` 在 `discount = 20` 时已计算为 80；后续修改 `discount = 50` 不会重算 `final_price`。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_var_assign",
+            "target_error_codes": ["var_assign_reactive_formula"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "topic_py_cond_branch",
+      "slug": "py-conditional-branching",
+      "domain_code": "python",
+      "title": "条件判断与 if-elif-else 互斥分支",
+      "summary": "掌握 `if / elif / else` 单次命中短路机制与多个独立 `if` 语句的执行差异。",
+      "difficulty_level": 1,
+      "prerequisites": ["py-variable-assignment"],
+      "common_error_patterns": [
+        {
+          "error_code": "cond_elif_treated_as_independent_if",
+          "name": "忽略 elif 的互斥短路特性",
+          "description": "误以为前面 `if` 条件为真后，后面同样满足条件的 `elif` 分支仍会继续执行。",
+          "evidence_clues": [
+            "学习者认为 `if ... elif ...` 结构中多个满足条件的分支都会执行",
+            "输出结果等同于最后一个满足的 `elif` 分支覆盖了首个 `if` 分支"
+          ]
+        },
+        {
+          "error_code": "cond_boundary_equality_missed",
+          "name": "比较运算符边界值（>= 与 >）判断失误",
+          "description": "当变量恰好等于临界值时，混淆严格大于 `>` 与大于等于 `>=`。",
+          "evidence_clues": [
+            "临界值测试点落入相邻的下一个分支"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "id": "mat_py_cond_01",
+          "title": "if-elif-else 与独立 if 的区别",
+          "summary": "同一个 `if-elif-else` 链条中最多只执行第一个条件为 True 的分支。",
+          "content_format": "markdown",
+          "version": 1,
+          "content_body": "在 `if ... elif ... else` 结构中，Python 自上而下依次求值条件，一旦某个分支条件为 `True`，执行该分支代码块后立即跳出整个条件链，后续 `elif` 即使条件也为真也不会再被检查。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_py_cond_initial_01",
+          "material_id": "mat_py_cond_01",
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "code_trace",
+          "prompt_text": "阅读下方 Python 3 代码，写出 `print(level)` 的输出结果并说明原因。",
+          "context_snippet": "score = 85\nlevel = \"D\"\nif score >= 60:\n    level = \"C\"\nelif score >= 80:\n    level = \"B\"\nelse:\n    level = \"F\"\nprint(level)",
+          "standard_answer": "C",
+          "answer_explanation": "`score = 85` 首先满足第一个 `if score >= 60:`，因此 `level` 被设为 `\"C\"` 并跳过后续 `elif score >= 80:`。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "C",
+            "candidate_error_mappings": [
+              {
+                "observed_answer_pattern": "B",
+                "target_error_code": "cond_elif_treated_as_independent_if",
+                "clue": "回答 B 可能是按常规成绩直觉猜测，或者误以为 `elif score >= 80` 会继续执行并覆盖 `C`。"
+              }
+            ]
+          }
+        },
+        {
+          "id": "q_py_cond_followup_01",
+          "material_id": "mat_py_cond_01",
+          "parent_question_id": "q_py_cond_initial_01",
+          "question_role": "diagnostic_followup",
+          "question_type": "code_trace",
+          "prompt_text": "对比下面两段代码：如果把原题中的 `elif score >= 80:` 改成独立的 `if score >= 80:`，两段代码的输出还一样吗？分别输出什么？",
+          "context_snippet": "# 片段 1 (elif)\nscore = 85\nres1 = \"\"\nif score >= 60:\n    res1 += \"C\"\nelif score >= 80:\n    res1 += \"B\"\n\n# 片段 2 (独立 if)\nres2 = \"\"\nif score >= 60:\n    res2 += \"C\"\nif score >= 80:\n    res2 += \"B\"\nprint(res1, res2)",
+          "standard_answer": "不一样，res1 是 C，res2 是 CB",
+          "answer_explanation": "区分“未仔细看题而按分数常理猜测”与“真正混淆 `elif` 和独立 `if` 的执行机制”。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["cond_elif_treated_as_independent_if"],
+            "discriminating_rationale": "若认为 `res1` 也是 `CB`，则确认对 `elif` 互斥短路机制存在概念误解。"
+          }
+        },
+        {
+          "id": "q_py_cond_practice_01",
+          "material_id": "mat_py_cond_01",
+          "parent_question_id": "q_py_cond_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "当 `temp = 30` 时，下方代码会输出什么？",
+          "context_snippet": "temp = 30\nstatus = \"normal\"\nif temp > 30:\n    status = \"hot\"\nelif temp >= 20:\n    status = \"warm\"\nelif temp >= 10:\n    status = \"cool\"\nprint(status)",
+          "standard_answer": "warm",
+          "answer_explanation": "`temp > 30` 为假（30 不严格大于 30），进入第一个为真的 `elif temp >= 20:`，输出 `warm` 并短路跳过后续分支。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["cond_elif_treated_as_independent_if", "cond_boundary_equality_missed"]
+          }
+        },
+        {
+          "id": "q_py_cond_transfer_01",
+          "material_id": "mat_py_cond_01",
+          "parent_question_id": "q_py_cond_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_trace",
+          "prompt_text": "【迁移验证】在物流运费阶梯计价代码中，当包裹重量 `weight = 12` 时，写出 `print(fee)` 的输出结果。",
+          "context_snippet": "weight = 12\nfee = 0\nif weight >= 5:\n    fee += 10\nelif weight >= 10:\n    fee += 20\nif weight > 10:\n    fee += 5\nprint(fee)",
+          "standard_answer": "15",
+          "answer_explanation": "第一个 `if weight >= 5` 命中后 `fee` 变为 10，`elif weight >= 10` 被短路跳过；随后第二个独立的 `if weight > 10` 命中，`fee` 再加 5 变为 15。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_cond_branch",
+            "target_error_codes": ["cond_elif_treated_as_independent_if"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "topic_py_range_func",
+      "slug": "py-range-function",
+      "domain_code": "python",
+      "title": "range() 序列起点、终点与步长规则",
+      "summary": "理解 `range(stop)` 与 `range(start, stop, step)` 左闭右开区间 `[start, stop)` 的精确含义。",
+      "difficulty_level": 1,
+      "prerequisites": ["py-variable-assignment"],
+      "common_error_patterns": [
+        {
+          "error_code": "range_start_at_one",
+          "name": "误以为 range(n) 默认从 1 开始",
+          "description": "认为 `range(3)` 生成 `[1, 2, 3]` 而非 `[0, 1, 2]`。",
+          "evidence_clues": [
+            "序列首元素被写为 1",
+            "累加或打印结果包含了终点值 `n`"
+          ]
+        },
+        {
+          "error_code": "range_stop_inclusive",
+          "name": "误以为 range(start, stop) 包含终点 stop",
+          "description": "知道起点规则，但将右边界视为闭区间，认为 `range(1, 4)` 包含 4。",
+          "evidence_clues": [
+            "生成的列表长度比 `stop - start` 多 1，且末尾包含 `stop`"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "id": "mat_py_range_01",
+          "title": "range() 的左闭右开原则",
+          "summary": "`range(stop)` 默认从 0 开始，到 `stop - 1` 结束，不包含 `stop` 本身。",
+          "content_format": "markdown",
+          "version": 1,
+          "content_body": "在 Python 3 中：\n- `range(n)` 等价于 `range(0, n)`，依次生成 `0, 1, ..., n - 1`（共 `n` 个整数）；\n- `range(start, stop)` 包含 `start`，但严格不包含 `stop`。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_py_range_initial_01",
+          "material_id": "mat_py_range_01",
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "code_trace",
+          "prompt_text": "写出下方 Python 3 代码执行后的输出结果。",
+          "context_snippet": "nums = list(range(1, 5))\nprint(nums)",
+          "standard_answer": "[1, 2, 3, 4]",
+          "answer_explanation": "`range(1, 5)` 从起点 1 开始，到终点 5 之前结束，因此生成的列表为 `[1, 2, 3, 4]`。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "[1, 2, 3, 4]",
+            "candidate_error_mappings": [
+              {
+                "observed_answer_pattern": "[1, 2, 3, 4, 5]",
+                "target_error_code": "range_stop_inclusive",
+                "clue": "包含了右边界 5，违反了左闭右开原则。"
+              },
+              {
+                "observed_answer_pattern": "[0, 1, 2, 3, 4]",
+                "target_error_code": "range_start_at_one",
+                "clue": "忽略了显式传入的起点参数 1。"
+              }
+            ]
+          }
+        },
+        {
+          "id": "q_py_range_followup_01",
+          "material_id": "mat_py_range_01",
+          "parent_question_id": "q_py_range_initial_01",
+          "question_role": "diagnostic_followup",
+          "question_type": "short_text",
+          "prompt_text": "请问 `list(range(3))` 会生成哪几个数字？第一个数字和最后一个数字分别是什么？",
+          "context_snippet": "print(list(range(3)))",
+          "standard_answer": "[0, 1, 2]，第一个数字是 0，最后一个数字是 2",
+          "answer_explanation": "同时检验学习者对默认起点（0 还是 1）和右开边界（是否包含 3）的理解。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["range_start_at_one", "range_stop_inclusive"],
+            "discriminating_rationale": "回答 `[1, 2, 3]` 对应默认起点与终点双重偏差；回答 `[0, 1, 2, 3]` 对应仅终点包含误解。"
+          }
+        },
+        {
+          "id": "q_py_range_practice_01",
+          "material_id": "mat_py_range_01",
+          "parent_question_id": "q_py_range_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "写出 `list(range(2, 6))` 和 `len(range(2, 6))` 的输出结果。",
+          "context_snippet": "seq = list(range(2, 6))\nprint(seq, len(seq))",
+          "standard_answer": "[2, 3, 4, 5] 4",
+          "answer_explanation": "从 2 开始到 6 之前结束，元素为 `[2, 3, 4, 5]`，元素个数为 `6 - 2 = 4`。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["range_stop_inclusive"]
+          }
+        },
+        {
+          "id": "q_py_range_transfer_01",
+          "material_id": "mat_py_range_01",
+          "parent_question_id": "q_py_range_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_writing",
+          "prompt_text": "【迁移验证】带步长的 `range(start, stop, step)` 同样遵循左闭右开规则。请写出下方代码中 `print(even_numbers)` 的输出结果。",
+          "context_snippet": "even_numbers = list(range(2, 10, 2))\nprint(even_numbers)",
+          "standard_answer": "[2, 4, 6, 8]",
+          "answer_explanation": "起点为 2，步长为 2，依次生成 2, 4, 6, 8；因为右边界 10 不包含在内，所以不会出现 10。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_range_func",
+            "target_error_codes": ["range_stop_inclusive"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "topic_py_for_loop",
+      "slug": "py-for-loop",
+      "domain_code": "python",
+      "title": "for 循环迭代与累加状态追踪",
+      "summary": "追踪 `for` 循环在每一轮迭代中循环变量与累加器变量的中间状态变化。",
+      "difficulty_level": 2,
+      "prerequisites": ["py-variable-assignment", "py-range-function"],
+      "common_error_patterns": [
+        {
+          "error_code": "loop_memorized_result_without_trace",
+          "name": "仅凭直觉猜测最终结果，无法追踪每轮中间状态",
+          "description": "可能碰巧猜对小规模循环结果，但无法写出每轮循环中累加器的变化过程。",
+          "evidence_clues": [
+            "最终结果正确但理由缺失或与每轮状态矛盾",
+            "当循环内增加语句或改变初始值时立即出错"
+          ]
+        },
+        {
+          "error_code": "loop_reset_accumulator_inside_body",
+          "name": "在循环体内部重置累加器变量",
+          "description": "将 `total = 0` 或覆盖赋值写在循环内部，导致只保留最后一轮迭代的结果。",
+          "evidence_clues": [
+            "认为每次循环累加器都会保留之前的值，忽略了循环内 `total = i` 的覆盖效应"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "id": "mat_py_for_loop_01",
+          "title": "在 Python 3 中追踪 for 循环状态",
+          "summary": "循环变量依次取序列中的每个元素，每轮执行一次缩进代码块。",
+          "content_format": "markdown",
+          "version": 1,
+          "content_body": "执行 `for item in iterable:` 时，Python 依次将 `iterable` 中的元素绑定给 `item` 并执行循环体。可以通过状态表记录每一轮进入循环体前后的变量值，验证自己的执行心智模型。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_py_loop_initial_01",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "code_trace",
+          "prompt_text": "阅读下方合法的 Python 3 代码，写出最后一行 `print(total)` 的输出结果，并简述每一轮 `total` 的变化。",
+          "context_snippet": "total = 0\nfor i in range(3):\n    total += i\nprint(total)",
+          "standard_answer": "3",
+          "answer_explanation": "`range(3)` 依次产生 0, 1, 2。第 1 轮 `total` 为 `0 + 0 = 0`；第 2 轮为 `0 + 1 = 1`；第 3 轮为 `1 + 2 = 3`。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "3",
+            "candidate_error_mappings": [
+              {
+                "observed_answer_pattern": "6",
+                "target_error_code": "range_stop_inclusive",
+                "clue": "输出 6（0+1+2+3 或 1+2+3）说明将 `range(3)` 误认为包含 3。"
+              },
+              {
+                "observed_answer_pattern": "3 (no trace)",
+                "target_error_code": "loop_memorized_result_without_trace",
+                "clue": "仅给出数字 3 但未说明每轮状态变化，需通过追问验证是否真正追踪了中间状态。"
+              }
+            ]
+          }
+        },
+        {
+          "id": "q_py_loop_followup_01",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_initial_01",
+          "question_role": "diagnostic_followup",
+          "question_type": "code_trace",
+          "prompt_text": "如果把 `print(total)` 缩进放进 `for` 循环内部（位于 `total += i` 下一行），程序会依次打印出哪几个数字？",
+          "context_snippet": "total = 0\nfor i in range(3):\n    total += i\n    print(total)",
+          "standard_answer": "依次打印 0、1、3",
+          "answer_explanation": "通过要求写出每轮循环体末尾的打印序列，精准区分“真正掌握每轮状态追踪”与“误以为 `range(3)` 是 1, 2 或仅靠记忆猜出 3”。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["loop_memorized_result_without_trace", "range_start_at_one"],
+            "discriminating_rationale": "若回答 `1、3`（共两轮，认为 1+2=3），则暴露其将 `range(3)` 误解为 `[1, 2]` 却碰巧算得总和 3！"
+          }
+        },
+        {
+          "id": "q_py_loop_practice_01",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "对比下面这段代码（注意循环内的赋值符号），写出最终打印的 `total` 值。",
+          "context_snippet": "total = 10\nfor i in range(1, 4):\n    total = i * 2\nprint(total)",
+          "standard_answer": "6",
+          "answer_explanation": "循环体内使用的是 `=` 而非 `+=`，每轮都会覆盖 `total`；最后一轮 `i = 3`，因此最终 `total` 为 `3 * 2 = 6`。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["loop_reset_accumulator_inside_body", "loop_memorized_result_without_trace"]
+          }
+        },
+        {
+          "id": "q_py_loop_transfer_01",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_trace",
+          "prompt_text": "【迁移验证】下方代码在循环中同时维护了两个状态变量 `count` 和 `running_sum`，请写出最终 `print(count, running_sum)` 的输出。",
+          "context_snippet": "count = 0\nrunning_sum = 5\nfor step in range(1, 4):\n    count += 1\n    running_sum += step * 2\nprint(count, running_sum)",
+          "standard_answer": "3 17",
+          "answer_explanation": "`step` 依次取 1, 2, 3（共 3 轮，`count` 为 3）；`running_sum` 从初始值 5 开始依次加上 2、4、6，最终为 `5 + 2 + 4 + 6 = 17`。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_for_loop",
+            "target_error_codes": ["loop_memorized_result_without_trace"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "topic_py_list_index",
+      "slug": "py-list-indexing",
+      "domain_code": "python",
+      "title": "列表零基索引、负向索引与切片边界",
+      "summary": "掌握 Python 列表从 0 开始的正向索引、从 -1 开始的尾部负向索引以及切片左闭右开规则。",
+      "difficulty_level": 2,
+      "prerequisites": ["py-variable-assignment", "py-range-function"],
+      "common_error_patterns": [
+        {
+          "error_code": "list_one_based_indexing",
+          "name": "将列表正向索引误作从 1 开始",
+          "description": "认为 `items[1]` 是列表的第一个元素。",
+          "evidence_clues": [
+            "取出的元素整体向后偏移一位"
+          ]
+        },
+        {
+          "error_code": "list_negative_index_off_by_one",
+          "name": "混淆负向索引起点（误以为从 -0 或倒数第二个开始）",
+          "description": "不理解 `items[-1]` 表示最后一个元素，或将 `items[-2]` 误认为最后一个元素。",
+          "evidence_clues": [
+            "负索引取值结果偏差一位"
+          ]
+        }
+      ],
+      "materials": [
+        {
+          "id": "mat_py_list_01",
+          "title": "Python 列表索引与切片规则",
+          "summary": "正向索引从 `0` 到 `len(lst) - 1`；负向索引从 `-1`（末尾元素）到 `-len(lst)`；切片 `lst[a:b]` 不包含索引 `b`。",
+          "content_format": "markdown",
+          "version": 1,
+          "content_body": "对于列表 `letters = [\"a\", \"b\", \"c\", \"d\"]`：\n- `letters[0]` 是 `\"a\"`，`letters[1]` 是 `\"b\"`；\n- `letters[-1]` 是最后一个元素 `\"d\"`；\n- 切片 `letters[1:3]` 包含索引 1 和 2，返回 `[\"b\", \"c\"]`。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q_py_list_initial_01",
+          "material_id": "mat_py_list_01",
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "code_trace",
+          "prompt_text": "阅读下方 Python 3 代码，写出 `print(first_pick, last_pick)` 的输出结果。",
+          "context_snippet": "scores = [70, 80, 90, 100]\nfirst_pick = scores[1]\nlast_pick = scores[-1]\nprint(first_pick, last_pick)",
+          "standard_answer": "80 100",
+          "answer_explanation": "列表正向索引从 0 开始，因此 `scores[1]` 是第二个元素 `80`；`scores[-1]` 是最后一个元素 `100`。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "80 100",
+            "candidate_error_mappings": [
+              {
+                "observed_answer_pattern": "70 100",
+                "target_error_code": "list_one_based_indexing",
+                "clue": "将 `scores[1]` 误认为第一个元素 70。"
+              },
+              {
+                "observed_answer_pattern": "80 90",
+                "target_error_code": "list_negative_index_off_by_one",
+                "clue": "对 `-1` 负向索引位置判断失误。"
+              }
+            ]
+          }
+        },
+        {
+          "id": "q_py_list_followup_01",
+          "material_id": "mat_py_list_01",
+          "parent_question_id": "q_py_list_initial_01",
+          "question_role": "diagnostic_followup",
+          "question_type": "short_text",
+          "prompt_text": "在 `scores = [70, 80, 90, 100]` 中，如果要取出第一个元素 `70` 和倒数第二个元素 `90`，分别应该写什么索引表达式？",
+          "context_snippet": "scores = [70, 80, 90, 100]",
+          "standard_answer": "scores[0] 和 scores[-2]（或 scores[2]）",
+          "answer_explanation": "直接定位学习者究竟是正向零基索引偏移，还是负向索引偏移。",
+          "difficulty": 1,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["list_one_based_indexing", "list_negative_index_off_by_one"],
+            "discriminating_rationale": "能否正确写出 `scores[0]` 与 `scores[-2]` 直接区分正向与负向索引心智模型。"
+          }
+        },
+        {
+          "id": "q_py_list_practice_01",
+          "material_id": "mat_py_list_01",
+          "parent_question_id": "q_py_list_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "写出下方列表切片与索引组合代码的输出结果。",
+          "context_snippet": "items = [\"alpha\", \"beta\", \"gamma\", \"delta\"]\nsub = items[1:3]\nprint(sub[0], items[-2])",
+          "standard_answer": "beta gamma",
+          "answer_explanation": "`items[1:3]` 为 `[\"beta\", \"gamma\"]`，其第 0 个元素为 `\"beta\"`；原列表 `items[-2]` 为倒数第二个元素 `\"gamma\"`。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["list_one_based_indexing", "list_negative_index_off_by_one"]
+          }
+        },
+        {
+          "id": "q_py_list_transfer_01",
+          "material_id": "mat_py_list_01",
+          "parent_question_id": "q_py_list_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_trace",
+          "prompt_text": "【迁移验证】结合循环与列表索引：阅读下方代码，写出 `print(result)` 的输出结果。",
+          "context_snippet": "data = [10, 20, 30, 40, 50]\nresult = []\nfor idx in range(1, 4):\n    result.append(data[idx] - data[idx - 1])\nprint(result)",
+          "standard_answer": "[10, 10, 10]",
+          "answer_explanation": "`idx` 依次取 1, 2, 3，计算相邻元素差值：`data[1]-data[0]=10`、`data[2]-data[1]=10`、`data[3]-data[2]=10`。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_list_index",
+            "target_error_codes": ["list_one_based_indexing", "range_stop_inclusive"]
+          }
+        }
+      ]
+    }
+  ]
+}

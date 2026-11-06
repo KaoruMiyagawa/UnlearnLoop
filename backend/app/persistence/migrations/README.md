@@ -1,7 +1,6 @@
-# Alembic 数据库迁移目录（Stage 2 启用）
+# Alembic 数据库迁移目录
 
-本目录预留用于存放 SQLAlchemy + Alembic 数据库迁移脚本（`env.py` 与 `versions/`）。
+本目录存放 UnlearnLoop 的 SQLAlchemy 2.x + Alembic 数据库迁移配置与版本脚本：
 
-根据 `docs/development/ROADMAP.md`：
-- **Stage 1**：仅建立 SQLAlchemy `Base`、Engine 工厂与 Alembic 配置接入点，不创建业务表。
-- **Stage 2**：在此目录下初始化首个领域实体迁移（`KnowledgeTopic`、`LearningSession`、`Attempt`、`DiagnosticCase`、`Hypothesis`、`EvidenceLink` 等）。
+- `env.py`：Alembic 迁移运行环境（自动对 SQLite 连接开启 `PRAGMA foreign_keys=ON`）。
+- `versions/0001_initial_stage2_schema.py`：Stage 2 初始领域模型迁移，创建学科无关的核心表结构（`knowledge_topics`、`knowledge_topic_dependencies`、`learning_materials`、`questions`、`learning_sessions`、`attempts`、`diagnostic_cases`、`hypotheses`、`decision_events`、`evidence_links`、`knowledge_states`、`review_items`）。
