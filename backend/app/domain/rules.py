@@ -112,6 +112,7 @@ ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS: dict[
         DiagnosticCaseStatus.PAUSED,
     },
     DiagnosticCaseStatus.RETRY_WAITING: {
+        DiagnosticCaseStatus.NEEDS_EVIDENCE,
         DiagnosticCaseStatus.INITIAL_EVALUATED,
         DiagnosticCaseStatus.HYPOTHESES_GENERATED,
         DiagnosticCaseStatus.QUESTION_SELECTED,

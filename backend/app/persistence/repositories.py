@@ -61,6 +61,9 @@ class LearningRepository:
             stmt = stmt.where(KnowledgeTopic.domain_code == domain_code)
         return list(self.session.scalars(stmt).all())
 
+    def get_topic_by_id(self, topic_id: str) -> KnowledgeTopic | None:
+        return self.session.get(KnowledgeTopic, topic_id)
+
     def get_topic_by_slug(self, slug: str) -> KnowledgeTopic | None:
         stmt = select(KnowledgeTopic).where(KnowledgeTopic.slug == slug)
         return self.session.scalar(stmt)
@@ -78,6 +81,97 @@ class LearningRepository:
         if role is not None:
             role_val = QuestionRole(role).value
             stmt = stmt.where(Question.question_role == role_val)
+        return list(self.session.scalars(stmt).all())
+
+    def get_question_by_id(self, question_id: str) -> Question | None:
+        return self.session.get(Question, question_id)
+
+    def get_session(self, session_id: str) -> LearningSession | None:
+        return self.session.get(LearningSession, session_id)
+
+    def list_sessions_for_learner(
+        self,
+        learner_id: str = "local_default_learner",
+    ) -> list[LearningSession]:
+        stmt = (
+            select(LearningSession)
+            .where(LearningSession.learner_id == learner_id)
+            .order_by(LearningSession.started_at.desc())
+        )
+        return list(self.session.scalars(stmt).all())
+
+    def get_attempt(self, attempt_id: str) -> Attempt | None:
+        return self.session.get(Attempt, attempt_id)
+
+    def list_attempts_for_session(self, session_id: str) -> list[Attempt]:
+        stmt = (
+            select(Attempt)
+            .where(Attempt.session_id == session_id)
+            .order_by(Attempt.submitted_at.asc())
+        )
+        return list(self.session.scalars(stmt).all())
+
+    def get_diagnostic_case(self, case_id: str) -> DiagnosticCase | None:
+        return self.session.get(DiagnosticCase, case_id)
+
+    def list_evidence_for_case(self, case_id: str) -> list[EvidenceLink]:
+        stmt = (
+            select(EvidenceLink)
+            .join(Hypothesis, EvidenceLink.hypothesis_id == Hypothesis.id)
+            .where(Hypothesis.diagnostic_case_id == case_id)
+            .order_by(EvidenceLink.created_at.asc())
+        )
+        return list(self.session.scalars(stmt).all())
+
+    def list_review_items_for_learner(
+        self,
+        learner_id: str = "local_default_learner",
+        status: str | None = None,
+    ) -> list[ReviewItem]:
+        stmt = (
+            select(ReviewItem)
+            .where(ReviewItem.learner_id == learner_id)
+            .order_by(ReviewItem.scheduled_for.asc())
+        )
+        if status:
+            stmt = stmt.where(ReviewItem.status == status)
+        return list(self.session.scalars(stmt).all())
+
+    def complete_review_item(
+        self,
+        review_id: str,
+        *,
+        review_notes: str | None = None,
+    ) -> ReviewItem:
+        item = self.session.get(ReviewItem, review_id)
+        if item is None:
+            raise DomainRuleViolationError(f"ReviewItem '{review_id}' not found.")
+        item.status = ReviewStatus.COMPLETED.value
+        item.completed_at = utc_now()
+        item.review_notes = review_notes
+        self.session.flush()
+        return item
+
+    def get_knowledge_state(
+        self,
+        learner_id: str,
+        topic_id: str,
+    ) -> KnowledgeState | None:
+        stmt = select(KnowledgeState).where(
+            KnowledgeState.learner_id == learner_id,
+            KnowledgeState.topic_id == topic_id,
+        )
+        return self.session.scalar(stmt)
+
+    def list_knowledge_states_for_learner(
+        self,
+        learner_id: str = "local_default_learner",
+    ) -> list[KnowledgeState]:
+        stmt = (
+            select(KnowledgeState)
+            .where(KnowledgeState.learner_id == learner_id)
+            .order_by(KnowledgeState.updated_at.desc())
+        )
         return list(self.session.scalars(stmt).all())
 
     # ------------------------------------------------------------------
