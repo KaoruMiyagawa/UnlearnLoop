@@ -55,7 +55,7 @@ def test_alembic_migration_from_empty_database_and_sqlite_fk_pragma(
     inspector = inspect(migrated_engine)
     tables = set(inspector.get_table_names())
 
-    expected_business_tables = {
+    expected_stage2_tables = {
         "knowledge_topics",
         "knowledge_topic_dependencies",
         "learning_materials",
@@ -69,8 +69,9 @@ def test_alembic_migration_from_empty_database_and_sqlite_fk_pragma(
         "knowledge_states",
         "review_items",
     }
-    assert len(expected_business_tables) == 12
-    assert tables == expected_business_tables | {"alembic_version"}
+    assert len(expected_stage2_tables) == 12
+    assert expected_stage2_tables.issubset(tables)
+    assert "alembic_version" in tables
 
     with migrated_engine.connect() as conn:
         fk_enabled = conn.execute(text("PRAGMA foreign_keys")).scalar_one()
@@ -91,7 +92,7 @@ def test_content_pack_import_idempotency_and_python3_syntax(
         assert first_run.topics_updated == 0
         assert first_run.dependencies_created == 6
         assert first_run.materials_created == 5
-        assert first_run.questions_created == 20
+        assert first_run.questions_created == 22
 
     # Second import on the same database must update in place without duplicating rows
     with transactional_session(session_factory) as session:
@@ -102,7 +103,7 @@ def test_content_pack_import_idempotency_and_python3_syntax(
         assert second_run.materials_created == 0
         assert second_run.materials_updated == 5
         assert second_run.questions_created == 0
-        assert second_run.questions_updated == 20
+        assert second_run.questions_updated == 22
 
         repo = LearningRepository(session)
         topics = repo.list_topics(domain_code="python")
@@ -147,7 +148,7 @@ def test_topic_dependencies_and_question_queries_by_role(
         assert len(initial_qs) == 1
         assert len(followup_qs) == 1
         assert len(practice_qs) == 1
-        assert len(transfer_qs) == 1
+        assert len(transfer_qs) == 2
         assert initial_qs[0].standard_answer == "3"
 
 
@@ -655,11 +656,33 @@ def test_mastery_requires_transfer_verification_and_traceable_reason(
         )
         assert review_item.id.startswith("rev_")
 
-        # Passing transfer_check attempt allows transitioning KnowledgeState to STABLE
-        passed_transfer = repo.record_attempt(
+        # Retrying the same failed transfer question CANNOT promote KnowledgeState to STABLE
+        retry_same_transfer = repo.record_attempt(
             session_id=learning_session.id,
             question_id=q_transfer.id,
             submitted_answer="[10, 10, 10]",
+            is_correct=True,
+            evaluation_status=AttemptEvaluationStatus.EVALUATED,
+        )
+        with pytest.raises(UnverifiedMasteryError, match="retried transfer"):
+            repo.update_knowledge_state(
+                session_id=learning_session.id,
+                topic_id=topic.id,
+                target_status=KnowledgeMasteryStatus.STABLE,
+                reason="Retried same question after failing.",
+                transfer_attempt_id=retry_same_transfer.id,
+            )
+
+        # Passing an independent fresh transfer_check attempt allows transitioning KnowledgeState to STABLE
+        transfer_qs = repo.list_questions_for_topic(
+            topic.id, role=QuestionRole.TRANSFER_CHECK
+        )
+        assert len(transfer_qs) >= 2
+        q_transfer_fresh = transfer_qs[1]
+        passed_transfer = repo.record_attempt(
+            session_id=learning_session.id,
+            question_id=q_transfer_fresh.id,
+            submitted_answer="12 31 6",
             is_correct=True,
             evaluation_status=AttemptEvaluationStatus.EVALUATED,
         )
@@ -667,7 +690,7 @@ def test_mastery_requires_transfer_verification_and_traceable_reason(
             session_id=learning_session.id,
             topic_id=topic.id,
             target_status=KnowledgeMasteryStatus.STABLE,
-            reason="Passed independent transfer_check question q_py_list_transfer_01.",
+            reason="Passed independent fresh transfer_check question q_py_list_transfer_02.",
             unresolved_error_codes=[],
             transfer_attempt_id=passed_transfer.id,
         )

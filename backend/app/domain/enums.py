@@ -121,3 +121,31 @@ class ReviewStatus(StrEnum):
     PENDING = "pending"
     COMPLETED = "completed"
     REOPENED = "reopened"
+
+
+class ModelCallStatus(StrEnum):
+    """Execution outcome status of a ModelProvider call (ARCHITECTURE.md Section 4 & 7)."""
+
+    SUCCEEDED = "succeeded"
+    INVALID_JSON = "invalid_json"
+    SCHEMA_ERROR = "schema_error"
+    TIMEOUT = "timeout"
+    RATE_LIMITED = "rate_limited"
+    SERVICE_UNAVAILABLE = "service_unavailable"
+    AUTH_ERROR = "auth_error"
+    REMOTE_DISABLED = "remote_disabled"
+    BUDGET_EXCEEDED = "budget_exceeded"
+    PROVIDER_ERROR = "provider_error"
+
+
+class AgentToolName(StrEnum):
+    """Whitelisted tool/action set available to the Diagnostic Agent (ARCHITECTURE.md Section 6)."""
+
+    READ_MATERIAL_AND_QUESTION = "read_material_and_question"
+    QUERY_ATTEMPTS_AND_EVIDENCE = "query_attempts_and_evidence"
+    UPSERT_HYPOTHESES = "upsert_hypotheses"
+    SELECT_DIAGNOSTIC_FOLLOWUP = "select_diagnostic_followup"
+    PROVIDE_TARGETED_EXPLANATION = "provide_targeted_explanation"
+    ASSIGN_TARGETED_PRACTICE = "assign_targeted_practice"
+    ASSIGN_TRANSFER_VERIFICATION = "assign_transfer_verification"
+    UPDATE_KNOWLEDGE_STATE = "update_knowledge_state"

@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.enums import (
@@ -13,6 +13,7 @@ from app.domain.enums import (
     EvidenceSourceType,
     HypothesisStatus,
     KnowledgeMasteryStatus,
+    ModelCallStatus,
     QuestionRole,
     ReviewStatus,
     SessionStatus,
@@ -35,6 +36,7 @@ from app.persistence.models import (
     KnowledgeState,
     KnowledgeTopic,
     LearningSession,
+    ModelCall,
     Question,
     ReviewItem,
     utc_now,
@@ -435,12 +437,26 @@ class LearningRepository:
         target_enum = KnowledgeMasteryStatus(target_status)
 
         transfer_attempt: Attempt | None = None
+        is_retried_transfer = False
         if transfer_attempt_id is not None:
             transfer_attempt = self.session.get(Attempt, transfer_attempt_id)
             if transfer_attempt is None:
                 raise DomainRuleViolationError(
                     f"Unknown transfer_attempt_id: {transfer_attempt_id}"
                 )
+            # Check if this learner previously attempted the same transfer question and failed
+            prior_failed_attempt_id = self.session.scalar(
+                select(Attempt.id)
+                .join(LearningSession, Attempt.session_id == LearningSession.id)
+                .where(
+                    LearningSession.learner_id == learner_id,
+                    Attempt.question_id == transfer_attempt.question_id,
+                    Attempt.id != transfer_attempt.id,
+                    Attempt.is_correct.is_(False),
+                )
+            )
+            if prior_failed_attempt_id is not None:
+                is_retried_transfer = True
 
         existing = self.session.scalar(
             select(KnowledgeState).where(
@@ -467,6 +483,7 @@ class LearningRepository:
                 and self.session.get(Question, transfer_attempt.question_id).topic_id  # type: ignore[union-attr]
                 == topic_id
             ),
+            is_retried_transfer_attempt=is_retried_transfer,
         )
 
         decision_event = self.append_decision_event(
@@ -539,3 +556,66 @@ class LearningRepository:
         self.session.add(review)
         self.session.flush()
         return review
+
+    # ------------------------------------------------------------------
+    # ModelCall Audit & Diagnostic Budget Queries (Stage 3)
+    # ------------------------------------------------------------------
+
+    def record_model_call(
+        self,
+        *,
+        provider_name: str,
+        model_name: str,
+        prompt_version: str,
+        status: ModelCallStatus | str,
+        redacted_summary: str,
+        latency_ms: int = 0,
+        prompt_tokens: int = 0,
+        completion_tokens: int = 0,
+        total_tokens: int = 0,
+        attempt_count: int = 1,
+        error_code: str | None = None,
+        session_id: str | None = None,
+        diagnostic_case_id: str | None = None,
+        decision_event_id: str | None = None,
+    ) -> ModelCall:
+        """Append a redacted ModelCall audit record."""
+        status_enum = ModelCallStatus(status)
+        call = ModelCall(
+            session_id=session_id,
+            diagnostic_case_id=diagnostic_case_id,
+            decision_event_id=decision_event_id,
+            provider_name=provider_name,
+            model_name=model_name,
+            prompt_version=prompt_version,
+            status=status_enum.value,
+            latency_ms=max(0, int(latency_ms)),
+            prompt_tokens=max(0, int(prompt_tokens)),
+            completion_tokens=max(0, int(completion_tokens)),
+            total_tokens=max(0, int(total_tokens)),
+            attempt_count=max(1, int(attempt_count)),
+            error_code=error_code,
+            redacted_summary=redacted_summary,
+        )
+        self.session.add(call)
+        self.session.flush()
+        return call
+
+    def get_case_token_usage(self, diagnostic_case_id: str) -> int:
+        """Sum total tokens consumed across all ModelCalls for a DiagnosticCase."""
+        total = self.session.scalar(
+            select(func.coalesce(func.sum(ModelCall.total_tokens), 0)).where(
+                ModelCall.diagnostic_case_id == diagnostic_case_id
+            )
+        )
+        return int(total or 0)
+
+    def get_case_followup_turn_count(self, diagnostic_case_id: str) -> int:
+        """Count how many diagnostic follow-up questions have been selected for this case."""
+        count = self.session.scalar(
+            select(func.count(DecisionEvent.id)).where(
+                DecisionEvent.diagnostic_case_id == diagnostic_case_id,
+                DecisionEvent.action == "select_diagnostic_followup",
+            )
+        )
+        return int(count or 0)

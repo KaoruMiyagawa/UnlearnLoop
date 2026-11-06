@@ -1,18 +1,39 @@
-"""Model provider boundary (Stage 3 extension point).
+"""Model provider protocol, concrete adapters, and structured error taxonomy."""
 
-Per ARCHITECTURE.md section 7:
-- Business layers depend only on the ModelProvider protocol.
-- Concrete adapters (DeepSeekProvider, OllamaProvider, FakeProvider) are implemented in Stage 3.
-"""
+from typing import Protocol, TypeVar, runtime_checkable
 
-from typing import Any, Protocol, runtime_checkable
+from pydantic import BaseModel
+
+from app.model_provider.errors import (
+    ModelAuthenticationError,
+    ModelBudgetExceededError,
+    ModelInvalidJSONError,
+    ModelProviderError,
+    ModelRateLimitError,
+    ModelSchemaValidationError,
+    ModelServiceUnavailableError,
+    ModelTimeoutError,
+    RemoteModelCallsDisabledError,
+    redact_sensitive_text,
+)
+from app.model_provider.fake import FakeModelProvider
+from app.model_provider.openai_compatible import (
+    DeepSeekProvider,
+    OllamaProvider,
+    OpenAICompatibleProvider,
+    parse_and_validate_json,
+)
+from app.model_provider.schemas import ModelRequest, ModelResponse, TokenUsage
+
+SchemaT = TypeVar("SchemaT", bound=BaseModel)
 
 
 @runtime_checkable
 class ModelProvider(Protocol):
-    """Protocol interface reserved for structured AI model calls in Stage 3."""
+    """Protocol interface for schema-constrained AI model providers."""
 
     provider_name: str
+    model_name: str
 
     def is_configured(self) -> bool:
         """Return whether the provider has valid non-empty configuration."""
@@ -20,9 +41,31 @@ class ModelProvider(Protocol):
 
     def generate_structured(
         self,
-        request: dict[str, Any],
-        schema: dict[str, Any],
-        context: dict[str, Any] | None = None,
-    ) -> dict[str, Any]:
-        """Execute a schema-constrained model call (implemented in Stage 3)."""
+        request: ModelRequest,
+        schema_cls: type[SchemaT],
+    ) -> ModelResponse[SchemaT]:
+        """Execute a schema-constrained model call and return validated `ModelResponse`."""
         ...
+
+
+__all__ = [
+    "DeepSeekProvider",
+    "FakeModelProvider",
+    "ModelAuthenticationError",
+    "ModelBudgetExceededError",
+    "ModelInvalidJSONError",
+    "ModelProvider",
+    "ModelProviderError",
+    "ModelRateLimitError",
+    "ModelRequest",
+    "ModelResponse",
+    "ModelSchemaValidationError",
+    "ModelServiceUnavailableError",
+    "ModelTimeoutError",
+    "OllamaProvider",
+    "OpenAICompatibleProvider",
+    "RemoteModelCallsDisabledError",
+    "TokenUsage",
+    "parse_and_validate_json",
+    "redact_sensitive_text",
+]

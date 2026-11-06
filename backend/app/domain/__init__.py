@@ -1,6 +1,7 @@
 """Domain layer boundary: enums, exceptions, and pure domain rules."""
 
 from app.domain.enums import (
+    AgentToolName,
     AttemptEvaluationStatus,
     DiagnosticCaseStatus,
     EvidenceRelation,
@@ -8,6 +9,7 @@ from app.domain.enums import (
     HypothesisStatus,
     InterventionAction,
     KnowledgeMasteryStatus,
+    ModelCallStatus,
     QuestionRole,
     QuestionType,
     ReviewStatus,
@@ -29,6 +31,7 @@ from app.domain.rules import (
 )
 
 __all__ = [
+    "AgentToolName",
     "AttemptEvaluationStatus",
     "DiagnosticCaseStatus",
     "DomainRuleViolationError",
@@ -39,6 +42,7 @@ __all__ = [
     "InterventionAction",
     "InvalidStateTransitionError",
     "KnowledgeMasteryStatus",
+    "ModelCallStatus",
     "QuestionRole",
     "QuestionType",
     "ReviewStatus",

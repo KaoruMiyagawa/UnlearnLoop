@@ -41,6 +41,7 @@ from app.domain.enums import (
     EvidenceSourceType,
     HypothesisStatus,
     KnowledgeMasteryStatus,
+    ModelCallStatus,
     QuestionRole,
     QuestionType,
     ReviewStatus,
@@ -741,6 +742,66 @@ class ReviewItem(Base):
     hypothesis: Mapped["Hypothesis | None"] = relationship()
 
 
+class ModelCall(Base):
+    """Append-only redacted audit record of an AI model invocation (ARCHITECTURE.md Section 4 & 7).
+
+    Never stores API keys or raw unredacted secrets.
+    """
+
+    __tablename__ = "model_calls"
+    __table_args__ = (
+        CheckConstraint("latency_ms >= 0", name="ck_model_calls_latency_nonneg"),
+        CheckConstraint("total_tokens >= 0", name="ck_model_calls_tokens_nonneg"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(64),
+        primary_key=True,
+        default=lambda: new_id("mcall"),
+    )
+    session_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("learning_sessions.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+    diagnostic_case_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("diagnostic_cases.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+    decision_event_id: Mapped[str | None] = mapped_column(
+        String(64),
+        ForeignKey("decision_events.id", ondelete="RESTRICT"),
+        nullable=True,
+    )
+    provider_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    model_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    prompt_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default=ModelCallStatus.SUCCEEDED.value,
+    )
+    latency_ms: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    prompt_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    completion_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    total_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    attempt_count: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    redacted_summary: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
+    )
+
+    session: Mapped["LearningSession | None"] = relationship()
+    diagnostic_case: Mapped["DiagnosticCase | None"] = relationship()
+    decision_event: Mapped["DecisionEvent | None"] = relationship()
+
+
 # ---------------------------------------------------------------------------
 # ORM Immutability & Append-Only Guards (ARCHITECTURE.md Section 3)
 # ---------------------------------------------------------------------------
@@ -821,3 +882,21 @@ def _prevent_attempt_snapshot_mutation(
                 raise ImmutableRecordError(
                     f"Attempt.{eval_field} cannot be overwritten once evaluation_status is 'evaluated'."
                 )
+
+
+@event.listens_for(ModelCall, "before_update")
+def _prevent_model_call_update(
+    _mapper: Any, _connection: Any, _target: ModelCall
+) -> None:
+    raise ImmutableRecordError(
+        "ModelCall audit records are append-only and cannot be modified."
+    )
+
+
+@event.listens_for(ModelCall, "before_delete")
+def _prevent_model_call_delete(
+    _mapper: Any, _connection: Any, _target: ModelCall
+) -> None:
+    raise ImmutableRecordError(
+        "ModelCall audit records are append-only and cannot be deleted."
+    )

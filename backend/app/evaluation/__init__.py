@@ -1,5 +1,15 @@
-"""Evaluation boundary (Stage 3+).
+"""Evaluation boundary: deterministic rule pre-evaluator and evidence drafts."""
 
-Selects domain evaluators (text, code, formula) by content pack and validates
-structured outputs against domain rules.
-"""
+from app.evaluation.rule_evaluator import (
+    RuleEvaluationResult,
+    RuleEvaluator,
+    RuleEvidenceDraft,
+    RuleHypothesisDraft,
+)
+
+__all__ = [
+    "RuleEvaluationResult",
+    "RuleEvaluator",
+    "RuleEvidenceDraft",
+    "RuleHypothesisDraft",
+]

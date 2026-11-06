@@ -469,6 +469,23 @@
             "verifies_transfer_of": "topic_py_for_loop",
             "target_error_codes": ["loop_memorized_result_without_trace"]
           }
+        },
+        {
+          "id": "q_py_loop_transfer_02",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_trace",
+          "prompt_text": "【新情境迁移验证】在连续签到奖励结算场景中，阅读下方代码，写出最终 `print(streak, total_bonus)` 的输出结果。",
+          "context_snippet": "streak = 0\ntotal_bonus = 0\nfor day in range(3):\n    streak += 1\n    total_bonus += streak * 10\nprint(streak, total_bonus)",
+          "standard_answer": "3 60",
+          "answer_explanation": "`range(3)` 执行 3 轮（day 依次为 0, 1, 2）。第 1 轮 streak=1, total_bonus=10；第 2 轮 streak=2, total_bonus=10+20=30；第 3 轮 streak=3, total_bonus=30+30=60。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_for_loop",
+            "target_error_codes": ["loop_memorized_result_without_trace", "range_start_at_one"]
+          }
         }
       ]
     },
@@ -585,6 +602,23 @@
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_list_index",
             "target_error_codes": ["list_one_based_indexing", "range_stop_inclusive"]
+          }
+        },
+        {
+          "id": "q_py_list_transfer_02",
+          "material_id": "mat_py_list_01",
+          "parent_question_id": "q_py_list_initial_01",
+          "question_role": "transfer_check",
+          "question_type": "code_trace",
+          "prompt_text": "【迁移验证2】在传感器温度采样滑动窗口中，计算首末元素比值：写出 `print(head, tail, diff)` 的输出结果。",
+          "context_snippet": "temps = [12, 18, 25, 31]\nhead = temps[0]\ntail = temps[-1]\ndiff = tail - temps[-2]\nprint(head, tail, diff)",
+          "standard_answer": "12 31 6",
+          "answer_explanation": "temps[0] 是首个读数 12，temps[-1] 是最新读数 31，temps[-2] 是 25，diff = 31 - 25 = 6。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "verifies_transfer_of": "topic_py_list_index",
+            "target_error_codes": ["list_one_based_indexing", "list_negative_index_off_by_one"]
           }
         }
       ]

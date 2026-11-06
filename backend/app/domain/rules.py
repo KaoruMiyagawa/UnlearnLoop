@@ -105,6 +105,7 @@ ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS: dict[
         DiagnosticCaseStatus.PAUSED,
     },
     DiagnosticCaseStatus.TRANSFER_CHECKING: {
+        DiagnosticCaseStatus.TRANSFER_CHECKING,
         DiagnosticCaseStatus.RESOLVED,
         DiagnosticCaseStatus.HYPOTHESES_UPDATED,
         DiagnosticCaseStatus.NEEDS_EVIDENCE,
@@ -115,6 +116,7 @@ ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS: dict[
         DiagnosticCaseStatus.HYPOTHESES_GENERATED,
         DiagnosticCaseStatus.QUESTION_SELECTED,
         DiagnosticCaseStatus.HYPOTHESES_UPDATED,
+        DiagnosticCaseStatus.INTERVENTION_SELECTED,
         DiagnosticCaseStatus.PAUSED,
     },
     DiagnosticCaseStatus.PAUSED: {
@@ -131,6 +133,7 @@ ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS: dict[
 # Controlled state transitions for Hypothesis
 ALLOWED_HYPOTHESIS_TRANSITIONS: dict[HypothesisStatus, set[HypothesisStatus]] = {
     HypothesisStatus.CANDIDATE: {
+        HypothesisStatus.CANDIDATE,
         HypothesisStatus.INSUFFICIENT_EVIDENCE,
         HypothesisStatus.SUPPORTED,
         HypothesisStatus.LOWERED,
@@ -138,6 +141,7 @@ ALLOWED_HYPOTHESIS_TRANSITIONS: dict[HypothesisStatus, set[HypothesisStatus]] = 
         HypothesisStatus.CONFIRMED,
     },
     HypothesisStatus.INSUFFICIENT_EVIDENCE: {
+        HypothesisStatus.INSUFFICIENT_EVIDENCE,
         HypothesisStatus.CANDIDATE,
         HypothesisStatus.SUPPORTED,
         HypothesisStatus.LOWERED,
@@ -221,6 +225,7 @@ def validate_mastery_transition(
     verified_transfer_attempt_role: QuestionRole | str | None = None,
     verified_transfer_is_correct: bool | None = None,
     verified_transfer_topic_matches: bool = False,
+    is_retried_transfer_attempt: bool = False,
 ) -> None:
     """Enforce mastery transition traceability and transfer verification requirement.
 
@@ -228,6 +233,8 @@ def validate_mastery_transition(
     1. Every mastery state change must provide a non-empty reason and a DecisionEvent ID.
     2. A single correct answer on an initial/practice question CANNOT mark mastery as STABLE;
        transitioning to STABLE requires a passing transfer_check attempt on the same topic.
+    3. If a learner previously failed a transfer question, retrying the same question (even if correct)
+       CANNOT directly promote mastery to STABLE. An independent, unattempted transfer question is required.
     """
     target_enum = KnowledgeMasteryStatus(target_status)
 
@@ -259,4 +266,9 @@ def validate_mastery_transition(
         if not verified_transfer_topic_matches:
             raise UnverifiedMasteryError(
                 "Transfer verification attempt must belong to the same KnowledgeTopic."
+            )
+        if is_retried_transfer_attempt:
+            raise UnverifiedMasteryError(
+                "Cannot mark KnowledgeState as 'stable' using a retried transfer question that the learner previously failed; "
+                "an independent, unattempted transfer verification question is required."
             )

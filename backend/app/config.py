@@ -53,9 +53,27 @@ class Settings(BaseSettings):
         validation_alias="MODEL_TIMEOUT_SECONDS",
     )
     model_max_retries: int = Field(default=2, validation_alias="MODEL_MAX_RETRIES")
+    model_max_tokens_per_call: int = Field(
+        default=1024,
+        validation_alias="MODEL_MAX_TOKENS_PER_CALL",
+    )
+    model_temperature: float = Field(
+        default=0.1,
+        validation_alias="MODEL_TEMPERATURE",
+    )
     allow_remote_model_calls: bool = Field(
         default=False,
         validation_alias="ALLOW_REMOTE_MODEL_CALLS",
+    )
+
+    # Stage 3 Agent loop & budget limits
+    max_diagnostic_followup_turns: int = Field(
+        default=2,
+        validation_alias="MAX_DIAGNOSTIC_FOLLOWUP_TURNS",
+    )
+    diagnostic_session_token_budget: int = Field(
+        default=4096,
+        validation_alias="DIAGNOSTIC_SESSION_TOKEN_BUDGET",
     )
 
     @property

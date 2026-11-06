@@ -18,6 +18,7 @@ from app.persistence.models import (
     KnowledgeTopicDependency,
     LearningMaterial,
     LearningSession,
+    ModelCall,
     Question,
     ReviewItem,
 )
@@ -43,6 +44,7 @@ __all__ = [
     "LearningMaterial",
     "LearningRepository",
     "LearningSession",
+    "ModelCall",
     "Question",
     "ReviewItem",
     "SeedSummary",
