@@ -23,7 +23,7 @@ from app.domain.enums import (
     SessionStatus,
     UncertaintyLevel,
 )
-from app.model_provider import ModelProvider
+from app.model_provider import FakeModelProvider, ModelProvider
 from app.persistence.models import (
     Attempt,
     DecisionEvent,
@@ -87,6 +87,10 @@ class DiagnosticAppService:
             else UncertaintyLevel.INSUFFICIENT_EVIDENCE
         )
 
+        is_mock = (
+            isinstance(self.model_provider, FakeModelProvider)
+            or self.model_provider.provider_name == "fake"
+        )
         return DiagnosticCaseResponse(
             id=diag_case.id,
             session_id=diag_case.session_id,
@@ -96,6 +100,9 @@ class DiagnosticAppService:
             uncertainty_note=diag_case.uncertainty_note,
             followup_turn_count=followup_turns,
             tokens_used=tokens_used,
+            model_provider_name=self.model_provider.provider_name,
+            is_mock_provider=is_mock,
+            execution_mode="mock" if is_mock else "live",
             hypotheses=hypotheses_dto,
             evidence_count=len(evidence_links),
             created_at=diag_case.created_at,
@@ -149,6 +156,14 @@ class DiagnosticAppService:
                 current_state=sess.status,
             )
 
+        # Use the most recent attempt in the session so multi-turn follow-up/practice evidence is attributed accurately
+        session_attempts = self.repo.list_attempts_for_session(sess.id)
+        active_attempt_id = (
+            session_attempts[-1].id
+            if session_attempts
+            else diag_case.trigger_attempt_id
+        )
+
         # Release any uncommitted locks before model call
         self.db.commit()
 
@@ -160,7 +175,7 @@ class DiagnosticAppService:
 
         step_result = engine.run_diagnostic_step(
             session_id=sess.id,
-            attempt_id=diag_case.trigger_attempt_id,
+            attempt_id=active_attempt_id,
             diagnostic_case_id=diag_case.id,
             idempotency_key=idempotency_key,
         )
@@ -173,6 +188,10 @@ class DiagnosticAppService:
             if q is not None:
                 next_q_dto = LearningAppService.sanitize_question(q)
 
+        is_mock = (
+            isinstance(self.model_provider, FakeModelProvider)
+            or self.model_provider.provider_name == "fake"
+        )
         return DiagnosticStepResponse(
             session_id=step_result.session_id,
             diagnostic_case_id=step_result.diagnostic_case_id,
@@ -189,6 +208,9 @@ class DiagnosticAppService:
             max_followup_turns=step_result.max_followup_turns,
             tokens_used_in_case=step_result.tokens_used_in_case,
             session_token_budget=step_result.session_token_budget,
+            model_provider_name=self.model_provider.provider_name,
+            is_mock_provider=is_mock,
+            execution_mode="mock" if is_mock else "live",
             degraded_mode=step_result.degraded_mode,
             degradation_reason=step_result.degradation_reason,
             knowledge_state_status=step_result.knowledge_state_status,

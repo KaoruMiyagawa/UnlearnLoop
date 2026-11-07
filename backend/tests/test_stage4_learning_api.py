@@ -77,6 +77,8 @@ def test_topics_catalog_and_sanitized_question_security_contract(
     assert len(topic_data["prerequisites"]) == 2
     assert len(topic_data["materials"]) == 1
     assert topic_data["questions_count"] >= 4
+    # CRITICAL SECURITY CONTRACT: TopicDetailResponse MUST NOT leak internal common_error_patterns
+    assert "common_error_patterns" not in topic_data
 
     # Fetch questions directly and verify security contract
     q_resp = seeded_client.get("/api/v1/questions/q_py_loop_initial_01")
@@ -657,3 +659,341 @@ def test_token_budget_interception_via_api(
     assert t2_data["degraded_mode"] is True
     assert t2_data["executed_tool"] == "budget_limit_degrade"
     assert "低于单次调用最小预留安全阈值" in t2_data["degradation_reason"]
+
+
+# ---------------------------------------------------------------------------
+# Audit Regression Tests (Stage 4 Final Source Review)
+# ---------------------------------------------------------------------------
+
+
+def test_real_database_dependency_path_without_overrides_and_engine_reuse(
+    tmp_path: pytest.TempPathFactory,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Audit Item 1 & 6: Exercise real get_session_factory / get_db without dependency_overrides in development mode."""
+    from pathlib import Path
+    from app.api.v1.dependencies import (
+        _ENGINE_CACHE,
+        clear_engine_cache,
+        get_session_factory as real_get_session_factory,
+    )
+
+    clear_engine_cache()
+    db_file = Path(str(tmp_path)) / "dev_real_dep.db"
+    db_url = f"sqlite:///{db_file.as_posix()}"
+
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", db_url)
+    monkeypatch.setenv("ALLOW_REMOTE_MODEL_CALLS", "false")
+    get_settings.cache_clear()
+
+    try:
+        dev_settings = get_settings()
+        assert dev_settings.app_env == "development"
+
+        app = create_app(dev_settings)
+        # Crucial: ZERO dependency_overrides on app! Exercises real get_settings -> get_session_factory -> get_db
+        assert app.dependency_overrides == {}
+
+        with TestClient(app) as client:
+            resp1 = client.get("/api/v1/topics")
+            assert resp1.status_code == 200
+            topics = resp1.json()
+            assert len(topics) == 5
+
+            # Verify Engine was cached once and is reused across subsequent requests
+            assert len(_ENGINE_CACHE) == 1
+            cached_engine_1, cached_factory_1 = next(iter(_ENGINE_CACHE.values()))
+
+            resp2 = client.get("/api/v1/topics/py-for-loop")
+            assert resp2.status_code == 200
+            assert "common_error_patterns" not in resp2.json()
+
+            assert len(_ENGINE_CACHE) == 1
+            cached_engine_2, cached_factory_2 = next(iter(_ENGINE_CACHE.values()))
+            assert cached_engine_1 is cached_engine_2
+            assert cached_factory_1 is cached_factory_2
+            assert real_get_session_factory(dev_settings) is cached_factory_1
+    finally:
+        clear_engine_cache()
+        get_settings.cache_clear()
+
+
+def test_question_authorization_anti_bypass_and_idempotency_conflict(
+    seeded_client: TestClient,
+) -> None:
+    """Audit Item 2: Enforce question assignment authorization, initial_question_id role check, and idempotency conflict."""
+    # 1. Forbid creating a session with a non-initial question (e.g., transfer_check or followup)
+    bad_init_transfer = seeded_client.post(
+        "/api/v1/sessions",
+        json={
+            "topic_id": "topic_py_for_loop",
+            "learner_id": "learner_sec",
+            "initial_question_id": "q_py_loop_transfer_01",
+        },
+    )
+    assert bad_init_transfer.status_code == 400
+    assert bad_init_transfer.json()["code"] == "DOMAIN_RULE_VIOLATION"
+
+    bad_init_followup = seeded_client.post(
+        "/api/v1/sessions",
+        json={
+            "topic_id": "topic_py_for_loop",
+            "learner_id": "learner_sec",
+            "initial_question_id": "q_py_loop_followup_01",
+        },
+    )
+    assert bad_init_followup.status_code == 400
+    assert bad_init_followup.json()["code"] == "DOMAIN_RULE_VIOLATION"
+
+    # 2. Start a valid session (assigned q_py_loop_initial_01, status='active')
+    sess = seeded_client.post(
+        "/api/v1/sessions",
+        json={"topic_id": "topic_py_for_loop", "learner_id": "learner_sec"},
+    ).json()
+    sess_id = sess["id"]
+    assert sess["current_question_id"] == "q_py_loop_initial_01"
+
+    # 3. Malicious bypass attempt: directly submitting transfer_check question in active session must be blocked (400)
+    bypass_resp = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={"question_id": "q_py_loop_transfer_01", "submitted_answer": "3 17"},
+    )
+    assert bypass_resp.status_code == 400
+    assert bypass_resp.json()["code"] == "INVALID_SESSION_STATE"
+
+    # 4. Submitting an unassigned practice or followup question in active session must also be blocked (400)
+    unassigned_practice = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={"question_id": "q_py_loop_practice_01", "submitted_answer": "6"},
+    )
+    assert unassigned_practice.status_code == 400
+    assert unassigned_practice.json()["code"] == "INVALID_SESSION_STATE"
+
+    # 5. Submit legitimate initial attempt with idempotency_key -> transitions session to 'diagnosing'
+    valid_att = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={
+            "question_id": "q_py_loop_initial_01",
+            "submitted_answer": "4",
+            "idempotency_key": "idem_auth_01",
+        },
+    )
+    assert valid_att.status_code == 201
+    att_id = valid_att.json()["attempt_id"]
+
+    # 6. Re-sending the exact same request with the same idempotency_key succeeds (replays result even though session is now diagnosing)
+    replay_att = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={
+            "question_id": "q_py_loop_initial_01",
+            "submitted_answer": "4",
+            "idempotency_key": "idem_auth_01",
+        },
+    )
+    assert replay_att.status_code == 201
+    assert replay_att.json()["attempt_id"] == att_id
+
+    # 7. Reusing the same idempotency_key with a DIFFERENT answer must raise 409 IDEMPOTENCY_CONFLICT
+    conflict_att = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={
+            "question_id": "q_py_loop_initial_01",
+            "submitted_answer": "3",
+            "idempotency_key": "idem_auth_01",
+        },
+    )
+    assert conflict_att.status_code == 409
+    assert conflict_att.json()["code"] == "IDEMPOTENCY_CONFLICT"
+
+    # 8. Submitting a new attempt on q_py_loop_initial_01 without idempotency key while session is in 'diagnosing' is blocked
+    repeat_initial = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={"question_id": "q_py_loop_initial_01", "submitted_answer": "3"},
+    )
+    assert repeat_initial.status_code == 400
+    assert repeat_initial.json()["code"] == "INVALID_SESSION_STATE"
+
+
+def test_session_completion_semantics_distinguishes_ended_vs_mastered(
+    seeded_client: TestClient,
+) -> None:
+    """Audit Item 3: Strictly distinguish session completed vs topic mastered (stable) vs transfer failed (needs_practice)."""
+    sess = seeded_client.post(
+        "/api/v1/sessions",
+        json={"topic_id": "topic_py_for_loop", "learner_id": "learner_comp_sem"},
+    ).json()
+    sess_id = sess["id"]
+
+    # Dispatch transfer check -> session enters 'transfer_checking' with q_py_loop_transfer_01 assigned
+    disp = seeded_client.post(f"/api/v1/sessions/{sess_id}/transfer-check")
+    assert disp.status_code == 200
+    assert disp.json()["session_status"] == "transfer_checking"
+    assigned_q_id = disp.json()["question"]["id"]
+    assert assigned_q_id == "q_py_loop_transfer_01"
+
+    # 1. Attempting to complete session in 'transfer_checking' BEFORE submitting any transfer attempt must fail (400)
+    early_complete = seeded_client.post(f"/api/v1/sessions/{sess_id}/complete")
+    assert early_complete.status_code == 400
+    assert early_complete.json()["code"] == "INVALID_SESSION_STATE"
+
+    # 2. Submit a WRONG transfer attempt ('3 15') -> KnowledgeState becomes 'needs_practice'
+    fail_att = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={"question_id": assigned_q_id, "submitted_answer": "3 15"},
+    )
+    assert fail_att.status_code == 201
+    assert fail_att.json()["is_correct"] is False
+    assert fail_att.json()["knowledge_state_status"] == "needs_practice"
+
+    # 3. Complete (end) the session after failed transfer check -> session is 'completed',
+    #    but topic_mastered is False and knowledge_state_status remains 'needs_practice' (NEVER 'stable'!)
+    comp_resp = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/complete",
+        json={"reason": "Learner ended session for today; will review tomorrow."},
+    )
+    assert comp_resp.status_code == 200
+    comp_data = comp_resp.json()
+    assert comp_data["status"] == "completed"
+    assert comp_data["knowledge_state_status"] == "needs_practice"
+    assert comp_data["topic_mastered"] is False
+
+    # Verify profile endpoint also shows needs_practice, NOT stable
+    ks_resp = seeded_client.get(
+        "/api/v1/profile/knowledge-states?learner_id=learner_comp_sem"
+    )
+    assert ks_resp.status_code == 200
+    ks_list = ks_resp.json()
+    assert len(ks_list) == 1
+    assert ks_list[0]["status"] == "needs_practice"
+
+
+def test_model_provider_modes_demo_mock_labeling_and_ollama_without_api_key(
+    seeded_client: TestClient,
+    test_settings: Settings,
+) -> None:
+    """Audit Item 5: Verify Demo/Mock mode is explicitly labeled and Ollama does not require a remote API key."""
+    from app.api.v1.dependencies import get_model_provider
+    from app.model_provider import OllamaProvider
+
+    # 1. Verify OllamaProvider resolution when allow_remote_model_calls=True and model_api_key=""
+    ollama_settings = test_settings.model_copy(
+        update={
+            "app_env": "development",
+            "model_provider": "ollama",
+            "model_name": "qwen2.5-coder:7b",
+            "model_api_key": "",
+            "allow_remote_model_calls": True,
+        }
+    )
+    provider = get_model_provider(ollama_settings)
+    assert isinstance(provider, OllamaProvider)
+    assert provider.provider_name == "ollama"
+    assert provider.require_api_key is False
+    assert provider.is_configured() is True
+
+    # 2. Verify default dev/testing fallback uses FakeModelProvider with explicit mock/demo flags in API responses
+    sess = seeded_client.post(
+        "/api/v1/sessions",
+        json={"topic_id": "topic_py_for_loop", "learner_id": "learner_mock_mode"},
+    ).json()
+    att = seeded_client.post(
+        f"/api/v1/sessions/{sess['id']}/attempts",
+        json={"question_id": "q_py_loop_initial_01", "submitted_answer": "4"},
+    ).json()
+    diag_id = att["diagnostic_case_id"]
+
+    case_resp = seeded_client.get(f"/api/v1/diagnoses/{diag_id}")
+    assert case_resp.status_code == 200
+    case_data = case_resp.json()
+    assert case_data["model_provider_name"] == "fake"
+    assert case_data["is_mock_provider"] is True
+    assert case_data["execution_mode"] == "mock"
+
+    # Unscripted step in default FakeModelProvider uses explicit [DEMO/MOCK MODE] fallback
+    step_resp = seeded_client.post(f"/api/v1/diagnoses/{diag_id}/step")
+    assert step_resp.status_code == 200
+    step_data = step_resp.json()
+    assert step_data["model_provider_name"] == "fake"
+    assert step_data["is_mock_provider"] is True
+    assert step_data["execution_mode"] == "mock"
+    assert "DEMO/MOCK MODE" in (step_data["uncertainty_note"] or "")
+
+
+def test_lifespan_raises_on_seed_failure_and_preserves_existing_data(
+    tmp_path: pytest.TempPathFactory,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Audit Item 6: Verify lifespan does not silently swallow initialization errors and never overwrites existing data."""
+    from pathlib import Path
+    from app.api.v1.dependencies import clear_engine_cache
+    import app.main as main_mod
+
+    clear_engine_cache()
+    db_file = Path(str(tmp_path)) / "lifespan_test.db"
+    db_url = f"sqlite:///{db_file.as_posix()}"
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", db_url)
+    monkeypatch.setenv("ALLOW_REMOTE_MODEL_CALLS", "false")
+    get_settings.cache_clear()
+    dev_settings = get_settings()
+
+    try:
+        # 1. Normal startup migrates and seeds cleanly; create a learning session
+        app1 = create_app(dev_settings)
+        with TestClient(app1) as client1:
+            s_resp = client1.post(
+                "/api/v1/sessions",
+                json={"topic_id": "topic_py_for_loop", "learner_id": "learner_persist"},
+            )
+            assert s_resp.status_code == 201
+            created_session_id = s_resp.json()["id"]
+
+        # 2. Second startup on the same DB preserves existing learner session without overwriting
+        app2 = create_app(dev_settings)
+        with TestClient(app2) as client2:
+            get_resp = client2.get(f"/api/v1/sessions/{created_session_id}")
+            assert get_resp.status_code == 200
+            assert get_resp.json()["learner_id"] == "learner_persist"
+
+        # 3. If import_content_pack raises a critical error, lifespan MUST re-raise (never silently ignore)
+        def broken_seed(_session: Session) -> None:
+            raise RuntimeError("Simulated critical content pack initialization failure")
+
+        monkeypatch.setattr(main_mod, "import_content_pack", broken_seed)
+        app_broken = create_app(dev_settings)
+        with pytest.raises(RuntimeError, match="Simulated critical content pack initialization failure"):
+            with TestClient(app_broken):
+                pass
+    finally:
+        clear_engine_cache()
+        get_settings.cache_clear()
+
+
+def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
+    """Audit Item 7: Verify exact OpenAPI paths and HTTP operation counts vs hidden aliases."""
+    openapi_resp = seeded_client.get("/openapi.json")
+    assert openapi_resp.status_code == 200
+    schema = openapi_resp.json()
+    paths = schema["paths"]
+
+    # 22 distinct URL paths in public OpenAPI schema (1 Stage 1 /health + 21 Stage 4 paths)
+    assert len(paths) == 22
+
+    # 24 public HTTP operations (GET /sessions + POST /sessions and GET /attempts + POST /attempts share paths)
+    public_operations = [
+        (method.upper(), path)
+        for path, methods in paths.items()
+        for method in methods
+        if method.lower() in {"get", "post", "put", "patch", "delete"}
+    ]
+    assert len(public_operations) == 24
+    stage4_public_operations = [
+        op for op in public_operations if op[1] != "/api/v1/health"
+    ]
+    assert len(stage4_public_operations) == 23
+
+    # Hidden alias GET /api/v1/dashboard/summary is functional (200) but excluded from OpenAPI schema
+    assert "/api/v1/dashboard/summary" not in paths
+    alias_resp = seeded_client.get("/api/v1/dashboard/summary?learner_id=new_learner")
+    assert alias_resp.status_code == 200

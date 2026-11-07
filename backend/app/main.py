@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.v1.dependencies import get_or_create_engine_and_factory
 from app.api.v1.router import api_v1_router
 from app.application.exceptions import ApplicationError
 from app.config import Settings, get_settings
@@ -20,7 +21,6 @@ from app.domain.exceptions import (
 )
 from app.model_provider import ModelProviderError
 from app.observability import RequestIdMiddleware
-from app.persistence.database import create_db_engine, create_session_factory
 from app.persistence.migrations_runner import upgrade_database
 from app.persistence.seed import import_content_pack
 
@@ -31,17 +31,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        # In development mode, auto-migrate schema and seed baseline content if empty
+        # In development mode, incrementally migrate schema to head and seed baseline content
+        # without dropping existing tables or silently swallowing critical initialization errors.
         if resolved_settings.app_env == "development":
-            engine = create_db_engine(resolved_settings)
+            engine, factory = get_or_create_engine_and_factory(resolved_settings)
             upgrade_database(database_url=resolved_settings.database_url, engine=engine)
-            factory = create_session_factory(engine)
             with factory() as session:
                 try:
                     import_content_pack(session)
                     session.commit()
                 except Exception:
                     session.rollback()
+                    raise
         yield
 
     app = FastAPI(

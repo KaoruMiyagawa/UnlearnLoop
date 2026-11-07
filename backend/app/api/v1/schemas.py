@@ -71,7 +71,12 @@ class TopicSummaryResponse(BaseModel):
 
 
 class TopicDetailResponse(BaseModel):
-    """Full detail of a knowledge topic, including prerequisites and materials."""
+    """Full detail of a knowledge topic, including prerequisites and materials.
+
+    SECURITY CONTRACT:
+    - Never exposes internal `common_error_patterns` or diagnostic rubrics to learners;
+      internal error patterns remain in the backend database for Agent diagnosis only.
+    """
 
     id: str
     slug: str
@@ -81,7 +86,6 @@ class TopicDetailResponse(BaseModel):
     difficulty_level: int
     prerequisites: list[TopicPrerequisiteSummary] = Field(default_factory=list)
     materials: list[LearningMaterialResponse] = Field(default_factory=list)
-    common_error_patterns: list[dict[str, Any]] = Field(default_factory=list)
     questions_count: int
 
 
@@ -146,6 +150,8 @@ class SessionSummaryResponse(BaseModel):
     topic_title: str
     learner_id: str
     status: SessionStatus
+    knowledge_state_status: KnowledgeMasteryStatus | None = None
+    topic_mastered: bool = False
     current_question_id: str | None = None
     attempts_count: int = 0
     started_at: datetime
@@ -154,13 +160,15 @@ class SessionSummaryResponse(BaseModel):
 
 
 class SessionDetailResponse(BaseModel):
-    """Detailed learning session state including current question and diagnostic pointer."""
+    """Detailed learning session state including current question, diagnostic pointer, and distinct mastery status."""
 
     id: str
     topic_id: str
     topic_title: str
     learner_id: str
     status: SessionStatus
+    knowledge_state_status: KnowledgeMasteryStatus | None = None
+    topic_mastered: bool = False
     current_question_id: str | None = None
     current_question: SanitizedQuestionResponse | None = None
     active_diagnostic_case_id: str | None = None
@@ -282,6 +290,9 @@ class DiagnosticCaseResponse(BaseModel):
     uncertainty_note: str | None = None
     followup_turn_count: int
     tokens_used: int
+    model_provider_name: str = "fake"
+    is_mock_provider: bool = True
+    execution_mode: str = "mock"
     hypotheses: list[HypothesisResponse] = Field(default_factory=list)
     evidence_count: int = 0
     created_at: datetime
@@ -316,6 +327,9 @@ class DiagnosticStepResponse(BaseModel):
     max_followup_turns: int
     tokens_used_in_case: int
     session_token_budget: int
+    model_provider_name: str = "fake"
+    is_mock_provider: bool = True
+    execution_mode: str = "mock"
     degraded_mode: bool = False
     degradation_reason: str | None = None
     knowledge_state_status: str | None = None

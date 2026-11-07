@@ -39,11 +39,13 @@ class FakeModelProvider:
         max_retries: int = 2,
         max_tokens_per_call: int = 1024,
         default_token_usage: TokenUsage | None = None,
+        allow_default_fallback: bool = False,
     ) -> None:
         self.provider_name = provider_name
         self.model_name = model_name
         self.max_retries = max_retries
         self.max_tokens_per_call = max_tokens_per_call
+        self.allow_default_fallback = allow_default_fallback
         self.default_token_usage = default_token_usage or TokenUsage(
             prompt_tokens=180,
             completion_tokens=120,
@@ -59,6 +61,42 @@ class FakeModelProvider:
         """Append one or more scripted responses or exceptions to the queue."""
         for step in steps:
             self._queue.append(step)
+
+    @staticmethod
+    def _build_default_demo_step(request: ModelRequest) -> dict[str, Any]:
+        """Synthesize an explicit Demo/Mock decision proposal when running unscripted in dev mode."""
+        followup_turns = 0
+        try:
+            payload = json.loads(request.user_prompt)
+            followup_turns = int(
+                payload.get("constraints", {}).get("followup_turns_used", 0)
+            )
+        except Exception:
+            followup_turns = 0
+
+        if followup_turns == 0:
+            selected_tool = {
+                "tool_name": "select_diagnostic_followup",
+                "arguments": {
+                    "discriminating_reason": "[DEMO/MOCK MODE] 模拟诊断追问：请补充每一步的中间计算状态以区分候选错误假设。"
+                },
+            }
+        else:
+            selected_tool = {
+                "tool_name": "assign_targeted_practice",
+                "arguments": {
+                    "target_error_codes": [],
+                    "practice_reason": "[DEMO/MOCK MODE] 模拟针对性干预：分配针对性练习巩固核心概念。",
+                },
+            }
+
+        return {
+            "reasoning": "[DEMO/MOCK MODE - FakeModelProvider] 当前未启用真实远程大模型，使用离线模拟决策流程。",
+            "uncertainty_level": "insufficient_evidence",
+            "uncertainty_note": "[DEMO/MOCK MODE] 当前处于离线模拟诊断模式（FakeModelProvider），非真实 AI 模型推理结果。",
+            "hypothesis_updates": [],
+            "selected_tool": selected_tool,
+        }
 
     def generate_structured(
         self,
@@ -80,13 +118,16 @@ class FakeModelProvider:
         while total_attempts < max_total_attempts:
             total_attempts += 1
             if not self._queue:
-                raise ModelProviderError(
-                    "FakeModelProvider has no remaining scripted responses in queue.",
-                    attempt_count=total_attempts,
-                    latency_ms=5,
-                )
-
-            step = self._queue.popleft()
+                if self.allow_default_fallback:
+                    step: ScriptedStep = self._build_default_demo_step(request)
+                else:
+                    raise ModelProviderError(
+                        "FakeModelProvider has no remaining scripted responses in queue.",
+                        attempt_count=total_attempts,
+                        latency_ms=5,
+                    )
+            else:
+                step = self._queue.popleft()
             usage = self.default_token_usage
 
             if callable(step) and not isinstance(step, type):

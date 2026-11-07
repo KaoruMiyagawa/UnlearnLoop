@@ -23,6 +23,7 @@ from app.api.v1.schemas import (
 )
 from app.application.exceptions import (
     EntityNotFoundError,
+    IdempotencyConflictError,
     InvalidSessionOperationError,
 )
 from app.domain.enums import (
@@ -46,6 +47,7 @@ from app.domain.rules import validate_mastery_transition, validate_session_trans
 from app.evaluation.rule_evaluator import RuleEvaluator
 from app.persistence.models import (
     Attempt,
+    DecisionEvent,
     DiagnosticCase,
     KnowledgeState,
     KnowledgeTopic,
@@ -140,7 +142,6 @@ class LearningAppService:
             difficulty_level=topic.difficulty_level,
             prerequisites=prereqs,
             materials=materials,
-            common_error_patterns=list(topic.common_error_patterns or []),
             questions_count=len(questions),
         )
 
@@ -173,11 +174,16 @@ class LearningAppService:
         if topic is None:
             raise EntityNotFoundError("KnowledgeTopic", topic_id)
 
-        # Resolve initial question
+        # Resolve initial question (must belong to topic AND have role == 'initial')
         if initial_question_id:
             init_q = self.repo.get_question_by_id(initial_question_id)
             if init_q is None or init_q.topic_id != topic.id:
                 raise EntityNotFoundError("Question", initial_question_id)
+            if init_q.question_role != QuestionRole.INITIAL.value:
+                raise DomainRuleViolationError(
+                    f"Question '{init_q.id}' has role '{init_q.question_role}'; "
+                    "session initial_question_id must have question_role='initial'."
+                )
             selected_q_id = init_q.id
         else:
             initial_qs = self.repo.list_questions_for_topic(
@@ -198,8 +204,40 @@ class LearningAppService:
 
         return self.get_session_detail(learning_session.id)
 
+    def _resolve_knowledge_state_fields(
+        self, learner_id: str, topic_id: str
+    ) -> tuple[KnowledgeMasteryStatus | None, bool]:
+        """Return (knowledge_state_status, topic_mastered) for a learner and topic."""
+        ks = self.repo.get_knowledge_state(learner_id, topic_id)
+        if ks is None:
+            return None, False
+        ks_enum = KnowledgeMasteryStatus(ks.status)
+        return ks_enum, (ks_enum == KnowledgeMasteryStatus.STABLE)
+
+    def _select_fresh_transfer_question(
+        self, topic_id: str, learner_id: str
+    ) -> Question | None:
+        """Select the first unattempted transfer_check question for a learner and topic."""
+        transfer_qs = self.repo.list_questions_for_topic(
+            topic_id, role=QuestionRole.TRANSFER_CHECK
+        )
+        if not transfer_qs:
+            return None
+        attempted_q_ids = set(
+            self.db.scalars(
+                select(Attempt.question_id)
+                .join(LearningSession, Attempt.session_id == LearningSession.id)
+                .where(
+                    LearningSession.learner_id == learner_id,
+                    Attempt.attempt_role == QuestionRole.TRANSFER_CHECK.value,
+                )
+            ).all()
+        )
+        fresh_qs = [q for q in transfer_qs if q.id not in attempted_q_ids]
+        return fresh_qs[0] if fresh_qs else None
+
     def get_session_detail(self, session_id: str) -> SessionDetailResponse:
-        """Fetch session detail including current sanitized question and diagnostic case pointer."""
+        """Fetch session detail including current sanitized question, diagnostic case pointer, and mastery status."""
         sess = self.repo.get_session(session_id)
         if sess is None:
             raise EntityNotFoundError("LearningSession", session_id)
@@ -216,6 +254,9 @@ class LearningAppService:
                 .order_by(DiagnosticCase.created_at.desc())
             ).first()
         )
+        ks_status, topic_mastered = self._resolve_knowledge_state_fields(
+            sess.learner_id, sess.topic_id
+        )
 
         return SessionDetailResponse(
             id=sess.id,
@@ -223,6 +264,8 @@ class LearningAppService:
             topic_title=sess.topic.title,
             learner_id=sess.learner_id,
             status=SessionStatus(sess.status),
+            knowledge_state_status=ks_status,
+            topic_mastered=topic_mastered,
             current_question_id=sess.current_question_id,
             current_question=current_q_dto,
             active_diagnostic_case_id=active_diag.id if active_diag else None,
@@ -242,21 +285,28 @@ class LearningAppService:
         if status:
             sessions = [s for s in sessions if s.status == status]
 
-        return [
-            SessionSummaryResponse(
-                id=s.id,
-                topic_id=s.topic_id,
-                topic_title=s.topic.title,
-                learner_id=s.learner_id,
-                status=SessionStatus(s.status),
-                current_question_id=s.current_question_id,
-                attempts_count=len(s.attempts),
-                started_at=s.started_at,
-                updated_at=s.updated_at,
-                completed_at=s.completed_at,
+        results: list[SessionSummaryResponse] = []
+        for s in sessions:
+            ks_status, topic_mastered = self._resolve_knowledge_state_fields(
+                s.learner_id, s.topic_id
             )
-            for s in sessions
-        ]
+            results.append(
+                SessionSummaryResponse(
+                    id=s.id,
+                    topic_id=s.topic_id,
+                    topic_title=s.topic.title,
+                    learner_id=s.learner_id,
+                    status=SessionStatus(s.status),
+                    knowledge_state_status=ks_status,
+                    topic_mastered=topic_mastered,
+                    current_question_id=s.current_question_id,
+                    attempts_count=len(s.attempts),
+                    started_at=s.started_at,
+                    updated_at=s.updated_at,
+                    completed_at=s.completed_at,
+                )
+            )
+        return results
 
     def pause_session(
         self,
@@ -299,17 +349,37 @@ class LearningAppService:
                 f"Cannot resume session '{sess.id}' because current status is '{sess.status}', not 'paused'."
             )
 
-        # Check if there is an unresolved diagnostic case
-        active_diag = (
+        # Restore the prior session state from the latest pause DecisionEvent if available
+        pause_evt = (
             self.db.scalars(
-                select(DiagnosticCase)
+                select(DecisionEvent)
                 .where(
-                    DiagnosticCase.session_id == sess.id,
-                    DiagnosticCase.status != DiagnosticCaseStatus.RESOLVED.value,
+                    DecisionEvent.session_id == sess.id,
+                    DecisionEvent.event_type == "session_paused",
                 )
+                .order_by(DecisionEvent.created_at.desc())
             ).first()
         )
-        target_status = SessionStatus.DIAGNOSING if active_diag else SessionStatus.ACTIVE
+        if pause_evt and pause_evt.from_state in (
+            SessionStatus.ACTIVE.value,
+            SessionStatus.DIAGNOSING.value,
+            SessionStatus.INTERVENING.value,
+            SessionStatus.TRANSFER_CHECKING.value,
+        ):
+            target_status = SessionStatus(pause_evt.from_state)
+        else:
+            active_diag = (
+                self.db.scalars(
+                    select(DiagnosticCase).where(
+                        DiagnosticCase.session_id == sess.id,
+                        DiagnosticCase.status != DiagnosticCaseStatus.RESOLVED.value,
+                    )
+                ).first()
+            )
+            target_status = (
+                SessionStatus.DIAGNOSING if active_diag else SessionStatus.ACTIVE
+            )
+
         self.repo.transition_session_status(sess, target_status)
         self.repo.append_decision_event(
             session_id=sess.id,
@@ -327,22 +397,81 @@ class LearningAppService:
         session_id: str,
         reason: str | None = None,
     ) -> SessionDetailResponse:
-        """Complete a session once transfer checking has succeeded."""
+        """Complete a learning session in TRANSFER_CHECKING state.
+
+        Strictly distinguishes:
+        - Session ended (`session.status == 'completed'`)
+        - Topic mastered (`KnowledgeState.status == 'stable'`)
+        - Transfer failed / needs practice (`KnowledgeState.status == 'needs_practice'`)
+
+        Completing a session NEVER fabricates or promotes KnowledgeState to `stable`.
+        Requires at least one transfer_check attempt in the session (or documented transfer question exhaustion).
+        """
         sess = self.repo.get_session(session_id)
         if sess is None:
             raise EntityNotFoundError("LearningSession", session_id)
 
         # Domain invariant: validate transition from TRANSFER_CHECKING to COMPLETED
         validate_session_transition(sess.status, SessionStatus.COMPLETED)
+
+        has_transfer_attempt = any(
+            att.attempt_role == QuestionRole.TRANSFER_CHECK.value
+            for att in sess.attempts
+        )
+        has_exhausted_degrade = (
+            self.db.scalars(
+                select(DecisionEvent).where(
+                    DecisionEvent.session_id == sess.id,
+                    DecisionEvent.action.in_(
+                        (
+                            "exhausted_transfer_questions_degrade",
+                            "transfer_questions_exhausted",
+                        )
+                    ),
+                )
+            ).first()
+            is not None
+        )
+        if not has_transfer_attempt and not has_exhausted_degrade:
+            raise InvalidSessionOperationError(
+                "Cannot complete session in 'transfer_checking' before submitting a transfer verification attempt.",
+                current_state=sess.status,
+            )
+
+        ks = self.repo.get_knowledge_state(sess.learner_id, sess.topic_id)
+        if ks is None or ks.status != KnowledgeMasteryStatus.STABLE.value:
+            # Ensure ending a session without passing transfer check leaves KnowledgeState in needs_practice (never stable)
+            if ks is None:
+                ks = self.repo.update_knowledge_state(
+                    session_id=sess.id,
+                    topic_id=sess.topic_id,
+                    target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                    reason="Session ended in transfer_checking without passing independent transfer verification.",
+                    learner_id=sess.learner_id,
+                )
+            event_type = "session_completed_without_mastery"
+            default_reason = (
+                "Completed learning session; topic remains in 'needs_practice' (not mastered)."
+            )
+        else:
+            event_type = "session_completed"
+            default_reason = (
+                "Completed learning session following verified transfer mastery ('stable')."
+            )
+
         old_status = sess.status
         self.repo.transition_session_status(sess, SessionStatus.COMPLETED)
         self.repo.append_decision_event(
             session_id=sess.id,
-            event_type="session_completed",
+            event_type=event_type,
             from_state=old_status,
             to_state=SessionStatus.COMPLETED.value,
             action="complete_session",
-            reason=reason or "Completed learning session following transfer verification.",
+            reason=reason or default_reason,
+            payload_json={
+                "knowledge_state_status": ks.status,
+                "topic_mastered": ks.status == KnowledgeMasteryStatus.STABLE.value,
+            },
         )
         self.db.commit()
         return self.get_session_detail(sess.id)
@@ -379,7 +508,9 @@ class LearningAppService:
                 f"which does not match session topic '{sess.topic_id}'."
             )
 
-        # Idempotency check: if attempt already exists for this idempotency_key, return it directly
+        # 1. Idempotency check FIRST:
+        #    - If same idempotency_key + same (question_id, submitted_answer), replay result even if session advanced.
+        #    - If same idempotency_key + different (question_id, submitted_answer), raise 409 IdempotencyConflictError.
         if idempotency_key:
             existing_attempt = (
                 self.db.scalars(
@@ -390,7 +521,90 @@ class LearningAppService:
                 ).first()
             )
             if existing_attempt is not None:
+                if (
+                    existing_attempt.question_id != question.id
+                    or existing_attempt.submitted_answer != submitted_answer
+                ):
+                    raise IdempotencyConflictError(
+                        idempotency_key,
+                        "Idempotency key was already used with a different question_id or submitted_answer.",
+                    )
                 return self._build_attempt_result(sess, existing_attempt, question)
+
+        # 2. Session active status check
+        if sess.status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value):
+            raise InvalidSessionOperationError(
+                f"Cannot submit answers while session is in '{sess.status}' status.",
+                current_state=sess.status,
+            )
+
+        # 3. Assigned question authorization check:
+        #    Only the question currently assigned to `sess.current_question_id` may be answered.
+        if sess.current_question_id != question.id:
+            raise InvalidSessionOperationError(
+                f"Question '{question.id}' (role='{question.question_role}') is not the currently assigned "
+                f"question ('{sess.current_question_id}') for session '{sess.id}'.",
+                current_state=sess.status,
+            )
+
+        # 4. Question role vs session workflow stage consistency check:
+        role = QuestionRole(question.question_role)
+        allowed_statuses_by_role: dict[QuestionRole, set[str]] = {
+            QuestionRole.INITIAL: {SessionStatus.ACTIVE.value},
+            QuestionRole.DIAGNOSTIC_FOLLOWUP: {SessionStatus.DIAGNOSING.value},
+            QuestionRole.TARGETED_PRACTICE: {
+                SessionStatus.INTERVENING.value,
+                SessionStatus.DIAGNOSING.value,
+            },
+            QuestionRole.TRANSFER_CHECK: {SessionStatus.TRANSFER_CHECKING.value},
+        }
+        if sess.status not in allowed_statuses_by_role.get(role, set()):
+            raise InvalidSessionOperationError(
+                f"Cannot submit question '{question.id}' with role '{role.value}' "
+                f"while session is in '{sess.status}' stage.",
+                current_state=sess.status,
+            )
+
+        # 5. Same-question retry guardrails:
+        #    - For diagnostic_followup: once answered in the current diagnostic turn, require an Agent step before another attempt.
+        #    - For transfer_check: if already answered correctly in this session, forbid redundant re-submissions.
+        if role == QuestionRole.DIAGNOSTIC_FOLLOWUP:
+            latest_followup_dispatch = (
+                self.db.scalars(
+                    select(DecisionEvent)
+                    .where(
+                        DecisionEvent.session_id == sess.id,
+                        DecisionEvent.action == "select_diagnostic_followup",
+                    )
+                    .order_by(DecisionEvent.created_at.desc())
+                ).first()
+            )
+            prior_followup_attempts = [
+                att
+                for att in sess.attempts
+                if att.question_id == question.id
+                and (
+                    latest_followup_dispatch is None
+                    or att.submitted_at >= latest_followup_dispatch.created_at
+                )
+            ]
+            if prior_followup_attempts:
+                raise InvalidSessionOperationError(
+                    f"Diagnostic follow-up question '{question.id}' has already been answered in the current turn; "
+                    "execute the next diagnostic step before submitting another attempt.",
+                    current_state=sess.status,
+                )
+        elif role == QuestionRole.TRANSFER_CHECK:
+            already_passed_in_session = any(
+                att.question_id == question.id and att.is_correct is True
+                for att in sess.attempts
+            )
+            if already_passed_in_session:
+                raise InvalidSessionOperationError(
+                    f"Transfer verification question '{question.id}' has already been answered correctly in this session; "
+                    "dispatch a fresh transfer question or complete the session.",
+                    current_state=sess.status,
+                )
 
         # Record initial pending Attempt
         attempt = self.repo.record_attempt(
@@ -414,7 +628,6 @@ class LearningAppService:
         attempt.evaluation_summary = rule_res.summary
         self.db.flush()
 
-        role = QuestionRole(question.question_role)
         next_action = "continue"
         diag_case_id: str | None = None
         ks_status: str | None = None
@@ -448,6 +661,11 @@ class LearningAppService:
                     # Fully verified correct initial answer: proceed to transfer check
                     if sess.status != SessionStatus.TRANSFER_CHECKING.value:
                         self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
+                    fresh_transfer = self._select_fresh_transfer_question(
+                        sess.topic_id, sess.learner_id
+                    )
+                    if fresh_transfer is not None:
+                        sess.current_question_id = fresh_transfer.id
                     next_action = "transfer_check"
 
         elif role == QuestionRole.DIAGNOSTIC_FOLLOWUP:
@@ -470,6 +688,11 @@ class LearningAppService:
             if attempt.is_correct:
                 if sess.status != SessionStatus.TRANSFER_CHECKING.value:
                     self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
+                fresh_transfer = self._select_fresh_transfer_question(
+                    sess.topic_id, sess.learner_id
+                )
+                if fresh_transfer is not None:
+                    sess.current_question_id = fresh_transfer.id
                 next_action = "transfer_check"
             else:
                 next_action = "review_scheduled"
@@ -657,16 +880,33 @@ class LearningAppService:
         fresh_qs = [q for q in transfer_qs if q.id not in attempted_q_ids]
 
         if not fresh_qs:
-            # Safe degradation: do not recycle attempted questions, schedule review
+            # Safe degradation: do not recycle attempted questions, schedule review and record exhaustion event
             msg = (
                 f"知识点 '{sess.topic.slug}' 暂无未作答过的独立新情境迁移验证题；"
                 "保留待练习状态并安排复习巩固，防止同题重复猜测造成虚假掌握。"
+            )
+            if sess.status != SessionStatus.TRANSFER_CHECKING.value:
+                self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
+            self.repo.update_knowledge_state(
+                session_id=sess.id,
+                topic_id=sess.topic_id,
+                target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                reason=msg,
+                learner_id=sess.learner_id,
             )
             self.repo.schedule_review_item(
                 topic_id=sess.topic_id,
                 session_id=sess.id,
                 learner_id=sess.learner_id,
                 trigger_reason=msg,
+            )
+            self.repo.append_decision_event(
+                session_id=sess.id,
+                event_type="transfer_questions_exhausted",
+                from_state=sess.status,
+                to_state=sess.status,
+                action="transfer_questions_exhausted",
+                reason=msg,
             )
             self.db.commit()
             return TransferCheckDispatchResponse(
@@ -788,26 +1028,36 @@ class LearningAppService:
             ).all()
         )
 
-        active_s = sum(1 for s in sessions if s.status in ("active", "diagnosing", "transfer_checking"))
+        active_s = sum(
+            1
+            for s in sessions
+            if s.status in ("active", "diagnosing", "intervening", "transfer_checking")
+        )
         comp_s = sum(1 for s in sessions if s.status == "completed")
         mastered_topics = sum(1 for ks in k_states if ks.status == KnowledgeMasteryStatus.STABLE.value)
         needs_practice_topics = sum(1 for ks in k_states if ks.status == KnowledgeMasteryStatus.NEEDS_PRACTICE.value)
 
-        recent_sessions_dto = [
-            SessionSummaryResponse(
-                id=s.id,
-                topic_id=s.topic_id,
-                topic_title=s.topic.title,
-                learner_id=s.learner_id,
-                status=SessionStatus(s.status),
-                current_question_id=s.current_question_id,
-                attempts_count=len(s.attempts),
-                started_at=s.started_at,
-                updated_at=s.updated_at,
-                completed_at=s.completed_at,
+        recent_sessions_dto: list[SessionSummaryResponse] = []
+        for s in sessions[:5]:
+            ks_status, topic_mastered = self._resolve_knowledge_state_fields(
+                s.learner_id, s.topic_id
             )
-            for s in sessions[:5]
-        ]
+            recent_sessions_dto.append(
+                SessionSummaryResponse(
+                    id=s.id,
+                    topic_id=s.topic_id,
+                    topic_title=s.topic.title,
+                    learner_id=s.learner_id,
+                    status=SessionStatus(s.status),
+                    knowledge_state_status=ks_status,
+                    topic_mastered=topic_mastered,
+                    current_question_id=s.current_question_id,
+                    attempts_count=len(s.attempts),
+                    started_at=s.started_at,
+                    updated_at=s.updated_at,
+                    completed_at=s.completed_at,
+                )
+            )
         pending_reviews_dto = [
             ReviewItemResponse(
                 id=r.id,
