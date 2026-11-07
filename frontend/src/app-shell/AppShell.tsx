@@ -1,18 +1,40 @@
 import React, { useState } from 'react';
 import { WORKSPACE_NAV_ITEMS, WorkspaceId } from './navigation';
-import { StatusBadge } from '../design-system/StatusBadge';
+import {
+  INITIAL_LOOP_STAGE_SNAPSHOTS,
+  LoopStageId,
+  UiSimulationMode,
+} from '../design-system/stage5WorkbenchModel';
 
 interface AppShellProps {
   activeWorkspace: WorkspaceId;
   onSelectWorkspace: (workspace: WorkspaceId) => void;
   backendConnected: boolean | null;
+  currentStage?: LoopStageId;
+  maxUnlockedStage?: LoopStageId;
+  onSelectStage?: (stage: LoopStageId) => void;
+  stageGuardAlert?: string | null;
+  onDismissGuardAlert?: () => void;
+  uiMode?: UiSimulationMode;
+  onChangeUiMode?: (mode: UiSimulationMode) => void;
+  onResetProgression?: () => void;
   children: React.ReactNode;
 }
+
+const LOOP_STAGE_IDS: readonly LoopStageId[] = [1, 2, 3, 4, 5, 6];
 
 export const AppShell: React.FC<AppShellProps> = ({
   activeWorkspace,
   onSelectWorkspace,
   backendConnected,
+  currentStage = 2,
+  maxUnlockedStage = 2,
+  onSelectStage,
+  stageGuardAlert,
+  onDismissGuardAlert,
+  uiMode = 'normal',
+  onChangeUiMode,
+  onResetProgression,
   children,
 }) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -23,131 +45,236 @@ export const AppShell: React.FC<AppShellProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-surface-page text-text-primary">
-      {/* Top Brand Header */}
-      <header className="sticky top-0 z-20 border-b border-border-default bg-surface-raised">
-        <div className="mx-auto flex h-16 max-w-stage items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="grid h-8 w-8 place-items-center rounded-control bg-action-primary text-xs font-semibold text-white"
-            >
-              UL
+    <div className="wb-shell">
+      {/* Left Persistent Dark Product Navigation Rail (Scheme B Signature) */}
+      <aside className="wb-sidebar" aria-label="UnlearnLoop 产品主导航">
+        <div>
+          <div className="wb-brand-box">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <a
+                href="/"
+                className="wb-brand-logo"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick('home');
+                }}
+              >
+                <span className="wb-brand-icon" aria-hidden="true">
+                  UL
+                </span>
+                <span>UnlearnLoop</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen((prev) => !prev)}
+                className="wb-btn sm lg:hidden"
+                style={{
+                  background: '#1E293B',
+                  color: '#F8FAFC',
+                  borderColor: '#334155',
+                }}
+              >
+                {mobileNavOpen ? '收起菜单' : '导航菜单'}
+              </button>
+            </div>
+            <span className="wb-scheme-sub">
+              方案 B · Modern Product / Precision Workbench
             </span>
-            <div>
-              <span className="text-base font-semibold tracking-tight text-text-primary">
-                UnlearnLoop
-              </span>
-              <span className="ml-2 hidden text-xs text-text-secondary sm:inline">
-                错误诊断优先的自适应学习系统 · Stage 1 基线
-              </span>
-            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block">
-              {backendConnected === null && (
-                <StatusBadge tone="primary" label="API 检查中" />
-              )}
-              {backendConnected === true && (
-                <StatusBadge tone="success" label="API 在线" />
-              )}
-              {backendConnected === false && (
-                <StatusBadge tone="error" label="API 离线" />
-              )}
-            </div>
+          <nav
+            className={`wb-rail-nav ${mobileNavOpen ? 'block' : 'hidden lg:grid'}`}
+            aria-label="主工作区切换"
+          >
+            {WORKSPACE_NAV_ITEMS.map((item) => {
+              const isActive =
+                item.id === activeWorkspace ||
+                (activeWorkspace === 'review' && item.id === 'profile');
 
-            {/* Mobile expandable navigation toggle (DESIGN_SYSTEM.md 3.1) */}
-            <button
-              type="button"
-              aria-expanded={mobileNavOpen}
-              aria-controls="mobile-primary-nav"
-              onClick={() => setMobileNavOpen((prev) => !prev)}
-              className="h-10 rounded-control border border-border-default bg-surface-raised px-3 text-sm font-semibold text-text-primary hover:bg-surface-subtle focus:outline-none focus:ring-2 focus:ring-action-primary lg:hidden"
-            >
-              {mobileNavOpen ? '收起导航' : '展开导航'}
-            </button>
-          </div>
+              let dynamicBadge = item.badgeText;
+              if (item.id === 'learning') {
+                dynamicBadge = `Step ${currentStage}/6`;
+              } else if (item.id === 'diagnosis') {
+                const hypCount =
+                  INITIAL_LOOP_STAGE_SNAPSHOTS[currentStage].hypotheses.length;
+                dynamicBadge = `${hypCount} 假设`;
+              }
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`wb-rail-btn ${isActive ? 'active' : ''}`}
+                >
+                  <span>{item.label}</span>
+                  <span className="wb-rail-badge">{dynamicBadge}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Mobile Expandable Navigation Drawer */}
-        {mobileNavOpen && (
-          <nav
-            id="mobile-primary-nav"
-            aria-label="移动端主导航"
-            className="border-t border-border-default bg-surface-raised px-4 py-3 lg:hidden"
-          >
-            <ul className="space-y-1">
-              {WORKSPACE_NAV_ITEMS.map((item) => {
-                const isActive = item.id === activeWorkspace;
+        <div className="wb-rail-footer">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+            <strong style={{ color: '#F8FAFC' }}>[MOCK DATA · 正式前端]</strong>
+            {backendConnected === true && (
+              <span className="wb-rail-badge" style={{ background: '#065F46', color: '#A7F3D0' }}>
+                API 在线
+              </span>
+            )}
+            {backendConnected === false && (
+              <span className="wb-rail-badge" style={{ background: '#334155', color: '#CBD5E1' }}>
+                本地沙盒
+              </span>
+            )}
+            {backendConnected === null && (
+              <span className="wb-rail-badge">检测中…</span>
+            )}
+          </div>
+          <div>
+            三栏高密度结构：左轨导航 + 顶部受控状态机进度条 + 主操作区与实时证据侧栏。
+          </div>
+          <div style={{ fontSize: 11, color: '#64748B' }}>
+            禁止通过 UI 越权跳过未完成的诊断或迁移验证步骤；状态流转严格受服务端领域状态机与证据链约束。
+          </div>
+        </div>
+      </aside>
+
+      {/* Right Main Area: Sticky Closed-Loop Header + Workbench Body */}
+      <div className="wb-main-area">
+        <header className="wb-top-header">
+          <div className="wb-top-row">
+            <div className="wb-stepper-bar" role="group" aria-label="六步闭环领域状态机进度">
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'var(--text-muted)',
+                  marginRight: 4,
+                }}
+              >
+                闭环状态机（不可越级跳过）：
+              </span>
+              {LOOP_STAGE_IDS.map((stepId) => {
+                const cfg = INITIAL_LOOP_STAGE_SNAPSHOTS[stepId];
+                const isCurrent = stepId === currentStage;
+                const isUnlocked = stepId <= maxUnlockedStage;
+                const isCompleted = stepId < currentStage || (stepId <= maxUnlockedStage && !isCurrent);
+
+                let stateClass = '';
+                if (isCurrent) stateClass = 'active';
+                else if (isCompleted) stateClass = 'done';
+                else if (!isUnlocked) stateClass = 'locked';
+
                 return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      aria-current={isActive ? 'page' : undefined}
-                      onClick={() => handleNavClick(item.id)}
-                      className={`flex w-full items-center justify-between rounded-control px-3 py-2.5 text-left text-sm font-semibold transition ${
-                        isActive
-                          ? 'bg-blue-50 text-action-primary'
-                          : 'text-text-secondary hover:bg-surface-subtle hover:text-text-primary'
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      {isActive && (
-                        <span className="text-xs font-normal text-action-primary">
-                          当前工作空间
-                        </span>
-                      )}
-                    </button>
-                  </li>
+                  <button
+                    key={stepId}
+                    type="button"
+                    onClick={() => onSelectStage && onSelectStage(stepId)}
+                    className={`wb-step-pill ${stateClass}`}
+                    title={
+                      isUnlocked
+                        ? `查看或返回已解锁阶段：${cfg.stageTitle}`
+                        : `🔒 阶段尚未解锁：请先在工作台完成前置作答、追问或迁移验证`
+                    }
+                  >
+                    <span>
+                      {!isUnlocked ? '🔒 ' : isCompleted && !isCurrent ? '✓ ' : ''}
+                      {cfg.shortLabel}
+                    </span>
+                  </button>
                 );
               })}
-            </ul>
-          </nav>
-        )}
-      </header>
+            </div>
 
-      {/* Main Responsive Stage: Desktop left navigation + primary column (max 1200px) */}
-      <div className="mx-auto flex max-w-stage flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:py-8">
-        <aside className="hidden w-56 shrink-0 lg:block">
-          <nav
-            aria-label="桌面端主导航"
-            className="rounded-control border border-border-default bg-surface-raised p-3"
-          >
-            <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              工作空间导航
-            </p>
-            <ul className="space-y-1">
-              {WORKSPACE_NAV_ITEMS.map((item) => {
-                const isActive = item.id === activeWorkspace;
-                return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      aria-current={isActive ? 'page' : undefined}
-                      onClick={() => handleNavClick(item.id)}
-                      className={`flex w-full items-center justify-between rounded-control px-3 py-2.5 text-left text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-action-primary ${
-                        isActive
-                          ? 'bg-blue-50 text-action-primary'
-                          : 'text-text-secondary hover:bg-surface-subtle hover:text-text-primary'
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      {isActive && (
-                        <span
-                          aria-hidden="true"
-                          className="h-2 w-2 rounded-full bg-action-primary"
-                        />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-        </aside>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span className="wb-badge purple" title="当前使用明确标识的 Stage 5 交互式 Mock 数据源">
+                数据源：[MOCK DATA]
+              </span>
+              <span className="wb-badge slate">
+                引擎：Demo / Mock (<code>FakeModelProvider</code>)
+              </span>
+            </div>
+          </div>
 
-        <main className="min-w-0 flex-1 space-y-6">{children}</main>
+          {/* Interactive UI State Simulator Bar (Normal / Loading / Empty / Error & Retry) */}
+          {onChangeUiMode && (
+            <div
+              className="wb-top-row"
+              style={{
+                paddingTop: 8,
+                borderTop: '1px dashed var(--border-default)',
+                fontSize: 12,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>
+                  界面完备状态演练：
+                </span>
+                {(
+                  [
+                    { id: 'normal', label: '● 正常交互态 (Interactive)' },
+                    { id: 'loading', label: '⏳ 加载锁定态 (Loading)' },
+                    { id: 'empty', label: '∅ 空数据引导态 (Empty)' },
+                    { id: 'error', label: '⚠️ 超时错误与重试 (retry_waiting)' },
+                  ] as const
+                ).map((modeItem) => (
+                  <button
+                    key={modeItem.id}
+                    type="button"
+                    onClick={() => onChangeUiMode(modeItem.id)}
+                    className={`wb-btn sm ${uiMode === modeItem.id ? 'primary' : ''}`}
+                  >
+                    {modeItem.label}
+                  </button>
+                ))}
+              </div>
+
+              {onResetProgression && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    当前最高已解锁：第 {maxUnlockedStage} / 6 步
+                  </span>
+                  <button type="button" className="wb-btn sm" onClick={onResetProgression}>
+                    重置为第 1 步初始作答状态
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Guardrail Alert when Learner Attempts to Skip Ahead in the State Machine */}
+          {stageGuardAlert && (
+            <div
+              role="alert"
+              style={{
+                padding: '9px 14px',
+                borderRadius: 8,
+                background: 'var(--warning-soft)',
+                border: '1px solid #FDE68A',
+                color: 'var(--warning)',
+                fontSize: 12.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+              }}
+            >
+              <span>
+                <strong>🔒 领域状态机越级拦截：</strong> {stageGuardAlert}
+              </span>
+              {onDismissGuardAlert && (
+                <button type="button" className="wb-btn sm" onClick={onDismissGuardAlert}>
+                  知道了
+                </button>
+              )}
+            </div>
+          )}
+        </header>
+
+        <main className="wb-body">{children}</main>
       </div>
     </div>
   );

@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnlearnLoop · 方案 B：现代学习产品型 (Modern Learning Product)</title>
+  <style>
+    :root {
+      --surface-page: #F4F6FA;
+      --surface-raised: #FFFFFF;
+      --surface-subtle: #EDF1F7;
+      --surface-rail: #0F172A;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --border-default: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --action-primary: #2563EB;
+      --action-primary-hover: #1D4ED8;
+      --action-soft: #EFF6FF;
+      --success: #059669;
+      --success-soft: #ECFDF5;
+      --warning: #D97706;
+      --warning-soft: #FFFBEB;
+      --danger: #E11D48;
+      --danger-soft: #FFF1F2;
+      --purple: #7C3AED;
+      --purple-soft: #F5F3FF;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--surface-page);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      line-height: 1.55;
+      display: grid;
+      grid-template-columns: 232px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    /* Left Product Navigation Rail */
+    .sidebar {
+      background: var(--surface-rail);
+      color: #F8FAFC;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .brand-box {
+      padding: 4px 10px 18px;
+      border-bottom: 1px solid #1E293B;
+      margin-bottom: 16px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #FFFFFF;
+      text-decoration: none;
+    }
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--action-primary);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .scheme-sub {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 6px;
+      display: block;
+    }
+    .rail-nav {
+      display: grid;
+      gap: 4px;
+    }
+    .rail-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: left;
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.15s ease;
+    }
+    .rail-btn:hover {
+      background: #1E293B;
+      color: #F8FAFC;
+    }
+    .rail-btn.active {
+      background: var(--action-primary);
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+    .rail-badge {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #E2E8F0;
+    }
+    .rail-footer {
+      padding: 12px 10px;
+      border-top: 1px solid #1E293B;
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .rail-footer a {
+      color: #60A5FA;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    /* Main Content Area */
+    .main-shell {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Top Context & Closed-Loop Stepper Header */
+    .top-header {
+      background: var(--surface-raised);
+      border-bottom: 1px solid var(--border-default);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 15;
+    }
+    .stepper-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .step-pill {
+      appearance: none;
+      border: 1px solid var(--border-default);
+      background: var(--surface-page);
+      color: var(--text-secondary);
+      padding: 5px 11px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .step-pill:hover {
+      border-color: var(--action-primary);
+      color: var(--action-primary);
+    }
+    .step-pill.active {
+      background: var(--action-primary);
+      border-color: var(--action-primary);
+      color: #FFFFFF;
+    }
+    .step-pill.done {
+      background: var(--success-soft);
+      border-color: #A7F3D0;
+      color: var(--success);
+    }
+
+    .workspace-body {
+      padding: 24px 28px 64px;
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Split-Pane Workbench Grid */
+    .workbench-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.95fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--surface-raised);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .card-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #FAFBFD;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 650;
+      margin: 0;
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid transparent;
+    }
+    .badge.blue { background: var(--action-soft); color: var(--action-primary); border-color: #BFDBFE; }
+    .badge.green { background: var(--success-soft); color: var(--success); border-color: #A7F3D0; }
+    .badge.amber { background: var(--warning-soft); color: var(--warning); border-color: #FDE68A; }
+    .badge.red { background: var(--danger-soft); color: var(--danger); border-color: #FECDD3; }
+    .badge.purple { background: var(--purple-soft); color: var(--purple); border-color: #DDD6FE; }
+    .badge.slate { background: var(--surface-subtle); color: var(--text-secondary); border-color: var(--border-strong); }
+
+    /* Code Block */
+    .code-box {
+      background: #0F172A;
+      color: #E2E8F0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .code-box-head {
+      padding: 7px 14px;
+      background: #1E293B;
+      color: #94A3B8;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .code-box pre {
+      margin: 0;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    textarea.modern-input {
+      width: 100%;
+      min-height: 104px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      background: #FCFDFE;
+    }
+    textarea.modern-input:focus {
+      outline: 2px solid var(--action-primary);
+      border-color: transparent;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: var(--surface-raised);
+      color: var(--text-primary);
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: var(--surface-subtle);
+    }
+    .btn.primary {
+      background: var(--action-primary);
+      border-color: var(--action-primary);
+      color: #FFFFFF;
+    }
+    .btn.primary:hover {
+      background: var(--action-primary-hover);
+    }
+
+    /* Hypothesis Progress Card */
+    .hyp-card {
+      border: 1px solid var(--border-default);
+      border-radius: 9px;
+      padding: 13px 14px;
+      margin-bottom: 10px;
+      background: #FCFDFE;
+    }
+    .hyp-bar-track {
+      height: 6px;
+      background: var(--surface-subtle);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .hyp-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+
+    .ev-pill-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12.5px;
+    }
+    .ev-entry {
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--surface-page);
+      border-left: 3px solid var(--border-strong);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .ev-entry.sup { border-left-color: var(--success); background: var(--success-soft); }
+    .ev-entry.con { border-left-color: var(--danger); background: var(--danger-soft); }
+    .ev-entry.mis { border-left-color: var(--warning); background: var(--warning-soft); }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi-box {
+      background: var(--surface-raised);
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .kpi-val {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 1024px) {
+      body { grid-template-columns: 1fr; }
+      .sidebar { height: auto; position: static; }
+      .workbench-grid { grid-template-columns: 1fr; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div>
+      <div class="brand-box">
+        <a class="brand-logo" href="./index.html">
+          <span class="brand-icon">UL</span>
+          <span>UnlearnLoop</span>
+        </a>
+        <span class="scheme-sub">方案 B · 现代学习产品型工作台</span>
+      </div>
+      <nav class="rail-nav" aria-label="产品侧边栏导航">
+        <button class="rail-btn active" data-view="home"><span>学习焦点总览</span><span class="rail-badge">今日</span></button>
+        <button class="rail-btn" data-view="workspace"><span>双栏学习工作台</span><span class="rail-badge">进行中</span></button>
+        <button class="rail-btn" data-view="diagnosis"><span>Agent 诊断检视器</span><span class="rail-badge">2 假设</span></button>
+        <button class="rail-btn" data-view="transfer"><span>变式迁移验证室</span><span class="rail-badge">防刷分</span></button>
+        <button class="rail-btn" data-view="progress"><span>掌握状态与复习计划</span><span class="rail-badge">5 主题</span></button>
+      </nav>
+    </div>
+    <div class="rail-footer">
+      <div><strong>[MOCK DATA · 审美评审]</strong></div>
+      <div>三栏高密度结构：左轨导航 + 顶部闭环进度条 + 主操作区与实时证据侧栏。</div>
+      <a href="./index.html">← 返回三方案对比总览</a>
+    </div>
+  </aside>
+
+  <div class="main-shell">
+    <header class="top-header">
+      <div class="stepper-bar" aria-label="六步闭环进度">
+        <span style="font-size:12px;font-weight:700;color:var(--text-muted);margin-right:4px;">学习闭环阶段联动：</span>
+        <button class="step-pill done" onclick="jumpLoopStep(1)">1. 初始作答 ("3")</button>
+        <button class="step-pill active" id="st-btn-2" onclick="jumpLoopStep(2)">2. 竞争假设 & 证据不足</button>
+        <button class="step-pill" id="st-btn-3" onclick="jumpLoopStep(3)">3. 区分性追问 ("1、3")</button>
+        <button class="step-pill" id="st-btn-4" onclick="jumpLoopStep(4)">4. 针对性干预 & 练习</button>
+        <button class="step-pill" id="st-btn-5" onclick="jumpLoopStep(5)">5. 迁移失败 & 同题拦截</button>
+        <button class="step-pill" id="st-btn-6" onclick="jumpLoopStep(6)">6. 独立新题掌握 (stable)</button>
+      </div>
+      <div>
+        <span class="badge slate">引擎模式：Demo / Mock (<code>FakeModelProvider</code>)</span>
+      </div>
+    </header>
+
+    <main class="workspace-body" id="b-root"></main>
+  </div>
+
+  <script>
+    const state = {
+      view: 'workspace',
+      loopStep: 2 // 1..6 interactive synchronized state across main pane & inspector rail
+    };
+
+    const stepConfigs = {
+      1: {
+        stageTitle: '第 1 步：提交初始作答与规则预检',
+        sessionStatus: 'active → diagnosing',
+        uncertainty: 'INSUFFICIENT_EVIDENCE（证据不足）',
+        uncertaintyBadge: 'amber',
+        rawAttempt: 'Attempt #att_01 · 提交答案："3"（仅输出最终数字，未提供循环变量追踪）',
+        agentTool: 'rule_pre_evaluation (RuleEvaluator)',
+        agentReason: '答案 "3" 与标准答案匹配，但缺少执行过程追踪。无法区分“正确计算 0+1+2”与“误把 range(3) 当作 [1,2] 碰巧得 3”。',
+        h1Conf: 38, h1Status: 'candidate（候选）', h1Badge: 'amber',
+        h2Conf: 48, h2Status: 'insufficient_evidence（待验）', h2Badge: 'amber',
+        promptRole: 'initial · q_py_loop_initial_01',
+        promptText: '阅读下方 Python 循环代码，预测最终打印的值，并说明每轮 i 与 total 的变化：',
+        code: 'total = 0\nfor i in range(3):\n    total = total + i\nprint(total)',
+        userInput: '3',
+        ctaText: '推进至第 2 步：查看生成的竞争性错误假设 →',
+        nextStep: 2
+      },
+      2: {
+        stageTitle: '第 2 步：并列维护竞争性错误假设（拒绝武断归因）',
+        sessionStatus: 'diagnosing（诊断中）',
+        uncertainty: 'INSUFFICIENT_EVIDENCE（证据不足）',
+        uncertaintyBadge: 'amber',
+        rawAttempt: 'Attempt #att_01 · 提交答案："3"',
+        agentTool: 'select_diagnostic_followup',
+        agentReason: '当前存在 2 个竞争假设（H1: range_start_at_one vs H2: loop_memorized_result_without_trace）。选择信息区分度最高的低成本追问 q_py_loop_followup_01。',
+        h1Conf: 38, h1Status: 'candidate（候选）', h1Badge: 'amber',
+        h2Conf: 48, h2Status: 'insufficient_evidence（待验）', h2Badge: 'amber',
+        promptRole: 'diagnostic_followup · q_py_loop_followup_01',
+        promptText: '【Agent 区分性追问】如果把 print(total) 放进 for 循环内部，每一轮会依次打印什么？',
+        code: 'total = 0\nfor i in range(3):\n    total = total + i\n    print(total)  # <-- 每轮打印什么？',
+        userInput: '依次打印 1、3',
+        ctaText: '提交追问回答 "依次打印 1、3" 并观察证据演化 →',
+        nextStep: 3
+      },
+      3: {
+        stageTitle: '第 3 步：追问新证据入链 · 排除巧合假设并确诊卡点',
+        sessionStatus: 'diagnosing → intervening',
+        uncertainty: 'LOW（高区分度证据已收敛）',
+        uncertaintyBadge: 'green',
+        rawAttempt: 'Attempt #att_02（追问回应）："依次打印 1、3"',
+        agentTool: 'provide_targeted_explanation + assign_targeted_practice',
+        agentReason: '学习者写出“1、3”两轮累加过程：1) 反驳了 H2（证明有逐步追踪而非死记）；2) 强力支持并确认 H1（误以为 range(3) 从 1 开始生成 [1, 2]）。',
+        h1Conf: 86, h1Status: 'confirmed（已确认）', h1Badge: 'red',
+        h2Conf: 15, h2Status: 'lowered（已降低）', h2Badge: 'slate',
+        promptRole: 'targeted_explanation · 针对性概念纠偏',
+        promptText: '【针对性干预】range(3) 单参数默认从 0 开始（生成 0, 1, 2 共三轮），第一轮 i=0 时 total 保持 0。下一步请完成显式起止边界练习：',
+        code: '# 对比纠正：\n# range(3)    -> [0, 1, 2] (3 轮，依次打印 0, 1, 3)\n# range(1, 3) -> [1, 2]    (2 轮，依次打印 1, 3)',
+        userInput: '已阅读概念边界解释，准备进入针对性练习',
+        ctaText: '推进至第 4 步：完成针对性练习题 →',
+        nextStep: 4
+      },
+      4: {
+        stageTitle: '第 4 步：完成针对性练习 · 准备迁移验证',
+        sessionStatus: 'intervening → transfer_checking',
+        uncertainty: 'MEDIUM（练习通过，待独立迁移验证）',
+        uncertaintyBadge: 'blue',
+        rawAttempt: 'Attempt #att_03（练习作答）："6"（正确）',
+        agentTool: 'assign_transfer_verification',
+        agentReason: '针对性练习 q_py_loop_practice_01 作答正确（输出 6），H1 风险下降；但同结构练习答对不等于掌握，必须派发新情境迁移验证题。',
+        h1Conf: 35, h1Status: 'lowered（已缓解）', h1Badge: 'blue',
+        h2Conf: 15, h2Status: 'lowered（已降低）', h2Badge: 'slate',
+        promptRole: 'targeted_practice · q_py_loop_practice_01',
+        promptText: '【针对性练习】当循环显式指定 range(1, 4) 时，最终 total 输出什么？',
+        code: 'total = 0\nfor i in range(1, 4):\n    total += i\nprint(total)',
+        userInput: '6（第1轮 i=1, 第2轮 i=2, 第3轮 i=3，相加得 6）',
+        ctaText: '推进至第 5 步：进入迁移验证与防刷分测试 →',
+        nextStep: 5
+      },
+      5: {
+        stageTitle: '第 5 步：迁移验证失败 + 同题重试防刷分拦截',
+        sessionStatus: 'transfer_checking（迁移验证中）',
+        uncertainty: 'MEDIUM（同题重试被拦截，需独立新题）',
+        uncertaintyBadge: 'amber',
+        rawAttempt: 'Attempt #att_04: "3 15"(错) → Attempt #att_05(同题重答): "3 17"(对，被拦截)',
+        agentTool: 'transfer_retry_blocked (Stage 3/4 领域不变量)',
+        agentReason: '学习者在 q_py_loop_transfer_01 首次答错（"3 15"），随后对同一道题重答 "3 17"。系统拦截同题重试直接晋升 stable，保持 needs_practice 并要求派发全新迁移题。',
+        h1Conf: 35, h1Status: 'lowered（待新题验证）', h1Badge: 'amber',
+        h2Conf: 15, h2Status: 'lowered', h2Badge: 'slate',
+        promptRole: 'transfer_check · q_py_loop_transfer_01（已被污染，需换新题）',
+        promptText: '【迁移题 #1 · 仓库双变量盘点】首次回答 "3 15" 失败后，再次提交同一题正确答案 "3 17"：',
+        code: 'count = 0\nrunning_sum = 5\nfor step in range(1, 7, 2):\n    count += 1\n    running_sum += step * 2\nprint(count, running_sum)',
+        userInput: '3 17（同题第 2 次重试提交 -> 被系统拦截晋升 stable）',
+        ctaText: '推进至第 6 步：派发未作答过的独立新迁移题 #2 →',
+        nextStep: 6
+      },
+      6: {
+        stageTitle: '第 6 步：独立新情境迁移验证通过 · 合法晋升 stable',
+        sessionStatus: 'transfer_checking → completed',
+        uncertainty: 'LOW（独立新题首次验证通过）',
+        uncertaintyBadge: 'green',
+        rawAttempt: 'Attempt #att_06（新迁移题 q_py_loop_transfer_02 首次作答）："3 60"（正确）',
+        agentTool: 'update_knowledge_state (target_status="stable")',
+        agentReason: '学习者在从未接触过的新情境迁移题 q_py_loop_transfer_02（温控采样）中一次答对 "3 60"。满足完整证据链，KnowledgeState 合法更新为 stable。',
+        h1Conf: 10, h1Status: 'lowered（已解决）', h1Badge: 'green',
+        h2Conf: 10, h2Status: 'lowered（已解决）', h2Badge: 'green',
+        promptRole: 'transfer_check · q_py_loop_transfer_02（全新情境）',
+        promptText: '【独立新迁移题 #2 · 传感器采样累加】首次独立作答：',
+        code: 'alerts = 0\nenergy = 15\nfor tick in range(2, 8, 2):\n    alerts += 1\n    energy += tick * 3\nprint(alerts, energy)',
+        userInput: '3 60',
+        ctaText: '查看最终掌握度档案与复习计划 →',
+        nextStep: 1
+      }
+    };
+
+    function setView(v) {
+      state.view = v;
+      document.querySelectorAll('.rail-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.view === v);
+      });
+      render();
+    }
+
+    function jumpLoopStep(step) {
+      state.loopStep = step;
+      if (state.view === 'home' || state.view === 'progress') {
+        state.view = 'workspace';
+        document.querySelectorAll('.rail-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.view === 'workspace');
+        });
+      }
+      render();
+    }
+
+    function renderInspectorRail(cfg) {
+      return `
+        <aside>
+          <div class="card">
+            <div class="card-head">
+              <h3 class="card-title">实时 Agent 诊断与证据检视器</h3>
+              <span class="badge ${cfg.uncertaintyBadge}">${cfg.uncertainty}</span>
+            </div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">学习者原始作答不可变快照</div>
+              <div style="padding:9px 12px;background:var(--surface-page);border:1px solid var(--border-default);border-radius:7px;font-family:var(--font-mono);font-size:12.5px;margin-bottom:16px;">
+                ${cfg.rawAttempt}
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <strong style="font-size:13px;">并列竞争性错误假设</strong>
+                <span style="font-size:11px;color:var(--text-muted)">启发式权重 (非统计概率)</span>
+              </div>
+
+              <div class="hyp-card">
+                <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px;">
+                  <strong>H1: <code>range_start_at_one</code></strong>
+                  <span class="badge ${cfg.h1Badge}">${cfg.h1Status} · ${cfg.h1Conf}%</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;">误以为 range(3) 从 1 开始生成 [1, 2]</div>
+                <div class="hyp-bar-track">
+                  <div class="hyp-bar-fill" style="width:${cfg.h1Conf}%;background:${cfg.h1Conf > 60 ? 'var(--danger)' : 'var(--warning)'}"></div>
+                </div>
+                <div class="ev-pill-row">
+                  <div class="ev-entry"><span>[中立] 初始输出 3 与 1+2=3 兼容</span><code>#att_01</code></div>
+                  ${
+                    state.loopStep >= 3
+                      ? `<div class="ev-entry sup"><span>[支持 +] 追问回答 "依次打印 1、3" 证实首轮为 1</span><code>#att_02</code></div>`
+                      : `<div class="ev-entry mis"><span>[缺失证据] 待验证首轮循环体内打印值</span><code>待追问</code></div>`
+                  }
+                  ${
+                    state.loopStep >= 4
+                      ? `<div class="ev-entry con"><span>[反驳 −] 针对性练习 range(1,4) 正确输出 6</span><code>#att_03</code></div>`
+                      : ''
+                  }
+                </div>
+              </div>
+
+              <div class="hyp-card">
+                <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px;">
+                  <strong>H2: <code>loop_memorized_without_trace</code></strong>
+                  <span class="badge ${cfg.h2Badge}">${cfg.h2Status} · ${cfg.h2Conf}%</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;">仅凭记忆给出结果 3，未执行逐轮状态追踪</div>
+                <div class="hyp-bar-track">
+                  <div class="hyp-bar-fill" style="width:${cfg.h2Conf}%;background:var(--action-primary)"></div>
+                </div>
+                <div class="ev-pill-row">
+                  <div class="ev-entry sup"><span>[支持 +] 初答仅单个数字 3，无过程说明</span><code>rule_check</code></div>
+                  ${
+                    state.loopStep >= 3
+                      ? `<div class="ev-entry con"><span>[反驳 −] 追问能写出逐轮累加序列 1 → 3</span><code>#att_02</code></div>`
+                      : ''
+                  }
+                </div>
+              </div>
+
+              <div style="margin-top:14px;padding:12px;background:var(--action-soft);border:1px solid #BFDBFE;border-radius:8px;">
+                <div style="font-size:11.5px;font-weight:700;color:var(--action-primary);text-transform:uppercase;">
+                  Agent 决策工具调用 · ${cfg.agentTool}
+                </div>
+                <p style="margin:6px 0 0;font-size:12.5px;color:var(--text-primary);">
+                  ${cfg.agentReason}
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      `;
+    }
+
+    function renderHome() {
+      return `
+        <div style="margin-bottom:20px;">
+          <h1 style="margin:0 0 6px;font-size:24px;">今日学习焦点与证据待办</h1>
+          <p style="margin:0;color:var(--text-secondary)">方案 B 以清晰的任务卡片、闭环进度条与双栏联动工作台组织完整学习体验。</p>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi-box">
+            <div style="font-size:12px;color:var(--text-muted)">待区分错误假设</div>
+            <div class="kpi-val" style="color:var(--warning)">2 个</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">位于 <code>py-for-loop</code> 会话</div>
+          </div>
+          <div class="kpi-box">
+            <div style="font-size:12px;color:var(--text-muted)">待独立迁移验证</div>
+            <div class="kpi-val" style="color:var(--action-primary)">1 项</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">需未接触过的新情境题</div>
+          </div>
+          <div class="kpi-box">
+            <div style="font-size:12px;color:var(--text-muted)">待执行间隔复习</div>
+            <div class="kpi-val" style="color:var(--danger)">2 项</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">因上次迁移验证失败触发</div>
+          </div>
+          <div class="kpi-box">
+            <div style="font-size:12px;color:var(--text-muted)">已验证操作性掌握</div>
+            <div class="kpi-val" style="color:var(--success)">2 / 5</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">全部具备迁移验证证据</div>
+          </div>
+        </div>
+
+        <div class="workbench-grid">
+          <div class="card">
+            <div class="card-head">
+              <h2 class="card-title">当前主任务：完成 <code>py-for-loop</code> 诊断追问与迁移验证</h2>
+              <span class="badge amber">会话状态：diagnosing</span>
+            </div>
+            <div class="card-body">
+              <p style="margin-top:0;color:var(--text-secondary)">
+                你上次提交了初始答案 <code>"3"</code>。系统已保存不可变作答快照，并生成 2 个并列候选假设。点击下方按钮进入双栏工作台，体验从“追问取证 → 针对性干预 → 迁移验证防刷分”的完整 6 步闭环。
+              </p>
+              <div class="btn-group">
+                <button class="btn primary" onclick="setView('workspace')">打开双栏学习工作台 →</button>
+                <button class="btn" onclick="setView('diagnosis')">进入 Agent 诊断检视器</button>
+                <button class="btn" onclick="setView('transfer')">体验迁移验证防刷分</button>
+              </div>
+            </div>
+          </div>
+          ${renderInspectorRail(stepConfigs[state.loopStep])}
+        </div>
+      `;
+    }
+
+    function renderWorkspaceOrDiagnosis() {
+      const cfg = stepConfigs[state.loopStep];
+      return `
+        <div class="workbench-grid">
+          <div>
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <div style="font-size:12px;color:var(--action-primary);font-weight:700;">${cfg.stageTitle}</div>
+                  <h2 class="card-title" style="margin-top:2px;">知识点：Python <code>for</code> 循环与累加器 (<code>py-for-loop</code>)</h2>
+                </div>
+                <span class="badge blue">会话状态：${cfg.sessionStatus}</span>
+              </div>
+              <div class="card-body">
+                <div style="padding:12px 14px;background:var(--surface-page);border:1px solid var(--border-default);border-radius:8px;margin-bottom:16px;font-size:13.5px;">
+                  <strong>当前合法分配任务（<code>${cfg.promptRole}</code>）：</strong>
+                  <div style="margin-top:4px;color:var(--text-secondary)">${cfg.promptText}</div>
+                </div>
+
+                <div class="code-box">
+                  <div class="code-box-head">
+                    <span>python3 · 脱敏题目上下文</span>
+                    <span>禁止越权提交非当前派发题目</span>
+                  </div>
+                  <pre>${cfg.code}</pre>
+                </div>
+
+                <label style="display:block;font-weight:600;margin:14px 0 6px;">学习者当前输入 / 响应记录：</label>
+                <textarea class="modern-input">${cfg.userInput}</textarea>
+
+                <div class="btn-group">
+                  <button class="btn primary" onclick="${state.loopStep === 6 ? "setView('progress')" : `jumpLoopStep(${cfg.nextStep})`}">
+                    ${cfg.ctaText}
+                  </button>
+                  <button class="btn" onclick="jumpLoopStep(${state.loopStep === 1 ? 6 : state.loopStep - 1})">← 回看上一步状态</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head">
+                <h3 class="card-title">决策审计时间线（DecisionEvent 不可变日志）</h3>
+                <span class="badge slate">支持按固定输入重放</span>
+              </div>
+              <div class="card-body" style="display:grid;gap:10px;font-size:13px;">
+                <div style="display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--border-default);">
+                  <span><strong>#evt_881</strong> · <code>rule_pre_evaluation</code>：初答 "3" 缺少追踪，生成 H1/H2 竞争假设</span>
+                  <span class="badge amber">INSUFFICIENT_EVIDENCE</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--border-default);">
+                  <span><strong>#evt_882</strong> · <code>select_diagnostic_followup</code>：派发追问题 <code>q_py_loop_followup_01</code></span>
+                  <span class="badge blue">QUESTION_SELECTED</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--border-default);">
+                  <span><strong>#evt_885</strong> · <code>assign_targeted_practice</code>：追问回应 "1、3" 确认 H1，派发练习</span>
+                  <span class="badge purple">INTERVENTION_SELECTED</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span><strong>#evt_890</strong> · <code>update_knowledge_state</code>：同题重试被拒后，独立新迁移题通过 → <code>stable</code></span>
+                  <span class="badge green">RESOLVED</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          ${renderInspectorRail(cfg)}
+        </div>
+      `;
+    }
+
+    function renderTransfer() {
+      return `
+        <div style="margin-bottom:18px;">
+          <h1 style="margin:0 0 6px;font-size:22px;">变式迁移验证室 · 防记忆答案刷分机制</h1>
+          <p style="margin:0;color:var(--text-secondary)">直观对比“首次迁移失败 → 同题重答被拦截 → 派发全新情境题验证通过”的完整防伪造掌握流程。</p>
+        </div>
+
+        <div class="workbench-grid">
+          <div class="card">
+            <div class="card-head">
+              <h2 class="card-title">三阶段迁移验证对比面板</h2>
+              <div style="display:flex;gap:6px;">
+                <button class="btn" onclick="jumpLoopStep(5);setView('transfer')">看同题拦截 (Step 5)</button>
+                <button class="btn primary" onclick="jumpLoopStep(6);setView('transfer')">看新题通过 (Step 6)</button>
+              </div>
+            </div>
+            <div class="card-body" style="display:grid;gap:14px;">
+              <div style="padding:14px;border:1px solid #FECDD3;background:var(--danger-soft);border-radius:8px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <strong>阶段 1：迁移题 #1 (<code>q_py_loop_transfer_01</code>) 首次作答失败</strong>
+                  <span class="badge red">needs_practice</span>
+                </div>
+                <p style="margin:6px 0 0;font-size:13px;">提交 <code>"3 15"</code>（错误）。系统保持 <code>needs_practice</code> 并自动创建复习任务 <code>ReviewItem</code>。</p>
+              </div>
+
+              <div style="padding:14px;border:1px solid #FDE68A;background:var(--warning-soft);border-radius:8px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <strong>阶段 2：对同一道迁移题 #1 重试提交正确答案 <code>"3 17"</code></strong>
+                  <span class="badge amber">🚫 transfer_retry_blocked</span>
+                </div>
+                <p style="margin:6px 0 0;font-size:13px;">
+                  <strong>核心原则拦截：</strong>虽然 <code>"3 17"</code> 文本正确，但系统检索到该题存在历史失败记录 <code>#att_04</code>。为防止背答案虚假掌握，拒绝晋升 <code>stable</code>！
+                </p>
+              </div>
+
+              <div style="padding:14px;border:1px solid #A7F3D0;background:var(--success-soft);border-radius:8px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <strong>阶段 3：派发全新未作答迁移题 #2 (<code>q_py_loop_transfer_02</code>) 首次答对 <code>"3 60"</code></strong>
+                  <span class="badge green">✓ mastery_achieved (stable)</span>
+                </div>
+                <p style="margin:6px 0 0;font-size:13px;">
+                  表面结构切换为“温控传感器采样”，考查同一目标知识点 <code>py-for-loop</code>。首次独立作答正确，合法晋升为 <code>stable</code>。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          ${renderInspectorRail(stepConfigs[state.loopStep])}
+        </div>
+      `;
+    }
+
+    function renderProgress() {
+      return `
+        <div style="margin-bottom:18px;">
+          <h1 style="margin:0 0 6px;font-size:22px;">知识点掌握状态与会话结束语义矩阵</h1>
+          <p style="margin:0;color:var(--text-secondary)">严格区分 <code>session.status == "completed"</code>（会话已结束）与 <code>KnowledgeState.status == "stable"</code>（当前知识点已掌握）。</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title">Python 基础内容包 · 掌握度与待复习原因列表</h2>
+            <span class="badge slate">所有置信度均标记 confidence_is_heuristic = true</span>
+          </div>
+          <div class="card-body" style="display:grid;gap:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border-default);border-radius:8px;">
+              <div>
+                <strong><code>py-for-loop</code> · for 循环与状态累加</strong>
+                <div style="font-size:12.5px;color:var(--text-secondary)">最近验证：独立迁移题 <code>q_py_loop_transfer_02 (#att_06)</code> 通过 · 会话已正常完成</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge slate">Session: completed</span>
+                <span class="badge green">Mastery: stable (topic_mastered=true)</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border-default);border-radius:8px;">
+              <div>
+                <strong><code>py-list-reference</code> · 列表引用与浅拷贝别名</strong>
+                <div style="font-size:12.5px;color:var(--text-secondary)">迁移题首次验证失败后用户主动结束会话（<code>session_completed_without_mastery</code>）· 已排入明日复习</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge slate">Session: completed</span>
+                <span class="badge amber">Mastery: needs_practice (topic_mastered=false)</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border-default);border-radius:8px;">
+              <div>
+                <strong><code>py-if-elif-else</code> · 条件分支互斥与短路执行</strong>
+                <div style="font-size:12.5px;color:var(--text-secondary)">会话已暂停 · 2 个候选错误假设等待补充区分性证据</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge purple">Session: paused</span>
+                <span class="badge amber">Mastery: insufficient_evidence</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      // Update top stepper buttons
+      for (let i = 1; i <= 6; i++) {
+        const pills = document.querySelectorAll('.step-pill');
+        if (pills[i - 1]) {
+          pills[i - 1].className = 'step-pill' + (i === state.loopStep ? ' active' : i < state.loopStep ? ' done' : '');
+        }
+      }
+      const root = document.getElementById('b-root');
+      if (state.view === 'home') root.innerHTML = renderHome();
+      else if (state.view === 'workspace' || state.view === 'diagnosis') root.innerHTML = renderWorkspaceOrDiagnosis();
+      else if (state.view === 'transfer') root.innerHTML = renderTransfer();
+      else root.innerHTML = renderProgress();
+    }
+
+    document.querySelectorAll('.rail-btn').forEach(btn => {
+      btn.addEventListener('click', () => setView(btn.dataset.view));
+    });
+
+    render();
+  </script>
+</body>
+</html>
