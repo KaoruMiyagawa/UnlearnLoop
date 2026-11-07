@@ -970,6 +970,69 @@ def test_lifespan_raises_on_seed_failure_and_preserves_existing_data(
         get_settings.cache_clear()
 
 
+def test_stage5c_real_session_http_smoke_with_isolated_sqlite_and_fake_provider(
+    session_factory: sessionmaker[Session],
+    test_settings: Settings,
+) -> None:
+    """Exercise the C1 browser flow through HTTP using isolated SQLite and an explicit offline model."""
+    with transactional_session(session_factory) as session:
+        import_content_pack(session)
+
+    fake_provider = FakeModelProvider()
+    app = create_app(test_settings)
+    app.dependency_overrides[get_settings] = lambda: test_settings
+    app.dependency_overrides[get_session_factory] = lambda: session_factory
+    app.dependency_overrides[get_model_provider] = lambda: fake_provider
+
+    with TestClient(app) as http:
+        topics = http.get("/api/v1/topics")
+        assert topics.status_code == 200
+        assert any(topic["slug"] == "py-for-loop" for topic in topics.json())
+
+        materials = http.get("/api/v1/topics/py-for-loop/materials")
+        assert materials.status_code == 200
+        assert materials.json()
+
+        created = http.post(
+            "/api/v1/sessions",
+            json={"topic_id": "topic_py_for_loop", "learner_id": "stage5c_http_smoke"},
+        )
+        assert created.status_code == 201
+        session_id = created.json()["id"]
+        initial_question = created.json()["current_question"]
+        assert initial_question["id"] == created.json()["current_question_id"]
+        assert "standard_answer" not in initial_question
+
+        loaded = http.get(f"/api/v1/sessions/{session_id}")
+        assert loaded.status_code == 200
+        assert loaded.json()["current_question"]["id"] == initial_question["id"]
+
+        attempt = http.post(
+            f"/api/v1/sessions/{session_id}/attempts",
+            json={
+                "question_id": initial_question["id"],
+                "submitted_answer": "999, definitely incorrect",
+                "idempotency_key": "stage5c-http-smoke-initial-1",
+            },
+        )
+        assert attempt.status_code == 201
+        result = attempt.json()
+        assert result["attempt_id"]
+        assert result["is_correct"] is False
+        assert result["next_action"] == "diagnose"
+        assert result["diagnostic_case_id"]
+
+        case = http.get(f"/api/v1/diagnoses/{result['diagnostic_case_id']}")
+        assert case.status_code == 200
+        assert case.json()["is_mock_provider"] is True
+        assert case.json()["execution_mode"] == "mock"
+
+        updated = http.get(f"/api/v1/sessions/{session_id}")
+        assert updated.status_code == 200
+        assert updated.json()["status"] == "diagnosing"
+        assert updated.json()["active_diagnostic_case_id"] == result["diagnostic_case_id"]
+
+
 def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
     """Audit Item 7: Verify exact OpenAPI paths and HTTP operation counts vs hidden aliases."""
     openapi_resp = seeded_client.get("/openapi.json")

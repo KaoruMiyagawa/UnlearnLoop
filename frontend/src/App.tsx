@@ -21,10 +21,12 @@ import {
 } from './design-system/stage5WorkbenchModel';
 import { DiagnosisWorkspacePlaceholder } from './diagnosis-workspace/DiagnosisWorkspacePlaceholder';
 import { LearningWorkspacePlaceholder } from './learning-workspace/LearningWorkspacePlaceholder';
+import { RealLearningWorkspace } from './learning-workspace/RealLearningWorkspace';
 import { ProfileWorkspacePlaceholder } from './profile-workspace/ProfileWorkspacePlaceholder';
 import { ReviewWorkspacePlaceholder } from './review-workspace/ReviewWorkspacePlaceholder';
 
 export const App: React.FC = () => {
+  const [dataMode, setDataMode] = useState<'demo' | 'real'>('real');
   const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceId>(() =>
     resolveWorkspaceFromPath(window.location.pathname),
   );
@@ -37,6 +39,13 @@ export const App: React.FC = () => {
   const [maxUnlockedStage, setMaxUnlockedStage] = useState<LoopStageId>(2);
   const [stageGuardAlert, setStageGuardAlert] = useState<string | null>(null);
   const [uiMode, setUiMode] = useState<UiSimulationMode>('normal');
+  const [realVisualStage, setRealVisualStage] = useState<LoopStageId>(1);
+  const [realHasDiagnosis, setRealHasDiagnosis] = useState(false);
+
+  const handleRealVisualState = useCallback((stage: LoopStageId, hasDiagnosis: boolean) => {
+    setRealVisualStage(stage);
+    setRealHasDiagnosis(hasDiagnosis);
+  }, []);
 
   // Local Answer Draft Cache per Loop Stage (preserves draft across navigation & error states)
   const [draftsByStage, setDraftsByStage] = useState<Record<LoopStageId, string>>(() => ({
@@ -155,15 +164,25 @@ export const App: React.FC = () => {
       activeWorkspace={activeWorkspace}
       onSelectWorkspace={navigateWorkspace}
       backendConnected={backendConnected}
-      currentStage={currentStage}
-      maxUnlockedStage={maxUnlockedStage}
-      onSelectStage={handleSelectStage}
-      stageGuardAlert={stageGuardAlert}
+      dataMode={dataMode}
+      onChangeDataMode={setDataMode}
+      hasDiagnosticCase={realHasDiagnosis}
+      currentStage={dataMode === 'real' ? realVisualStage : currentStage}
+      maxUnlockedStage={dataMode === 'real' ? realVisualStage : maxUnlockedStage}
+      onSelectStage={dataMode === 'demo' ? handleSelectStage : undefined}
+      stageGuardAlert={dataMode === 'demo' ? stageGuardAlert : null}
       onDismissGuardAlert={() => setStageGuardAlert(null)}
       uiMode={uiMode}
-      onChangeUiMode={setUiMode}
-      onResetProgression={handleResetToStageOne}
+      onChangeUiMode={dataMode === 'demo' ? setUiMode : undefined}
+      onResetProgression={dataMode === 'demo' ? handleResetToStageOne : undefined}
     >
+      {dataMode === 'real' ? (
+        <RealLearningWorkspace
+          workspace={activeWorkspace}
+          onNavigateWorkspace={navigateWorkspace}
+          onVisualStageChange={handleRealVisualState}
+        />
+      ) : <>
       {/* 1. Learning Home (学习焦点总览) */}
       {activeWorkspace === 'home' && (
         <div>
@@ -433,6 +452,7 @@ export const App: React.FC = () => {
           onOpenTransferWorkspace={() => navigateWorkspace('transfer')}
         />
       )}
+      </>}
     </AppShell>
   );
 };

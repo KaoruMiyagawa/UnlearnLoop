@@ -10,6 +10,9 @@ interface AppShellProps {
   activeWorkspace: WorkspaceId;
   onSelectWorkspace: (workspace: WorkspaceId) => void;
   backendConnected: boolean | null;
+  dataMode: 'demo' | 'real';
+  onChangeDataMode: (mode: 'demo' | 'real') => void;
+  hasDiagnosticCase?: boolean;
   currentStage?: LoopStageId;
   maxUnlockedStage?: LoopStageId;
   onSelectStage?: (stage: LoopStageId) => void;
@@ -27,6 +30,9 @@ export const AppShell: React.FC<AppShellProps> = ({
   activeWorkspace,
   onSelectWorkspace,
   backendConnected,
+  dataMode,
+  onChangeDataMode,
+  hasDiagnosticCase = false,
   currentStage = 2,
   maxUnlockedStage = 2,
   onSelectStage,
@@ -95,9 +101,9 @@ export const AppShell: React.FC<AppShellProps> = ({
               if (item.id === 'learning') {
                 dynamicBadge = `Step ${currentStage}/6`;
               } else if (item.id === 'diagnosis') {
-                const hypCount =
-                  INITIAL_LOOP_STAGE_SNAPSHOTS[currentStage].hypotheses.length;
-                dynamicBadge = `${hypCount} 假设`;
+                dynamicBadge = dataMode === 'demo'
+                  ? `${INITIAL_LOOP_STAGE_SNAPSHOTS[currentStage].hypotheses.length} 假设 · Mock`
+                  : hasDiagnosticCase ? '诊断待处理' : '无活动诊断';
               }
 
               return (
@@ -118,10 +124,10 @@ export const AppShell: React.FC<AppShellProps> = ({
 
         <div className="wb-rail-footer">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-            <strong style={{ color: '#F8FAFC' }}>[MOCK DATA · 正式前端]</strong>
+            <strong style={{ color: '#F8FAFC' }}>{dataMode === 'demo' ? '[DEMO · MOCK DATA]' : '[REAL API DATA]'}</strong>
             {backendConnected === true && (
               <span className="wb-rail-badge" style={{ background: '#065F46', color: '#A7F3D0' }}>
-                API 在线
+                健康检查在线
               </span>
             )}
             {backendConnected === false && (
@@ -134,7 +140,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             )}
           </div>
           <div>
-            三栏高密度结构：左轨导航 + 顶部受控状态机进度条 + 主操作区与实时证据侧栏。
+            {dataMode === 'demo' ? '演示数据与真实 API 健康检查彼此独立。' : '业务数据仅来自 FastAPI；健康检查状态不代表 Agent 已运行。'}
           </div>
           <div style={{ fontSize: 11, color: '#64748B' }}>
             禁止通过 UI 越权跳过未完成的诊断或迁移验证步骤；状态流转严格受服务端领域状态机与证据链约束。
@@ -155,12 +161,12 @@ export const AppShell: React.FC<AppShellProps> = ({
                   marginRight: 4,
                 }}
               >
-                闭环状态机（不可越级跳过）：
+                {dataMode === 'demo' ? '演示闭环进度（Mock）：' : '学习过程提示（服务端状态映射）：'}
               </span>
               {LOOP_STAGE_IDS.map((stepId) => {
                 const cfg = INITIAL_LOOP_STAGE_SNAPSHOTS[stepId];
                 const isCurrent = stepId === currentStage;
-                const isUnlocked = stepId <= maxUnlockedStage;
+                const isUnlocked = dataMode === 'demo' ? stepId <= maxUnlockedStage : true;
                 const isCompleted = stepId < currentStage || (stepId <= maxUnlockedStage && !isCurrent);
 
                 let stateClass = '';
@@ -172,13 +178,10 @@ export const AppShell: React.FC<AppShellProps> = ({
                   <button
                     key={stepId}
                     type="button"
+                    disabled={dataMode === 'real' || !isUnlocked}
                     onClick={() => onSelectStage && onSelectStage(stepId)}
                     className={`wb-step-pill ${stateClass}`}
-                    title={
-                      isUnlocked
-                        ? `查看或返回已解锁阶段：${cfg.stageTitle}`
-                        : `🔒 阶段尚未解锁：请先在工作台完成前置作答、追问或迁移验证`
-                    }
+                    title={dataMode === 'real' ? `视觉提示：${cfg.shortLabel}；业务流程由服务端状态决定` : isUnlocked ? `查看或返回演示阶段：${cfg.stageTitle}` : '演示阶段尚未解锁'}
                   >
                     <span>
                       {!isUnlocked ? '🔒 ' : isCompleted && !isCurrent ? '✓ ' : ''}
@@ -190,17 +193,16 @@ export const AppShell: React.FC<AppShellProps> = ({
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span className="wb-badge purple" title="当前使用明确标识的 Stage 5 交互式 Mock 数据源">
-                数据源：[MOCK DATA]
-              </span>
-              <span className="wb-badge slate">
-                引擎：Demo / Mock (<code>FakeModelProvider</code>)
-              </span>
+              <div className="wb-mode-switch" role="group" aria-label="数据模式">
+                <button type="button" className={`wb-btn sm ${dataMode === 'real' ? 'primary' : ''}`} aria-pressed={dataMode === 'real'} onClick={() => onChangeDataMode('real')}>真实 API</button>
+                <button type="button" className={`wb-btn sm ${dataMode === 'demo' ? 'primary' : ''}`} aria-pressed={dataMode === 'demo'} onClick={() => onChangeDataMode('demo')}>演示 Mock</button>
+              </div>
+              {dataMode === 'demo' ? <span className="wb-badge purple">演示数据：Mock / FakeModelProvider</span> : <span className="wb-badge green">业务数据：FastAPI 响应</span>}
             </div>
           </div>
 
           {/* Interactive UI State Simulator Bar (Normal / Loading / Empty / Error & Retry) */}
-          {onChangeUiMode && (
+          {dataMode === 'demo' && onChangeUiMode && (
             <div
               className="wb-top-row"
               style={{
