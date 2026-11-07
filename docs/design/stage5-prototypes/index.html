@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnlearnLoop · Stage 5 三套视觉方案交互评审总览</title>
+  <style>
+    :root {
+      --bg-bar: #090D16;
+      --bg-panel: #111827;
+      --border-bar: #1F2937;
+      --text-light: #F9FAFB;
+      --text-dim: #9CA3AF;
+      --accent: #3B82F6;
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #0F172A;
+      color: var(--text-light);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .review-header {
+      background: var(--bg-bar);
+      border-bottom: 1px solid var(--border-bar);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      z-index: 50;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-mark {
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 5px 8px;
+      border-radius: 6px;
+    }
+    .title-group h1 {
+      font-size: 15px;
+      margin: 0;
+      font-weight: 650;
+    }
+    .title-group span.sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .scheme-switcher {
+      display: flex;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-bar);
+      padding: 4px;
+      border-radius: 10px;
+      gap: 4px;
+    }
+    .s-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .s-btn:hover { color: #FFFFFF; }
+    .s-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+    .s-btn .rec-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .view-jumper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .v-btn {
+      appearance: none;
+      border: 1px solid #374151;
+      background: #1F2937;
+      color: #D1D5DB;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .v-btn:hover {
+      border-color: #60A5FA;
+      color: #FFFFFF;
+    }
+    .v-btn.active {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border-color: #93C5FD;
+      font-weight: 600;
+    }
+
+    .actions-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .open-standalone {
+      font-size: 12px;
+      color: #93C5FD;
+      text-decoration: none;
+      padding: 6px 10px;
+      border: 1px solid #1E3A8A;
+      border-radius: 6px;
+      background: rgba(30, 58, 138, 0.35);
+    }
+
+    .comparison-drawer {
+      background: #111827;
+      border-bottom: 1px solid var(--border-bar);
+      padding: 12px 20px;
+      font-size: 12.5px;
+      color: #D1D5DB;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .comp-col {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #1F2937;
+      border: 1px solid #374151;
+    }
+    .comp-col.active {
+      border-color: var(--accent);
+      background: rgba(37, 99, 235, 0.14);
+    }
+
+    .frame-container {
+      flex: 1;
+      width: 100%;
+      background: #FFFFFF;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .comparison-drawer { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="review-header">
+    <div class="title-group">
+      <span class="logo-mark">Stage 5</span>
+      <div>
+        <h1>UnlearnLoop · 视觉方案与交互评审总览</h1>
+        <span class="sub">模拟数据（Mock Data）· 零外部网络依赖 · 支持一键切换方案与同步跳转 5 大核心页面</span>
+      </div>
+    </div>
+
+    <div class="scheme-switcher" role="tablist" aria-label="切换三套视觉方案">
+      <button class="s-btn" data-scheme="A" onclick="switchScheme('A')">A · 极简专注型 (Zen)</button>
+      <button class="s-btn active" data-scheme="B" onclick="switchScheme('B')">B · 现代学习产品型 (推荐)<span class="rec-dot" title="推荐方案"></span></button>
+      <button class="s-btn" data-scheme="C" onclick="switchScheme('C')">C · 探索式学习型 (Graph)</button>
+    </div>
+
+    <div class="view-jumper" aria-label="同步切换当前方案内的 5 个核心页面">
+      <span style="font-size:11.5px;color:var(--text-dim);margin-right:4px;">当前方案页面：</span>
+      <button class="v-btn" data-v="home" onclick="jumpView('home')">1. 学习首页</button>
+      <button class="v-btn active" data-v="workspace" onclick="jumpView('workspace')">2. 学习工作区</button>
+      <button class="v-btn" data-v="diagnosis" onclick="jumpView('diagnosis')">3. Agent 诊断</button>
+      <button class="v-btn" data-v="transfer" onclick="jumpView('transfer')">4. 迁移验证</button>
+      <button class="v-btn" data-v="progress" onclick="jumpView('progress')">5. 掌握状态</button>
+    </div>
+
+    <div class="actions-right">
+      <a id="standalone-link" class="open-standalone" href="./scheme-b-modern-learning.html" target="_blank" rel="noopener">新窗口独立打开当前方案 ↗</a>
+    </div>
+  </header>
+
+  <section class="comparison-drawer">
+    <div class="comp-col" id="col-A">
+      <strong>方案 A · 极简专注型 (Minimal Focus)</strong>
+      <div style="color:var(--text-dim);margin-top:4px;">单栏手稿流（780px 阅读脊柱）+ 暖白纸张质感 + 内联页边批注折页（Marginalia）。无侧栏干扰，极度克制，适合长时间深度阅读与写推理过程。</div>
+    </div>
+    <div class="comp-col active" id="col-B">
+      <strong>方案 B · 现代学习产品型 (Modern Product · 推荐)</strong>
+      <div style="color:var(--text-dim);margin-top:4px;">左轨导航 + 顶部六步闭环进度条 + 主操作区与右侧“实时 Agent 诊断/竞争假设/证据检视器”双栏联动。信息层级最清晰，兼顾心流引导与证据透明。</div>
+    </div>
+    <div class="comp-col" id="col-C">
+      <strong>方案 C · 探索式学习型 (Exploratory Graph)</strong>
+      <div style="color:var(--text-dim);margin-top:4px;">点阵画布 + 可点击 SVG 知识点前置依赖拓扑图 + 二维“竞争假设 × 正反证据”交叉验证矩阵 + 时间轴演化回放（T1→T4）。强调认知结构与证据推演。</div>
+    </div>
+  </section>
+
+  <div class="frame-container">
+    <iframe id="proto-frame" src="./scheme-b-modern-learning.html" title="UnlearnLoop Stage 5 Prototype Viewport"></iframe>
+  </div>
+
+  <script>
+    const files = {
+      A: './scheme-a-minimal-focus.html',
+      B: './scheme-b-modern-learning.html',
+      C: './scheme-c-exploratory-graph.html'
+    };
+    let currentScheme = 'B';
+    let currentView = 'workspace';
+
+    function switchScheme(s) {
+      currentScheme = s;
+      document.querySelectorAll('.s-btn').forEach(b => b.classList.toggle('active', b.dataset.scheme === s));
+      ['A', 'B', 'C'].forEach(k => {
+        document.getElementById('col-' + k).classList.toggle('active', k === s);
+      });
+      const frame = document.getElementById('proto-frame');
+      frame.src = files[s];
+      document.getElementById('standalone-link').href = files[s];
+      frame.onload = () => {
+        try {
+          if (frame.contentWindow && typeof frame.contentWindow.setView === 'function') {
+            frame.contentWindow.setView(currentView);
+          }
+        } catch (_) {}
+      };
+    }
+
+    function jumpView(v) {
+      currentView = v;
+      document.querySelectorAll('.v-btn').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+      const frame = document.getElementById('proto-frame');
+      try {
+        if (frame.contentWindow && typeof frame.contentWindow.setView === 'function') {
+          frame.contentWindow.setView(v);
+        }
+      } catch (_) {}
+    }
+  </script>
+</body>
+</html>
