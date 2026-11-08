@@ -182,19 +182,19 @@ export const App: React.FC = () => {
           onNavigateWorkspace={navigateWorkspace}
           onVisualStageChange={handleRealVisualState}
         />
-      ) : <>
+      ) : <div className={`focus-demo-workspace focus-demo-${activeWorkspace}`}>
       {/* 1. Learning Home (学习焦点总览) */}
       {activeWorkspace === 'home' && (
         <div>
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--action-primary)' }}>
-              UNLEARNLOOP · SCHEME B PRECISION WORKBENCH
+              UNLEARNLOOP · DEMO SCENARIO
             </div>
             <h1 style={{ margin: '2px 0 6px', fontSize: 24, fontWeight: 700 }}>
-              今日学习焦点与证据待办总览
+              继续上次的学习
             </h1>
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 14 }}>
-              以清晰的任务卡片、受控六步闭环进度条与双栏实时证据检视器组织完整诊断驱动学习体验。
+              以下为本地演示情境，用于预览学习、诊断与迁移验证的交互。
             </p>
           </div>
 
@@ -270,7 +270,7 @@ export const App: React.FC = () => {
                       marginBottom: 14,
                     }}
                   >
-                    <strong>当前闭环进度（第 {currentStage} / 6 步）：</strong>{' '}
+                    <strong>演示情境：</strong>{' '}
                     {currentSnapshot.stageTitle}
                   </div>
                   <div className="wb-btn-group">
@@ -279,7 +279,7 @@ export const App: React.FC = () => {
                       className="wb-btn primary"
                       onClick={() => navigateWorkspace('learning')}
                     >
-                      进入双栏学习工作台继续闭环 →
+                      继续学习 →
                     </button>
                     <button
                       type="button"
@@ -373,7 +373,7 @@ export const App: React.FC = () => {
             </div>
 
             {/* Right Live Agent Diagnostic & Evidence Inspector Rail */}
-            <DiagnosticInspectorRail
+                    <DiagnosticInspectorRail
               snapshot={currentSnapshot}
               currentStage={currentStage}
               maxUnlockedStage={maxUnlockedStage}
@@ -452,7 +452,7 @@ export const App: React.FC = () => {
           onOpenTransferWorkspace={() => navigateWorkspace('transfer')}
         />
       )}
-      </>}
+      </div>}
     </AppShell>
   );
 };
