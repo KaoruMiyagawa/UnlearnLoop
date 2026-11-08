@@ -92,7 +92,7 @@ class RuleEvaluator:
         norm_expected = _normalize_text(expected_out)
         norm_std = _normalize_text(question.standard_answer)
 
-        # Output matches if normalized answer equals expected/standard or starts with expected output
+        # A reasoning suffix needs a token boundary: expected "6" must not accept "60".
         answer_matches = (
             norm_submitted == norm_expected
             or norm_submitted == norm_std
@@ -100,6 +100,7 @@ class RuleEvaluator:
                 norm_expected != ""
                 and norm_submitted.startswith(norm_expected)
                 and len(norm_submitted) > len(norm_expected)
+                and norm_submitted[len(norm_expected)] in " ，,。.、:：;；()（）"
             )
         )
         has_trace = _has_explanation_beyond_output(submitted, expected_out)
@@ -182,7 +183,7 @@ class RuleEvaluator:
                         status=HypothesisStatus.INSUFFICIENT_EVIDENCE,
                         missing_desc="需要追问每轮中间状态以确认是否真正理解执行过程",
                         ev_relation=EvidenceRelation.SUPPORTS,
-                        ev_summary=f"规则检查：作答结果匹配 '{expected_out}'，但未提供中间过程说明（{clue}）",
+                        ev_summary="规则检查：作答结果匹配，但未提供中间过程说明。",
                     )
 
             # Also retain competing topic patterns as low-confidence candidates (e.g., range(3)=[1,2] sum=3)
@@ -194,7 +195,7 @@ class RuleEvaluator:
                         status=HypothesisStatus.INSUFFICIENT_EVIDENCE,
                         missing_desc="当前仅有最终结果，需区分性追问排除巧合得数",
                         ev_relation=EvidenceRelation.NEUTRAL,
-                        ev_summary=f"规则检查：仅凭单一输出结果 '{expected_out}' 尚不足以排除竞争性假设 '{code}'。",
+                        ev_summary=f"规则检查：仅凭单一输出结果尚不足以排除竞争性假设 '{code}'。",
                     )
 
             return RuleEvaluationResult(
@@ -229,7 +230,7 @@ class RuleEvaluator:
                         status=HypothesisStatus.CANDIDATE,
                         missing_desc="需通过区分性追问验证该错误假设是否成立",
                         ev_relation=EvidenceRelation.SUPPORTS,
-                        ev_summary=f"规则检查：作答 '{submitted}' 命中候选错误线索（{clue}）",
+                        ev_summary="规则检查：作答与一个候选错误模式相符，仍需追问验证。",
                     )
                 else:
                     _register_candidate(
@@ -252,7 +253,7 @@ class RuleEvaluator:
                         ev_relation=EvidenceRelation.SUPPORTS
                         if not matched_any_rubric
                         else EvidenceRelation.NEUTRAL,
-                        ev_summary=f"规则检查：作答 '{submitted}' 与标准答案 '{question.standard_answer}' 不一致，纳入竞争性假设 '{code}'。",
+                        ev_summary=f"规则检查：本次作答未通过评价，纳入竞争性假设 '{code}'。",
                     )
 
             return RuleEvaluationResult(

@@ -150,9 +150,11 @@ class DiagnosticAppService:
         if sess is None:
             raise EntityNotFoundError("LearningSession", diag_case.session_id)
 
-        if sess.status == SessionStatus.PAUSED.value:
+        if sess.status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value) or diag_case.status in (
+            DiagnosticCaseStatus.PAUSED.value, DiagnosticCaseStatus.RESOLVED.value,
+        ):
             raise InvalidSessionOperationError(
-                "Cannot execute diagnostic step on a paused session; resume first.",
+                "Cannot execute a diagnostic step on a paused or completed session/case.",
                 current_state=sess.status,
             )
 

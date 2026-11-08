@@ -885,7 +885,14 @@ def test_session_completion_semantics_distinguishes_ended_vs_mastered(
     ).json()
     sess_id = sess["id"]
 
-    # Dispatch transfer check -> session enters 'transfer_checking' with q_py_loop_transfer_01 assigned
+    # A correct initial answer with reasoning authorizes transfer; direct skipping is forbidden.
+    initial = seeded_client.post(
+        f"/api/v1/sessions/{sess_id}/attempts",
+        json={"question_id": "q_py_loop_initial_01", "submitted_answer": "3; each iteration adds the next value: 0, 1, 2."},
+    )
+    assert initial.status_code == 201
+    assert initial.json()["next_action"] == "transfer_check"
+    # Dispatch is now a safe recovery of the assigned, unanswered transfer item.
     disp = seeded_client.post(f"/api/v1/sessions/{sess_id}/transfer-check")
     assert disp.status_code == 200
     assert disp.json()["session_status"] == "transfer_checking"

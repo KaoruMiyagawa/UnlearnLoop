@@ -13,6 +13,30 @@ from app.domain.exceptions import (
     UnverifiedMasteryError,
 )
 
+
+def transfer_context_key(prompt: str, context: str | None) -> str:
+    """Compare task content rather than IDs; code whitespace must not grant freshness."""
+    return " ".join((context or prompt).split())
+
+
+def validate_transfer_entry(
+    session_status: str,
+    *,
+    has_pending_question: bool,
+    practice_required: bool,
+    practice_passed: bool,
+    agent_selected: bool = False,
+) -> None:
+    """Guard existing workflow transitions; only an Agent may choose an early transfer."""
+    if session_status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value):
+        raise DomainRuleViolationError("Cannot dispatch transfer in a paused or completed session.")
+    if has_pending_question:
+        raise DomainRuleViolationError("Answer the currently assigned question before transfer verification.")
+    if practice_required and not practice_passed:
+        raise DomainRuleViolationError("The assigned targeted practice must pass before transfer verification.")
+    if not agent_selected and session_status != SessionStatus.TRANSFER_CHECKING.value:
+        raise DomainRuleViolationError("Transfer verification has not been authorized by the server workflow.")
+
 # Controlled state transitions for LearningSession
 ALLOWED_SESSION_TRANSITIONS: dict[SessionStatus, set[SessionStatus]] = {
     SessionStatus.ACTIVE: {

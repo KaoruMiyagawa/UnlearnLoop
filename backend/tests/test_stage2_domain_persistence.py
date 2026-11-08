@@ -92,7 +92,7 @@ def test_content_pack_import_idempotency_and_python3_syntax(
         assert first_run.topics_updated == 0
         assert first_run.dependencies_created == 6
         assert first_run.materials_created == 5
-        assert first_run.questions_created == 22
+        assert first_run.questions_created == 23
 
     # Second import on the same database must update in place without duplicating rows
     with transactional_session(session_factory) as session:
@@ -103,7 +103,7 @@ def test_content_pack_import_idempotency_and_python3_syntax(
         assert second_run.materials_created == 0
         assert second_run.materials_updated == 5
         assert second_run.questions_created == 0
-        assert second_run.questions_updated == 22
+        assert second_run.questions_updated == 23
 
         repo = LearningRepository(session)
         topics = repo.list_topics(domain_code="python")
@@ -147,7 +147,7 @@ def test_topic_dependencies_and_question_queries_by_role(
 
         assert len(initial_qs) == 1
         assert len(followup_qs) == 1
-        assert len(practice_qs) == 1
+        assert len(practice_qs) == 2
         assert len(transfer_qs) == 2
         assert initial_qs[0].standard_answer == "3"
 

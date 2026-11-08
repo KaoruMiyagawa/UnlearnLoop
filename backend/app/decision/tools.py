@@ -29,6 +29,7 @@ from app.domain.enums import (
     EvidenceSourceType,
     HypothesisStatus,
     InterventionAction,
+    KnowledgeMasteryStatus,
     QuestionRole,
     SessionStatus,
     UncertaintyLevel,
@@ -375,10 +376,24 @@ class AgentToolExecutor:
             practice_qs = self.repo.list_questions_for_topic(
                 learning_session.topic_id, role=QuestionRole.TARGETED_PRACTICE
             )
+            answered_ids = {attempt.question_id for attempt in self.repo.list_attempts_for_session(learning_session.id)}
+            practice_qs = [question for question in practice_qs if question.id not in answered_ids]
             if not practice_qs:
-                raise DomainRuleViolationError(
-                    f"No targeted_practice questions available for topic {learning_session.topic_id}."
+                reason = "没有尚未作答的针对性练习；保留不确定性，等待补充材料或人工介入。"
+                learning_session.current_question_id = None
+                evt = self.repo.transition_diagnostic_case(
+                    diag_case, DiagnosticCaseStatus.INSUFFICIENT_EVIDENCE,
+                    action="practice_questions_exhausted", reason=reason,
+                    uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE, uncertainty_note=reason,
                 )
+                self.repo.update_knowledge_state(
+                    session_id=learning_session.id, topic_id=learning_session.topic_id,
+                    learner_id=learning_session.learner_id, target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                    reason=reason,
+                )
+                return {"executed_tool": "practice_questions_exhausted", "selected_intervention": None,
+                        "selected_question_id": None, "explanation_text": reason,
+                        "decision_event_id": evt.id, "knowledge_state_status": "needs_practice"}
             valid_ids = {q.id for q in practice_qs}
             chosen_practice_id = (
                 args.practice_question_id
@@ -421,30 +436,8 @@ class AgentToolExecutor:
                     f"Invalid arguments for {tool_enum.value}: {exc.errors()}"
                 ) from exc
 
-            transfer_qs = self.repo.list_questions_for_topic(
-                learning_session.topic_id, role=QuestionRole.TRANSFER_CHECK
-            )
-            if not transfer_qs:
-                raise DomainRuleViolationError(
-                    f"No transfer_check questions available for topic {learning_session.topic_id}."
-                )
-
-            # Query all transfer questions already attempted by this learner for this topic
-            attempted_transfer_q_ids = set(
-                self.repo.session.scalars(
-                    select(Attempt.question_id)
-                    .join(LearningSession, Attempt.session_id == LearningSession.id)
-                    .where(
-                        LearningSession.learner_id == learning_session.learner_id,
-                        Attempt.attempt_role == QuestionRole.TRANSFER_CHECK.value,
-                    )
-                ).all()
-            )
-
-            # Prioritize independent, unattempted (fresh) transfer verification questions
-            fresh_transfer_qs = [
-                q for q in transfer_qs if q.id not in attempted_transfer_q_ids
-            ]
+            self.repo.validate_transfer_readiness(learning_session, agent_selected=True)
+            fresh_transfer_qs = self.repo.fresh_transfer_questions(learning_session)
 
             if not fresh_transfer_qs:
                 # Safe degradation: do not loop the same failed transfer question or grant false mastery
@@ -469,7 +462,6 @@ class AgentToolExecutor:
                     payload_json={
                         "degraded_mode": True,
                         "degradation_reason": degrade_msg,
-                        "attempted_transfer_q_ids": list(attempted_transfer_q_ids),
                     },
                 )
                 return {

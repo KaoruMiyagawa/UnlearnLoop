@@ -15,6 +15,27 @@ export interface PendingAttemptIntent {
   payload: Readonly<SubmitAttemptRequest>;
 }
 
+const pendingStorageKey = (sessionId: string) => `unlearnloop.real.pending-attempt.v1.${sessionId}`;
+
+export function storePendingAttempt(storage: Pick<Storage, 'setItem'>, intent: PendingAttemptIntent): void {
+  storage.setItem(pendingStorageKey(intent.sessionId), JSON.stringify(intent));
+}
+
+export function readPendingAttempt(storage: Pick<Storage, 'getItem'>, sessionId: string): PendingAttemptIntent | null {
+  const raw = storage.getItem(pendingStorageKey(sessionId));
+  if (!raw) return null;
+  const intent = JSON.parse(raw) as PendingAttemptIntent;
+  if (intent.sessionId !== sessionId || typeof intent.payload?.question_id !== 'string'
+    || typeof intent.payload.submitted_answer !== 'string' || !intent.payload.idempotency_key) {
+    throw new Error('保存的作答请求无效；请重新读取服务端状态。');
+  }
+  return { sessionId, payload: Object.freeze({ ...intent.payload }) };
+}
+
+export function clearPendingAttempt(storage: Pick<Storage, 'removeItem'>, sessionId: string): void {
+  storage.removeItem(pendingStorageKey(sessionId));
+}
+
 /** Keeps a retry bound to its original answer and idempotency key. */
 export function prepareAttemptIntent(
   pending: PendingAttemptIntent | null,
@@ -77,7 +98,7 @@ export function describeNextAction(action: string): NextActionPresentation {
     case 'diagnose':
       return { title: '等待诊断步骤', description: '服务端已创建诊断案例；本阶段不会在前端生成假设或证据。', tone: 'warning' };
     case 'diagnose_step':
-      return { title: '需要继续诊断', description: '服务端要求继续诊断；Agent 诊断交互将在 Stage 5C.2 接入。', tone: 'warning' };
+      return { title: '需要继续诊断', description: '服务端要求继续收集证据或安排针对性干预。', tone: 'warning' };
     case 'transfer_check':
       return { title: '需要迁移验证题', description: '由服务端选择一题新的迁移验证题。', tone: 'neutral' };
     case 'transfer_failed_needs_practice':
@@ -85,7 +106,9 @@ export function describeNextAction(action: string): NextActionPresentation {
     case 'transfer_retry_blocked':
       return { title: '需要未尝试过的迁移题', description: '服务端没有将同题重答作为掌握证据。', tone: 'warning' };
     case 'mastery_achieved':
-      return { title: '服务端确认达到当前掌握标准', description: '这是知识状态结果；会话仍需单独结束。', tone: 'success' };
+      return { title: '本次独立迁移验证通过', description: '当前验证通过不代表长期保持；会话仍需单独结束。', tone: 'success' };
+    case 'transfer_unavailable':
+      return { title: '独立迁移证据不足', description: '暂无未见过的新情境题。系统保留不确定性，不使用旧题确认掌握。', tone: 'warning' };
     case 'review_scheduled':
       return { title: '已安排复习', description: '当前操作结果由服务端返回。', tone: 'warning' };
     default:

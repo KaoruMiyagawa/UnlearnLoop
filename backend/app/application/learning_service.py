@@ -3,6 +3,7 @@
 from typing import Any
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.v1.schemas import (
@@ -37,6 +38,7 @@ from app.domain.enums import (
     QuestionType,
     ReviewStatus,
     SessionStatus,
+    UncertaintyLevel,
 )
 from app.domain.exceptions import (
     DomainRuleViolationError,
@@ -214,27 +216,51 @@ class LearningAppService:
         ks_enum = KnowledgeMasteryStatus(ks.status)
         return ks_enum, (ks_enum == KnowledgeMasteryStatus.STABLE)
 
-    def _select_fresh_transfer_question(
-        self, topic_id: str, learner_id: str
-    ) -> Question | None:
-        """Select the first unattempted transfer_check question for a learner and topic."""
-        transfer_qs = self.repo.list_questions_for_topic(
-            topic_id, role=QuestionRole.TRANSFER_CHECK
-        )
-        if not transfer_qs:
-            return None
-        attempted_q_ids = set(
-            self.db.scalars(
-                select(Attempt.question_id)
-                .join(LearningSession, Attempt.session_id == LearningSession.id)
-                .where(
-                    LearningSession.learner_id == learner_id,
-                    Attempt.attempt_role == QuestionRole.TRANSFER_CHECK.value,
+    def _select_fresh_transfer_question(self, sess: LearningSession) -> Question | None:
+        candidates = self.repo.fresh_transfer_questions(sess)
+        return candidates[0] if candidates else None
+
+    def _enter_transfer(self, sess: LearningSession, reason: str) -> Question | None:
+        """Synchronize the existing session and diagnostic state machines."""
+        if sess.status != SessionStatus.TRANSFER_CHECKING.value:
+            self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
+        case = self.repo.latest_diagnostic_case(sess.id)
+        question = self._select_fresh_transfer_question(sess)
+        sess.current_question_id = question.id if question else None
+        if case and case.status != DiagnosticCaseStatus.RESOLVED.value and question is not None:
+            if case.status not in (DiagnosticCaseStatus.INTERVENTION_SELECTED.value, DiagnosticCaseStatus.TRANSFER_CHECKING.value):
+                self.repo.transition_diagnostic_case(
+                    case, DiagnosticCaseStatus.INTERVENTION_SELECTED,
+                    action="prepare_transfer_verification", reason=reason,
+                    selected_intervention="transfer_check",
                 )
-            ).all()
-        )
-        fresh_qs = [q for q in transfer_qs if q.id not in attempted_q_ids]
-        return fresh_qs[0] if fresh_qs else None
+            if case.status != DiagnosticCaseStatus.TRANSFER_CHECKING.value:
+                self.repo.transition_diagnostic_case(
+                    case, DiagnosticCaseStatus.TRANSFER_CHECKING,
+                    action="assign_transfer_verification", reason=reason,
+                    selected_intervention="transfer_check",
+                    uncertainty_note="需要独立新情境作答；练习正确尚不能证明迁移或长期保持。",
+                    payload_json={"selected_question_id": question.id if question else None},
+                )
+        elif case and question is None and case.status in (
+            DiagnosticCaseStatus.INTERVENTION_SELECTED.value, DiagnosticCaseStatus.TRANSFER_CHECKING.value,
+        ):
+            self.repo.transition_diagnostic_case(
+                case, DiagnosticCaseStatus.NEEDS_EVIDENCE,
+                action="transfer_evidence_unavailable", reason="No independent transfer question is available.",
+                uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                uncertainty_note="缺少未见过的独立迁移题；保留不确定性，可继续针对性干预。",
+            )
+        if question is None and self.db.scalar(select(DecisionEvent.id).where(
+            DecisionEvent.session_id == sess.id, DecisionEvent.action == "transfer_questions_exhausted",
+        )) is None:
+            self.repo.append_decision_event(
+                session_id=sess.id, diagnostic_case_id=case.id if case else None,
+                event_type="transfer_questions_exhausted", action="transfer_questions_exhausted",
+                to_state=sess.status, reason="暂无未见过的独立迁移题；保留证据不足，不重复使用旧题。",
+                uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+            )
+        return question
 
     def get_session_detail(self, session_id: str) -> SessionDetailResponse:
         """Fetch session detail including current sanitized question, diagnostic case pointer, and mastery status."""
@@ -243,8 +269,9 @@ class LearningAppService:
             raise EntityNotFoundError("LearningSession", session_id)
 
         current_q_dto = None
-        if sess.current_question:
-            current_q_dto = self.sanitize_question(sess.current_question)
+        current_question = self.repo.get_question_by_id(sess.current_question_id) if sess.current_question_id else None
+        if current_question:
+            current_q_dto = self.sanitize_question(current_question)
 
         # Find latest active or incomplete diagnostic case
         active_diag = (
@@ -257,6 +284,13 @@ class LearningAppService:
         ks_status, topic_mastered = self._resolve_knowledge_state_fields(
             sess.learner_id, sess.topic_id
         )
+        history = self.repo.list_attempts_for_session(sess.id)
+        latest_result = self._stored_attempt_result(sess.id, history[-1].id) if history else None
+        try:
+            self.repo.validate_transfer_readiness(sess)
+            can_dispatch_transfer = True
+        except DomainRuleViolationError:
+            can_dispatch_transfer = False
 
         return SessionDetailResponse(
             id=sess.id,
@@ -269,6 +303,8 @@ class LearningAppService:
             current_question_id=sess.current_question_id,
             current_question=current_q_dto,
             active_diagnostic_case_id=active_diag.id if active_diag else None,
+            latest_attempt_result=latest_result,
+            can_dispatch_transfer=can_dispatch_transfer,
             attempts_count=len(sess.attempts),
             started_at=sess.started_at,
             updated_at=sess.updated_at,
@@ -492,12 +528,6 @@ class LearningAppService:
         if sess is None:
             raise EntityNotFoundError("LearningSession", session_id)
 
-        if sess.status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value):
-            raise InvalidSessionOperationError(
-                f"Cannot submit answers while session is in '{sess.status}' status.",
-                current_state=sess.status,
-            )
-
         question = self.repo.get_question_by_id(question_id)
         if question is None:
             raise EntityNotFoundError("Question", question_id)
@@ -515,14 +545,14 @@ class LearningAppService:
             existing_attempt = (
                 self.db.scalars(
                     select(Attempt).where(
-                        Attempt.session_id == sess.id,
                         Attempt.idempotency_key == idempotency_key,
                     )
                 ).first()
             )
             if existing_attempt is not None:
                 if (
-                    existing_attempt.question_id != question.id
+                    existing_attempt.session_id != sess.id
+                    or existing_attempt.question_id != question.id
                     or existing_attempt.submitted_answer != submitted_answer
                 ):
                     raise IdempotencyConflictError(
@@ -568,6 +598,13 @@ class LearningAppService:
         # 5. Same-question retry guardrails:
         #    - For diagnostic_followup: once answered in the current diagnostic turn, require an Agent step before another attempt.
         #    - For transfer_check: if already answered correctly in this session, forbid redundant re-submissions.
+        if role == QuestionRole.TARGETED_PRACTICE and any(
+            prior.question_id == question.id for prior in sess.attempts
+        ):
+            raise InvalidSessionOperationError(
+                "This targeted practice has already been evaluated; request a new server intervention.",
+                current_state=sess.status,
+            )
         if role == QuestionRole.DIAGNOSTIC_FOLLOWUP:
             latest_followup_dispatch = (
                 self.db.scalars(
@@ -607,13 +644,25 @@ class LearningAppService:
                 )
 
         # Record initial pending Attempt
-        attempt = self.repo.record_attempt(
-            session_id=sess.id,
-            question_id=question.id,
-            submitted_answer=submitted_answer,
-            evaluation_status=AttemptEvaluationStatus.PENDING,
-            idempotency_key=idempotency_key,
-        )
+        try:
+            attempt = self.repo.record_attempt(
+                session_id=sess.id, question_id=question.id, submitted_answer=submitted_answer,
+                evaluation_status=AttemptEvaluationStatus.PENDING, idempotency_key=idempotency_key,
+            )
+        except IntegrityError:
+            # A second client may race the same intent past the initial read.
+            self.db.rollback()
+            existing = self.db.scalar(select(Attempt).where(Attempt.idempotency_key == idempotency_key)) if idempotency_key else None
+            if existing is None:
+                raise
+            if (existing.session_id, existing.question_id, existing.submitted_answer) != (session_id, question_id, submitted_answer):
+                raise IdempotencyConflictError(idempotency_key, "Idempotency key belongs to a different answer intent.")
+            return self._build_attempt_result(self.repo.get_session(session_id), existing, question)
+        if (attempt.session_id, attempt.question_id, attempt.submitted_answer) != (session_id, question_id, submitted_answer):
+            raise IdempotencyConflictError(idempotency_key or "", "Idempotency key belongs to a different answer intent.")
+        stored = self._stored_attempt_result(sess.id, attempt.id)
+        if stored:
+            return stored
 
         # Run local rule pre-evaluator
         rule_res = self.rule_evaluator.evaluate_attempt(
@@ -659,14 +708,8 @@ class LearningAppService:
                     next_action = "diagnose"
                 else:
                     # Fully verified correct initial answer: proceed to transfer check
-                    if sess.status != SessionStatus.TRANSFER_CHECKING.value:
-                        self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
-                    fresh_transfer = self._select_fresh_transfer_question(
-                        sess.topic_id, sess.learner_id
-                    )
-                    if fresh_transfer is not None:
-                        sess.current_question_id = fresh_transfer.id
-                    next_action = "transfer_check"
+                    fresh_transfer = self._enter_transfer(sess, "Initial answer includes reasoning; verify in a new situation.")
+                    next_action = "transfer_check" if fresh_transfer else "transfer_unavailable"
 
         elif role == QuestionRole.DIAGNOSTIC_FOLLOWUP:
             # Attach follow-up evidence to active diagnostic case
@@ -685,25 +728,36 @@ class LearningAppService:
                 next_action = "diagnose_step"
 
         elif role == QuestionRole.TARGETED_PRACTICE:
+            active_diag = self.repo.latest_diagnostic_case(sess.id)
+            diag_case_id = active_diag.id if active_diag else None
             if attempt.is_correct:
-                if sess.status != SessionStatus.TRANSFER_CHECKING.value:
-                    self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
-                fresh_transfer = self._select_fresh_transfer_question(
-                    sess.topic_id, sess.learner_id
+                fresh_transfer = self._enter_transfer(sess, "Targeted practice passed; independent transfer is still required.")
+                next_action = "transfer_check" if fresh_transfer else "transfer_unavailable"
+                ks = self.repo.update_knowledge_state(
+                    session_id=sess.id, topic_id=sess.topic_id, learner_id=sess.learner_id,
+                    target_status=KnowledgeMasteryStatus.INSUFFICIENT_EVIDENCE,
+                    reason="Targeted practice passed, but independent transfer and long-term retention remain unverified.",
                 )
-                if fresh_transfer is not None:
-                    sess.current_question_id = fresh_transfer.id
-                next_action = "transfer_check"
+                ks_status = ks.status
             else:
-                next_action = "review_scheduled"
-                self.repo.schedule_review_item(
-                    topic_id=sess.topic_id,
-                    session_id=sess.id,
-                    learner_id=sess.learner_id,
-                    trigger_reason=f"Targeted practice for '{question.id}' failed.",
+                next_action = "diagnose_step"
+                self.repo.transition_session_status(sess, SessionStatus.DIAGNOSING)
+                if active_diag and active_diag.status == DiagnosticCaseStatus.INTERVENTION_SELECTED.value:
+                    self.repo.transition_diagnostic_case(
+                        active_diag, DiagnosticCaseStatus.NEEDS_EVIDENCE,
+                        action="practice_failed", reason="Practice result requires further diagnosis or intervention.",
+                        uncertainty_note="针对性练习未通过；尚不能确定错误原因或进入迁移验证。",
+                    )
+                ks = self.repo.update_knowledge_state(
+                    session_id=sess.id, topic_id=sess.topic_id, learner_id=sess.learner_id,
+                    target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                    reason="Targeted practice failed; collect more evidence before transfer.",
                 )
+                ks_status = ks.status
 
         elif role == QuestionRole.TRANSFER_CHECK:
+            active_diag = self.repo.latest_diagnostic_case(sess.id)
+            diag_case_id = active_diag.id if active_diag else None
             if not attempt.is_correct:
                 # Transfer check failed: schedule review and retain needs_practice
                 self.repo.schedule_review_item(
@@ -721,6 +775,12 @@ class LearningAppService:
                 )
                 ks_status = ks.status
                 next_action = "transfer_failed_needs_practice"
+                if active_diag and active_diag.status == DiagnosticCaseStatus.TRANSFER_CHECKING.value:
+                    self.repo.transition_diagnostic_case(
+                        active_diag, DiagnosticCaseStatus.NEEDS_EVIDENCE,
+                        action="transfer_failed", reason="Transfer failed; retain competing explanations and allow further intervention.",
+                        uncertainty_note="独立迁移未通过，仍需针对性干预或新的区分性证据。",
+                    )
             else:
                 # Transfer check passed: verify it is NOT a retried question
                 # Query prior attempts for this learner on this exact question_id
@@ -760,8 +820,34 @@ class LearningAppService:
                     ks_status = ks.status
                     next_action = "mastery_achieved"
 
-        self.db.commit()
-        return self._build_attempt_result(
+                    if active_diag and active_diag.status == DiagnosticCaseStatus.TRANSFER_CHECKING.value:
+                        self.repo.transition_diagnostic_case(
+                            active_diag, DiagnosticCaseStatus.RESOLVED,
+                            action="transfer_verified", reason="Fresh independent transfer passed; current operational verification only.",
+                            uncertainty_note="本次独立迁移验证通过；长期保持尚未验证。",
+                        )
+
+        if role == QuestionRole.INITIAL and diag_case_id:
+            ks = self.repo.update_knowledge_state(
+                session_id=sess.id, topic_id=sess.topic_id, learner_id=sess.learner_id,
+                target_status=KnowledgeMasteryStatus.NEEDS_DIAGNOSIS,
+                reason="New initial response needs diagnosis; previous verification does not override new contradictory or insufficient evidence.",
+            )
+            ks_status = ks.status
+
+        if role in (QuestionRole.TARGETED_PRACTICE, QuestionRole.TRANSFER_CHECK) and diag_case_id:
+            case = self.repo.get_diagnostic_case(diag_case_id)
+            for hypothesis in case.hypotheses if case else []:
+                self.repo.record_evidence(
+                    hypothesis_id=hypothesis.id, attempt_id=attempt.id,
+                    source_type=EvidenceSourceType.PRACTICE_ATTEMPT if role == QuestionRole.TARGETED_PRACTICE else EvidenceSourceType.TRANSFER_ATTEMPT,
+                    source_ref=f"attempt:{attempt.id}",
+                    relation=EvidenceRelation.CONTRADICTS if attempt.is_correct else EvidenceRelation.NEUTRAL,
+                    summary="本次作答通过规则评价。" if attempt.is_correct else "本次作答未通过；单次失败不能区分具体错误假设。",
+                    reliability_note="Deterministic rule evaluation; not proof of a unique misconception or long-term retention.",
+                )
+
+        result = self._build_attempt_result(
             sess,
             attempt,
             question,
@@ -769,20 +855,42 @@ class LearningAppService:
             diagnostic_case_id=diag_case_id,
             knowledge_state_status=ks_status,
         )
+        self.repo.append_decision_event(
+            session_id=sess.id, diagnostic_case_id=diag_case_id,
+            event_type="attempt_evaluated", action="record_attempt_result", to_state=sess.status,
+            reason="Persist learner-facing evaluation, provenance and original retry response.",
+            payload_json={"attempt_id": attempt.id, "evaluation_source": "rule_check", "result": result.model_dump(mode="json")},
+        )
+        self.db.commit()
+        return result
+
+    def _stored_attempt_result(self, session_id: str, attempt_id: str) -> AttemptResultResponse | None:
+        events = self.db.scalars(select(DecisionEvent).where(
+            DecisionEvent.session_id == session_id, DecisionEvent.action == "record_attempt_result",
+        ))
+        for event in events:
+            if event.payload_json.get("attempt_id") == attempt_id:
+                return AttemptResultResponse.model_validate(event.payload_json["result"])
+        return None
 
     def _build_attempt_result(
         self,
         session: LearningSession,
         attempt: Attempt,
         question: Question,
-        next_action: str = "continue",
+        next_action: str | None = None,
         diagnostic_case_id: str | None = None,
         knowledge_state_status: str | None = None,
     ) -> AttemptResultResponse:
         """Construct a structured AttemptResultResponse."""
+        if next_action is None:
+            stored = self._stored_attempt_result(session.id, attempt.id)
+            if stored is not None:
+                return stored
         next_q_dto = None
-        if session.current_question:
-            next_q_dto = self.sanitize_question(session.current_question)
+        next_question = self.repo.get_question_by_id(session.current_question_id) if session.current_question_id else None
+        if next_question:
+            next_q_dto = self.sanitize_question(next_question)
 
         return AttemptResultResponse(
             attempt_id=attempt.id,
@@ -796,10 +904,11 @@ class LearningAppService:
                 if attempt.is_correct
                 else f"回答与预期不符。{attempt.evaluation_summary or ''}"
             ),
-            next_action=next_action,
+            next_action=next_action or "continue",
             next_question=next_q_dto,
             diagnostic_case_id=diagnostic_case_id,
             knowledge_state_status=knowledge_state_status,
+            mastery_note="本次独立迁移验证通过；长期保持尚未验证。" if next_action == "mastery_achieved" else None,
         )
 
     def list_attempts_for_session(self, session_id: str) -> list[AttemptSummaryResponse]:
@@ -830,6 +939,7 @@ class LearningAppService:
         if att is None:
             raise EntityNotFoundError("Attempt", attempt_id)
 
+        stored = self._stored_attempt_result(att.session_id, att.id)
         return AttemptDetailResponse(
             id=att.id,
             session_id=att.session_id,
@@ -841,6 +951,8 @@ class LearningAppService:
             evaluation_status=att.evaluation_status,
             evaluation_summary=att.evaluation_summary,
             idempotency_key=att.idempotency_key,
+            diagnostic_case_id=stored.diagnostic_case_id if stored else None,
+            evaluation_source=stored.evaluation_source if stored else None,
             submitted_at=att.submitted_at,
         )
 
@@ -858,75 +970,25 @@ class LearningAppService:
         if sess is None:
             raise EntityNotFoundError("LearningSession", session_id)
 
-        transfer_qs = self.repo.list_questions_for_topic(
-            sess.topic_id, role=QuestionRole.TRANSFER_CHECK
-        )
-        if not transfer_qs:
-            raise DomainRuleViolationError(
-                f"No transfer_check questions found for topic '{sess.topic.slug}'."
-            )
-
-        # Enforce Stage 3 principle: Prioritize unattempted transfer questions
-        attempted_q_ids = set(
-            self.db.scalars(
-                select(Attempt.question_id)
-                .join(LearningSession, Attempt.session_id == LearningSession.id)
-                .where(
-                    LearningSession.learner_id == sess.learner_id,
-                    Attempt.attempt_role == QuestionRole.TRANSFER_CHECK.value,
-                )
-            ).all()
-        )
-        fresh_qs = [q for q in transfer_qs if q.id not in attempted_q_ids]
-
-        if not fresh_qs:
-            # Safe degradation: do not recycle attempted questions, schedule review and record exhaustion event
-            msg = (
-                f"知识点 '{sess.topic.slug}' 暂无未作答过的独立新情境迁移验证题；"
-                "保留待练习状态并安排复习巩固，防止同题重复猜测造成虚假掌握。"
-            )
-            if sess.status != SessionStatus.TRANSFER_CHECKING.value:
-                self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
-            self.repo.update_knowledge_state(
-                session_id=sess.id,
-                topic_id=sess.topic_id,
-                target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
-                reason=msg,
-                learner_id=sess.learner_id,
-            )
-            self.repo.schedule_review_item(
-                topic_id=sess.topic_id,
-                session_id=sess.id,
-                learner_id=sess.learner_id,
-                trigger_reason=msg,
-            )
-            self.repo.append_decision_event(
-                session_id=sess.id,
-                event_type="transfer_questions_exhausted",
-                from_state=sess.status,
-                to_state=sess.status,
-                action="transfer_questions_exhausted",
-                reason=msg,
-            )
-            self.db.commit()
+        # Retried dispatches recover the already-assigned question even when
+        # force_fresh=True. Never discard an unanswered item to manufacture freshness.
+        current = self.repo.get_question_by_id(sess.current_question_id) if sess.current_question_id else None
+        history = self.repo.list_attempts_for_session(sess.id)
+        if (sess.status == SessionStatus.TRANSFER_CHECKING.value and current
+            and current.question_role == QuestionRole.TRANSFER_CHECK.value
+            and not any(attempt.question_id == current.id for attempt in history)):
             return TransferCheckDispatchResponse(
-                question=None,
-                session_status=SessionStatus(sess.status),
-                degraded=True,
-                message=msg,
+                question=self.sanitize_question(current), session_status=SessionStatus(sess.status),
+                degraded=False, message="恢复尚未作答的服务端迁移验证题。",
             )
-
-        chosen_q = fresh_qs[0]
-        sess.current_question_id = chosen_q.id
-        if sess.status != SessionStatus.TRANSFER_CHECKING.value:
-            self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
+        self.repo.validate_transfer_readiness(sess)
+        chosen_q = self._enter_transfer(sess, "Server-authorized independent transfer dispatch.")
         self.db.commit()
-
         return TransferCheckDispatchResponse(
-            question=self.sanitize_question(chosen_q),
+            question=self.sanitize_question(chosen_q) if chosen_q else None,
             session_status=SessionStatus(sess.status),
-            degraded=False,
-            message="成功派发独立新情境迁移验证题。",
+            degraded=chosen_q is None,
+            message="成功派发独立新情境迁移验证题。" if chosen_q else "暂无未作答过的独立新情境迁移题；证据不足，未确认掌握。",
         )
 
     # -----------------------------------------------------------------------

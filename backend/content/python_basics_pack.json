@@ -454,6 +454,22 @@
           }
         },
         {
+          "id": "q_py_loop_practice_02",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "再次练习逐轮追踪：写出最终输出，并说明每轮 total 的变化。",
+          "context_snippet": "total = 2\nfor n in range(4):\n    total += n\nprint(total)",
+          "standard_answer": "8",
+          "answer_explanation": "total 从 2 开始，依次加上 0、1、2、3，最终得到 8。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": ["range_start_at_one", "loop_memorized_result_without_trace"]
+          }
+        },
+        {
           "id": "q_py_loop_transfer_01",
           "material_id": "mat_py_for_loop_01",
           "parent_question_id": "q_py_loop_initial_01",

@@ -26,7 +26,8 @@ import type {
   TopicSummary,
 } from '../api/types';
 import type { WorkspaceId } from '../app-shell/navigation';
-import { deriveLearningVisualStage, describeNextAction, prepareAttemptIntent, restoreSessionFromServer, SingleFlightGate, type PendingAttemptIntent } from './learningFlow';
+import { clearPendingAttempt, deriveLearningVisualStage, describeNextAction, prepareAttemptIntent, readPendingAttempt, restoreSessionFromServer, SingleFlightGate, storePendingAttempt, type PendingAttemptIntent } from './learningFlow';
+import { getTransferPresentation } from './transferFlow';
 import {
   canRetryDiagnosticStep,
   canRunDiagnosticStep,
@@ -175,6 +176,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
     ]);
     setSession(detail);
     setAttempts(history);
+    setAttemptResult(detail.latest_attempt_result ?? null);
     setSelectedTopicId(detail.topic_id);
     setSessionLoadError(null);
     window.sessionStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, sessionId);
@@ -192,6 +194,10 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
     void restoreSessionFromServer(savedId, controller.signal).then(({ session: detail, attempts: history }) => {
       setSession(detail);
       setAttempts(history);
+      setAttemptResult(detail.latest_attempt_result ?? null);
+      const pending = readPendingAttempt(window.sessionStorage, detail.id);
+      setPendingAttempt(pending);
+      if (pending && pending.payload.question_id === detail.current_question_id) setDraft(pending.payload.submitted_answer);
       setSelectedTopicId(detail.topic_id);
       setDidRecoverPointer(true);
     }).catch((error: unknown) => {
@@ -234,21 +240,26 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
     setSession(resumed);
     setAttempts(history);
     setSelectedTopicId(resumed.topic_id);
-    setAttemptResult(null);
-    setPendingAttempt(null);
-    setDraft('');
+    setAttemptResult(resumed.latest_attempt_result ?? null);
+    const pending = readPendingAttempt(window.sessionStorage, resumed.id);
+    setPendingAttempt(pending);
+    setDraft(pending && pending.payload.question_id === resumed.current_question_id ? pending.payload.submitted_answer : '');
     setSessionLoadError(null);
     window.sessionStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, resumed.id);
   });
 
   const submitPreparedAttempt = async (reusePending: boolean) => {
-    if (!session || !activeQuestion || operationGate.current.isActive) return;
+    if (!session || operationGate.current.isActive || (!reusePending && !activeQuestion)) return;
+    if (reusePending && !pendingAttempt) return;
     const answer = draft.trim();
     if (!reusePending && !answer) return;
 
     let prepared: PendingAttemptIntent;
     try {
-      prepared = prepareAttemptIntent(pendingAttempt, session.id, activeQuestion.id, answer, reusePending);
+      prepared = reusePending && pendingAttempt?.sessionId === session.id
+        ? pendingAttempt
+        : prepareAttemptIntent(pendingAttempt, session.id, activeQuestion!.id, answer, reusePending);
+      storePendingAttempt(window.sessionStorage, prepared);
     } catch (error) {
       setOperation({ kind: 'error', label: '作答内容已改变', error });
       return;
@@ -260,9 +271,12 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
       const result = await submitAttempt(submitted.sessionId, submitted.payload, signal);
       setAttemptResult(result);
       setPendingAttempt(null);
+      clearPendingAttempt(window.sessionStorage, submitted.sessionId);
+      setDiagnosticStep(null);
       if (draft.trim() === submitted.payload.submitted_answer) setDraft('');
       try {
         await refreshSession(submitted.sessionId, signal);
+        if (diagnosticCaseId && result.diagnostic_case_id === diagnosticCaseId) await diagnosticResource.retry();
         void sessionsResource.retry();
       } catch (syncError) {
         setSessionLoadError(syncError);
@@ -286,7 +300,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
     const diagnosis = loaded?.diagnosis ?? null;
     if (!session || !diagnosticCaseId || !diagnosis) return;
 
-    if (!replayPending && action === 'step' && !canRunDiagnosticStep(session, diagnosis)) return;
+    if (!replayPending && action === 'step' && !canRunDiagnosticStep(session, diagnosis, attempts)) return;
     if (!replayPending && action === 'retry' && !canRetryDiagnosticStep(session, diagnosis)) return;
 
     let intent: PendingDiagnosticIntent;
@@ -408,7 +422,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
   };
 
   const renderOperation = () => {
-    if (operation.kind === 'idle') return null;
+    if (operation.kind === 'idle') return pendingAttempt ? <div role="status" className="wb-alert warning">保存着一次尚未确认结果的作答。恢复时会使用原题目、原答案和原幂等键。<button type="button" className="wb-btn sm" onClick={() => void submitPreparedAttempt(true)}>恢复上次作答结果</button></div> : null;
     if (operation.kind === 'loading') {
       return (
         <div role="status" className="wb-alert info">
@@ -425,7 +439,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
         {error.code === 'REQUEST_TIMEOUT' && <div>请求超时。若这是作答请求，重试会复用原幂等键。</div>}
         {error.code === 'REQUEST_ABORTED' && <div>请求已取消；若服务器已处理作答，复用原幂等键可安全重试。</div>}
         {canRetrySubmission && <button type="button" className="wb-btn sm primary" onClick={() => void submitPreparedAttempt(true)}>用原载荷重试</button>}
-        {pendingAttempt && <button type="button" className="wb-btn sm" onClick={() => setPendingAttempt(null)}>保留草稿并重新编辑</button>}
+        {pendingAttempt && <button type="button" className="wb-btn sm" onClick={() => { clearPendingAttempt(window.sessionStorage, pendingAttempt.sessionId); setPendingAttempt(null); }}>保留草稿并重新编辑</button>}
       </div>
     );
   };
@@ -490,7 +504,17 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
               </div>
             </details>
             {activeQuestion && session.status !== 'completed' ? <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-question-meta"><span className="focus-eyebrow">{activeQuestion.question_role} · {activeQuestion.question_type}</span><span className="wb-badge blue">服务端题目</span></div><h2 className="focus-question-prompt">{activeQuestion.prompt_text}</h2>{activeQuestion.context_snippet && <pre className="wb-code-block focus-code">{activeQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="real-answer">你的答案或推理过程</label><textarea id="real-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small className="focus-char-count">{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary focus-primary-action" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交作答</button><button type="button" className="wb-btn" disabled={!draft} onClick={() => setDraft('')}>清空草稿</button></div></div></section> : <section className="wb-card"><div className="wb-card-body">{session.status === 'completed' ? <p>此会话已由服务端结束。</p> : submittedQuestionAlreadyCurrent ? <p>该题已有作答记录；等待服务端下一步或派发新题，不会重复显示为可作答题目。</p> : <p>当前会话暂无可作答题目。请查看服务端返回的下一步动作。</p>}</div></section>}
-            {attemptResult && <section className="wb-card"><div className="wb-card-head"><h2 className="wb-card-title">服务端作答结果</h2><span className={`wb-badge ${attemptResult.is_correct === true ? 'green' : attemptResult.is_correct === false ? 'amber' : 'slate'}`}>{attemptResult.is_correct === true ? '正确' : attemptResult.is_correct === false ? '未通过' : '待判定'}</span></div><div className="wb-card-body"><p>Attempt ID：<code>{attemptResult.attempt_id}</code></p><p>{attemptResult.evaluation_summary ?? attemptResult.feedback_text ?? '服务端未返回评估说明。'}</p><p>next_action：<code>{attemptResult.next_action}</code></p>{attemptResult.diagnostic_case_id && <p>诊断案例：<code>{attemptResult.diagnostic_case_id}</code> · 真实假设与证据已载入右侧 Inspector。</p>}{attemptResult.knowledge_state_status && <StateBadge label="KnowledgeMasteryStatus" value={attemptResult.knowledge_state_status} />}{nextAction && <div className={`wb-alert ${nextAction.tone}`}>{nextAction.title} · {nextAction.description}</div>}{attemptResult.next_question && attemptResult.next_question.id !== attemptResult.question_id && <div className="wb-alert info">服务端已返回下一题：<code>{attemptResult.next_question.id}</code>（{attemptResult.next_question.question_role}）。重新读取会话以同步当前题目。</div>}{attemptResult.next_action === 'transfer_check' && !activeQuestion && <button className="wb-btn primary" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求服务端派发迁移验证题</button>}{attemptResult.next_action === 'transfer_failed_needs_practice' && <button className="wb-btn" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求另一道服务端迁移题</button>}{attemptResult.next_action === 'transfer_retry_blocked' && <button className="wb-btn primary" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求未尝试过的迁移题</button>}</div></section>}
+            {attemptResult && <section className="wb-card">
+              <div className="wb-card-head"><h2 className="wb-card-title">最近一次作答评价</h2><span className={`wb-badge ${attemptResult.is_correct === true ? 'green' : attemptResult.is_correct === false ? 'amber' : 'slate'}`}>{attemptResult.is_correct === true ? '正确' : attemptResult.is_correct === false ? '未通过' : '待判定'}</span></div>
+              <div className="wb-card-body">
+                <p>{attemptResult.evaluation_summary ?? attemptResult.feedback_text ?? '服务端未返回评估说明。'}</p>
+                {nextAction && (!activeQuestion || attemptResult.next_question?.id === activeQuestion.id) && <div className={`wb-alert ${nextAction.tone}`}>{nextAction.title} · {nextAction.description}</div>}
+                {attemptResult.mastery_note && <p>{attemptResult.mastery_note}</p>}
+                <details className="focus-disclosure"><summary>查看本次评价记录</summary><div className="focus-disclosure-content">Attempt <code>{attemptResult.attempt_id}</code> · next_action <code>{attemptResult.next_action}</code><p>评价来源：{attemptResult.evaluation_source ?? 'unknown'} · 诊断案例：{attemptResult.diagnostic_case_id ?? '无关联诊断'}</p>{attemptResult.knowledge_state_status && <StateBadge label="本次知识状态" value={attemptResult.knowledge_state_status} />}</div></details>
+                {session.can_dispatch_transfer && !activeQuestion && <button className="wb-btn" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求服务端派发迁移验证题</button>}
+                {activeQuestion?.question_role === 'transfer_check' && <button className="wb-btn" onClick={() => onNavigateWorkspace('transfer')}>进入独立迁移验证</button>}
+              </div>
+            </section>}
             {diagnosticCaseId && <DiagnosticPanel {...diagnosticPanelProps} />}
             {session.status !== 'completed' && <button type="button" className="wb-btn" disabled={operation.kind === 'loading'} onClick={() => void endSession()}>结束此会话</button>}
           </>}
@@ -502,13 +526,17 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
   }
 
   if (workspace === 'transfer') {
-    const transferQuestion = activeQuestion?.question_role === 'transfer_check' ? activeQuestion : null;
+    const transfer = getTransferPresentation(session, attempts, attemptResult);
+    const transferQuestion = transfer.question;
     return <div className="focus-learning-page"><main>
       <header className="focus-page-header"><div className="focus-eyebrow">TRANSFER CHECK</div><h1 className="focus-page-title">把理解带到新的情境。</h1><p className="focus-page-subtitle">只有服务端派发的迁移题会显示在这里；本页面不会自行推定掌握状态。</p></header>
       {!session && <section className="wb-card"><div className="wb-card-body"><p>当前没有可恢复的学习会话。</p><button className="wb-btn primary" onClick={() => onNavigateWorkspace('home')}>返回首页</button></div></section>}
-      {session && !transferQuestion && <section className="wb-card"><div className="wb-card-body"><p>{session.current_question ? '当前服务端题目不是迁移验证题。' : '服务端尚未派发迁移验证题。请先按当前学习决策继续。'}</p><button className="wb-btn" onClick={() => onNavigateWorkspace('learning')}>查看当前学习任务</button>{attemptResult?.next_action === 'transfer_check' && <button className="wb-btn primary" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求服务端派发迁移验证题</button>}</div></section>}
+      {session && !transferQuestion && <section className="wb-card"><div className="wb-card-body"><p>{session.status === 'completed' ? '本次会话已结束。' : transfer.passed ? '本次独立迁移验证已通过。' : session.current_question?.question_role === 'transfer_check' ? '当前迁移题已评价；请根据服务端结果继续。' : '当前没有待作答的服务端迁移题，请按学习决策继续。'}</p><button className="wb-btn" onClick={() => onNavigateWorkspace('learning')}>查看当前学习任务</button></div></section>}
       {transferQuestion && <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-eyebrow">SERVER-ASSIGNED · {transferQuestion.question_type}</div><h2>{transferQuestion.prompt_text}</h2>{transferQuestion.context_snippet && <pre className="wb-code-block">{transferQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="transfer-answer">写下你的答案或推理过程</label><textarea id="transfer-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small>{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交迁移验证</button>{pendingAttempt && <button type="button" className="wb-btn" onClick={() => void submitPreparedAttempt(true)}>用原请求重试</button>}</div></div></section>}
-      {attemptResult && <section className="wb-card"><div className="wb-card-body"><h2>服务端验证结果</h2><p>{attemptResult.evaluation_summary ?? attemptResult.feedback_text ?? '服务端未返回评估说明。'}</p><p>下一步：{describeNextAction(attemptResult.next_action)?.title ?? attemptResult.next_action}</p></div></section>}
+      {transfer.result && <section className="wb-card"><div className="wb-card-body"><h2>{transfer.passed ? '本次独立迁移验证通过' : '最近一次迁移评价'}</h2><p>{transfer.result.evaluation_summary ?? transfer.result.feedback_text ?? '服务端未返回评估说明。'}</p><p>该次评价后的建议：{describeNextAction(transfer.result.next_action).title}</p><p>{transfer.result.mastery_note ?? '本次题目结果不能证明长期保持。'}</p><small>评价来源：{transfer.result.evaluation_source ?? 'unknown'} · 诊断案例：{transfer.result.diagnostic_case_id ?? '无关联诊断'}</small></div></section>}
+      {transfer.canDispatch && <button className="wb-btn primary" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求服务端派发新的迁移题</button>}
+      {session && <div className="wb-btn-group"><button className="wb-btn" onClick={() => onNavigateWorkspace('learning')}>返回学习与诊断</button>{session.status === 'transfer_checking' && <button className="wb-btn" disabled={operation.kind === 'loading'} onClick={() => void endSession()}>结束本次学习</button>}</div>}
+      {sessionLoadError !== null && <div role="alert" className="wb-alert danger">读取会话失败：{getErrorView(sessionLoadError).message}<button className="wb-btn sm" onClick={retrySessionSync}>重新读取服务端状态</button></div>}
       {renderOperation()}
     </main></div>;
   }

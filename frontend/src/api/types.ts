@@ -152,6 +152,8 @@ export interface SessionSummary {
 export interface SessionDetail extends SessionSummary {
   current_question?: SanitizedQuestion | null;
   active_diagnostic_case_id?: string | null;
+  latest_attempt_result?: AttemptResult | null;
+  can_dispatch_transfer?: boolean;
 }
 
 export interface SubmitAttemptRequest {
@@ -175,6 +177,8 @@ export interface AttemptSummary {
 export interface AttemptDetail extends AttemptSummary {
   question_version: number;
   idempotency_key?: string | null;
+  diagnostic_case_id?: string | null;
+  evaluation_source?: string | null;
 }
 
 export interface AttemptResult {
@@ -189,6 +193,8 @@ export interface AttemptResult {
   next_question?: SanitizedQuestion | null;
   diagnostic_case_id?: string | null;
   knowledge_state_status?: string | null;
+  evaluation_source?: string;
+  mastery_note?: string | null;
 }
 
 export interface Hypothesis {

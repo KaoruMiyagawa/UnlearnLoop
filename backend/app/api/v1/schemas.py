@@ -172,6 +172,8 @@ class SessionDetailResponse(BaseModel):
     current_question_id: str | None = None
     current_question: SanitizedQuestionResponse | None = None
     active_diagnostic_case_id: str | None = None
+    latest_attempt_result: "AttemptResultResponse | None" = None
+    can_dispatch_transfer: bool = False
     attempts_count: int = 0
     started_at: datetime
     updated_at: datetime
@@ -226,6 +228,8 @@ class AttemptDetailResponse(BaseModel):
     evaluation_status: str
     evaluation_summary: str | None = None
     idempotency_key: str | None = None
+    diagnostic_case_id: str | None = None
+    evaluation_source: str | None = None
     submitted_at: datetime
 
 
@@ -243,6 +247,11 @@ class AttemptResultResponse(BaseModel):
     next_question: SanitizedQuestionResponse | None = None
     diagnostic_case_id: str | None = None
     knowledge_state_status: str | None = None
+    evaluation_source: str = "rule_check"
+    mastery_note: str | None = None
+
+
+SessionDetailResponse.model_rebuild()
 
 
 # ---------------------------------------------------------------------------

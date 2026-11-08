@@ -21,6 +21,8 @@ from app.domain.enums import (
 )
 from app.domain.exceptions import DomainRuleViolationError
 from app.domain.rules import (
+    transfer_context_key,
+    validate_transfer_entry,
     validate_confidence,
     validate_diagnostic_case_transition,
     validate_hypothesis_transition,
@@ -218,6 +220,53 @@ class LearningRepository:
             learning_session.completed_at = utc_now()
         self.session.flush()
         return learning_session
+
+    def latest_diagnostic_case(self, session_id: str) -> DiagnosticCase | None:
+        return self.session.scalars(
+            select(DiagnosticCase).where(DiagnosticCase.session_id == session_id)
+            .order_by(DiagnosticCase.created_at.desc(), DiagnosticCase.id.desc())
+        ).first()
+
+    def fresh_transfer_questions(self, learning_session: LearningSession) -> list[Question]:
+        """Exclude previously attempted IDs AND contexts, including renamed copies."""
+        attempts = list(self.session.scalars(
+            select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
+            .where(LearningSession.learner_id == learning_session.learner_id,
+                   LearningSession.topic_id == learning_session.topic_id)
+        ))
+        excluded_ids = {attempt.question_id for attempt in attempts}
+        excluded_contexts = {
+            transfer_context_key(
+                attempt.question_snapshot_json.get("prompt_text", attempt.question.prompt_text),
+                attempt.question_snapshot_json.get("context_snippet", attempt.question.context_snippet),
+            ) for attempt in attempts
+        }
+        # Catalog role labels alone do not prove a new situation.
+        for question in self.list_questions_for_topic(learning_session.topic_id):
+            if question.question_role != QuestionRole.TRANSFER_CHECK.value:
+                excluded_contexts.add(transfer_context_key(question.prompt_text, question.context_snippet))
+        return [question for question in self.list_questions_for_topic(
+            learning_session.topic_id, role=QuestionRole.TRANSFER_CHECK
+        ) if question.id not in excluded_ids and transfer_context_key(
+            question.prompt_text, question.context_snippet
+        ) not in excluded_contexts]
+
+    def validate_transfer_readiness(
+        self, learning_session: LearningSession, *, agent_selected: bool = False,
+    ) -> None:
+        attempts = self.list_attempts_for_session(learning_session.id)
+        case = self.latest_diagnostic_case(learning_session.id)
+        practices = [attempt for attempt in attempts if attempt.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
+        validate_transfer_entry(
+            learning_session.status,
+            has_pending_question=bool(learning_session.current_question_id and not any(
+                attempt.question_id == learning_session.current_question_id for attempt in attempts
+            )),
+            practice_required=bool(practices or (case and case.selected_intervention == "targeted_practice")),
+            practice_passed=bool(practices and practices[-1].is_correct is True
+                                 and practices[-1].evaluation_status == AttemptEvaluationStatus.EVALUATED.value),
+            agent_selected=agent_selected,
+        )
 
     def record_attempt(
         self,
@@ -552,6 +601,8 @@ class LearningRepository:
                 raise DomainRuleViolationError(
                     f"Unknown transfer_attempt_id: {transfer_attempt_id}"
                 )
+            if transfer_attempt.session_id != session_id or transfer_attempt.session.learner_id != learner_id:
+                raise DomainRuleViolationError("Transfer evidence must belong to this learner and session.")
             # Check if this learner previously attempted the same transfer question and failed
             prior_failed_attempt_id = self.session.scalar(
                 select(Attempt.id)
@@ -565,6 +616,26 @@ class LearningRepository:
             )
             if prior_failed_attempt_id is not None:
                 is_retried_transfer = True
+            if target_enum == KnowledgeMasteryStatus.STABLE:
+                key = transfer_context_key(transfer_attempt.question.prompt_text, transfer_attempt.question.context_snippet)
+                other_attempts = self.session.scalars(
+                    select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
+                    .where(LearningSession.learner_id == learner_id, LearningSession.topic_id == topic_id,
+                           Attempt.id != transfer_attempt.id)
+                )
+                if any(
+                    prior.question_id == transfer_attempt.question_id
+                    or transfer_context_key(prior.question_snapshot_json.get("prompt_text", prior.question.prompt_text),
+                                            prior.question_snapshot_json.get("context_snippet", prior.question.context_snippet)) == key
+                    for prior in other_attempts
+                ):
+                    is_retried_transfer = True
+                if any(
+                    question.question_role != QuestionRole.TRANSFER_CHECK.value
+                    and transfer_context_key(question.prompt_text, question.context_snippet) == key
+                    for question in self.list_questions_for_topic(topic_id)
+                ):
+                    is_retried_transfer = True
 
         existing = self.session.scalar(
             select(KnowledgeState).where(
@@ -583,7 +654,7 @@ class LearningRepository:
                 transfer_attempt.attempt_role if transfer_attempt else None
             ),
             verified_transfer_is_correct=(
-                transfer_attempt.is_correct if transfer_attempt else None
+                transfer_attempt.is_correct if transfer_attempt and transfer_attempt.evaluation_status == AttemptEvaluationStatus.EVALUATED.value else None
             ),
             verified_transfer_topic_matches=bool(
                 transfer_attempt
