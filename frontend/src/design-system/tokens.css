@@ -509,6 +509,19 @@
 .wb-inspector { min-width: 0; }
 .wb-muted-note { margin-top: 14px; color: var(--text-muted); font-size: 12px; }
 .wb-topic-option:focus-visible, .wb-btn:focus-visible { outline: 2px solid var(--action-primary); outline-offset: 2px; }
+.wb-diagnostic-panel { max-height: min(78vh, 980px); overflow: auto; }
+.wb-diagnostic-panel h3, .wb-diagnostic-summary h3 { margin: 14px 0 8px; font-size: 14px; }
+.wb-diagnostic-original { margin: 14px 0; padding: 10px 12px; background: var(--surface-subtle); border-radius: 8px; overflow-wrap: anywhere; }
+.wb-diagnostic-original blockquote { margin: 8px 0 0; padding-left: 10px; border-left: 3px solid var(--border-strong); white-space: pre-wrap; }
+.wb-diagnostic-hypothesis { margin: 10px 0; padding: 10px 0; border-top: 1px solid var(--border-default); }
+.wb-diagnostic-hypothesis p { margin: 7px 0; }
+.wb-confidence { color: var(--text-secondary); font-size: 11px; }
+.wb-evidence-list { display: grid; gap: 8px; margin: 8px 0; padding: 0; list-style: none; }
+.wb-evidence-row { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 5px 8px; padding: 8px; border: 1px solid var(--border-default); border-radius: 7px; overflow-wrap: anywhere; }
+.wb-evidence-row small { grid-column: 1 / -1; color: var(--text-muted); }
+.wb-diagnostic-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+.wb-diagnostic-controls .wb-alert { flex-basis: 100%; }
+.wb-diagnostic-summary { margin: 10px 0; }
 
 @keyframes wbPulse {
   0%, 100% { opacity: 1; }

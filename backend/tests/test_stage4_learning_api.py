@@ -268,6 +268,55 @@ def test_wrong_answer_triggers_diagnosis_hypotheses_and_followup(
 # ---------------------------------------------------------------------------
 
 
+def test_fake_provider_can_select_practice_without_hypothesis_updates(
+    seeded_client: TestClient,
+) -> None:
+    """An intervention may follow a diagnostic question even when the Agent leaves hypotheses unchanged."""
+    session_resp = seeded_client.post(
+        "/api/v1/sessions",
+        json={"topic_id": "topic_py_for_loop", "learner_id": "learner_fake_practice"},
+    )
+    assert session_resp.status_code == 201
+    session_id = session_resp.json()["id"]
+
+    initial = seeded_client.post(
+        f"/api/v1/sessions/{session_id}/attempts",
+        json={"question_id": "q_py_loop_initial_01", "submitted_answer": "4"},
+    ).json()
+    case_id = initial["diagnostic_case_id"]
+
+    first_step = seeded_client.post(f"/api/v1/diagnoses/{case_id}/step")
+    assert first_step.status_code == 200
+    followup = first_step.json()["next_question"]
+    assert followup["question_role"] == "diagnostic_followup"
+
+    duplicate_step = seeded_client.post(f"/api/v1/diagnoses/{case_id}/step")
+    assert duplicate_step.status_code == 400
+    assert duplicate_step.json()["code"] == "INVALID_SESSION_STATE"
+    still_waiting = seeded_client.get(f"/api/v1/sessions/{session_id}").json()
+    assert still_waiting["current_question_id"] == followup["id"]
+
+    followup_result = seeded_client.post(
+        f"/api/v1/sessions/{session_id}/attempts",
+        json={
+            "question_id": followup["id"],
+            "submitted_answer": "I can trace the total after each iteration.",
+        },
+    )
+    assert followup_result.status_code == 201
+    assert followup_result.json()["next_action"] == "diagnose_step"
+
+    second_step = seeded_client.post(f"/api/v1/diagnoses/{case_id}/step")
+    assert second_step.status_code == 200
+    result = second_step.json()
+    assert result["selected_intervention"] == "targeted_practice"
+    assert result["next_question"]["question_role"] == "targeted_practice"
+
+    current = seeded_client.get(f"/api/v1/sessions/{session_id}")
+    assert current.status_code == 200
+    assert current.json()["current_question_id"] == result["next_question"]["id"]
+
+
 def test_full_end_to_end_learning_loop_with_transfer_check_and_mastery(
     session_factory: sessionmaker[Session],
     test_settings: Settings,
@@ -396,10 +445,10 @@ def test_full_end_to_end_learning_loop_with_transfer_check_and_mastery(
     assert att_3["is_correct"] is True
     assert att_3["next_action"] == "transfer_check"
 
-    # Step 7: Run Agent step 3 -> assigns transfer verification 1
-    step_3 = client.post(f"/api/v1/diagnoses/{diag_case_id}/step").json()
-    assert step_3["executed_tool"] == "assign_transfer_verification"
-    assert step_3["selected_question_id"] == "q_py_loop_transfer_01"
+    # The service dispatches the transfer question with the practice result;
+    # do not run another Agent step while that server question is unanswered.
+    session_after_practice = client.get(f"/api/v1/sessions/{sess_id}").json()
+    assert session_after_practice["current_question_id"] == "q_py_loop_transfer_01"
 
     # Step 8: Submit WRONG answer '3 15' on transfer check 1
     att_4 = client.post(
@@ -652,7 +701,18 @@ def test_token_budget_interception_via_api(
     assert t1_resp.status_code == 200
     assert t1_resp.json()["degraded_mode"] is False
 
-    # Turn 2 is intercepted by token budget guard -> safe degradation
+    followup_question = t1_resp.json()["next_question"]
+    followup_resp = client.post(
+        f"/api/v1/sessions/{sess['id']}/attempts",
+        json={
+            "question_id": followup_question["id"],
+            "submitted_answer": "The loop visits each value once.",
+        },
+    )
+    assert followup_resp.status_code == 201
+    assert followup_resp.json()["next_action"] == "diagnose_step"
+
+    # After the dispatched follow-up has an answer, the token budget guard safely degrades.
     t2_resp = client.post(f"/api/v1/diagnoses/{diag_id}/step")
     assert t2_resp.status_code == 200
     t2_data = t2_resp.json()

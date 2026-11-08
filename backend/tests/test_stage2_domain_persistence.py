@@ -554,6 +554,20 @@ def test_illegal_state_transitions_are_rejected(
                 reason="Illegal shortcut.",
             )
 
+        # The newly supported edge still requires evidence from the selected question.
+        q_followup = repo.list_questions_for_topic(
+            topic.id, role=QuestionRole.DIAGNOSTIC_FOLLOWUP
+        )[0]
+        diag_case.status = DiagnosticCaseStatus.QUESTION_SELECTED.value
+        diag_case.current_followup_question_id = q_followup.id
+        with pytest.raises(InvalidStateTransitionError):
+            repo.transition_diagnostic_case(
+                diag_case,
+                DiagnosticCaseStatus.INTERVENTION_SELECTED,
+                action="premature_intervention",
+                reason="The learner has not answered the selected follow-up.",
+            )
+
         hyp = repo.add_hypothesis(
             diagnostic_case_id=diag_case.id,
             error_code="cond_elif_treated_as_independent_if",

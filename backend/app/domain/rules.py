@@ -88,6 +88,9 @@ ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS: dict[
         DiagnosticCaseStatus.HYPOTHESES_UPDATED,
         DiagnosticCaseStatus.NEEDS_EVIDENCE,
         DiagnosticCaseStatus.INSUFFICIENT_EVIDENCE,
+        # A valid Agent proposal may choose an intervention without changing
+        # hypothesis statuses (for example, the offline FakeModelProvider path).
+        DiagnosticCaseStatus.INTERVENTION_SELECTED,
         DiagnosticCaseStatus.RETRY_WAITING,
         DiagnosticCaseStatus.PAUSED,
     },
@@ -195,10 +198,20 @@ def validate_session_transition(
 def validate_diagnostic_case_transition(
     current: DiagnosticCaseStatus | str,
     target: DiagnosticCaseStatus | str,
+    *,
+    selected_question_answered: bool = False,
 ) -> None:
     """Validate that a DiagnosticCase status transition is permitted."""
     current_enum = DiagnosticCaseStatus(current)
     target_enum = DiagnosticCaseStatus(target)
+    if (
+        current_enum == DiagnosticCaseStatus.QUESTION_SELECTED
+        and target_enum == DiagnosticCaseStatus.INTERVENTION_SELECTED
+        and not selected_question_answered
+    ):
+        raise InvalidStateTransitionError(
+            "Cannot select an intervention until the selected diagnostic question has been answered."
+        )
     if target_enum not in ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS.get(current_enum, set()):
         raise InvalidStateTransitionError(
             f"Illegal DiagnosticCase state transition: {current_enum} -> {target_enum}"

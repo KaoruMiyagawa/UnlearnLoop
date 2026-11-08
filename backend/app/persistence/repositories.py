@@ -375,7 +375,21 @@ class LearningRepository:
         """Validate DiagnosticCase state transition and append a DecisionEvent."""
         target_enum = DiagnosticCaseStatus(target_status)
         previous_status = diag_case.status
-        validate_diagnostic_case_transition(previous_status, target_enum)
+        selected_question_answered = False
+        if (
+            previous_status == DiagnosticCaseStatus.QUESTION_SELECTED.value
+            and target_enum == DiagnosticCaseStatus.INTERVENTION_SELECTED
+            and diag_case.current_followup_question_id
+        ):
+            selected_question_answered = any(
+                attempt.question_id == diag_case.current_followup_question_id
+                for attempt in self.list_attempts_for_session(diag_case.session_id)
+            )
+        validate_diagnostic_case_transition(
+            previous_status,
+            target_enum,
+            selected_question_answered=selected_question_answered,
+        )
 
         diag_case.status = target_enum.value
         if uncertainty_note is not None:

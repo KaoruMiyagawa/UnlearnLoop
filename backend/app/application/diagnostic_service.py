@@ -156,6 +156,15 @@ class DiagnosticAppService:
                 current_state=sess.status,
             )
 
+        if sess.current_question_id and not any(
+            attempt.question_id == sess.current_question_id
+            for attempt in self.repo.list_attempts_for_session(sess.id)
+        ):
+            raise InvalidSessionOperationError(
+                "Cannot execute a diagnostic step while the currently dispatched question is unanswered.",
+                current_state=sess.status,
+            )
+
         # Use the most recent attempt in the session so multi-turn follow-up/practice evidence is attributed accurately
         session_attempts = self.repo.list_attempts_for_session(sess.id)
         active_attempt_id = (
