@@ -1,5 +1,6 @@
 export * from './client';
 export * from './diagnoses';
+export * from './exams';
 export * from './health';
 export * from './profile';
 export * from './reviews';

@@ -1159,29 +1159,17 @@ def test_migration_0001_to_0002_upgrade_data_integrity(
         factory = create_session_factory(engine)
 
         with transactional_session(factory) as session:
-            # Seed Stage 2 content and write a learning session with an attempt and event
             import_content_pack(session)
-            repo = LearningRepository(session)
-            topic = repo.get_topic_by_slug("py-variable-assignment")
-            assert topic is not None
-            sess = repo.create_session(topic_id=topic.id)
-            att = repo.record_attempt(
-                session_id=sess.id,
-                question_id="q_py_var_initial_01",
-                submitted_answer="20 15",
-                is_correct=True,
-                evaluation_status="evaluated",
-            )
-            evt = repo.append_decision_event(
-                session_id=sess.id,
-                event_type="stage2_baseline_event",
-                to_state="active",
-                action="test_seed",
-                reason="Pre-migration event.",
-            )
-            saved_sess_id = sess.id
-            saved_att_id = att.id
-            saved_evt_id = evt.id
+        # Historical ORM mappings include columns that did not exist at revision 0001.
+        # Insert through the actual 0001 schema to keep this migration test meaningful.
+        from sqlalchemy import text
+        saved_sess_id = "migration_0001_session"
+        saved_att_id = "migration_0001_attempt"
+        saved_evt_id = "migration_0001_event"
+        with engine.begin() as connection:
+            connection.execute(text("INSERT INTO learning_sessions (id, learner_id, topic_id, current_question_id, status, started_at, updated_at) VALUES (:id, :learner, :topic, :question, 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"), {"id": saved_sess_id, "learner": "local_default_learner", "topic": "topic_py_var_assign", "question": "q_py_var_initial_01"})
+            connection.execute(text("INSERT INTO attempts (id, session_id, question_id, question_version, question_snapshot_json, attempt_role, submitted_answer, is_correct, evaluation_status, submitted_at) VALUES (:id, :session, :question, 1, '{}', 'initial', '20 15', 1, 'evaluated', CURRENT_TIMESTAMP)"), {"id": saved_att_id, "session": saved_sess_id, "question": "q_py_var_initial_01"})
+            connection.execute(text("INSERT INTO decision_events (id, session_id, event_type, to_state, action, reason, uncertainty_level, payload_json, created_at) VALUES (:id, :session, 'stage2_baseline_event', 'active', 'test_seed', 'Pre-migration event.', 'low', '{}', CURRENT_TIMESTAMP)"), {"id": saved_evt_id, "session": saved_sess_id})
 
         # Step 2: Incrementally upgrade to Stage 3 schema (revision 0002_stage3_model_calls)
         upgrade_database(
@@ -1189,6 +1177,15 @@ def test_migration_0001_to_0002_upgrade_data_integrity(
             engine=engine,
             revision="0002_stage3_model_calls",
         )
+
+        # At this historical revision the current ORM includes columns added by
+        # later migrations. Verify the 0001→0002 data with SQL, then advance the
+        # isolated fixture to head before loading current ORM models.
+        with engine.connect() as connection:
+            assert connection.execute(text("SELECT id FROM learning_sessions WHERE id=:id"), {"id": saved_sess_id}).scalar_one() == saved_sess_id
+            assert connection.execute(text("SELECT submitted_answer FROM attempts WHERE id=:id"), {"id": saved_att_id}).scalar_one() == "20 15"
+            assert connection.execute(text("SELECT action FROM decision_events WHERE id=:id"), {"id": saved_evt_id}).scalar_one() == "test_seed"
+        upgrade_database(database_url=migration_url, engine=engine)
 
         with transactional_session(factory) as session:
             # Verify existing Stage 2 records remain completely intact

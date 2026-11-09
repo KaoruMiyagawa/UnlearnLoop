@@ -7,6 +7,7 @@ from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.application.diagnostic_service import DiagnosticAppService
+from app.application.exam_profile_service import ExamProfileService
 from app.application.learning_service import LearningAppService
 from app.config import Settings, get_settings
 from app.model_provider import (
@@ -144,3 +145,7 @@ def get_diagnostic_service(
 ) -> DiagnosticAppService:
     """Dependency injection for DiagnosticAppService."""
     return DiagnosticAppService(db, provider, settings)
+
+
+def get_exam_profile_service(db: Session = Depends(get_db)) -> ExamProfileService:
+    return ExamProfileService(db)

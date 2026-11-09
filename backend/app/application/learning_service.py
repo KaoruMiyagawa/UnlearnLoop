@@ -50,7 +50,9 @@ from app.domain.exceptions import (
     UnverifiedMasteryError,
 )
 from app.domain.rules import validate_mastery_transition, validate_session_transition
-from app.evaluation.rule_evaluator import RuleEvaluator
+from app.evaluation.registry import evaluator_for_domain
+from app.domain.exams import EXAM_CATALOG_VERSION, domain_for_variant
+from app.persistence.models import ExamPreparationProfile
 from app.persistence.models import (
     Attempt,
     DecisionEvent,
@@ -79,7 +81,6 @@ class LearningAppService:
     ) -> None:
         self.db = db_session
         self.repo = LearningRepository(db_session)
-        self.rule_evaluator = RuleEvaluator()
         self.review_intervals_days = (settings or Settings()).review_intervals_days
         if not self.review_intervals_days or any(day < 1 for day in self.review_intervals_days):
             raise ValueError("Review intervals must contain positive day counts.")
@@ -191,6 +192,9 @@ class LearningAppService:
             TopicPrerequisiteSummary(id=p.id, slug=p.slug, title=p.title)
             for p in topic.prerequisites
         ]
+        # Reading passages are released with the currently assigned question.
+        # Returning every passage here would expose future transfer/review contexts.
+        visible_materials = [] if topic.domain_code in {"ielts_academic", "ielts_general_training"} else topic.materials
         materials = [
             LearningMaterialResponse(
                 id=m.id,
@@ -201,7 +205,7 @@ class LearningAppService:
                 content_format=m.content_format,
                 version=m.version,
             )
-            for m in topic.materials
+            for m in visible_materials
         ]
         questions = self.repo.list_questions_for_topic(topic.id)
 
@@ -222,6 +226,18 @@ class LearningAppService:
         detail = self.get_topic_detail(topic_id_or_slug)
         return detail.materials
 
+    def get_current_session_material(self, session_id: str) -> LearningMaterialResponse | None:
+        session = self.repo.get_session(session_id)
+        if session is None:
+            raise EntityNotFoundError("LearningSession", session_id)
+        question = self.repo.get_question_by_id(session.current_question_id) if session.current_question_id else None
+        material = question.material if question else None
+        if material is None:
+            return None
+        return LearningMaterialResponse(id=material.id, topic_id=material.topic_id, title=material.title,
+                                        summary=material.summary, content_body=material.content_body,
+                                        content_format=material.content_format, version=material.version)
+
     def get_sanitized_question(self, question_id: str) -> SanitizedQuestionResponse:
         """Get a single question by ID, strictly sanitized to protect rubrics/answers."""
         q = self.repo.get_question_by_id(question_id)
@@ -238,6 +254,7 @@ class LearningAppService:
         topic_id: str,
         learner_id: str = "default_learner",
         initial_question_id: str | None = None,
+        exam_variant: str | None = None,
     ) -> SessionDetailResponse:
         """Create and initialize a new learning session."""
         topic = self.repo.get_topic_by_id(topic_id)
@@ -267,10 +284,27 @@ class LearningAppService:
                 )
             selected_q_id = initial_qs[0].id
 
+        if topic.domain_code.startswith("ielts_"):
+            profile = self.db.get(ExamPreparationProfile, learner_id)
+            selected_variant = exam_variant or (profile.exam_variant if profile else None)
+            if selected_variant is None or domain_for_variant(selected_variant) != topic.domain_code:
+                raise DomainRuleViolationError("选择的考试模式与阅读材料不匹配，请先保存 Academic 或 General Training 目标。")
+            if profile is None or profile.exam_variant != selected_variant:
+                raise DomainRuleViolationError("请先将所选 IELTS 考试模式保存到学习档案。")
+            session_exam_variant = selected_variant
+            session_spec_version = EXAM_CATALOG_VERSION
+        else:
+            if exam_variant is not None:
+                raise DomainRuleViolationError("非 IELTS 学习会话不能携带 IELTS 考试模式。")
+            session_exam_variant = None
+            session_spec_version = None
+
         learning_session = self.repo.create_session(
             topic_id=topic.id,
             learner_id=learner_id,
             current_question_id=selected_q_id,
+            exam_variant=session_exam_variant,
+            exam_spec_version=session_spec_version,
         )
         self.db.commit()
 
@@ -367,6 +401,8 @@ class LearningAppService:
             topic_id=sess.topic_id,
             topic_title=sess.topic.title,
             learner_id=sess.learner_id,
+            exam_variant=sess.exam_variant,
+            exam_spec_version=sess.exam_spec_version,
             status=SessionStatus(sess.status),
             knowledge_state_status=ks_status,
             topic_mastered=topic_mastered,
@@ -402,6 +438,8 @@ class LearningAppService:
                     topic_id=s.topic_id,
                     topic_title=s.topic.title,
                     learner_id=s.learner_id,
+                    exam_variant=s.exam_variant,
+                    exam_spec_version=s.exam_spec_version,
                     status=SessionStatus(s.status),
                     knowledge_state_status=ks_status,
                     topic_mastered=topic_mastered,
@@ -773,7 +811,7 @@ class LearningAppService:
             return stored
 
         # Run local rule pre-evaluator
-        rule_res = self.rule_evaluator.evaluate_attempt(
+        rule_res = evaluator_for_domain(sess.topic.domain_code).evaluate_attempt(
             attempt=attempt,
             question=question,
             topic=sess.topic,
@@ -1251,9 +1289,12 @@ class LearningAppService:
             return self._review_item_response(item, "题库中没有未作答且情境不同的复习题。任务仍保留待办，不会记为通过。")
 
         try:
+            source_session = self.repo.get_session(item.session_id) if item.session_id else None
             review_session = self.repo.create_session(
                 topic_id=item.topic_id, learner_id=item.learner_id,
                 current_question_id=question.id, status=SessionStatus.REVIEWING,
+                exam_variant=source_session.exam_variant if source_session else None,
+                exam_spec_version=source_session.exam_spec_version if source_session else None,
             )
             claim = self.db.execute(
                 update(ReviewItem)

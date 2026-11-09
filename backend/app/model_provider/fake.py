@@ -74,11 +74,16 @@ class FakeModelProvider:
         except Exception:
             followup_turns = 0
 
+        reading = request.metadata.get("domain_code") in {"ielts_academic", "ielts_general_training"}
+
         if followup_turns == 0:
             selected_tool = {
                 "tool_name": "select_diagnostic_followup",
                 "arguments": {
-                    "discriminating_reason": "[DEMO/MOCK MODE] 模拟诊断追问：请补充每一步的中间计算状态以区分候选错误假设。"
+                    "discriminating_reason": (
+                        "[DEMO/MOCK MODE] 离线模拟派发另一篇阅读题以收集更多证据；尚未验证该题能区分候选原因。"
+                        if reading else "[DEMO/MOCK MODE] 模拟诊断追问：请补充每一步的中间计算状态以区分候选错误假设。"
+                    )
                 },
             }
         else:
@@ -86,7 +91,7 @@ class FakeModelProvider:
                 "tool_name": "assign_targeted_practice",
                 "arguments": {
                     "target_error_codes": [],
-                    "practice_reason": "[DEMO/MOCK MODE] 模拟针对性干预：分配针对性练习巩固核心概念。",
+                    "practice_reason": ("[DEMO/MOCK MODE] 离线模拟派发阅读练习；不代表已实现个性化干预。" if reading else "[DEMO/MOCK MODE] 模拟针对性干预：分配针对性练习巩固核心概念。"),
                 },
             }
 

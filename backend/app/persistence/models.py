@@ -14,7 +14,7 @@ Subject-agnostic schema covering:
 - ReviewItem
 """
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 from uuid import uuid4
 
@@ -279,6 +279,10 @@ class LearningSession(Base):
         nullable=False,
         default=SessionStatus.ACTIVE.value,
     )
+    # Null for all pre-IELTS sessions; new IELTS sessions snapshot the selected exam
+    # and product's official-spec catalogue version without rewriting history.
+    exam_variant: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    exam_spec_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -308,6 +312,39 @@ class LearningSession(Base):
     decision_events: Mapped[list["DecisionEvent"]] = relationship(
         back_populates="session",
         order_by="DecisionEvent.created_at",
+    )
+
+
+class ExamPreparationProfile(Base):
+    """Persisted exam choice and targets; assessed ability remains absent until evidence exists."""
+
+    __tablename__ = "exam_preparation_profiles"
+    __table_args__ = (
+        CheckConstraint(
+            "goal_type = 'band' AND target_overall_band IS NOT NULL AND target_outcome IS NULL "
+            "OR goal_type = 'pass' AND target_overall_band IS NULL AND target_outcome = 'pass'",
+            name="ck_exam_profile_goal_matches_scoring_system",
+        ),
+        CheckConstraint(
+            "actual_level_status IN ('not_assessed', 'assessed')",
+            name="ck_exam_profile_actual_level_status",
+        ),
+    )
+
+    learner_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    exam_variant: Mapped[str] = mapped_column(String(32), nullable=False)
+    goal_type: Mapped[str] = mapped_column(String(16), nullable=False, default="band")
+    target_overall_band: Mapped[float | None] = mapped_column(Float, nullable=True)
+    target_skill_bands: Mapped[dict[str, float] | None] = mapped_column(JSON, nullable=True)
+    target_outcome: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    exam_date: Mapped[date | None] = mapped_column(nullable=True)
+    actual_level_status: Mapped[str] = mapped_column(
+        String(24), nullable=False, default="not_assessed"
+    )
+    # This is our catalogue snapshot identifier, not an IELTS-issued version label.
+    spec_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now
     )
 
 

@@ -771,7 +771,7 @@ def test_real_database_dependency_path_without_overrides_and_engine_reuse(
             resp1 = client.get("/api/v1/topics")
             assert resp1.status_code == 200
             topics = resp1.json()
-            assert len(topics) == 5
+            assert len(topics) == 9
 
             # Verify Engine was cached once and is reused across subsequent requests
             assert len(_ENGINE_CACHE) == 1
@@ -1120,7 +1120,7 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
     paths = schema["paths"]
 
     # Review detail/dispatch and the learner-safe history timeline are public paths.
-    assert len(paths) == 25
+    assert len(paths) == 28
 
     # Review detail and dispatch add two public HTTP operations.
     public_operations = [
@@ -1129,11 +1129,11 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
         for method in methods
         if method.lower() in {"get", "post", "put", "patch", "delete"}
     ]
-    assert len(public_operations) == 27
+    assert len(public_operations) == 31
     stage4_public_operations = [
         op for op in public_operations if op[1] != "/api/v1/health"
     ]
-    assert len(stage4_public_operations) == 26
+    assert len(stage4_public_operations) == 30
 
     # Hidden alias GET /api/v1/dashboard/summary is functional (200) but excluded from OpenAPI schema
     assert "/api/v1/dashboard/summary" not in paths

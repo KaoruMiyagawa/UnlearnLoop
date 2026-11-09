@@ -48,10 +48,10 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
             type="button"
             className="focus-brand"
             onClick={() => onSelectWorkspace('home')}
-            aria-label="UnlearnLoop 首页"
+            aria-label="VerbaTrail 首页（暂定名称）"
           >
-            <span className="focus-brand-mark" aria-hidden="true">U</span>
-            <span>UnlearnLoop</span>
+            <span className="focus-brand-mark" aria-hidden="true">V</span>
+            <span>VerbaTrail <small>暂定</small></span>
           </button>
 
           <nav className="focus-nav-links" aria-label="主导航">

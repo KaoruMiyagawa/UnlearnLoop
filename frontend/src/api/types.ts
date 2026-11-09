@@ -21,6 +21,10 @@ export type QuestionType =
   | 'code_trace'
   | 'code_writing'
   | 'multiple_choice';
+export type ExamVariant = 'academic' | 'general_training' | 'ukvi_academic' | 'ukvi_general_training' | 'life_skills_a1' | 'life_skills_a2' | 'life_skills_b1';
+export interface ExamCatalogEntry { code: ExamVariant; label: string; base_variant: string | null; scoring_system: 'band' | 'pass_fail'; availability: 'available' | 'planned'; purpose: string; spec_version: string; }
+export interface ExamPreparationProfile { learner_id: string; selection_persisted: boolean; exam_variant: ExamVariant; selection_status: 'available' | 'planned'; goal_type: 'band' | 'pass'; target_overall_band: number | null; target_skill_bands: Record<string, number> | null; target_outcome: 'pass' | null; exam_date: string | null; actual_level_status: 'not_assessed' | 'assessed'; current_skill_bands: Record<string, number | null>; spec_version: string; }
+export interface ExamPreparationProfileUpdate { exam_variant: ExamVariant; target_overall_band?: number; target_skill_bands?: Record<string, number>; exam_date?: string | null; }
 export type SessionStatus =
   | 'active'
   | 'diagnosing'
@@ -130,6 +134,7 @@ export interface CreateSessionRequest {
   topic_id: string;
   learner_id?: string;
   initial_question_id?: string | null;
+  exam_variant?: ExamVariant | null;
 }
 
 export interface SessionActionRequest {
@@ -141,6 +146,8 @@ export interface SessionSummary {
   topic_id: string;
   topic_title: string;
   learner_id: string;
+  exam_variant?: ExamVariant | null;
+  exam_spec_version?: string | null;
   status: SessionStatus;
   knowledge_state_status?: KnowledgeMasteryStatus | null;
   topic_mastered?: boolean;

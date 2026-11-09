@@ -41,6 +41,7 @@ from app.domain.enums import (
 )
 from app.domain.exceptions import DomainRuleViolationError
 from app.evaluation.rule_evaluator import RuleEvaluationResult, RuleEvaluator
+from app.evaluation.registry import evaluator_for_domain
 from app.model_provider import (
     ModelProvider,
     ModelProviderError,
@@ -272,7 +273,7 @@ class DiagnosticAgentEngine:
             )
 
         # Step 1: Run local deterministic rule pre-evaluation
-        rule_result = self.rule_evaluator.evaluate_attempt(
+        rule_result = evaluator_for_domain(topic.domain_code).evaluate_attempt(
             attempt=attempt,
             question=question,
             topic=topic,
@@ -435,7 +436,7 @@ class DiagnosticAgentEngine:
             temperature=self.settings.model_temperature,
             session_id=learning_session.id,
             diagnostic_case_id=diag_case.id,
-            metadata={"attempt_id": attempt.id, "question_role": attempt.attempt_role},
+            metadata={"attempt_id": attempt.id, "question_role": attempt.attempt_role, "domain_code": topic.domain_code},
         )
 
         try:

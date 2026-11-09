@@ -1,9 +1,9 @@
 """Pydantic request and response schemas for UnlearnLoop /api/v1 endpoints."""
 
-from datetime import datetime
-from typing import Any
+from datetime import date, datetime
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.domain.enums import (
     DiagnosticCaseStatus,
@@ -130,6 +130,7 @@ class CreateSessionRequest(BaseModel):
         max_length=64,
         description="Optional specific initial question ID to start with.",
     )
+    exam_variant: str | None = Field(default=None, max_length=32)
 
 
 class SessionActionRequest(BaseModel):
@@ -149,6 +150,8 @@ class SessionSummaryResponse(BaseModel):
     topic_id: str
     topic_title: str
     learner_id: str
+    exam_variant: str | None = None
+    exam_spec_version: str | None = None
     status: SessionStatus
     knowledge_state_status: KnowledgeMasteryStatus | None = None
     topic_mastered: bool = False
@@ -166,6 +169,8 @@ class SessionDetailResponse(BaseModel):
     topic_id: str
     topic_title: str
     learner_id: str
+    exam_variant: str | None = None
+    exam_spec_version: str | None = None
     status: SessionStatus
     knowledge_state_status: KnowledgeMasteryStatus | None = None
     topic_mastered: bool = False
@@ -439,6 +444,66 @@ class KnowledgeStateResponse(BaseModel):
     last_reviewed_at: datetime | None = None
     last_retention_verified_at: datetime | None = None
     unresolved_error_reasons: list[UnresolvedErrorReasonResponse] = Field(default_factory=list)
+
+
+class ExamCatalogEntryResponse(BaseModel):
+    code: str
+    label: str
+    base_variant: str | None
+    scoring_system: Literal["band", "pass_fail"]
+    availability: Literal["available", "planned"]
+    purpose: str
+    spec_version: str
+
+
+class ExamPreparationProfileUpdate(BaseModel):
+    exam_variant: str = Field(min_length=1, max_length=32)
+    target_overall_band: float = Field(default=8.0, ge=1.0, le=9.0)
+    target_skill_bands: dict[str, float] = Field(
+        default_factory=lambda: {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0,
+        }
+    )
+    exam_date: date | None = None
+
+    @staticmethod
+    def _check_band(value: float) -> float:
+        if value < 1.0 or value > 9.0:
+            raise ValueError("IELTS band targets must be between 1.0 and 9.0.")
+        if round(value * 2) != value * 2:
+            raise ValueError("IELTS band targets must use whole or half bands.")
+        return value
+
+    @field_validator("target_overall_band")
+    @classmethod
+    def validate_overall_band(cls, value: float) -> float:
+        return cls._check_band(value)
+
+    @field_validator("target_skill_bands")
+    @classmethod
+    def validate_skill_bands(cls, value: dict[str, float]) -> dict[str, float]:
+        required = {"listening", "reading", "writing", "speaking"}
+        if set(value) != required:
+            raise ValueError("Skill targets must define Listening, Reading, Writing, and Speaking.")
+        return {key: cls._check_band(band) for key, band in value.items()}
+
+
+class ExamPreparationProfileResponse(BaseModel):
+    learner_id: str
+    selection_persisted: bool = True
+    exam_variant: str
+    selection_status: Literal["available", "planned"]
+    goal_type: Literal["band", "pass"]
+    target_overall_band: float | None = None
+    target_skill_bands: dict[str, float] | None = None
+    target_outcome: Literal["pass"] | None = None
+    exam_date: date | None = None
+    actual_level_status: Literal["not_assessed", "assessed"]
+    current_skill_bands: dict[str, float | None]
+    spec_version: str
 
 
 class LearningHistoryEventResponse(BaseModel):

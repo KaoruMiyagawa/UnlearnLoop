@@ -9,6 +9,7 @@ import type {
   SessionDetail,
   SessionStatus,
   SessionSummary,
+  LearningMaterial,
   SubmitAttemptRequest,
   TransferCheckDispatchResponse,
 } from './types.ts';
@@ -32,6 +33,10 @@ export function listSessions(query: ListSessionsQuery = {}, signal?: AbortSignal
 
 export function getSession(sessionId: string, signal?: AbortSignal): Promise<SessionDetail> {
   return apiRequest(`/api/v1/sessions/${encodeURIComponent(sessionId)}`, { method: 'GET', signal });
+}
+
+export function getSessionMaterial(sessionId: string, signal?: AbortSignal): Promise<LearningMaterial | null> {
+  return apiRequest(`/api/v1/sessions/${encodeURIComponent(sessionId)}/material`, { method: 'GET', signal });
 }
 
 function postSessionAction(

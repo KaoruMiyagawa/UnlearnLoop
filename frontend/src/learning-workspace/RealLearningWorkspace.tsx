@@ -5,8 +5,8 @@ import {
   createSession,
   dispatchTransferCheck,
   getSession,
+  getSessionMaterial,
   getTopic,
-  getTopicMaterials,
   listSessionAttempts,
   listSessions,
   listTopics,
@@ -47,6 +47,8 @@ import {
 } from './diagnosticFlow';
 import { useApiResource } from './useApiResource';
 import { ReviewHomeEntry } from '../review-workspace/ReviewHomeEntry';
+import { getExamProfile } from '../api/exams';
+import type { ExamPreparationProfile } from '../api/types';
 
 const LEARNER_ID = 'default_learner';
 const ACTIVE_SESSION_STORAGE_KEY = 'unlearnloop.real.active-session.v1';
@@ -109,18 +111,21 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
   const sessionsResource = useApiResource<SessionSummary[]>(loadSessions);
 
   const [selectedTopicId, setSelectedTopicId] = useState('');
+  const [session, setSession] = useState<SessionDetail | null>(null);
+  const [examProfile, setExamProfile] = useState<ExamPreparationProfile | null>(null);
+  const [examProfileError, setExamProfileError] = useState(false);
+  useEffect(() => { const controller = new AbortController(); void getExamProfile(LEARNER_ID, controller.signal).then(setExamProfile).catch(() => { if (!controller.signal.aborted) setExamProfileError(true); }); return () => controller.abort(); }, []);
   const topicLoader = useCallback(
-    (signal: AbortSignal) => selectedTopicId ? getTopic(selectedTopicId, signal) : Promise.resolve(null),
-    [selectedTopicId],
+    (signal: AbortSignal) => workspace === 'home' && selectedTopicId ? getTopic(selectedTopicId, signal) : Promise.resolve(null),
+    [selectedTopicId, workspace],
   );
   const materialsLoader = useCallback(
-    (signal: AbortSignal) => selectedTopicId ? getTopicMaterials(selectedTopicId, signal) : Promise.resolve([]),
-    [selectedTopicId],
+    async (signal: AbortSignal) => session?.id ? [await getSessionMaterial(session.id, signal)].filter((item): item is LearningMaterial => item !== null) : [],
+    [session?.id, session?.current_question_id],
   );
   const topicResource = useApiResource<TopicDetail | null>(topicLoader);
   const materialsResource = useApiResource<LearningMaterial[]>(materialsLoader);
 
-  const [session, setSession] = useState<SessionDetail | null>(null);
   const [attempts, setAttempts] = useState<AttemptSummary[]>([]);
   const [draft, setDraft] = useState('');
   const [attemptResult, setAttemptResult] = useState<AttemptResult | null>(null);
@@ -224,7 +229,9 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
   const createLearningSession = async () => {
     if (!selectedTopicId) return;
     await runOperation('创建学习会话', async (signal) => {
-      const created = await createSession({ topic_id: selectedTopicId, learner_id: LEARNER_ID }, signal);
+      const selected = topicsResource.state.status === 'success' ? topicsResource.state.data.find(t => t.id === selectedTopicId || t.slug === selectedTopicId) : undefined;
+      const examVariant = selected?.domain_code === 'ielts_academic' || selected?.domain_code === 'ielts_general_training' ? examProfile?.exam_variant : undefined;
+      const created = await createSession({ topic_id: selectedTopicId, learner_id: LEARNER_ID, ...(examVariant ? { exam_variant: examVariant } : {}) }, signal);
       setSession(created);
       setAttempts([]);
       setAttemptResult(null);
@@ -397,6 +404,9 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
   const selectedTopic = topicsResource.state.status === 'success'
     ? topicsResource.state.data.find((topic) => topic.id === selectedTopicId || topic.slug === selectedTopicId)
     : undefined;
+  const selectableTopics = topicsResource.state.status === 'success'
+    ? topicsResource.state.data.filter(topic => examProfile?.selection_persisted && topic.domain_code === (examProfile.exam_variant === 'general_training' ? 'ielts_general_training' : 'ielts_academic') && topic.id.endsWith('-reading-english'))
+    : [];
   const nextAction = attemptResult ? describeNextAction(attemptResult.next_action) : null;
   const activeDiagnosticStep = diagnosticStep?.caseId === diagnosticCaseId ? diagnosticStep.result : null;
   const diagnosticPanelProps: DiagnosticPanelProps = {
@@ -461,8 +471,8 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
           <section className="wb-card">
             <div className="wb-card-head"><h2 className="wb-card-title">选择学习主题</h2><span className="wb-muted-note">来自服务端知识目录</span></div>
             <div className="wb-card-body">
-              <ResourceNotice state={topicsResource.state} emptyMessage="服务端当前没有可用知识点。" onRetry={() => void topicsResource.retry()} />
-              {topicsResource.state.status === 'success' && <div className="wb-topic-list">{topicsResource.state.data.map((topic) => (
+              <ResourceNotice state={topicsResource.state} emptyMessage="当前考试模式暂无可用阅读主题。" onRetry={() => void topicsResource.retry()} />
+              {topicsResource.state.status === 'success' && <div className="wb-topic-list">{selectableTopics.map((topic) => (
                 <button key={topic.id} type="button" className={`wb-topic-option ${selectedTopicId === topic.id ? 'selected' : ''}`} onClick={() => setSelectedTopicId(topic.id)}>
                   <strong>{topic.title}</strong><span>{topic.summary}</span><small>{topic.domain_code} · difficulty {topic.difficulty_level}</small>
                 </button>
@@ -495,14 +505,23 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
       <div className="focus-learning-page">
         <main>
           <header className="focus-page-header"><div className="focus-eyebrow">{activeQuestion?.question_role === 'transfer_check' ? 'TRANSFER CHECK' : 'LEARNING SESSION'}</div><h1 className="focus-page-title">{activeQuestion?.question_role === 'transfer_check' ? '换个场景，试着运用。' : '专注理解当前问题。'}</h1><p className="focus-page-subtitle">题目与下一步均由当前服务端会话决定。</p></header>
-          {!session && <section className="wb-card"><div className="wb-card-body"><p>尚未选择学习会话。请从学习主页创建新会话或恢复历史会话。</p><button className="wb-btn primary" onClick={() => onNavigateWorkspace('home')}>选择知识点与会话</button></div></section>}
+          {!session && <section className="wb-card"><div className="wb-card-body">
+            <h2>选择阅读任务</h2>
+            {examProfileError && <p role="alert">无法读取考试模式，请检查后端连接并返回首页重试。</p>}
+            <ResourceNotice state={topicsResource.state} emptyMessage="当前考试模式暂无阅读任务。" onRetry={() => void topicsResource.retry()} />
+            {topicsResource.state.status === 'success' && selectableTopics.map(topic => <button key={topic.id} type="button" className={`wb-topic-option ${selectedTopicId === topic.id ? 'selected' : ''}`} onClick={() => setSelectedTopicId(topic.id)}><strong>{topic.title}</strong><span>{topic.summary}</span></button>)}
+            {selectedTopic && <button type="button" className="wb-btn primary" disabled={operation.kind === 'loading' || !examProfile?.selection_persisted} onClick={() => void createLearningSession()}>开始阅读</button>}
+            <details className="focus-disclosure"><summary>恢复历史会话</summary><div className="focus-disclosure-content"><ResourceNotice state={sessionsResource.state} emptyMessage="尚无历史会话。" onRetry={() => void sessionsResource.retry()} />{sessionsResource.state.status === 'success' && sessionsResource.state.data.map(item => <div className="wb-session-row" key={item.id}><span>{item.topic_title} · {item.exam_variant ?? '原有学习'} · {item.status}</span><button className="wb-btn sm" onClick={() => void restoreSelectedSession(item)}>打开会话</button></div>)}</div></details>
+            {!examProfileError && examProfile && !examProfile.selection_persisted && <p>请先在首页保存考试模式。</p>}
+            <button className="wb-btn" onClick={() => onNavigateWorkspace('home')}>返回首页</button>
+          </div></section>}
           {session && <>
-            <div className="focus-session-meta"><span>{session.topic_title}</span><span className="focus-meta-separator">·</span><StateBadge label="学习状态" value={session.knowledge_state_status ?? 'unknown'} /></div>
+            <div className="focus-session-meta"><span>{session.topic_title}</span><span>{session.exam_variant ?? '原有学习'}</span><span className="focus-meta-separator">·</span><StateBadge label="学习状态" value={session.knowledge_state_status ?? 'unknown'} /><button type="button" className="wb-btn sm" disabled={Boolean(draft.trim()) || operation.kind === 'loading'} onClick={() => { setSession(null); setSelectedTopicId(''); setAttempts([]); setAttemptResult(null); window.sessionStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY); }}>选择其他阅读任务</button></div>
             <details className="focus-disclosure focus-learning-materials">
               <summary>查看相关学习材料</summary>
               <div className="focus-disclosure-content">
                 <ResourceNotice state={materialsResource.state} emptyMessage="该知识点目前没有服务端学习材料。" onRetry={() => void materialsResource.retry()} />
-                {materialsResource.state.status === 'success' && materialsResource.state.data.map((material) => <article className="wb-material" key={material.id}><h3>{material.title}</h3><p>{material.summary}</p><pre>{material.content_body}</pre></article>)}
+                {materialsResource.state.status === 'success' && materialsResource.state.data.filter(material => !session.exam_variant || material.id === session.current_question?.material_id).map((material) => <article className="wb-material" key={material.id}><h3>{material.title}</h3><p>{material.summary}</p><pre>{material.content_body}</pre></article>)}
               </div>
             </details>
             {activeQuestion && session.status !== 'completed' ? <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-question-meta"><span className="focus-eyebrow">{activeQuestion.question_role} · {activeQuestion.question_type}</span><span className="wb-badge blue">服务端题目</span></div><h2 className="focus-question-prompt">{activeQuestion.prompt_text}</h2>{activeQuestion.context_snippet && <pre className="wb-code-block focus-code">{activeQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="real-answer">你的答案或推理过程</label><textarea id="real-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small className="focus-char-count">{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary focus-primary-action" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交作答</button><button type="button" className="wb-btn" disabled={!draft} onClick={() => setDraft('')}>清空草稿</button></div></div></section> : <section className="wb-card"><div className="wb-card-body">{session.status === 'completed' ? <p>此会话已由服务端结束。</p> : submittedQuestionAlreadyCurrent ? <p>该题已有作答记录；等待服务端下一步或派发新题，不会重复显示为可作答题目。</p> : <p>当前会话暂无可作答题目。请查看服务端返回的下一步动作。</p>}</div></section>}
@@ -534,7 +553,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
       <header className="focus-page-header"><div className="focus-eyebrow">TRANSFER CHECK</div><h1 className="focus-page-title">把理解带到新的情境。</h1><p className="focus-page-subtitle">只有服务端派发的迁移题会显示在这里；本页面不会自行推定掌握状态。</p></header>
       {!session && <section className="wb-card"><div className="wb-card-body"><p>当前没有可恢复的学习会话。</p><button className="wb-btn primary" onClick={() => onNavigateWorkspace('home')}>返回首页</button></div></section>}
       {session && !transferQuestion && <section className="wb-card"><div className="wb-card-body"><p>{session.status === 'completed' ? '本次会话已结束。' : transfer.passed ? '本次独立迁移验证已通过。' : session.current_question?.question_role === 'transfer_check' ? '当前迁移题已评价；请根据服务端结果继续。' : '当前没有待作答的服务端迁移题，请按学习决策继续。'}</p><button className="wb-btn" onClick={() => onNavigateWorkspace('learning')}>查看当前学习任务</button></div></section>}
-      {transferQuestion && <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-eyebrow">SERVER-ASSIGNED · {transferQuestion.question_type}</div><h2>{transferQuestion.prompt_text}</h2>{transferQuestion.context_snippet && <pre className="wb-code-block">{transferQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="transfer-answer">写下你的答案或推理过程</label><textarea id="transfer-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small>{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交迁移验证</button>{pendingAttempt && <button type="button" className="wb-btn" onClick={() => void submitPreparedAttempt(true)}>用原请求重试</button>}</div></div></section>}
+      {transferQuestion && <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-eyebrow">SERVER-ASSIGNED · {transferQuestion.question_type}</div>{materialsResource.state.status === 'success' && materialsResource.state.data.filter(material => material.id === transferQuestion.material_id).map(material => <article className="wb-material" key={material.id}><h3>{material.title}</h3><pre>{material.content_body}</pre></article>)}<ResourceNotice state={materialsResource.state} onRetry={() => void materialsResource.retry()} /><h2>{transferQuestion.prompt_text}</h2>{transferQuestion.context_snippet && <pre className="wb-code-block">{transferQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="transfer-answer">写下你的答案或推理过程</label><textarea id="transfer-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small>{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交迁移验证</button>{pendingAttempt && <button type="button" className="wb-btn" onClick={() => void submitPreparedAttempt(true)}>用原请求重试</button>}</div></div></section>}
       {transfer.result && <section className="wb-card"><div className="wb-card-body"><h2>{transfer.passed ? '本次独立迁移验证通过' : '最近一次迁移评价'}</h2><p>{transfer.result.evaluation_summary ?? transfer.result.feedback_text ?? '服务端未返回评估说明。'}</p><p>该次评价后的建议：{describeNextAction(transfer.result.next_action).title}</p><p>{transfer.result.mastery_note ?? '本次题目结果不能证明长期保持。'}</p><small>评价来源：{transfer.result.evaluation_source ?? 'unknown'} · 诊断案例：{transfer.result.diagnostic_case_id ?? '无关联诊断'}</small></div></section>}
       {transfer.canDispatch && <button className="wb-btn primary" disabled={operation.kind === 'loading'} onClick={() => void dispatchNextTransfer()}>请求服务端派发新的迁移题</button>}
       {session && <div className="wb-btn-group"><button className="wb-btn" onClick={() => onNavigateWorkspace('learning')}>返回学习与诊断</button>{session.status === 'transfer_checking' && <button className="wb-btn" disabled={operation.kind === 'loading'} onClick={() => void endSession()}>结束本次学习</button>}</div>}

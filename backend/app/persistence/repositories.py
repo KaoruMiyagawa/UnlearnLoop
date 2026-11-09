@@ -1,6 +1,7 @@
 """Repository and domain persistence operations enforcing Stage 2 invariants."""
 
 from datetime import datetime
+import hashlib
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -50,6 +51,25 @@ class LearningRepository:
 
     def __init__(self, session: Session) -> None:
         self.session = session
+
+    @staticmethod
+    def _reading_material_fingerprint(question: Question) -> str | None:
+        if not question.material or not question.material.content_body.strip():
+            return None
+        normalized = " ".join(question.material.content_body.casefold().split())
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+    def _attempt_material_fingerprint(self, attempt: Attempt) -> str | None:
+        snapshot = attempt.question_snapshot_json or {}
+        return snapshot.get("material_fingerprint") or self._reading_material_fingerprint(attempt.question)
+
+    def _assigned_reading_materials(self, learner_id: str, topic_id: str, *, exclude_session_id: str | None = None) -> set[str | None]:
+        statement = select(Question).join(LearningSession, LearningSession.current_question_id == Question.id).where(
+            LearningSession.learner_id == learner_id, LearningSession.topic_id == topic_id,
+        )
+        if exclude_session_id is not None:
+            statement = statement.where(LearningSession.id != exclude_session_id)
+        return {self._reading_material_fingerprint(question) for question in self.session.scalars(statement)}
 
     # ------------------------------------------------------------------
     # Topics & Questions
@@ -191,11 +211,17 @@ class LearningRepository:
             )
             for attempt in prior_attempts
         }
+        is_reading = item.topic.domain_code in {"ielts_academic", "ielts_general_training"}
+        seen_materials = {self._attempt_material_fingerprint(attempt) for attempt in prior_attempts} if is_reading else set()
+        if is_reading:
+            seen_materials.update(self._assigned_reading_materials(item.learner_id, item.topic_id))
         return next(
             (
                 question for question in candidates
                 if question.id not in seen_ids
                 and transfer_context_key(question.prompt_text, question.context_snippet) not in seen_contexts
+                and (not is_reading or (None not in seen_materials and self._reading_material_fingerprint(question) is not None
+                     and self._reading_material_fingerprint(question) not in seen_materials))
             ),
             None,
         )
@@ -246,6 +272,8 @@ class LearningRepository:
         learner_id: str = "local_default_learner",
         current_question_id: str | None = None,
         status: SessionStatus | str = SessionStatus.ACTIVE,
+        exam_variant: str | None = None,
+        exam_spec_version: str | None = None,
     ) -> LearningSession:
         topic = self.session.get(KnowledgeTopic, topic_id)
         if topic is None:
@@ -263,6 +291,8 @@ class LearningRepository:
             topic_id=topic_id,
             current_question_id=current_question_id,
             status=SessionStatus(status).value,
+            exam_variant=exam_variant,
+            exam_spec_version=exam_spec_version,
         )
         self.session.add(learning_session)
         self.session.flush()
@@ -305,11 +335,18 @@ class LearningRepository:
         for question in self.list_questions_for_topic(learning_session.topic_id):
             if question.question_role != QuestionRole.TRANSFER_CHECK.value:
                 excluded_contexts.add(transfer_context_key(question.prompt_text, question.context_snippet))
+        is_reading = learning_session.topic.domain_code in {"ielts_academic", "ielts_general_training"}
+        excluded_materials = {self._attempt_material_fingerprint(attempt) for attempt in attempts} if is_reading else set()
+        if is_reading:
+            excluded_materials.update(self._assigned_reading_materials(learning_session.learner_id, learning_session.topic_id, exclude_session_id=learning_session.id))
+            excluded_materials.update(self._reading_material_fingerprint(q) for q in self.list_questions_for_topic(learning_session.topic_id)
+                                      if q.question_role in {QuestionRole.INITIAL.value, QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value})
         return [question for question in self.list_questions_for_topic(
             learning_session.topic_id, role=QuestionRole.TRANSFER_CHECK
         ) if question.id not in excluded_ids and transfer_context_key(
             question.prompt_text, question.context_snippet
-        ) not in excluded_contexts]
+        ) not in excluded_contexts and (not is_reading or (None not in excluded_materials and self._reading_material_fingerprint(question) is not None
+                                and self._reading_material_fingerprint(question) not in excluded_materials))]
 
     def validate_transfer_readiness(
         self, learning_session: LearningSession, *, agent_selected: bool = False,
@@ -374,6 +411,8 @@ class LearningRepository:
             "prompt_text": question.prompt_text,
             "context_snippet": question.context_snippet,
             "standard_answer": question.standard_answer,
+            "material_id": question.material_id,
+            "material_fingerprint": self._reading_material_fingerprint(question),
         }
         attempt = Attempt(
             session_id=session_id,
@@ -680,11 +719,11 @@ class LearningRepository:
                 is_retried_transfer = True
             if target_enum == KnowledgeMasteryStatus.STABLE:
                 key = transfer_context_key(transfer_attempt.question.prompt_text, transfer_attempt.question.context_snippet)
-                other_attempts = self.session.scalars(
+                other_attempts = list(self.session.scalars(
                     select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
                     .where(LearningSession.learner_id == learner_id, LearningSession.topic_id == topic_id,
                            Attempt.id != transfer_attempt.id)
-                )
+                ))
                 if any(
                     prior.question_id == transfer_attempt.question_id
                     or transfer_context_key(prior.question_snapshot_json.get("prompt_text", prior.question.prompt_text),
@@ -692,6 +731,14 @@ class LearningRepository:
                     for prior in other_attempts
                 ):
                     is_retried_transfer = True
+                if transfer_attempt.question.topic.domain_code in {"ielts_academic", "ielts_general_training"}:
+                    material_key = self._attempt_material_fingerprint(transfer_attempt)
+                    prior_materials = {self._attempt_material_fingerprint(prior) for prior in other_attempts}
+                    prior_materials.update(self._assigned_reading_materials(learner_id, topic_id, exclude_session_id=session_id))
+                    training_materials = {self._reading_material_fingerprint(q) for q in self.list_questions_for_topic(topic_id)
+                                          if q.question_role in {QuestionRole.INITIAL.value, QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value}}
+                    if material_key is None or None in prior_materials or None in training_materials or material_key in prior_materials or material_key in training_materials:
+                        is_retried_transfer = True
                 if any(
                     question.question_role != QuestionRole.TRANSFER_CHECK.value
                     and transfer_context_key(question.prompt_text, question.context_snippet) == key

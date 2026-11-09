@@ -1,10 +1,12 @@
 """FastAPI application factory and entry point."""
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -39,6 +41,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             with factory() as session:
                 try:
                     import_content_pack(session)
+                    import_content_pack(
+                        session,
+                        pack_path=Path(__file__).parent / "content" / "ielts_reading_pack.json",
+                    )
+                    import_content_pack(
+                        session,
+                        pack_path=Path(__file__).parent / "content" / "ielts_reading_english_pack.json",
+                    )
                     session.commit()
                 except Exception:
                     session.rollback()
@@ -202,7 +212,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "code": "VALIDATION_ERROR",
                 "message": "请求参数校验失败",
                 "request_id": request_id,
-                "details": exc.errors(),
+                "details": jsonable_encoder([{key: value for key, value in error.items() if key != "ctx"} for error in exc.errors()]),
             },
         )
 

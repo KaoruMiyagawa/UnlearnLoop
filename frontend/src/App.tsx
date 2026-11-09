@@ -26,6 +26,7 @@ import { FocusReviewWorkspace } from './review-workspace/FocusReviewWorkspace';
 import { FocusProfileWorkspace } from './profile-workspace/FocusProfileWorkspace';
 import { ProfileWorkspacePlaceholder } from './profile-workspace/ProfileWorkspacePlaceholder';
 import { ReviewWorkspacePlaceholder } from './review-workspace/ReviewWorkspacePlaceholder';
+import { IeltsHome } from './home/IeltsHome';
 
 export const App: React.FC = () => {
   const [dataMode, setDataMode] = useState<'demo' | 'real'>('real');
@@ -182,6 +183,8 @@ export const App: React.FC = () => {
         <FocusReviewWorkspace onNavigateWorkspace={navigateWorkspace} />
       ) : activeWorkspace === 'profile' ? (
         <FocusProfileWorkspace onNavigateWorkspace={navigateWorkspace} />
+      ) : activeWorkspace === 'home' ? (
+        <IeltsHome onNavigate={navigateWorkspace} />
       ) : (
         <RealLearningWorkspace
           workspace={activeWorkspace}

@@ -3,11 +3,12 @@ import test from 'node:test';
 
 import { ApiClientError, ApiResource, apiRequest } from '../src/api/client.ts';
 import { getTopic, listTopics } from '../src/api/topics.ts';
-import { createAttemptSubmission, submitAttempt } from '../src/api/sessions.ts';
+import { createAttemptSubmission, getSessionMaterial, submitAttempt } from '../src/api/sessions.ts';
 import { getDiagnosis } from '../src/api/diagnoses.ts';
 import { getModelExecutionKind } from '../src/api/types.ts';
 import { getReview, startReview } from '../src/api/reviews.ts';
 import { listLearningHistory } from '../src/api/profile.ts';
+import { getExamCatalog, getExamProfile, saveExamProfile } from '../src/api/exams.ts';
 
 const originalFetch = globalThis.fetch;
 
@@ -20,6 +21,29 @@ function response(body, { status = 200, headers = {} } = {}) {
 
 test.afterEach(() => {
   globalThis.fetch = originalFetch;
+});
+
+test('IELTS catalogue and persisted preparation goal use the real API contract', async () => {
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), init });
+    return response(init.method === 'GET' && String(url).includes('/catalog') ? [] : { exam_variant: 'academic' });
+  };
+  await getExamCatalog();
+  await getExamProfile('learner A');
+  await saveExamProfile({ exam_variant: 'general_training', target_overall_band: 8 });
+  assert.match(calls[0].url, /\/api\/v1\/exams\/catalog$/);
+  assert.match(calls[1].url, /learner_id=learner%20A$/);
+  assert.equal(calls[2].init.method, 'PUT');
+  assert.deepEqual(JSON.parse(calls[2].init.body), { exam_variant: 'general_training', target_overall_band: 8 });
+});
+
+test('reading material is requested for the currently assigned session', async () => {
+  let requestedUrl = '';
+  globalThis.fetch = async (url) => { requestedUrl = String(url); return response({ id: 'passage-current' }); };
+  const material = await getSessionMaterial('session/a');
+  assert.match(requestedUrl, /\/api\/v1\/sessions\/session%2Fa\/material$/);
+  assert.equal(material.id, 'passage-current');
 });
 
 test('topics use the OpenAPI paths and encode IDs and query parameters', async () => {

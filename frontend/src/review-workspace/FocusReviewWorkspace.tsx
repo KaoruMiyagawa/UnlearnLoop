@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiClientError } from '../api/client';
-import { createAttemptSubmission, submitAttempt } from '../api/sessions';
+import { createAttemptSubmission, getSessionMaterial, submitAttempt } from '../api/sessions';
 import { getReview, listReviews, startReview } from '../api/reviews';
 import { listLearningHistory } from '../api/profile';
 import type { AttemptResult, LearningHistoryEvent, ReviewItem, SubmitAttemptRequest } from '../api/types';
@@ -78,6 +78,9 @@ export const FocusReviewWorkspace: React.FC<{
 
   const activeReviewId = activeReview?.id ?? null;
   const activeQuestion = activeReview?.status === 'pending' ? activeReview.current_question ?? null : null;
+  const reviewSessionId = activeReview?.review_session_id;
+  const loadMaterials = useCallback(async (signal: AbortSignal) => reviewSessionId ? [await getSessionMaterial(reviewSessionId, signal)].filter((item): item is NonNullable<typeof item> => item !== null) : [], [reviewSessionId, activeQuestion?.id]);
+  const materials = useApiResource(loadMaterials);
   const isPendingIntentForActive = pendingAnswer?.reviewId === activeReview?.id;
 
   useEffect(() => {
@@ -231,6 +234,9 @@ export const FocusReviewWorkspace: React.FC<{
           <button type="button" className="focus-button-quiet" disabled={busy} onClick={() => void recoverActiveReview()}>重新读取</button>
         </div>
         {activeQuestion && <div className="focus-review-question">
+          {materials.state.status === 'loading' && <p role="status">正在读取本题材料…</p>}
+          {materials.state.status === 'error' && <p role="alert">材料读取失败。<button onClick={() => void materials.retry()}>重试</button></p>}
+          {materials.state.status === 'success' && materials.state.data.filter(material => material.id === activeQuestion.material_id).map(material => <article className="wb-material" key={material.id}><h3>{material.title}</h3><pre>{material.content_body}</pre></article>)}
             <div className="focus-review-meta">服务端派发 · {activeQuestion.question_type} · 计划时间 {formatDate(activeReview.scheduled_for)}</div>
             <h3>{activeQuestion.prompt_text}</h3>
             {activeQuestion.context_snippet && <pre className="focus-code">{activeQuestion.context_snippet}</pre>}
