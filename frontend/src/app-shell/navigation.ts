@@ -38,6 +38,13 @@ export const WORKSPACE_NAV_ITEMS: readonly WorkspaceNavItem[] = [
     summary: '首次迁移失败、同题重答防刷分拦截与独立新情境题合法晋升 stable',
   },
   {
+    id: 'review',
+    path: '/review',
+    label: '复习',
+    badgeText: '待复习',
+    summary: '通过服务端派发题目和真实作答验证延迟保持',
+  },
+  {
     id: 'profile',
     path: '/profile',
     label: '学习档案',
@@ -48,9 +55,6 @@ export const WORKSPACE_NAV_ITEMS: readonly WorkspaceNavItem[] = [
 
 export function resolveWorkspaceFromPath(pathname: string): WorkspaceId {
   const normalized = pathname.replace(/\/+$/, '') || '/';
-  if (normalized === '/review') {
-    return 'profile';
-  }
   const matched = WORKSPACE_NAV_ITEMS.find((item) => item.path === normalized);
   return matched ? matched.id : 'home';
 }

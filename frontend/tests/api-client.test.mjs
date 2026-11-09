@@ -6,6 +6,8 @@ import { getTopic, listTopics } from '../src/api/topics.ts';
 import { createAttemptSubmission, submitAttempt } from '../src/api/sessions.ts';
 import { getDiagnosis } from '../src/api/diagnoses.ts';
 import { getModelExecutionKind } from '../src/api/types.ts';
+import { getReview, startReview } from '../src/api/reviews.ts';
+import { listLearningHistory } from '../src/api/profile.ts';
 
 const originalFetch = globalThis.fetch;
 
@@ -33,6 +35,32 @@ test('topics use the OpenAPI paths and encode IDs and query parameters', async (
   assert.match(calls[0].url, /\/api\/v1\/topics\?domain_code=python\+basics$/);
   assert.match(calls[1].url, /\/api\/v1\/topics\/topic%2Fa%20b$/);
   assert.equal(calls[0].init.method, 'GET');
+});
+
+test('review detail and dispatch use server routes and preserve the selected learner', async () => {
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), method: init.method });
+    return response({ id: 'review/1' });
+  };
+
+  await getReview('review/1', 'learner a');
+  await startReview('review/1', 'learner a');
+  assert.match(calls[0].url, /\/api\/v1\/reviews\/review%2F1\?learner_id=learner\+a$/);
+  assert.equal(calls[0].method, 'GET');
+  assert.match(calls[1].url, /\/api\/v1\/reviews\/review%2F1\/start\?learner_id=learner\+a$/);
+  assert.equal(calls[1].method, 'POST');
+});
+
+test('learning history uses the learner-scoped read-only profile endpoint', async () => {
+  let request;
+  globalThis.fetch = async (url, init) => {
+    request = { url: String(url), method: init.method };
+    return response([]);
+  };
+  await listLearningHistory('learner/a', 40);
+  assert.match(request.url, /\/api\/v1\/profile\/history\?learner_id=learner%2Fa&limit=40$/);
+  assert.equal(request.method, 'GET');
 });
 
 test('HTTP errors preserve backend code, details and request ID', async () => {

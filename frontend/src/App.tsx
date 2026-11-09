@@ -22,6 +22,8 @@ import {
 import { DiagnosisWorkspacePlaceholder } from './diagnosis-workspace/DiagnosisWorkspacePlaceholder';
 import { LearningWorkspacePlaceholder } from './learning-workspace/LearningWorkspacePlaceholder';
 import { RealLearningWorkspace } from './learning-workspace/RealLearningWorkspace';
+import { FocusReviewWorkspace } from './review-workspace/FocusReviewWorkspace';
+import { FocusProfileWorkspace } from './profile-workspace/FocusProfileWorkspace';
 import { ProfileWorkspacePlaceholder } from './profile-workspace/ProfileWorkspacePlaceholder';
 import { ReviewWorkspacePlaceholder } from './review-workspace/ReviewWorkspacePlaceholder';
 
@@ -176,7 +178,11 @@ export const App: React.FC = () => {
       onChangeUiMode={dataMode === 'demo' ? setUiMode : undefined}
       onResetProgression={dataMode === 'demo' ? handleResetToStageOne : undefined}
     >
-      {dataMode === 'real' ? (
+      {dataMode === 'real' ? activeWorkspace === 'review' ? (
+        <FocusReviewWorkspace onNavigateWorkspace={navigateWorkspace} />
+      ) : activeWorkspace === 'profile' ? (
+        <FocusProfileWorkspace onNavigateWorkspace={navigateWorkspace} />
+      ) : (
         <RealLearningWorkspace
           workspace={activeWorkspace}
           onNavigateWorkspace={navigateWorkspace}

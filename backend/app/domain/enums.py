@@ -10,6 +10,7 @@ class QuestionRole(StrEnum):
     DIAGNOSTIC_FOLLOWUP = "diagnostic_followup"
     TARGETED_PRACTICE = "targeted_practice"
     TRANSFER_CHECK = "transfer_check"
+    REVIEW = "review"
 
 
 class QuestionType(StrEnum):
@@ -28,6 +29,7 @@ class SessionStatus(StrEnum):
     DIAGNOSING = "diagnosing"
     INTERVENING = "intervening"
     TRANSFER_CHECKING = "transfer_checking"
+    REVIEWING = "reviewing"
     COMPLETED = "completed"
     PAUSED = "paused"
 
@@ -121,6 +123,7 @@ class ReviewStatus(StrEnum):
     PENDING = "pending"
     COMPLETED = "completed"
     REOPENED = "reopened"
+    CANCELLED = "cancelled"
 
 
 class ModelCallStatus(StrEnum):

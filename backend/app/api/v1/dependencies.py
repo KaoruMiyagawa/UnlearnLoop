@@ -131,9 +131,10 @@ def get_model_provider(
 
 def get_learning_service(
     db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
 ) -> LearningAppService:
     """Dependency injection for LearningAppService."""
-    return LearningAppService(db)
+    return LearningAppService(db, settings=settings)
 
 
 def get_diagnostic_service(

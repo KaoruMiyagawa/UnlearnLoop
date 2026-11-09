@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.domain.enums import (
@@ -139,6 +139,67 @@ class LearningRepository:
             stmt = stmt.where(ReviewItem.status == status)
         return list(self.session.scalars(stmt).all())
 
+    def get_review_item(self, review_id: str) -> ReviewItem | None:
+        return self.session.get(ReviewItem, review_id)
+
+    def get_review_item_for_session(self, review_session_id: str) -> ReviewItem | None:
+        return self.session.scalar(
+            select(ReviewItem).where(ReviewItem.review_session_id == review_session_id)
+        )
+
+    def cancel_pending_review_items(
+        self, *, learner_id: str, topic_id: str, except_schedule_key: str,
+    ) -> list[ReviewItem]:
+        items = self.session.scalars(
+            select(ReviewItem).where(
+                ReviewItem.learner_id == learner_id,
+                ReviewItem.topic_id == topic_id,
+                ReviewItem.status == ReviewStatus.PENDING.value,
+                or_(ReviewItem.schedule_key.is_(None), ReviewItem.schedule_key != except_schedule_key),
+            )
+        ).all()
+        for item in items:
+            item.status = ReviewStatus.CANCELLED.value
+            item.review_outcome = "superseded_by_new_independent_transfer"
+        self.session.flush()
+        return list(items)
+
+    def next_review_question(self, item: ReviewItem) -> Question | None:
+        """Choose an unattempted review question with a context unseen by this learner."""
+        candidates = self.session.scalars(
+            select(Question)
+            .where(
+                Question.topic_id == item.topic_id,
+                Question.question_role == QuestionRole.REVIEW.value,
+            )
+            .order_by(Question.difficulty, Question.id)
+        ).all()
+        prior_attempts = self.session.scalars(
+            select(Attempt)
+            .join(LearningSession, Attempt.session_id == LearningSession.id)
+            .where(
+                LearningSession.learner_id == item.learner_id,
+                LearningSession.topic_id == item.topic_id,
+                Attempt.evaluation_status == AttemptEvaluationStatus.EVALUATED.value,
+            )
+        ).all()
+        seen_ids = {attempt.question_id for attempt in prior_attempts}
+        seen_contexts = {
+            transfer_context_key(
+                str(attempt.question_snapshot_json.get("prompt_text", attempt.question.prompt_text)),
+                attempt.question_snapshot_json.get("context_snippet", attempt.question.context_snippet),
+            )
+            for attempt in prior_attempts
+        }
+        return next(
+            (
+                question for question in candidates
+                if question.id not in seen_ids
+                and transfer_context_key(question.prompt_text, question.context_snippet) not in seen_contexts
+            ),
+            None,
+        )
+
     def complete_review_item(
         self,
         review_id: str,
@@ -148,11 +209,9 @@ class LearningRepository:
         item = self.session.get(ReviewItem, review_id)
         if item is None:
             raise DomainRuleViolationError(f"ReviewItem '{review_id}' not found.")
-        item.status = ReviewStatus.COMPLETED.value
-        item.completed_at = utc_now()
-        item.review_notes = review_notes
-        self.session.flush()
-        return item
+        raise DomainRuleViolationError(
+            "Review completion requires a server-assigned question and evaluated learner attempt."
+        )
 
     def get_knowledge_state(
         self,
@@ -186,6 +245,7 @@ class LearningRepository:
         topic_id: str,
         learner_id: str = "local_default_learner",
         current_question_id: str | None = None,
+        status: SessionStatus | str = SessionStatus.ACTIVE,
     ) -> LearningSession:
         topic = self.session.get(KnowledgeTopic, topic_id)
         if topic is None:
@@ -202,7 +262,7 @@ class LearningRepository:
             learner_id=learner_id,
             topic_id=topic_id,
             current_question_id=current_question_id,
-            status=SessionStatus.ACTIVE.value,
+            status=SessionStatus(status).value,
         )
         self.session.add(learning_session)
         self.session.flush()
@@ -278,6 +338,7 @@ class LearningRepository:
         evaluation_status: AttemptEvaluationStatus | str = AttemptEvaluationStatus.PENDING,
         evaluation_summary: str | None = None,
         idempotency_key: str | None = None,
+        submitted_at: datetime | None = None,
     ) -> Attempt:
         """Record an immutable learner attempt linked to its Question and LearningSession."""
         if idempotency_key:
@@ -325,6 +386,7 @@ class LearningRepository:
             evaluation_status=eval_status_enum.value,
             evaluation_summary=evaluation_summary,
             idempotency_key=idempotency_key,
+            submitted_at=submitted_at or utc_now(),
         )
         self.session.add(attempt)
         self.session.flush()
@@ -719,10 +781,18 @@ class LearningRepository:
         learner_id: str = "local_default_learner",
         session_id: str | None = None,
         hypothesis_id: str | None = None,
+        schedule_key: str | None = None,
+        review_stage: int = 0,
     ) -> ReviewItem:
         if not trigger_reason or not trigger_reason.strip():
             raise DomainRuleViolationError("ReviewItem trigger_reason cannot be empty.")
 
+        if schedule_key:
+            existing = self.session.scalar(
+                select(ReviewItem).where(ReviewItem.schedule_key == schedule_key)
+            )
+            if existing is not None:
+                return existing
         review = ReviewItem(
             learner_id=learner_id,
             topic_id=topic_id,
@@ -731,6 +801,8 @@ class LearningRepository:
             trigger_reason=trigger_reason.strip(),
             status=ReviewStatus.PENDING.value,
             scheduled_for=scheduled_for or utc_now(),
+            schedule_key=schedule_key,
+            review_stage=review_stage,
         )
         self.session.add(review)
         self.session.flush()

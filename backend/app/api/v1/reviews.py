@@ -23,6 +23,32 @@ def list_reviews(
     return service.list_reviews(learner_id=learner_id, status=review_status)
 
 
+@router.get(
+    "/reviews/{review_id}",
+    response_model=ReviewItemResponse,
+    summary="Get review task and resume its assigned question",
+)
+def get_review(
+    review_id: str,
+    learner_id: str = Query(default="default_learner"),
+    service: LearningAppService = Depends(get_learning_service),
+) -> ReviewItemResponse:
+    return service.get_review(review_id, learner_id)
+
+
+@router.post(
+    "/reviews/{review_id}/start",
+    response_model=ReviewItemResponse,
+    summary="Dispatch an eligible question for a due review task",
+)
+def start_review(
+    review_id: str,
+    learner_id: str = Query(default="default_learner"),
+    service: LearningAppService = Depends(get_learning_service),
+) -> ReviewItemResponse:
+    return service.start_review(review_id, learner_id)
+
+
 @router.post(
     "/reviews/{review_id}/complete",
     response_model=ReviewItemResponse,

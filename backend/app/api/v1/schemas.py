@@ -386,6 +386,22 @@ class ReviewItemResponse(BaseModel):
     status: str
     created_at: datetime
     completed_at: datetime | None = None
+    review_stage: int = 0
+    review_session_id: str | None = None
+    question_id: str | None = None
+    current_question: SanitizedQuestionResponse | None = None
+    review_question: SanitizedQuestionResponse | None = None
+    attempt_id: str | None = None
+    is_correct: bool | None = None
+    submitted_at: datetime | None = None
+    evaluation_summary: str | None = None
+    review_outcome: str | None = None
+    retention_verified: bool = False
+    retention_eligible: bool = False
+    decision_event_id: str | None = None
+    knowledge_state_id: str | None = None
+    message: str | None = None
+    is_due: bool = False
 
 
 class CompleteReviewRequest(BaseModel):
@@ -396,6 +412,12 @@ class CompleteReviewRequest(BaseModel):
         max_length=500,
         description="Optional learner or tutor notes on the review completion.",
     )
+
+
+class UnresolvedErrorReasonResponse(BaseModel):
+    title: str
+    summary: str
+    status: str
 
 
 class KnowledgeStateResponse(BaseModel):
@@ -412,6 +434,25 @@ class KnowledgeStateResponse(BaseModel):
     transition_reason: str | None = None
     last_transfer_attempt_id: str | None = None
     updated_at: datetime
+    retention_status: str = "not_verified"
+    retention_evidence_count: int = 0
+    last_reviewed_at: datetime | None = None
+    last_retention_verified_at: datetime | None = None
+    unresolved_error_reasons: list[UnresolvedErrorReasonResponse] = Field(default_factory=list)
+
+
+class LearningHistoryEventResponse(BaseModel):
+    id: str
+    kind: str
+    occurred_at: datetime
+    topic_id: str
+    topic_title: str
+    title: str
+    summary: str
+    evidence_summary: str
+    session_id: str | None = None
+    attempt_id: str | None = None
+    review_id: str | None = None
 
 
 class DashboardSummaryResponse(BaseModel):

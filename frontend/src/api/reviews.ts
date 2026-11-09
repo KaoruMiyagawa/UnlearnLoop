@@ -14,6 +14,16 @@ export function listReviews(query: ListReviewsQuery = {}, signal?: AbortSignal):
   return apiRequest(`/api/v1/reviews${suffix}`, { method: 'GET', signal });
 }
 
+export function getReview(reviewId: string, learnerId = 'default_learner', signal?: AbortSignal): Promise<ReviewItem> {
+  const params = new URLSearchParams({ learner_id: learnerId });
+  return apiRequest(`/api/v1/reviews/${encodeURIComponent(reviewId)}?${params}`, { method: 'GET', signal });
+}
+
+export function startReview(reviewId: string, learnerId = 'default_learner', signal?: AbortSignal): Promise<ReviewItem> {
+  const params = new URLSearchParams({ learner_id: learnerId });
+  return apiRequest(`/api/v1/reviews/${encodeURIComponent(reviewId)}/start?${params}`, { method: 'POST', signal });
+}
+
 export function completeReview(
   reviewId: string,
   payload?: CompleteReviewRequest,

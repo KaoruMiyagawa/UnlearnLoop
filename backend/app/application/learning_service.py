@@ -1,8 +1,9 @@
 """Application service orchestrating learning topics, sessions, attempts, and reviews."""
 
-from typing import Any
+from datetime import datetime, timedelta, timezone
+from typing import Any, Callable
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -12,6 +13,7 @@ from app.api.v1.schemas import (
     AttemptSummaryResponse,
     DashboardSummaryResponse,
     KnowledgeStateResponse,
+    LearningHistoryEventResponse,
     LearningMaterialResponse,
     ReviewItemResponse,
     SanitizedQuestionResponse,
@@ -21,7 +23,9 @@ from app.api.v1.schemas import (
     TopicPrerequisiteSummary,
     TopicSummaryResponse,
     TransferCheckDispatchResponse,
+    UnresolvedErrorReasonResponse,
 )
+from app.config import Settings
 from app.application.exceptions import (
     EntityNotFoundError,
     IdempotencyConflictError,
@@ -55,19 +59,85 @@ from app.persistence.models import (
     KnowledgeTopic,
     LearningMaterial,
     LearningSession,
+    Hypothesis,
     Question,
     ReviewItem,
 )
 from app.persistence.repositories import LearningRepository
+from app.persistence.models import utc_now
 
 
 class LearningAppService:
     """Coordinates core learning use cases with explicit transaction boundaries."""
 
-    def __init__(self, db_session: Session) -> None:
+    def __init__(
+        self,
+        db_session: Session,
+        *,
+        settings: Settings | None = None,
+        clock: Callable[[], datetime] | None = None,
+    ) -> None:
         self.db = db_session
         self.repo = LearningRepository(db_session)
         self.rule_evaluator = RuleEvaluator()
+        self.review_intervals_days = (settings or Settings()).review_intervals_days
+        if not self.review_intervals_days or any(day < 1 for day in self.review_intervals_days):
+            raise ValueError("Review intervals must contain positive day counts.")
+        self.clock = clock or utc_now
+
+    def _now(self) -> datetime:
+        value = self.clock()
+        return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+
+    @staticmethod
+    def _as_utc(value: datetime) -> datetime:
+        return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value.astimezone(timezone.utc)
+
+    def _review_interval(self, stage: int) -> int:
+        return self.review_intervals_days[min(max(stage, 0), len(self.review_intervals_days) - 1)]
+
+    def _schedule_review(
+        self, *, learner_id: str, topic_id: str, session_id: str,
+        trigger_attempt_id: str, reason: str, stage: int = 0,
+        retention_eligible: bool = True,
+    ) -> ReviewItem:
+        due_at = self._now() + timedelta(days=self._review_interval(stage))
+        schedule_key = f"{'retention' if retention_eligible else 'remediation'}:{trigger_attempt_id}:stage:{stage}"
+        if retention_eligible and stage == 0:
+            superseded = self.repo.cancel_pending_review_items(
+                learner_id=learner_id, topic_id=topic_id, except_schedule_key=schedule_key,
+            )
+            for prior in superseded:
+                self.repo.append_decision_event(
+                    session_id=session_id, event_type="review_plan_superseded",
+                    to_state=ReviewStatus.CANCELLED.value, action="cancel_review_plan",
+                    reason="A newer independent transfer result replaces the older pending review plan.",
+                    payload_json={"review_item_id": prior.id, "replacement_trigger_attempt_id": trigger_attempt_id},
+                    idempotency_key=f"review-cancel:{prior.id}:by:{trigger_attempt_id}",
+                )
+        item = self.repo.schedule_review_item(
+            learner_id=learner_id, topic_id=topic_id, session_id=session_id,
+            trigger_reason=reason, scheduled_for=due_at,
+            schedule_key=schedule_key,
+            review_stage=stage,
+        )
+        item.retention_eligible = retention_eligible
+        knowledge_state = self.repo.get_knowledge_state(learner_id, topic_id)
+        if item.knowledge_state_id is None and knowledge_state is not None:
+            item.knowledge_state_id = knowledge_state.id
+        event = self.repo.append_decision_event(
+            session_id=session_id, event_type="review_scheduled", to_state="pending",
+            action="schedule_review", reason=reason,
+            payload_json={"review_item_id": item.id, "scheduled_for": due_at.isoformat(),
+                          "review_stage": stage, "interval_days": self._review_interval(stage),
+                          "trigger_attempt_id": trigger_attempt_id,
+                          "knowledge_state_id": item.knowledge_state_id,
+                          "retention_eligible": retention_eligible},
+            idempotency_key=f"review-schedule:{trigger_attempt_id}:stage:{stage}",
+        )
+        item.decision_event_id = event.id
+        self.db.flush()
+        return item
 
     # -----------------------------------------------------------------------
     # Helper: Sanitization
@@ -401,6 +471,7 @@ class LearningAppService:
             SessionStatus.DIAGNOSING.value,
             SessionStatus.INTERVENING.value,
             SessionStatus.TRANSFER_CHECKING.value,
+            SessionStatus.REVIEWING.value,
         ):
             target_status = SessionStatus(pause_evt.from_state)
         else:
@@ -559,6 +630,9 @@ class LearningAppService:
                         idempotency_key,
                         "Idempotency key was already used with a different question_id or submitted_answer.",
                     )
+                stored = self._stored_attempt_result(sess.id, existing_attempt.id)
+                if stored is not None:
+                    return stored
                 return self._build_attempt_result(sess, existing_attempt, question)
 
         # 2. Session active status check
@@ -587,6 +661,7 @@ class LearningAppService:
                 SessionStatus.DIAGNOSING.value,
             },
             QuestionRole.TRANSFER_CHECK: {SessionStatus.TRANSFER_CHECKING.value},
+            QuestionRole.REVIEW: {SessionStatus.REVIEWING.value},
         }
         if sess.status not in allowed_statuses_by_role.get(role, set()):
             raise InvalidSessionOperationError(
@@ -594,6 +669,22 @@ class LearningAppService:
                 f"while session is in '{sess.status}' stage.",
                 current_state=sess.status,
             )
+
+        review_item = None
+        if role == QuestionRole.REVIEW:
+            review_item = self.repo.get_review_item_for_session(sess.id)
+            if (
+                review_item is None
+                or review_item.learner_id != sess.learner_id
+                or review_item.status != ReviewStatus.PENDING.value
+                or review_item.question_id != question.id
+            ):
+                raise InvalidSessionOperationError(
+                    "This review question is not assigned to an active review item.",
+                    current_state=sess.status,
+                )
+            if self._now() < self._as_utc(review_item.scheduled_for):
+                raise InvalidSessionOperationError("This review is not due yet.", current_state=review_item.status)
 
         # 5. Same-question retry guardrails:
         #    - For diagnostic_followup: once answered in the current diagnostic turn, require an Agent step before another attempt.
@@ -648,15 +739,32 @@ class LearningAppService:
             attempt = self.repo.record_attempt(
                 session_id=sess.id, question_id=question.id, submitted_answer=submitted_answer,
                 evaluation_status=AttemptEvaluationStatus.PENDING, idempotency_key=idempotency_key,
+                submitted_at=self._now(),
             )
         except IntegrityError:
             # A second client may race the same intent past the initial read.
             self.db.rollback()
             existing = self.db.scalar(select(Attempt).where(Attempt.idempotency_key == idempotency_key)) if idempotency_key else None
+            if existing is None and role == QuestionRole.REVIEW:
+                # Review questions admit only one evaluated attempt per session, even
+                # when clients omit an idempotency key or race with different keys.
+                existing = self.db.scalar(select(Attempt).where(
+                    Attempt.session_id == session_id,
+                    Attempt.question_id == question_id,
+                    Attempt.attempt_role == QuestionRole.REVIEW.value,
+                ))
             if existing is None:
                 raise
             if (existing.session_id, existing.question_id, existing.submitted_answer) != (session_id, question_id, submitted_answer):
-                raise IdempotencyConflictError(idempotency_key, "Idempotency key belongs to a different answer intent.")
+                raise IdempotencyConflictError(idempotency_key or "review-attempt", "This review question already has a different submitted answer.")
+            stored_result = self._stored_attempt_result(session_id, existing.id)
+            if stored_result is not None:
+                return stored_result
+            if role == QuestionRole.REVIEW:
+                raise InvalidSessionOperationError(
+                    "A concurrent review submission is being finalized; reload the review status before retrying.",
+                    current_state="review_submission_in_progress",
+                )
             return self._build_attempt_result(self.repo.get_session(session_id), existing, question)
         if (attempt.session_id, attempt.question_id, attempt.submitted_answer) != (session_id, question_id, submitted_answer):
             raise IdempotencyConflictError(idempotency_key or "", "Idempotency key belongs to a different answer intent.")
@@ -760,11 +868,13 @@ class LearningAppService:
             diag_case_id = active_diag.id if active_diag else None
             if not attempt.is_correct:
                 # Transfer check failed: schedule review and retain needs_practice
-                self.repo.schedule_review_item(
+                self._schedule_review(
                     topic_id=sess.topic_id,
                     session_id=sess.id,
                     learner_id=sess.learner_id,
-                    trigger_reason=f"Transfer verification question '{question.id}' failed.",
+                    trigger_attempt_id=attempt.id,
+                    reason=f"Transfer verification question '{question.id}' failed; preserve a short-interval follow-up.",
+                    retention_eligible=False,
                 )
                 ks = self.repo.update_knowledge_state(
                     session_id=sess.id,
@@ -819,6 +929,12 @@ class LearningAppService:
                     )
                     ks_status = ks.status
                     next_action = "mastery_achieved"
+                    self._schedule_review(
+                        learner_id=sess.learner_id, topic_id=sess.topic_id,
+                        session_id=sess.id, trigger_attempt_id=attempt.id,
+                        reason="Independent transfer passed; schedule the first delayed retention check.",
+                        retention_eligible=True,
+                    )
 
                     if active_diag and active_diag.status == DiagnosticCaseStatus.TRANSFER_CHECKING.value:
                         self.repo.transition_diagnostic_case(
@@ -847,6 +963,76 @@ class LearningAppService:
                     reliability_note="Deterministic rule evaluation; not proof of a unique misconception or long-term retention.",
                 )
 
+        if role == QuestionRole.REVIEW:
+            assert review_item is not None
+            now = self._now()
+            review_item.status = ReviewStatus.COMPLETED.value
+            review_item.completed_at = now
+            review_item.attempt_id = attempt.id
+            state = self.repo.get_knowledge_state(sess.learner_id, sess.topic_id)
+            if not attempt.is_correct:
+                review_item.review_outcome = "failed"
+                review_item.retention_verified = False
+                if state is not None and state.status == KnowledgeMasteryStatus.STABLE.value:
+                    state = self.repo.update_knowledge_state(
+                        session_id=sess.id, topic_id=sess.topic_id, learner_id=sess.learner_id,
+                        target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                        reason="A delayed review answer was incorrect; current independent verification no longer supports stable status.",
+                    )
+                    ks_status = state.status
+                if sess.status != SessionStatus.DIAGNOSING.value:
+                    self.repo.transition_session_status(sess, SessionStatus.DIAGNOSING)
+                case = self.repo.create_diagnostic_case(
+                    session_id=sess.id, trigger_attempt_id=attempt.id,
+                    uncertainty_note="Delayed review answer was incorrect; diagnosis is needed before another intervention.",
+                )
+                diag_case_id = case.id
+                self._schedule_review(
+                    learner_id=sess.learner_id, topic_id=sess.topic_id, session_id=sess.id,
+                    trigger_attempt_id=attempt.id,
+                    reason="Review failed; retain a short-interval follow-up while diagnosis proceeds.",
+                    retention_eligible=False,
+                )
+                next_action = "review_failed_needs_diagnosis"
+            elif (review_item.retention_eligible and state is not None
+                    and state.status == KnowledgeMasteryStatus.STABLE.value
+                    and now >= self._as_utc(review_item.scheduled_for)):
+                review_item.review_outcome = "passed_delayed"
+                review_item.retention_verified = True
+                next_action = "delayed_retention_verified"
+                event = self.repo.append_decision_event(
+                    session_id=sess.id, event_type="delayed_retention_evaluated",
+                    from_state=state.status, to_state=state.status, action="verify_delayed_retention",
+                    reason="A due, independently answered review passed; this delayed evidence is not a long-term guarantee.",
+                    payload_json={"review_item_id": review_item.id, "attempt_id": attempt.id,
+                                  "question_id": question.id, "retention_verified": True,
+                                  "knowledge_state_id": review_item.knowledge_state_id,
+                                  "scheduled_for": self._as_utc(review_item.scheduled_for).isoformat(),
+                                  "submitted_at": now.isoformat(), "review_stage": review_item.review_stage},
+                    idempotency_key=f"review-result:{attempt.id}",
+                )
+                review_item.decision_event_id = event.id
+                self.repo.transition_session_status(sess, SessionStatus.COMPLETED)
+                self._schedule_review(
+                    learner_id=sess.learner_id, topic_id=sess.topic_id, session_id=sess.id,
+                    trigger_attempt_id=attempt.id,
+                    reason="Delayed review passed; schedule the next spaced retention check.",
+                    stage=min(review_item.review_stage + 1, len(self.review_intervals_days) - 1),
+                    retention_eligible=True,
+                )
+            else:
+                review_item.review_outcome = "passed_without_retention_baseline"
+                review_item.retention_verified = False
+                next_action = "review_passed_without_retention"
+                self.repo.append_decision_event(
+                    session_id=sess.id, event_type="review_practice_evaluated",
+                    to_state=sess.status, action="review_passed_without_retention",
+                    reason="The answer passed, but no valid prior stable state supports a delayed-retention conclusion.",
+                    payload_json={"review_item_id": review_item.id, "attempt_id": attempt.id,
+                                  "question_id": question.id, "retention_verified": False},
+                )
+                self.repo.transition_session_status(sess, SessionStatus.COMPLETED)
+
         result = self._build_attempt_result(
             sess,
             attempt,
@@ -855,12 +1041,14 @@ class LearningAppService:
             diagnostic_case_id=diag_case_id,
             knowledge_state_status=ks_status,
         )
-        self.repo.append_decision_event(
+        result_event = self.repo.append_decision_event(
             session_id=sess.id, diagnostic_case_id=diag_case_id,
             event_type="attempt_evaluated", action="record_attempt_result", to_state=sess.status,
             reason="Persist learner-facing evaluation, provenance and original retry response.",
             payload_json={"attempt_id": attempt.id, "evaluation_source": "rule_check", "result": result.model_dump(mode="json")},
         )
+        if role == QuestionRole.REVIEW and review_item is not None:
+            review_item.decision_event_id = result_event.id
         self.db.commit()
         return result
 
@@ -995,50 +1183,126 @@ class LearningAppService:
     # 5. Reviews & Profile & Dashboard
     # -----------------------------------------------------------------------
 
+    def _review_item_response(self, item: ReviewItem, message: str | None = None) -> ReviewItemResponse:
+        question = self.repo.get_question_by_id(item.question_id) if item.question_id else None
+        attempt = self.repo.get_attempt(item.attempt_id) if item.attempt_id else None
+        return ReviewItemResponse(
+            id=item.id, topic_id=item.topic_id, topic_title=item.topic.title,
+            session_id=item.session_id, learner_id=item.learner_id,
+            trigger_reason=item.trigger_reason, scheduled_for=self._as_utc(item.scheduled_for),
+            status=item.status, created_at=self._as_utc(item.created_at),
+            completed_at=self._as_utc(item.completed_at) if item.completed_at else None,
+            review_stage=item.review_stage, review_session_id=item.review_session_id,
+            question_id=item.question_id,
+            current_question=self.sanitize_question(question) if question and item.status == ReviewStatus.PENDING.value else None,
+            review_question=self.sanitize_question(question) if question else None,
+            attempt_id=item.attempt_id, review_outcome=item.review_outcome,
+            is_correct=attempt.is_correct if attempt else None,
+            submitted_at=self._as_utc(attempt.submitted_at) if attempt else None,
+            evaluation_summary=attempt.evaluation_summary if attempt else None,
+            retention_verified=item.retention_verified,
+            retention_eligible=item.retention_eligible,
+            decision_event_id=item.decision_event_id, message=message,
+            is_due=(item.status == ReviewStatus.PENDING.value
+                    and self._now() >= self._as_utc(item.scheduled_for)),
+            knowledge_state_id=item.knowledge_state_id,
+        )
+
     def list_reviews(
         self,
         learner_id: str = "default_learner",
         status: str = "pending",
     ) -> list[ReviewItemResponse]:
-        """List scheduled review tasks for a learner."""
-        reviews = self.repo.list_review_items_for_learner(
-            learner_id=learner_id, status=status
-        )
-        return [
-            ReviewItemResponse(
-                id=r.id,
-                topic_id=r.topic_id,
-                topic_title=r.topic.title,
-                session_id=r.session_id,
-                learner_id=r.learner_id,
-                trigger_reason=r.trigger_reason,
-                scheduled_for=r.scheduled_for,
-                status=r.status,
-                created_at=r.created_at,
-                completed_at=r.completed_at,
+        reviews = self.repo.list_review_items_for_learner(learner_id=learner_id, status=status)
+        return [self._review_item_response(item) for item in reviews]
+
+    def get_review(self, review_id: str, learner_id: str) -> ReviewItemResponse:
+        item = self.repo.get_review_item(review_id)
+        if item is None or item.learner_id != learner_id:
+            raise EntityNotFoundError("ReviewItem", review_id)
+        return self._review_item_response(item)
+
+    def start_review(self, review_id: str, learner_id: str) -> ReviewItemResponse:
+        item = self.repo.get_review_item(review_id)
+        if item is None or item.learner_id != learner_id:
+            raise EntityNotFoundError("ReviewItem", review_id)
+        if item.status != ReviewStatus.PENDING.value:
+            raise DomainRuleViolationError("This review task has already been completed and cannot be started again.")
+        if self._now() < self._as_utc(item.scheduled_for):
+            raise DomainRuleViolationError("This review task is not due yet.")
+        if item.review_session_id:
+            return self._review_item_response(item, "恢复已派发的复习题；请继续提交作答。")
+
+        question = self.repo.next_review_question(item)
+        if question is None:
+            if not item.session_id:
+                self.db.commit()
+                return self._review_item_response(item, "题库中没有未作答且情境不同的复习题。任务仍保留待办，不会记为通过。")
+            event = self.repo.append_decision_event(
+                session_id=item.session_id, event_type="review_question_unavailable",
+                to_state=ReviewStatus.PENDING.value, action="review_question_pool_exhausted",
+                reason="No eligible unattempted review question is available; keep the review task pending.",
+                payload_json={"review_item_id": item.id, "topic_id": item.topic_id,
+                              "learner_id": item.learner_id, "retention_verified": False},
+                idempotency_key=f"review-empty:{item.id}",
             )
-            for r in reviews
-        ]
+            item.decision_event_id = event.id
+            self.db.commit()
+            return self._review_item_response(item, "题库中没有未作答且情境不同的复习题。任务仍保留待办，不会记为通过。")
+
+        try:
+            review_session = self.repo.create_session(
+                topic_id=item.topic_id, learner_id=item.learner_id,
+                current_question_id=question.id, status=SessionStatus.REVIEWING,
+            )
+            claim = self.db.execute(
+                update(ReviewItem)
+                .where(
+                    ReviewItem.id == item.id,
+                    ReviewItem.learner_id == learner_id,
+                    ReviewItem.status == ReviewStatus.PENDING.value,
+                    ReviewItem.review_session_id.is_(None),
+                )
+                .values(review_session_id=review_session.id, question_id=question.id)
+            )
+            if claim.rowcount != 1:
+                self.db.rollback()
+                restored = self.repo.get_review_item(review_id)
+                if restored and restored.learner_id == learner_id and restored.review_session_id:
+                    return self._review_item_response(restored, "另一请求已派发复习题；已恢复该服务端任务。")
+                raise DomainRuleViolationError("This review task changed while the question was being dispatched.")
+            item.review_session_id = review_session.id
+            item.question_id = question.id
+            dispatch_event = self.repo.append_decision_event(
+                session_id=review_session.id, event_type="review_question_dispatched",
+                to_state=review_session.status, action="dispatch_review_question",
+                reason="Dispatch an unseen review question for this due review task.",
+                payload_json={"review_item_id": item.id, "question_id": question.id,
+                              "source_session_id": item.session_id, "review_stage": item.review_stage,
+                              "scheduled_for": self._as_utc(item.scheduled_for).isoformat()},
+                idempotency_key=f"review-dispatch:{item.id}",
+            )
+            if item.decision_event_id is None:
+                item.decision_event_id = dispatch_event.id
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            restored = self.repo.get_review_item(review_id)
+            if restored and restored.learner_id == learner_id and restored.review_session_id:
+                return self._review_item_response(restored, "另一请求已派发复习题；已恢复该服务端任务。")
+            raise
+        return self._review_item_response(item, "已派发服务端复习题；延迟保持需以提交作答后的评价为准。")
 
     def complete_review(
         self,
         review_id: str,
         review_notes: str | None = None,
     ) -> ReviewItemResponse:
-        """Mark a scheduled review task as completed."""
-        r = self.repo.complete_review_item(review_id, review_notes=review_notes)
-        self.db.commit()
-        return ReviewItemResponse(
-            id=r.id,
-            topic_id=r.topic_id,
-            topic_title=r.topic.title,
-            session_id=r.session_id,
-            learner_id=r.learner_id,
-            trigger_reason=r.trigger_reason,
-            scheduled_for=r.scheduled_for,
-            status=r.status,
-            created_at=r.created_at,
-            completed_at=r.completed_at,
+        item = self.repo.get_review_item(review_id)
+        if item is None:
+            raise EntityNotFoundError("ReviewItem", review_id)
+        raise DomainRuleViolationError(
+            "A review cannot be completed by acknowledgment alone. Start the due task and submit its assigned answer."
         )
 
     def list_knowledge_states(
@@ -1047,8 +1311,51 @@ class LearningAppService:
     ) -> list[KnowledgeStateResponse]:
         """List current knowledge mastery states for a learner."""
         states = self.repo.list_knowledge_states_for_learner(learner_id)
-        return [
-            KnowledgeStateResponse(
+        hypotheses_by_topic_and_code: dict[tuple[str, str], list[Hypothesis]] = {}
+        learner_hypotheses = self.db.scalars(
+            select(Hypothesis)
+            .join(DiagnosticCase, Hypothesis.diagnostic_case_id == DiagnosticCase.id)
+            .join(LearningSession, DiagnosticCase.session_id == LearningSession.id)
+            .where(LearningSession.learner_id == learner_id)
+            .order_by(Hypothesis.updated_at.desc())
+        ).all()
+        for hypothesis in learner_hypotheses:
+            topic_id = hypothesis.diagnostic_case.topic_id
+            hypotheses_by_topic_and_code.setdefault((topic_id, hypothesis.error_code), []).append(hypothesis)
+        responses: list[KnowledgeStateResponse] = []
+        for ks in states:
+            reviews = self.db.scalars(
+                select(ReviewItem)
+                .where(ReviewItem.knowledge_state_id == ks.id)
+                .order_by(ReviewItem.created_at.desc())
+            ).all()
+            pending_retention = any(
+                item.status == ReviewStatus.PENDING.value and item.retention_eligible
+                for item in reviews
+            )
+            completed_reviews = [item for item in reviews if item.attempt_id is not None]
+            latest_review = max(
+                completed_reviews,
+                key=lambda item: self._as_utc(item.completed_at or item.created_at),
+                default=None,
+            )
+            verified_reviews = [item for item in reviews if item.retention_verified]
+            latest_verified_review = max(
+                verified_reviews,
+                key=lambda item: self._as_utc(item.completed_at or item.created_at),
+                default=None,
+            )
+            if latest_review and latest_review.review_outcome == "failed":
+                retention_status = "review_failed"
+            elif latest_review and latest_review.retention_verified:
+                retention_status = "delayed_check_passed"
+            elif pending_retention:
+                retention_status = "review_due"
+            elif any(item.retention_verified for item in reviews):
+                retention_status = "delayed_check_passed"
+            else:
+                retention_status = "not_verified"
+            responses.append(KnowledgeStateResponse(
                 id=ks.id,
                 learner_id=ks.learner_id,
                 topic_id=ks.topic_id,
@@ -1057,12 +1364,146 @@ class LearningAppService:
                 status=KnowledgeMasteryStatus(ks.status),
                 confidence_is_heuristic=True,
                 unresolved_error_codes=list(ks.unresolved_error_codes or []),
+                unresolved_error_reasons=[
+                    UnresolvedErrorReasonResponse(
+                        title=hypothesis.name,
+                        summary=hypothesis.description,
+                        status=hypothesis.status,
+                    )
+                    for error_code in (ks.unresolved_error_codes or [])
+                    for hypothesis in hypotheses_by_topic_and_code.get((ks.topic_id, error_code), [])[:1]
+                    if hypothesis.status != HypothesisStatus.RULED_OUT.value
+                ],
                 transition_reason=ks.transition_reason,
                 last_transfer_attempt_id=ks.last_transfer_attempt_id,
                 updated_at=ks.updated_at,
+                retention_status=retention_status,
+                retention_evidence_count=sum(1 for item in reviews if item.retention_verified),
+                last_reviewed_at=(
+                    self._as_utc(latest_review.completed_at)
+                    if latest_review and latest_review.completed_at else None
+                ),
+                last_retention_verified_at=(
+                    self._as_utc(latest_verified_review.completed_at)
+                    if latest_verified_review and latest_verified_review.completed_at else None
+                ),
+            ))
+        return responses
+
+    def list_learning_history(
+        self, learner_id: str = "default_learner", limit: int = 100,
+    ) -> list[LearningHistoryEventResponse]:
+        """Return a learner-safe timeline assembled from persisted domain records.
+
+        This intentionally projects a small allowlist of event summaries. Raw answers,
+        evaluator rules, model prompts, and arbitrary DecisionEvent payloads are never returned.
+        """
+        sessions = self.repo.list_sessions_for_learner(learner_id)
+        session_ids = [session.id for session in sessions]
+        if not session_ids:
+            return []
+        events: list[LearningHistoryEventResponse] = []
+        cases = self.db.scalars(
+            select(DiagnosticCase)
+            .join(LearningSession, DiagnosticCase.session_id == LearningSession.id)
+            .where(LearningSession.learner_id == learner_id)
+        ).all()
+        diagnostic_trigger_attempt_ids = {case.trigger_attempt_id for case in cases}
+
+        def add_event(
+            *, event_id: str, kind: str, occurred_at: datetime, topic_id: str,
+            topic_title: str, title: str, summary: str, evidence_summary: str,
+            session_id: str | None = None, attempt_id: str | None = None,
+            review_id: str | None = None,
+        ) -> None:
+            events.append(LearningHistoryEventResponse(
+                id=event_id, kind=kind, occurred_at=self._as_utc(occurred_at),
+                topic_id=topic_id, topic_title=topic_title, title=title,
+                summary=summary, evidence_summary=evidence_summary,
+                session_id=session_id, attempt_id=attempt_id, review_id=review_id,
+            ))
+
+        attempts = self.db.scalars(
+            select(Attempt)
+            .join(LearningSession, Attempt.session_id == LearningSession.id)
+            .where(LearningSession.learner_id == learner_id)
+        ).all()
+        review_items = self.db.scalars(
+            select(ReviewItem).where(ReviewItem.learner_id == learner_id)
+        ).all()
+        review_by_attempt = {item.attempt_id: item for item in review_items if item.attempt_id}
+        role_labels = {
+            QuestionRole.INITIAL.value: ("answer", "学习作答"),
+            QuestionRole.DIAGNOSTIC_FOLLOWUP.value: ("diagnostic_question", "诊断追问"),
+            QuestionRole.TARGETED_PRACTICE.value: ("targeted_practice", "针对性练习"),
+            QuestionRole.TRANSFER_CHECK.value: ("transfer_check", "独立迁移验证"),
+            QuestionRole.REVIEW.value: ("delayed_review", "延迟复习作答"),
+        }
+        for attempt in attempts:
+            session = self.repo.get_session(attempt.session_id)
+            if session is None:
+                continue
+            kind, label = role_labels.get(attempt.attempt_role, ("answer", "学习作答"))
+            passed = attempt.is_correct is True
+            result_text = "通过" if passed else "需要继续练习" if attempt.is_correct is False else "评价尚未完成"
+            if (attempt.attempt_role == QuestionRole.INITIAL.value
+                    and (not passed or attempt.id in diagnostic_trigger_attempt_ids)):
+                label, kind = "初次作答", "incorrect_answer"
+                result_text = "作答后进入诊断，原因仍需结合后续证据判断。"
+            elif attempt.attempt_role == QuestionRole.REVIEW.value:
+                label = "延迟复习作答"
+                result_text = "获得一次延迟复习证据。" if passed else "本次复习未通过，需要继续学习。"
+            add_event(
+                event_id=f"attempt:{attempt.id}", kind=kind,
+                occurred_at=attempt.submitted_at, topic_id=session.topic_id,
+                topic_title=session.topic.title, title=label, summary=result_text,
+                evidence_summary=f"服务端作答记录 · {attempt.id} · 评价状态 {attempt.evaluation_status}",
+                session_id=session.id, attempt_id=attempt.id,
+                review_id=(review_by_attempt[attempt.id].id if attempt.id in review_by_attempt else None),
             )
-            for ks in states
-        ]
+
+        for case in cases:
+            topic = self.repo.get_topic_by_id(case.topic_id)
+            if topic is None:
+                continue
+            add_event(
+                event_id=f"diagnosis:{case.id}", kind="diagnosis",
+                occurred_at=case.created_at, topic_id=case.topic_id,
+                topic_title=topic.title, title="开始错误诊断",
+                summary="系统保留了多个可能原因，并根据后续作答继续收集证据。",
+                evidence_summary=f"诊断案例 {case.id} · 触发作答 {case.trigger_attempt_id}",
+                session_id=case.session_id, attempt_id=case.trigger_attempt_id,
+            )
+
+        # DecisionEvent is append-only but its payload is internal. Expose only
+        # learner-facing event categories and fixed summaries from this allowlist.
+        learner_event_copy = {
+            "diagnostic_step_completed": ("diagnostic_update", "更新诊断判断", "系统根据新证据更新了可能原因和下一步安排。"),
+            "transfer_verified": ("transfer_verified", "迁移验证通过", "新的应用情境验证通过；这表示当前迁移证据，不代表长期保持。"),
+            "review_scheduled": ("review_scheduled", "安排后续复习", "系统根据已保存的学习证据安排了后续复习。"),
+        }
+        decisions = self.db.scalars(
+            select(DecisionEvent)
+            .where(DecisionEvent.session_id.in_(session_ids))
+            .order_by(DecisionEvent.created_at.desc())
+        ).all()
+        for event in decisions:
+            projection = learner_event_copy.get(event.event_type)
+            if projection is None:
+                continue
+            session = self.repo.get_session(event.session_id)
+            if session is None:
+                continue
+            kind, title, summary = projection
+            add_event(
+                event_id=f"decision:{event.id}", kind=kind,
+                occurred_at=event.created_at, topic_id=session.topic_id,
+                topic_title=session.topic.title, title=title, summary=summary,
+                evidence_summary=f"服务端决策记录 · {event.id} · 不含内部提示词或执行载荷",
+                session_id=session.id,
+            )
+
+        return sorted(events, key=lambda item: item.occurred_at, reverse=True)[:max(1, min(limit, 200))]
 
     def get_dashboard_summary(
         self,
@@ -1093,7 +1534,7 @@ class LearningAppService:
         active_s = sum(
             1
             for s in sessions
-            if s.status in ("active", "diagnosing", "intervening", "transfer_checking")
+            if s.status in ("active", "diagnosing", "intervening", "transfer_checking", "reviewing")
         )
         comp_s = sum(1 for s in sessions if s.status == "completed")
         mastered_topics = sum(1 for ks in k_states if ks.status == KnowledgeMasteryStatus.STABLE.value)

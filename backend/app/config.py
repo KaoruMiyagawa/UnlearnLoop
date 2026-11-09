@@ -76,6 +76,11 @@ class Settings(BaseSettings):
         validation_alias="DIAGNOSTIC_SESSION_TOKEN_BUDGET",
     )
 
+    # JSON array in the environment, e.g. REVIEW_INTERVALS_DAYS='[1,3,7,14,30]'.
+    review_intervals_days: tuple[int, ...] = Field(
+        default=(1, 3, 7, 14, 30), validation_alias="REVIEW_INTERVALS_DAYS"
+    )
+
     @property
     def cors_origin_list(self) -> list[str]:
         """Parse comma-separated CORS origins into a clean list."""

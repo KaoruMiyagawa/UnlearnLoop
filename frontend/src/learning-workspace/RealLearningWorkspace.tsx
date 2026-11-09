@@ -46,6 +46,7 @@ import {
   type PendingDiagnosticIntent,
 } from './diagnosticFlow';
 import { useApiResource } from './useApiResource';
+import { ReviewHomeEntry } from '../review-workspace/ReviewHomeEntry';
 
 const LEARNER_ID = 'default_learner';
 const ACTIVE_SESSION_STORAGE_KEY = 'unlearnloop.real.active-session.v1';
@@ -453,6 +454,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
             <h1 className="focus-page-title">从一个问题开始，继续向前。</h1>
             <p className="focus-page-subtitle">选择你想学习的知识，UnlearnLoop 会根据你的作答安排下一步。</p>
           </header>
+          <ReviewHomeEntry onNavigateWorkspace={onNavigateWorkspace} />
           {sessionLoadError !== null && <div role="alert" className="wb-alert danger">恢复上次会话失败 · {getErrorView(sessionLoadError).code}：{getErrorView(sessionLoadError).message}</div>}
           {!didRecoverPointer && <div role="status" className="wb-alert info">正在检查本机保存的会话 ID…</div>}
           {session && <section className="focus-card focus-continue-card"><div className="focus-continue-copy"><div className="focus-eyebrow">{session.status === 'completed' ? 'RECENT SESSION' : 'PICK UP WHERE YOU LEFT OFF'}</div><h2>{session.topic_title}</h2><p>{session.status === 'completed' ? '上次学习已结束，可以查看记录或开始新的学习。' : '你的学习进度已保存，可以从当前服务端会话继续。'}</p></div><button className="wb-btn primary" onClick={() => onNavigateWorkspace('learning')}>{session.status === 'completed' ? '查看学习记录' : '继续学习'}</button></section>}

@@ -14,7 +14,8 @@ export type QuestionRole =
   | 'initial'
   | 'diagnostic_followup'
   | 'targeted_practice'
-  | 'transfer_check';
+  | 'transfer_check'
+  | 'review';
 export type QuestionType =
   | 'short_text'
   | 'code_trace'
@@ -25,6 +26,7 @@ export type SessionStatus =
   | 'diagnosing'
   | 'intervening'
   | 'transfer_checking'
+  | 'reviewing'
   | 'completed'
   | 'paused';
 export type DiagnosticCaseStatus =
@@ -306,6 +308,22 @@ export interface ReviewItem {
   status: string;
   created_at: string;
   completed_at?: string | null;
+  review_stage?: number;
+  review_session_id?: string | null;
+  question_id?: string | null;
+  current_question?: SanitizedQuestion | null;
+  review_question?: SanitizedQuestion | null;
+  attempt_id?: string | null;
+  is_correct?: boolean | null;
+  submitted_at?: string | null;
+  evaluation_summary?: string | null;
+  review_outcome?: string | null;
+  retention_verified?: boolean;
+  retention_eligible?: boolean;
+  decision_event_id?: string | null;
+  message?: string | null;
+  is_due?: boolean;
+  knowledge_state_id?: string | null;
 }
 
 export interface CompleteReviewRequest {
@@ -324,6 +342,25 @@ export interface KnowledgeState {
   transition_reason?: string | null;
   last_transfer_attempt_id?: string | null;
   updated_at: string;
+  retention_status?: 'not_verified' | 'review_due' | 'delayed_check_passed' | 'review_failed';
+  retention_evidence_count?: number;
+  last_reviewed_at?: string | null;
+  last_retention_verified_at?: string | null;
+  unresolved_error_reasons?: Array<{ title: string; summary: string; status: string }>;
+}
+
+export interface LearningHistoryEvent {
+  id: string;
+  kind: string;
+  occurred_at: string;
+  topic_id: string;
+  topic_title: string;
+  title: string;
+  summary: string;
+  evidence_summary: string;
+  session_id?: string | null;
+  attempt_id?: string | null;
+  review_id?: string | null;
 }
 
 export interface DashboardSummary {

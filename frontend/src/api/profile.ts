@@ -1,5 +1,5 @@
 import { apiRequest } from './client.ts';
-import type { DashboardSummary, KnowledgeState } from './types.ts';
+import type { DashboardSummary, KnowledgeState, LearningHistoryEvent } from './types.ts';
 
 function learnerQuery(learnerId?: string): string {
   if (learnerId === undefined) return '';
@@ -13,4 +13,15 @@ export function listKnowledgeStates(learnerId?: string, signal?: AbortSignal): P
 
 export function getProfileSummary(learnerId?: string, signal?: AbortSignal): Promise<DashboardSummary> {
   return apiRequest(`/api/v1/profile/summary${learnerQuery(learnerId)}`, { method: 'GET', signal });
+}
+
+export function listLearningHistory(
+  learnerId?: string,
+  limit = 100,
+  signal?: AbortSignal,
+): Promise<LearningHistoryEvent[]> {
+  const params = new URLSearchParams();
+  if (learnerId !== undefined) params.set('learner_id', learnerId);
+  params.set('limit', String(limit));
+  return apiRequest(`/api/v1/profile/history?${params.toString()}`, { method: 'GET', signal });
 }

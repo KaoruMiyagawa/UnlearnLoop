@@ -491,19 +491,21 @@ def test_full_end_to_end_learning_loop_with_transfer_check_and_mastery(
     assert att_fresh_transfer["is_correct"] is True
     assert att_fresh_transfer["next_action"] == "mastery_achieved"
     assert att_fresh_transfer["knowledge_state_status"] == KnowledgeMasteryStatus.STABLE.value
+    scheduled_after_transfer = client.get(f"/api/v1/reviews?learner_id={learner_id}").json()
+    assert any(item["retention_eligible"] and item["is_due"] is False for item in scheduled_after_transfer)
 
     # Step 12: Complete session legally
     complete_resp = client.post(f"/api/v1/sessions/{sess_id}/complete")
     assert complete_resp.status_code == 200
     assert complete_resp.json()["status"] == "completed"
 
-    # Step 13: Complete scheduled review task
+    # Step 13: A review task cannot be completed without an assigned question and evaluated answer.
     comp_rev_resp = client.post(
         f"/api/v1/reviews/{review_id}/complete",
         json={"review_notes": "Reviewed loop range indexing logic."},
     )
-    assert comp_rev_resp.status_code == 200
-    assert comp_rev_resp.json()["status"] == "completed"
+    assert comp_rev_resp.status_code == 400
+    assert comp_rev_resp.json()["code"] == "DOMAIN_RULE_VIOLATION"
 
     # Step 14: Check learner dashboard and profile
     profile_resp = client.get(f"/api/v1/profile/knowledge-states?learner_id={learner_id}")
@@ -513,6 +515,16 @@ def test_full_end_to_end_learning_loop_with_transfer_check_and_mastery(
     loop_state = next(s for s in states if s["topic_slug"] == "py-for-loop")
     assert loop_state["status"] == "stable"
     assert loop_state["confidence_is_heuristic"] is True
+    assert loop_state["retention_status"] == "review_due"
+
+    history_resp = client.get(f"/api/v1/profile/history?learner_id={learner_id}")
+    assert history_resp.status_code == 200
+    history = history_resp.json()
+    history_kinds = {event["kind"] for event in history}
+    assert {"incorrect_answer", "diagnosis", "diagnostic_question", "targeted_practice",
+            "transfer_check", "review_scheduled"}.issubset(history_kinds)
+    assert all("submitted_answer" not in event for event in history)
+    assert all("payload_json" not in event for event in history)
 
     summary_resp = client.get(f"/api/v1/profile/summary?learner_id={learner_id}")
     assert summary_resp.status_code == 200
@@ -1107,21 +1119,21 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
     schema = openapi_resp.json()
     paths = schema["paths"]
 
-    # 22 distinct URL paths in public OpenAPI schema (1 Stage 1 /health + 21 Stage 4 paths)
-    assert len(paths) == 22
+    # Review detail/dispatch and the learner-safe history timeline are public paths.
+    assert len(paths) == 25
 
-    # 24 public HTTP operations (GET /sessions + POST /sessions and GET /attempts + POST /attempts share paths)
+    # Review detail and dispatch add two public HTTP operations.
     public_operations = [
         (method.upper(), path)
         for path, methods in paths.items()
         for method in methods
         if method.lower() in {"get", "post", "put", "patch", "delete"}
     ]
-    assert len(public_operations) == 24
+    assert len(public_operations) == 27
     stage4_public_operations = [
         op for op in public_operations if op[1] != "/api/v1/health"
     ]
-    assert len(stage4_public_operations) == 23
+    assert len(stage4_public_operations) == 26
 
     # Hidden alias GET /api/v1/dashboard/summary is functional (200) but excluded from OpenAPI schema
     assert "/api/v1/dashboard/summary" not in paths

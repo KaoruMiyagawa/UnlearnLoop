@@ -26,11 +26,13 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    Index,
     String,
     Text,
     UniqueConstraint,
     event,
     inspect,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -313,6 +315,16 @@ class Attempt(Base):
     """Immutable learner attempt snapshot associated with a Question and LearningSession."""
 
     __tablename__ = "attempts"
+    __table_args__ = (
+        Index(
+            "uq_review_attempt_session_question",
+            "session_id",
+            "question_id",
+            unique=True,
+            sqlite_where=text("attempt_role = 'review'"),
+            postgresql_where=text("attempt_role = 'review'"),
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         String(64),
@@ -687,6 +699,10 @@ class ReviewItem(Base):
     """Scheduled review task tied to unresolved error patterns or transfer results."""
 
     __tablename__ = "review_items"
+    __table_args__ = (
+        UniqueConstraint("schedule_key", name="uq_review_items_schedule_key"),
+        UniqueConstraint("review_session_id", name="uq_review_items_review_session_id"),
+    )
 
     id: Mapped[str] = mapped_column(
         String(64),
@@ -731,6 +747,25 @@ class ReviewItem(Base):
         nullable=True,
     )
     review_outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
+    schedule_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    review_stage: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    review_session_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("learning_sessions.id", ondelete="RESTRICT"), nullable=True
+    )
+    question_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("questions.id", ondelete="RESTRICT"), nullable=True
+    )
+    attempt_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("attempts.id", ondelete="RESTRICT"), nullable=True
+    )
+    decision_event_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("decision_events.id", ondelete="RESTRICT"), nullable=True
+    )
+    knowledge_state_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("knowledge_states.id", ondelete="RESTRICT"), nullable=True
+    )
+    retention_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    retention_eligible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -738,7 +773,8 @@ class ReviewItem(Base):
     )
 
     topic: Mapped["KnowledgeTopic"] = relationship()
-    session: Mapped["LearningSession | None"] = relationship()
+    session: Mapped["LearningSession | None"] = relationship(foreign_keys=[session_id])
+    review_session: Mapped["LearningSession | None"] = relationship(foreign_keys=[review_session_id])
     hypothesis: Mapped["Hypothesis | None"] = relationship()
 
 

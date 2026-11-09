@@ -350,6 +350,59 @@ code {
 .focus-notice.danger { border-color: #FECACA; background: var(--focus-red-soft); color: var(--focus-red); }
 .focus-notice.neutral { background: var(--focus-subtle); }
 .focus-notice button { margin-left: 8px; }
+.focus-help { margin: 9px 0 0; color: var(--focus-muted); font-size: 13px; line-height: 1.55; }
+.focus-page { width: min(100%, 760px); margin: 0 auto; }
+.focus-page-content { min-width: 0; }
+.focus-home-review { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 0 24px; border: 1px solid var(--focus-line); border-radius: var(--focus-radius-lg); padding: 17px 20px; background: #FFFFFF; }
+.focus-home-review-copy { min-width: 0; }
+.focus-home-review-copy strong { display: block; margin-top: 4px; color: var(--focus-ink); font-size: 16px; }
+.focus-home-review-copy p { margin: 4px 0 0; color: var(--focus-secondary); font-size: 13px; }
+.focus-review-session { margin: 0 0 32px; border: 1px solid var(--focus-line); border-radius: var(--focus-radius-lg); padding: 22px; background: #FFFFFF; box-shadow: var(--focus-shadow); }
+.focus-review-session-heading,.focus-review-section-heading,.focus-profile-topic-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.focus-review-session-heading h2,.focus-review-section-heading h2 { margin: 0; color: var(--focus-ink); font-size: 18px; font-weight: 650; }
+.focus-review-section-heading { align-items: center; margin-bottom: 12px; }
+.focus-review-section-heading p { margin: 4px 0 0; color: var(--focus-muted); font-size: 13px; }
+.focus-review-count { flex: 0 0 auto; color: var(--focus-muted); font-size: 13px; }
+.focus-review-question { margin-top: 18px; border-top: 1px solid var(--focus-line); padding-top: 17px; }
+.focus-review-question h3 { margin: 12px 0; color: var(--focus-ink); font-size: 19px; font-weight: 600; line-height: 1.5; }
+.focus-review-meta { color: var(--focus-muted); font-size: 12.5px; }
+.focus-review-list,.focus-profile-list { border-top: 1px solid var(--focus-line); }
+.focus-review-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--focus-line); padding: 17px 4px; }
+.focus-review-row:last-child,.focus-profile-topic:last-child { border-bottom: 0; }
+.focus-review-row-copy { min-width: 0; }
+.focus-review-topic { color: var(--focus-ink); font-size: 15px; font-weight: 650; }
+.focus-review-date { margin-top: 4px; color: var(--focus-secondary); font-size: 13px; }
+.focus-review-row p { margin: 7px 0 3px; color: var(--focus-secondary); font-size: 13.5px; line-height: 1.5; }
+.focus-review-row small { color: var(--focus-muted); font-size: 12px; }
+.focus-review-previous { margin-top: 8px; color: var(--focus-muted); font-size: 12.5px; line-height: 1.45; }
+.focus-review-row > button { flex: 0 0 auto; }
+.focus-profile-list { border-bottom: 1px solid var(--focus-line); }
+.focus-profile-topic { border-bottom: 1px solid var(--focus-line); padding: 20px 4px; }
+.focus-profile-topic-heading h3 { margin: 0; color: var(--focus-ink); font-size: 16px; font-weight: 650; }
+.focus-profile-topic-heading p { margin: 5px 0 0; color: var(--focus-secondary); font-size: 13px; }
+.focus-state-tag { display: inline-flex; border: 1px solid var(--focus-line); border-radius: 999px; padding: 5px 9px; color: var(--focus-secondary); font-size: 11.5px; line-height: 1.2; }
+.focus-state-tag.verified { border-color: #A7F3D0; background: var(--focus-green-soft); color: var(--focus-green); }
+.focus-profile-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 22px; margin: 18px 0; }
+.focus-profile-facts div { min-width: 0; }
+.focus-profile-facts dt { margin-bottom: 4px; color: var(--focus-muted); font-size: 12px; }
+.focus-profile-facts dd { margin: 0; color: var(--focus-secondary); font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere; }
+.focus-reason { padding: 10px 0; border-top: 1px solid var(--focus-line); }
+.focus-reason:first-child { border-top: 0; }
+.focus-reason strong { color: var(--focus-ink); font-size: 13.5px; }
+.focus-reason p { margin: 4px 0; line-height: 1.5; }
+.focus-reason small { color: var(--focus-muted); }
+.focus-timeline { position: relative; margin: 0; padding: 0; list-style: none; }
+.focus-timeline::before { position: absolute; top: 10px; bottom: 12px; left: 6px; width: 1px; background: var(--focus-line); content: ''; }
+.focus-timeline-item { position: relative; display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 13px; padding: 0 0 22px; }
+.focus-timeline-dot { z-index: 1; width: 13px; height: 13px; margin-top: 3px; border: 3px solid #DBEAFE; border-radius: 50%; background: var(--focus-blue); }
+.focus-timeline-main { min-width: 0; }
+.focus-timeline-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.focus-timeline-heading strong { color: var(--focus-ink); font-size: 14px; font-weight: 650; }
+.focus-timeline-heading time,.focus-timeline-topic { color: var(--focus-muted); font-size: 12px; }
+.focus-timeline-topic { margin-top: 3px; }
+.focus-timeline-main > p { margin: 6px 0 5px; color: var(--focus-secondary); font-size: 13.5px; line-height: 1.5; }
+.focus-timeline .focus-disclosure summary { font-size: 12.5px; }
+.focus-profile-page .focus-page-section { margin-top: 34px; }
 
 .focus-quiet-section { margin-top: 34px; }
 .focus-section-heading { margin: 0 0 10px; color: var(--focus-muted); font-size: 13px; font-weight: 600; }
@@ -532,6 +585,12 @@ code {
   .focus-question-card .wb-card-body { padding: 22px 18px; }
   .focus-diagnostic > .wb-card-body { padding: 19px 18px; }
   .focus-question-prompt { font-size: 18px; }
+  .focus-home-review,.focus-review-row { align-items: flex-start; flex-direction: column; }
+  .focus-home-review > button,.focus-review-row > button { width: 100%; }
+  .focus-review-session { padding: 18px; }
+  .focus-profile-facts { grid-template-columns: 1fr; gap: 12px; }
+  .focus-profile-topic-heading { flex-direction: column; }
+  .focus-timeline-heading { align-items: flex-start; flex-direction: column; gap: 3px; }
 }
 
 @media (max-width: 480px) {

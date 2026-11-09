@@ -43,6 +43,7 @@ ALLOWED_SESSION_TRANSITIONS: dict[SessionStatus, set[SessionStatus]] = {
         SessionStatus.DIAGNOSING,
         SessionStatus.INTERVENING,
         SessionStatus.TRANSFER_CHECKING,
+        SessionStatus.REVIEWING,
         SessionStatus.PAUSED,
     },
     SessionStatus.DIAGNOSING: {
@@ -59,6 +60,11 @@ ALLOWED_SESSION_TRANSITIONS: dict[SessionStatus, set[SessionStatus]] = {
     SessionStatus.TRANSFER_CHECKING: {
         SessionStatus.DIAGNOSING,
         SessionStatus.INTERVENING,
+        SessionStatus.COMPLETED,
+        SessionStatus.PAUSED,
+    },
+    SessionStatus.REVIEWING: {
+        SessionStatus.DIAGNOSING,
         SessionStatus.COMPLETED,
         SessionStatus.PAUSED,
     },

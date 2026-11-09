@@ -56,13 +56,13 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
 
           <nav className="focus-nav-links" aria-label="主导航">
             {WORKSPACE_NAV_ITEMS.map((item) => {
-              const active = item.id === activeWorkspace
-                || (activeWorkspace === 'review' && item.id === 'profile');
+              const active = item.id === activeWorkspace;
               const labels: Record<string, string> = {
                 home: '首页',
                 learning: '学习',
                 diagnosis: '诊断洞察',
                 transfer: '迁移验证',
+                review: '复习',
                 profile: '学习档案',
               };
               return (
