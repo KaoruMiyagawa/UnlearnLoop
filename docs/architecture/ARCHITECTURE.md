@@ -1,5 +1,7 @@
 # UnlearnLoop 系统架构
 
+> 本文保留原架构设计与目标，部分内容尚未实现；当前 main 的实现及边界见 [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)。
+
 ## 1. 目标与边界
 
 第一阶段采用单体仓库、前后端分离的模块化结构。FastAPI 提供版本化 HTTP API，React 负责工作空间界面，SQLite 保存本地学习记录，AI 通过后端模型服务调用。知识领域通过内容包、题型适配器和评估器扩展；引导式工作流、证据模型和诊断决策不绑定 Python。先不拆分微服务，避免核心决策流程未稳定时增加分布式成本。
