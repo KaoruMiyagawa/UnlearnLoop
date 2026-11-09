@@ -1,0 +1,242 @@
+{
+  "browser": "Headless Chrome 156.0.8078.80 via CDP",
+  "frontend": "http://127.0.0.1:18732",
+  "backend": "http://127.0.0.1:18731",
+  "home": {
+    "variant": [
+      {
+        "text": "IELTS Academic\n学术学习与高等教育",
+        "pressed": "false"
+      },
+      {
+        "text": "IELTS General Training\n日常、工作与移民场景",
+        "pressed": "true"
+      }
+    ],
+    "target": "7.5",
+    "aborted": false,
+    "width": 390,
+    "scroll": 390
+  },
+  "idsBeforeDemo": [
+    "sess_b10a1cf1b815476b",
+    "sess_89b63d7209414bd4"
+  ],
+  "idsAfterDemo": [
+    "sess_b10a1cf1b815476b",
+    "sess_89b63d7209414bd4"
+  ],
+  "sessions": [
+    {
+      "id": "sess_b10a1cf1b815476b",
+      "topic_id": "ielts-gt-reading-english",
+      "topic_title": "General Training Reading · English practice",
+      "learner_id": "default_learner",
+      "exam_variant": "general_training",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "transfer_checking",
+      "knowledge_state_status": "stable",
+      "topic_mastered": true,
+      "current_question_id": "ielts-gt-english-transfer_check",
+      "current_question": {
+        "id": "ielts-gt-english-transfer_check",
+        "topic_id": "ielts-gt-reading-english",
+        "material_id": "ielts-gt-english-mat-4",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "When can a participant cancel for a refund?",
+        "context_snippet": "A. Before the first class\nB. After any missed class\nC. Only after the course ends\nD. After reading a handout",
+        "difficulty": 2,
+        "version": 1
+      },
+      "active_diagnostic_case_id": "diag_13584e31b3764371",
+      "latest_attempt_result": {
+        "attempt_id": "att_12a6429467ad4ef1",
+        "session_id": "sess_b10a1cf1b815476b",
+        "question_id": "ielts-gt-english-transfer_check",
+        "question_role": "transfer_check",
+        "is_correct": true,
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "feedback_text": "回答正确！",
+        "next_action": "mastery_achieved",
+        "next_question": {
+          "id": "ielts-gt-english-transfer_check",
+          "topic_id": "ielts-gt-reading-english",
+          "material_id": "ielts-gt-english-mat-4",
+          "parent_question_id": null,
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "When can a participant cancel for a refund?",
+          "context_snippet": "A. Before the first class\nB. After any missed class\nC. Only after the course ends\nD. After reading a handout",
+          "difficulty": 2,
+          "version": 1
+        },
+        "diagnostic_case_id": "diag_13584e31b3764371",
+        "knowledge_state_status": "stable",
+        "evaluation_source": "rule_check",
+        "mastery_note": "本次独立迁移验证通过；长期保持尚未验证。"
+      },
+      "can_dispatch_transfer": true,
+      "attempts_count": 4,
+      "started_at": "2026-11-09T14:30:23.925533",
+      "updated_at": "2026-11-09T14:30:44.308810",
+      "completed_at": null
+    },
+    {
+      "id": "sess_89b63d7209414bd4",
+      "topic_id": "ielts-acad-reading-english",
+      "topic_title": "Academic Reading · English practice",
+      "learner_id": "default_learner",
+      "exam_variant": "academic",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "completed",
+      "knowledge_state_status": "stable",
+      "topic_mastered": true,
+      "current_question_id": "ielts-acad-english-transfer_check",
+      "current_question": {
+        "id": "ielts-acad-english-transfer_check",
+        "topic_id": "ielts-acad-reading-english",
+        "material_id": "ielts-acad-english-mat-4",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "What can be concluded from the bus lane report?",
+        "context_snippet": "A. Weekend journeys also became faster\nB. Weekday average journeys became shorter\nC. All roads need bus lanes\nD. Peak times did not change",
+        "difficulty": 2,
+        "version": 1
+      },
+      "active_diagnostic_case_id": "diag_ab5180286933480b",
+      "latest_attempt_result": {
+        "attempt_id": "att_4fcff443432f4166",
+        "session_id": "sess_89b63d7209414bd4",
+        "question_id": "ielts-acad-english-transfer_check",
+        "question_role": "transfer_check",
+        "is_correct": true,
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "feedback_text": "回答正确！",
+        "next_action": "mastery_achieved",
+        "next_question": {
+          "id": "ielts-acad-english-transfer_check",
+          "topic_id": "ielts-acad-reading-english",
+          "material_id": "ielts-acad-english-mat-4",
+          "parent_question_id": null,
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "What can be concluded from the bus lane report?",
+          "context_snippet": "A. Weekend journeys also became faster\nB. Weekday average journeys became shorter\nC. All roads need bus lanes\nD. Peak times did not change",
+          "difficulty": 2,
+          "version": 1
+        },
+        "diagnostic_case_id": "diag_ab5180286933480b",
+        "knowledge_state_status": "stable",
+        "evaluation_source": "rule_check",
+        "mastery_note": "本次独立迁移验证通过；长期保持尚未验证。"
+      },
+      "can_dispatch_transfer": false,
+      "attempts_count": 4,
+      "started_at": "2026-11-09T14:28:34.579811",
+      "updated_at": "2026-11-09T14:29:46.017359",
+      "completed_at": "2026-11-09T14:29:46.015708"
+    }
+  ],
+  "attempts": [
+    [
+      {
+        "id": "att_1b1fb8be56704e05",
+        "session_id": "sess_b10a1cf1b815476b",
+        "question_id": "ielts-gt-english-initial",
+        "question_role": "initial",
+        "submitted_answer": "A",
+        "is_correct": false,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+        "submitted_at": "2026-11-09T14:30:25.989107"
+      },
+      {
+        "id": "att_6675cc9f70964092",
+        "session_id": "sess_b10a1cf1b815476b",
+        "question_id": "ielts-gt-english-diagnostic_followup",
+        "question_role": "diagnostic_followup",
+        "submitted_answer": "A",
+        "is_correct": true,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "submitted_at": "2026-11-09T14:30:37.341590"
+      },
+      {
+        "id": "att_f61f2b0b65154e07",
+        "session_id": "sess_b10a1cf1b815476b",
+        "question_id": "ielts-gt-english-targeted_practice",
+        "question_role": "targeted_practice",
+        "submitted_answer": "A",
+        "is_correct": true,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "submitted_at": "2026-11-09T14:30:44.299088"
+      },
+      {
+        "id": "att_12a6429467ad4ef1",
+        "session_id": "sess_b10a1cf1b815476b",
+        "question_id": "ielts-gt-english-transfer_check",
+        "question_role": "transfer_check",
+        "submitted_answer": "A",
+        "is_correct": true,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "submitted_at": "2026-11-09T14:30:52.697771"
+      }
+    ],
+    [
+      {
+        "id": "att_7ab810619d944a2d",
+        "session_id": "sess_89b63d7209414bd4",
+        "question_id": "ielts-acad-english-initial",
+        "question_role": "initial",
+        "submitted_answer": "A",
+        "is_correct": false,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+        "submitted_at": "2026-11-09T14:28:44.538279"
+      },
+      {
+        "id": "att_30784a0658234a71",
+        "session_id": "sess_89b63d7209414bd4",
+        "question_id": "ielts-acad-english-diagnostic_followup",
+        "question_role": "diagnostic_followup",
+        "submitted_answer": "A",
+        "is_correct": true,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "submitted_at": "2026-11-09T14:28:59.254891"
+      },
+      {
+        "id": "att_fa89fcd322104874",
+        "session_id": "sess_89b63d7209414bd4",
+        "question_id": "ielts-acad-english-targeted_practice",
+        "question_role": "targeted_practice",
+        "submitted_answer": "B",
+        "is_correct": true,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "submitted_at": "2026-11-09T14:29:19.398607"
+      },
+      {
+        "id": "att_4fcff443432f4166",
+        "session_id": "sess_89b63d7209414bd4",
+        "question_id": "ielts-acad-english-transfer_check",
+        "question_role": "transfer_check",
+        "submitted_answer": "B",
+        "is_correct": true,
+        "evaluation_status": "evaluated",
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "submitted_at": "2026-11-09T14:29:43.962783"
+      }
+    ]
+  ],
+  "uncaughtBrowserExceptions": [],
+  "demoSnapshotComparison": {
+    "sessionsAndAttemptsUnchanged": true,
+    "action": "演示模式：派发独立新迁移题 #2"
+  }
+}

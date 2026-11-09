@@ -1,39 +1,101 @@
 # UnlearnLoop
 
-**Learn from mistakes. Verify real understanding.**
+**从错误出发，用新情境中的证据验证理解。**
 
-UnlearnLoop 是一个以错误诊断为核心的 AI 学习系统。它不把一次错误直接等同于某个结论，而是记录多个可能原因、支持证据和不确定性，再选择能够区分这些原因的追问或练习，并在新的应用场景中验证学习是否迁移。
+[English](README_EN.md) · [快速启动](docs/development/QUICKSTART.md) · [架构与状态](docs/architecture/CURRENT_ARCHITECTURE.md) · [验收报告](docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md) · [参与贡献](CONTRIBUTING.md)
 
-## 当前状态
+![Stage](https://img.shields.io/badge/stage-IELTS--1%20development-blue) ![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6)
 
-项目处于第一阶段的正式规划期。当前仓库已完成基础目录和项目说明，产品需求、设计规范、系统架构与开发路线图正在建立。
+UnlearnLoop 是一个探索证据驱动学习的本地 MVP。普通刷题通常止步于对错；这里保留多个可能的错误原因，让后续追问和练习补充证据，再用未作答的新情境检查理解能否迁移。候选假设与启发式权重是待验证的工作判断，并非确定结论。
 
-当前没有已完成的学习页面、后端 API、数据库模型或 AI 调用实现；本文档不将计划功能表述为已实现功能。
+> **本页描述 `feat/ielts-pivot` 开发分支。** IELTS-1 已通过隔离环境下的阶段浏览器验收，尚未合并到 `main`，也不是生产发布验收。`main` 的实际状态请查看[默认分支 README](https://github.com/KaoruMiyagawa/UnlearnLoop/blob/main/README.md)。
 
-## 第一阶段目标
+## 学习如何推进
 
-以通用知识学习为产品方向，先用 Python 作为首个内容包建立一条可测试的最小闭环：学习材料 → 问题与作答 → 基于证据的错误假设 → 区分性诊断 → 针对性干预 → 迁移验证 → 学习状态与复习记录。引导式工作流、诊断逻辑和学习状态模型不应绑定某一学科。
+```mermaid
+flowchart LR
+    A[阅读与作答] --> B[评价与错误诊断]
+    B --> C[竞争假设与证据]
+    C --> D[区分性追问]
+    D --> E[针对性练习]
+    E --> F[独立新题迁移验证]
+    F --> G[更新知识状态与复习安排]
+```
 
-完整产品愿景与第一阶段边界见 [产品需求文档](docs/product/PRD.md)。界面规则见 [设计系统](docs/design/DESIGN_SYSTEM.md)，技术边界见 [系统架构](docs/architecture/ARCHITECTURE.md)，实施顺序见 [开发路线图](docs/development/ROADMAP.md)。
+具体路径由服务端状态、评价结果和可用题目约束；不是每次作答都经过每一步。一次迁移通过不代表长期保持。
 
-## 计划技术栈
+## 已实现与验证范围
 
-- 前端：React、TypeScript、Vite、Tailwind CSS
-- 后端：Python、FastAPI
-- 数据库：SQLite、SQLAlchemy；预留 Alembic 迁移
-- AI：先接入 DeepSeek API；通过模型服务抽象预留 Ollama
-- 测试与质量：pytest、前端自动化测试、TypeScript 类型检查、代码规范检查
-- 工程：Git、GitHub、后续 CI 检查
+| 能力 | 当前分支状态 |
+| --- | --- |
+| IELTS Reading | Academic / General Training 原创英语阅读、任务选择、目标设置及独立会话；Listening、Writing、Speaking 等仍为计划 |
+| 学习闭环 | 服务端作答、诊断案例、候选假设与证据、追问、练习、独立迁移和知识状态；支持会话恢复 |
+| 复习与历史 | 服务端安排复习、学习历史和知识状态展示；本次浏览器验收中的复习任务尚未到期 |
+| 界面 | Real API 与 Demo 入口；指定阅读及答题页面已在 390px 视口验收 |
+| 模型 | `FakeModelProvider` 用于离线模拟；远程 provider 适配和配置门控存在，真实模型质量、成本及可靠性未在本次验收中验证 |
 
-## 设计与工程原则
+IELTS-1 浏览器验收通过两种考试模式的指定流程；后端 80 项、前端 40 项测试、typecheck 和 production build 均通过。完整范围、证据与未验证项见[验收报告](docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md)。这些结果不构成真实 AI 个性化诊断成功的证明。
 
-- 证据先于结论：诊断结论必须能回溯到学习者作答、追问或练习证据。
-- 不确定性显式化：系统可以保留多个候选错误原因，不强迫模型伪装成确定判断。
-- 决策可测试：诊断和干预选择使用明确的状态、输入、输出和转移条件。
-- 学习空间优先：学习、诊断、复习是不同工作空间，而不是单一聊天界面。
-- 增量交付：先验证一个窄而完整的 Python 内容包，再扩展题型、学科和模型提供商；产品流程保持内容无关。
-- 隐私优先：学习内容、答案和模型配置按最小必要原则保存，密钥不进入数据库或日志。
+<p align="center"><img src="docs/development/ielts-1-browser-evidence/14-gt-reading-mobile.png" alt="General Training 阅读文章在 390 像素浏览器视口中的真实截图" width="390"></p>
+<p align="center"><sub>隔离验收中的真实浏览器截图：General Training 阅读任务</sub></p>
 
-## 开发约定
+## 架构
 
-本阶段只维护规划文档，不安装依赖、不部署、不提交或推送。后续编码前需先完成产品范围和视觉方案评审，并以路线图中的验收标准作为进入下一阶段的条件。
+```mermaid
+flowchart LR
+    UI[React / TypeScript / Vite] -->|REST /api/v1| API[FastAPI]
+    API --> APP[应用服务与领域规则]
+    APP --> DB[(SQLite / SQLAlchemy / Alembic)]
+    APP --> EVAL[题型评价与内容包]
+    APP --> AGENT[诊断决策与工具校验]
+    AGENT --> PROVIDER[模型适配层：Fake / 可配置 provider]
+```
+
+前端呈现服务端派发的题目和状态；后端管理事务、证据及状态转移。默认远程模型调用关闭。更多实现边界见[当前架构](docs/architecture/CURRENT_ARCHITECTURE.md)，原[架构设计](docs/architecture/ARCHITECTURE.md)保留为设计资料。
+
+## 本地运行
+
+需要 Python 3.11+、Node.js 和 npm。以下 PowerShell 示例使用新的 SQLite 文件；完整步骤见[快速启动](docs/development/QUICKSTART.md)。
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python -m pip install -r backend/requirements.txt
+cd frontend
+npm ci
+cd ..
+```
+
+在一个终端中：
+
+```powershell
+$env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
+$env:MODEL_PROVIDER = 'fake'
+$env:ALLOW_REMOTE_MODEL_CALLS = 'false'
+cd backend
+..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
+```
+
+另开终端运行 `cd frontend` 和 `npm run dev`，打开 `http://127.0.0.1:15173`；API 文档位于 `http://127.0.0.1:18000/docs`。开发模式启动会迁移数据库并导入内容；使用已有数据库前请先独立备份。仅在本机可信环境使用：`learner_id` 是筛选标识，不是身份认证。
+
+## 验证与目录
+
+```powershell
+cd backend
+..\.venv\Scripts\python -m pytest
+cd ../frontend
+node --test tests/*.test.mjs
+npm run typecheck
+npm run build
+```
+
+`backend/` 包含 API、领域与应用服务、评价器、内容包、迁移及测试；`frontend/` 包含 React 工作空间、API 客户端与测试；`docs/` 保存产品、架构、计划、基线归档和验收证据。浏览器验收未覆盖真实手机、读屏器、所有网络故障或真实模型；其他风险见 [MVP 审查](docs/development/MVP_FINAL_AUDIT.md)。
+
+## 路线图
+
+- **已完成阶段验收：** 本分支 IELTS-1 阅读闭环及指定浏览器场景。
+- **集成前：** 审阅与主线差异；处理或明确接受数据库备份恢复、数据控制、依赖和单用户安全边界。
+- **后续：** 扩充 IELTS 内容与其他技能；在明确授权、预算和隐私边界下评估真实模型；完善可访问性与质量门禁。见 [IELTS 实施计划](docs/development/IELTS_IMPLEMENTATION_PLAN.md)。
+
+## 贡献与许可证
+
+欢迎通过 issue 讨论问题和方向；提交前请阅读[贡献说明](CONTRIBUTING.md)。仓库目前**没有声明开源许可证**，不应假设已授予开源使用或再分发许可；许可证选择由维护者决定。

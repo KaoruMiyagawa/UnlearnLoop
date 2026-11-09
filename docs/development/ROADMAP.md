@@ -1,5 +1,7 @@
 # UnlearnLoop 开发路线图
 
+> 本文保留早期规划。IELTS 开发分支的当前状态与后续工作见 [IELTS 实施计划](IELTS_IMPLEMENTATION_PLAN.md) 和 [IELTS-1 验收报告](IELTS_1_FINAL_BROWSER_ACCEPTANCE.md)；不要将规划项视为已交付。
+
 路线图按“先确定行为，再实现界面和基础设施”的顺序排列。阶段完成以验收标准为准，而不是文件数量或模型调用成功为准。
 
 ## 阶段 0：规划与视觉评审
