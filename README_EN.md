@@ -1,49 +1,66 @@
-# UnlearnLoop
+# VerbaTrail
 
 **Start with mistakes. Verify understanding in a new context.**
 
-[中文](README.md) · [Quick start](docs/development/QUICKSTART.md) · [Architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Acceptance report](docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md) · [Contributing](CONTRIBUTING.md)
+[中文](README.md) · [Quick start](docs/development/QUICKSTART.md) · [Architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Roadmap](docs/development/ROADMAP.md) · [Contributing](CONTRIBUTING.md)
 
-![Stage](https://img.shields.io/badge/stage-IELTS--1%20development-blue) ![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6)
+![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6) ![Storage](https://img.shields.io/badge/storage-SQLite-003B57)
 
-UnlearnLoop is a local MVP exploring evidence-driven learning. Rather than stop at right or wrong, it retains competing explanations, gathers evidence through follow-up questions and practice, and checks whether understanding transfers to a fresh task. Hypotheses and heuristic weights are provisional, not certain diagnoses.
+VerbaTrail is an adaptive English learning and IELTS preparation application. Typical practice tools stop at right or wrong. VerbaTrail keeps plausible explanations for errors, gathers more evidence, then uses targeted practice and an independent task to check whether understanding transfers.
 
-> This README describes the **`feat/ielts-pivot` development branch**. IELTS-1 passed the specified isolated browser acceptance; it has not been merged into `main` and is not a production release. See the [default branch README](https://github.com/KaoruMiyagawa/UnlearnLoop/blob/main/README_EN.md) for its actual state.
+The system stores revisable learning hypotheses and server-owned state. One correct answer is not presented as mastery, and uncalibrated scores are not presented as certainty.
+
+> **This workspace:** local branch `feat/verbatrail-consolidation`, based on the IELTS-1 accepted `feat/ielts-pivot` code. This consolidation has not been pushed or merged into GitHub `main`. The remote repository URL remains `KaoruMiyagawa/UnlearnLoop` for now.
 
 ## Learning loop
 
 ```mermaid
 flowchart LR
-    A[Answer] --> B[Evaluation and diagnosis]
+    A[Answer] --> B[Server evaluation]
     B --> C[Competing hypotheses and evidence]
-    C --> D[Follow-up]
+    C --> D[Discriminating follow-up]
     D --> E[Targeted practice]
     E --> F[Independent transfer task]
-    F --> G[Knowledge state and review]
+    F --> G[Knowledge state and review plan]
 ```
 
-The server selects permissible transitions; not every answer follows every step. A passed transfer task does not prove long-term retention.
+The server selects valid transitions from session state, evaluation results and available questions. A session does not necessarily pass through every step.
 
-## What works on this branch
+## Implemented status
 
 | Area | Status |
 | --- | --- |
-| IELTS Reading | Original English reading material, goal settings and separate Academic / General Training sessions. Other skills are planned. |
-| Learning | Server-side attempts, diagnostic cases, hypotheses, evidence, follow-up, practice, independent transfer and session recovery. |
-| Review and history | Scheduled reviews, history and knowledge states; the review displayed in browser acceptance was not yet due. |
-| Interface | Real API and Demo modes; specified reading and answer screens were checked at 390px. |
-| Models | `FakeModelProvider` simulates offline decisions. Remote provider adapters and gates exist; real-model quality, costs and reliability were not validated. |
+| IELTS Reading | Academic and General Training modes, original English reading material, server-selected tasks, answers and separate learning sessions passed IELTS-1 stage acceptance. |
+| Learning engine | The backend manages sessions, attempts, diagnostic cases, competing hypotheses, evidence, follow-up, targeted practice, independent transfer and knowledge-state updates. |
+| Review and profile | Server-side ReviewItems, due information, history, knowledge states, transfer/delayed-review evidence and unknown states are displayed. |
+| UI | One React application provides Premium Academic and Noir & Champagne themes. Reading passages keep a warm ivory surface in both themes; preference is stored locally. |
+| Demo / Real | Demo is an isolated presentation mode; Real uses the backend API. Real means the real backend data flow, not a real large language model. |
+| Agent / models | The backend Agent flow and FakeModelProvider support offline simulation. Real-model personalization quality, cost, reliability and production deployment have not passed validation. |
+| Other skills | Listening, Writing, Speaking, Vocabulary, Grammar, Mock Tests, UKVI and Life Skills remain planned or in progress, not delivered features. |
 
-The IELTS-1 acceptance covered the specified workflows in Headless Chrome. The recorded regression checks passed 80 backend tests, 40 frontend tests, typecheck and production build. See the [report](docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md) for evidence and limits. This does **not** establish successful real AI personalization.
+The IELTS-1 stage record reports 80 backend tests, 40 frontend tests, typecheck, production build and the specified isolated Headless Chrome flows passing. It is not a production release acceptance and does not prove real AI personalization. See the [dual-theme browser review](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md) for UI evidence and limitations.
 
-<p align="center"><img src="docs/development/ielts-1-browser-evidence/14-gt-reading-mobile.png" alt="Actual General Training reading screen at a 390-pixel browser viewport" width="390"></p>
-<p align="center"><sub>Actual browser capture from the isolated acceptance run</sub></p>
+<p align="center"><img src="docs/development/theme-visual-acceptance/premium-reading-mobile.png" alt="Premium Academic Reading workspace acceptance capture at mobile width" width="390"></p>
+<p align="center"><sub>Isolated browser capture; the diagnostic flow uses FakeModelProvider.</sub></p>
 
-## Architecture and local setup
+## Architecture
 
-React, TypeScript and Vite render server-assigned tasks. FastAPI coordinates application services, domain rules, content evaluators and diagnostic decisions; SQLAlchemy, SQLite and Alembic persist state. A provider abstraction separates the offline fake from configurable model adapters. See [current architecture](docs/architecture/CURRENT_ARCHITECTURE.md).
+```mermaid
+flowchart LR
+    UI[React / TypeScript / Vite] -->|REST /api/v1| API[FastAPI]
+    API --> APP[Application services and domain rules]
+    APP --> DB[(SQLAlchemy / SQLite)]
+    APP --> MIG[Alembic migrations]
+    APP --> EVAL[Reading evaluators and content packs]
+    APP --> AGENT[Evidence-driven diagnostic decisions]
+    AGENT --> PROVIDER[FakeModelProvider / configurable model adapters]
+```
 
-Requirements: Python 3.11+, Node.js and npm. On Windows PowerShell:
+The frontend renders server-assigned tasks and states. The backend owns transactions, idempotent recovery, evaluation, diagnostic decisions, transfer checks and review scheduling. Alembic migrations `0001`–`0004` and historical content are retained. See [current architecture](docs/architecture/CURRENT_ARCHITECTURE.md).
+
+## Install and run locally
+
+Requirements: Python 3.11+, Node.js, npm and Git. The PowerShell commands below start from the repository root:
 
 ```powershell
 python -m venv .venv
@@ -53,19 +70,31 @@ npm ci
 cd ..
 ```
 
-In one terminal:
+Start the backend in one terminal:
 
 ```powershell
-$env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
+$env:DATABASE_URL = 'sqlite:///./verbatrail-local.db'
+$env:APP_NAME = 'VerbaTrail'
 $env:MODEL_PROVIDER = 'fake'
 $env:ALLOW_REMOTE_MODEL_CALLS = 'false'
 cd backend
 ..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
 ```
 
-In another terminal run `cd frontend` and `npm run dev`, then open `http://127.0.0.1:15173`; API docs are at `http://127.0.0.1:18000/docs`. Development startup migrates the configured database and seeds content: choose a new path and back up existing data before using it. See the [quick start](docs/development/QUICKSTART.md). This is a trusted local, single-user MVP; `learner_id` is not authentication.
+`DATABASE_URL` is relative to `backend/`. First development startup runs Alembic migrations and imports content. Back up any existing database and verify that the backup is recoverable first. This example uses a new local database and does not select the archived `unlearnloop.db`.
 
-## Tests and layout
+In a second terminal:
+
+```powershell
+cd frontend
+npm run dev
+```
+
+Open `http://127.0.0.1:15173`; API docs are at `http://127.0.0.1:18000/docs`. On Windows you can also use `./start-verbatrail.ps1`. Services bind to localhost by default. `learner_id` is a filter, not authentication or a multi-user security boundary.
+
+See the [quick-start guide](docs/development/QUICKSTART.md) for configuration, shutdown, database notes and isolated-port usage.
+
+## Tests and engineering checks
 
 ```powershell
 cd backend
@@ -74,12 +103,34 @@ cd ../frontend
 node --test tests/*.test.mjs
 npm run typecheck
 npm run build
+git diff --check
 ```
 
-`backend/` contains API, domain, persistence, content and tests; `frontend/` contains the interface and client; `docs/` holds plans, architecture, baseline archives and acceptance evidence.
+Backend tests use pytest temporary SQLite databases; frontend flow tests use Node.js' built-in test runner. Automated tests use fixed fixtures and FakeModelProvider; they do not call paid models. Browser evidence and validation limits are in `docs/development/`.
 
-## Roadmap and contribution
+## Repository layout
 
-Before integration, review the branch and address or explicitly accept migration backup, data control, dependency and single-user security risks. Future work includes broader IELTS content and skills, accessibility, quality automation, and real-model evaluation with clear consent, budget and privacy boundaries. See the [implementation plan](docs/development/IELTS_IMPLEMENTATION_PLAN.md) and [MVP audit](docs/development/MVP_FINAL_AUDIT.md).
+```text
+backend/               FastAPI, application/domain services, content, Alembic and pytest
+frontend/              React workspaces, theme tokens, API client and flow tests
+docs/architecture/     Current architecture and original target design
+docs/design/           Dual-theme references, adopted design and archived prototypes
+docs/development/      Quick start, roadmap, stage acceptance and visual evidence
+docs/archive/          Useful planning material superseded by current plans
+```
 
-Issues and contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). **No open-source license is currently declared.** Do not assume permission to reuse or redistribute; the maintainer must choose a license.
+## Design references
+
+The selected product direction is a clear, restrained academic reading experience with Premium Academic and Noir & Champagne themes. The dual-theme HTML prototype, handoff and reference images are in [`docs/design/verbatrail-dual-theme-reference/`](docs/design/verbatrail-dual-theme-reference/). Argon's Focus prototype and Oxford, Nordic and Nocturne concepts are retained under `docs/design/archived/`; unselected concepts do not describe delivered product functionality.
+
+## Roadmap
+
+- **Stage acceptance completed:** Stage 3/4 diagnostic and API foundations, Stage 5 learning workspace/review/profile, IELTS-1 Academic and General Training Reading loop, and dual-theme UI.
+- **After consolidation:** review and safely integrate the local consolidation branch into the formal remote mainline; strengthen backup/recovery and data controls; verify a clean-environment install.
+- **Planned:** expand Listening, Writing, Speaking, Vocabulary, Grammar, Mock Tests, UKVI and Life Skills. Real models, scoring and band estimates require separate privacy, budget and quality gates.
+
+Implementation status follows code and tests. Future stages in planning documents are not marked as implemented. See the [roadmap](docs/development/ROADMAP.md) and [IELTS implementation plan](docs/development/IELTS_IMPLEMENTATION_PLAN.md).
+
+## Contributing and license
+
+Please discuss defects and proposals in issues first. Follow [CONTRIBUTING.md](CONTRIBUTING.md) and add tests for behavior changes. No open-source license is currently declared; do not assume reuse or redistribution is permitted.

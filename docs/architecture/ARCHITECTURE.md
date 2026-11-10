@@ -1,4 +1,4 @@
-# UnlearnLoop 系统架构
+# VerbaTrail 系统架构与目标设计
 
 > 本文保留原架构设计与目标，部分内容尚未实现；当前分支实际实现及安全边界见 [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)。
 

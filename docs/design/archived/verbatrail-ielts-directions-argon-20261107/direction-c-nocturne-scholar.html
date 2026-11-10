@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VerbaTrail · Direction C: Deep Ink Studio & Warm Alabaster</title>
+  <style>
+    :root {
+      --rail-ink: #091326;
+      --rail-card: #11203D;
+      --stage-alabaster: #F6F5F0;
+      --card-ivory: #FFFFFF;
+      --text-ink: #111827;
+      --text-body: #374151;
+      --text-muted: #6B7280;
+      --border-warm: #E5E2DC;
+      --accent-gold: #C69C3A;
+      --accent-navy: #162B52;
+      --radius-lg: 14px;
+      --font-serif: "Georgia", "Cambria", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--stage-alabaster);
+      color: var(--text-ink);
+      font-family: var(--font-sans);
+      display: grid;
+      grid-template-columns: 264px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    /* Left Deep Ink Scholarly Rail */
+    .ink-rail {
+      background: var(--rail-ink);
+      color: #F8FAFC;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .rail-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 18px;
+    }
+
+    .rail-target-card {
+      background: var(--rail-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .rail-menu {
+      display: grid;
+      gap: 6px;
+    }
+
+    .rail-link {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .rail-link.active {
+      background: var(--accent-gold);
+      color: var(--rail-ink);
+      font-weight: 700;
+    }
+
+    .stage-main {
+      padding: 36px 40px 80px;
+      max-width: 1060px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .ivory-card {
+      background: var(--card-ivory);
+      border: 1px solid var(--border-warm);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: 0 2px 10px rgba(17, 24, 39, 0.03);
+      margin-bottom: 20px;
+    }
+
+    .btn-ink {
+      appearance: none;
+      border: none;
+      background: var(--accent-navy);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-ghost {
+      appearance: none;
+      border: 1px solid var(--border-warm);
+      background: var(--card-ivory);
+      color: var(--text-body);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 960px) {
+      body { grid-template-columns: 1fr; }
+      .ink-rail { height: auto; position: static; }
+      .stage-main { padding: 24px 18px 64px; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="ink-rail">
+    <div>
+      <div class="rail-brand">
+        <span style="width:28px;height:28px;border-radius:6px;background:var(--accent-gold);color:var(--rail-ink);display:grid;place-items:center;font-size:15px;">V</span>
+        <span>VerbaTrail</span>
+      </div>
+
+      <div class="rail-target-card">
+        <div style="font-size:11px;color:#E2C675;text-transform:uppercase;letter-spacing:0.06em;">Target Goal</div>
+        <div style="font-family:var(--font-serif);font-size:24px;font-weight:700;margin:2px 0;">Overall Band 8.0</div>
+        <div style="font-size:12px;color:#CBD5E1;">IELTS Academic · L8.5 R8.5 W7.5 S7.5</div>
+      </div>
+
+      <nav class="rail-menu" aria-label="Studio Navigation">
+        <button type="button" class="rail-link active" data-v="dashboard" onclick="go('dashboard')">
+          <span>1. Daily Study Focus</span><span>→</span>
+        </button>
+        <button type="button" class="rail-link" data-v="reading" onclick="go('reading')">
+          <span>2. Reading Studio</span><span>P3</span>
+        </button>
+        <button type="button" class="rail-link" data-v="review" onclick="go('review')">
+          <span>3. Memory Review</span><span>2</span>
+        </button>
+        <button type="button" class="rail-link" data-v="profile" onclick="go('profile')">
+          <span>4. Band 8 Dossier</span><span>★</span>
+        </button>
+      </nav>
+    </div>
+
+    <div style="font-size:12px;color:#94A3B8;border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;">
+      <div>Direction C · Deep Ink Studio</div>
+      <a href="./index.html" style="color:#E2C675;text-decoration:none;display:inline-block;margin-top:6px;font-weight:600;">
+        ← Compare All 3 Directions
+      </a>
+    </div>
+  </aside>
+
+  <main class="stage-main" id="c-stage"></main>
+
+  <script>
+    const state = { view: 'dashboard', submitted: false };
+
+    function go(v) {
+      state.view = v;
+      document.querySelectorAll('.rail-link').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+      render();
+    }
+
+    function render() {
+      const root = document.getElementById('c-stage');
+      if (state.view === 'dashboard') {
+        root.innerHTML = `
+          <div class="ivory-card">
+            <div style="font-size:12px;font-weight:700;color:var(--accent-gold);text-transform:uppercase;letter-spacing:0.06em;">
+              Continue Today’s Study · Primary Task
+            </div>
+            <h1 style="font-family:var(--font-serif);font-size:26px;margin:8px 0 12px;">
+              Academic Reading Passage 3: Resolving “FALSE vs. NOT GIVEN” Scope Traps
+            </h1>
+            <p style="color:var(--text-body);font-size:15px;margin:0 0 18px;">
+              <strong>Why this task:</strong> Your target Reading score is 8.5. Mastering epistemic qualifiers (such as <em>“yet to establish”</em>) prevents over-inferring contradictions.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="btn-ink" onclick="go('reading')">Enter Immersive Reading Studio →</button>
+              <button type="button" class="btn-ghost" onclick="go('review')">2 Spaced Reviews Due</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">
+            <div class="ivory-card" style="margin-bottom:0;">
+              <h2 style="font-family:var(--font-serif);font-size:18px;margin:0 0 10px;">Four-Skill Gateways</h2>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <button type="button" class="btn-ghost" onclick="go('reading')">Reading (7.5→8.5)</button>
+                <button type="button" class="btn-ghost" onclick="go('profile')">Listening (8.0→8.5)</button>
+                <button type="button" class="btn-ghost" onclick="go('review')">Writing (7.0→7.5)</button>
+                <button type="button" class="btn-ghost" onclick="go('profile')">Speaking (7.0→7.5)</button>
+              </div>
+            </div>
+            <div class="ivory-card" style="margin-bottom:0;">
+              <h2 style="font-family:var(--font-serif);font-size:18px;margin:0 0 10px;">Foundational Archive</h2>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <button type="button" class="btn-ghost" onclick="go('review')">Vocabulary</button>
+                <button type="button" class="btn-ghost" onclick="go('review')">Grammar</button>
+                <button type="button" class="btn-ghost" onclick="go('profile')">Mock Tests</button>
+                <button type="button" class="btn-ghost" onclick="go('profile')">Learning Profile</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (state.view === 'reading') {
+        root.innerHTML = `
+          <div style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:20px;align-items:start;">
+            <article class="ivory-card" style="font-family:var(--font-serif);line-height:1.85;font-size:16px;">
+              <h2 style="margin-top:0;">Passage 3 · Proxy Reconstruction in Paleoclimatology</h2>
+              <p><strong>[B]</strong> Contemporary syntheses demonstrate that winter precipitation biases can skew isotopic ratios. <span style="${state.submitted ? 'background:#FEF3C7;border-bottom:2px solid #D97706;' : ''}">Crucially, while ensemble weighting narrows regional variance across the North Atlantic, researchers have yet to establish whether it yields superior predictive skill in tropical monsoon basins.</span></p>
+            </article>
+            <aside class="ivory-card">
+              <strong style="font-size:13px;color:var(--accent-gold);">Question 27 · T/F/NG</strong>
+              <p style="font-size:14.5px;font-weight:600;">“Multi-proxy weighting produces more accurate forecasts than unadjusted models in tropical monsoon regions.”</p>
+              <button type="button" class="btn-ink" style="width:100%;" onclick="state.submitted=true;render();">
+                Verify Answer (NOT GIVEN) & Highlight Passage
+              </button>
+              ${state.submitted ? `<p style="font-size:13.5px;color:var(--text-body);margin-top:12px;">✓ Highlighted in Paragraph [B]: <em>“have yet to establish”</em> confirms the comparison is unstated (NOT GIVEN).</p>` : ''}
+            </aside>
+          </div>
+        `;
+      } else if (state.view === 'review') {
+        root.innerHTML = `
+          <div class="ivory-card">
+            <h1 style="font-family:var(--font-serif);font-size:22px;margin-top:0;">Long-Term Memory Verification</h1>
+            <p>Verify C1 hedging verb <code>mitigate</code> in a fresh urban-policy context to advance its review cycle from +3 Days to <strong>+14 Days</strong>.</p>
+            <button type="button" class="btn-ink" onclick="go('profile')">Complete Verification & View Band 8 Dossier →</button>
+          </div>
+        `;
+      } else {
+        root.innerHTML = `
+          <div class="ivory-card">
+            <h1 style="font-family:var(--font-serif);font-size:22px;margin-top:0;">Band 8.0 Growth Dossier</h1>
+            <p>Longitudinal record of Reading (7.5→8.5), Listening (8.0→8.5), Writing (7.0→7.5), and Speaking (7.0→7.5) diagnostic evidence.</p>
+          </div>
+        `;
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

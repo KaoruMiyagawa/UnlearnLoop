@@ -1,4 +1,4 @@
-"""Deterministic local rule pre-evaluator for UnlearnLoop Stage 3.
+"""Deterministic local rule pre-evaluator for VerbaTrail Stage 3.
 
 Per Stage 3 Section 2:
 - Prioritizes local rule evaluation for questions with deterministic answers/rubrics.

@@ -20,7 +20,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = Field(default="UnlearnLoop", validation_alias="APP_NAME")
+    app_name: str = Field(default="VerbaTrail", validation_alias="APP_NAME")
     app_env: Literal["development", "testing", "production"] = Field(
         default="development",
         validation_alias="APP_ENV",

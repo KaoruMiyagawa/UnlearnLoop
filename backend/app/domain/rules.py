@@ -1,4 +1,4 @@
-"""Pure domain rules and state transition matrices for UnlearnLoop."""
+"""Pure domain rules and state transition matrices for VerbaTrail."""
 
 from app.domain.enums import (
     DiagnosticCaseStatus,

@@ -1,4 +1,4 @@
-"""SQLAlchemy 2.x ORM models for UnlearnLoop Stage 2.
+"""SQLAlchemy 2.x ORM models for VerbaTrail Stage 2.
 
 Subject-agnostic schema covering:
 - KnowledgeTopic & KnowledgeTopicDependency

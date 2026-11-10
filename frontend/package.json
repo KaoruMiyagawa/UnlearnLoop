@@ -1,5 +1,5 @@
 {
-  "name": "unlearnloop-frontend",
+  "name": "verbatrail-frontend",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -21,6 +21,6 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "~5.6.2",
-    "vite": "^5.4.11"
+    "vite": "^6.4.6"
   }
 }

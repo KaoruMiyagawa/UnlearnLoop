@@ -1,4 +1,4 @@
-"""Pytest fixtures for UnlearnLoop backend tests."""
+"""Pytest fixtures for VerbaTrail backend tests."""
 
 from collections.abc import Iterator
 from pathlib import Path
@@ -19,7 +19,7 @@ def test_settings(tmp_path: Path) -> Settings:
     """Return isolated test settings backed by a temporary SQLite file."""
     temp_db_file = tmp_path / "test_unlearnloop.db"
     return Settings(
-        APP_NAME="UnlearnLoop",
+        APP_NAME="VerbaTrail",
         APP_ENV="testing",
         APP_VERSION="0.1.0",
         DATABASE_URL=f"sqlite:///{temp_db_file.as_posix()}",

@@ -47,7 +47,7 @@
 在 backend 目录使用已有 Python 环境执行：
 
 ```powershell
-& 'D:\Temp\unlearnloop-stage5c2-final-venv\Scripts\python.exe' -m pytest -o addopts='' -q
+& '..\.venv\Scripts\python.exe' -m pytest -o addopts='' -q
 ```
 
 结果：59 passed，1 项现有 Starlette/httpx 弃用提示。

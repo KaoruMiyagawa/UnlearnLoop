@@ -197,7 +197,7 @@ export const App: React.FC = () => {
         <div>
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--action-primary)' }}>
-              UNLEARNLOOP · DEMO SCENARIO
+              VERBATRAIL · DEMO SCENARIO
             </div>
             <h1 style={{ margin: '2px 0 6px', fontSize: 24, fontWeight: 700 }}>
               继续上次的学习

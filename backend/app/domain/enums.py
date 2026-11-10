@@ -1,4 +1,4 @@
-"""Domain enumerations for UnlearnLoop (subject-agnostic)."""
+"""Domain enumerations for VerbaTrail (subject-agnostic)."""
 
 from enum import StrEnum
 

@@ -1,4 +1,6 @@
-# UnlearnLoop 第一阶段 MVP 最终工程审查
+# VerbaTrail（原 UnlearnLoop）第一阶段历史工程审查
+
+> 历史快照：以下状态针对 Stage 5C Integration 基线（2026-11-09），不描述当前 IELTS-1 / 双主题整合分支。
 
 审查日期：2026-11-09
 

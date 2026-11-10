@@ -1,6 +1,7 @@
 import React from 'react';
 import { WORKSPACE_NAV_ITEMS, WorkspaceId } from './navigation';
 import { UiSimulationMode } from '../design-system/stage5WorkbenchModel';
+import { useTheme } from '../design-system/ThemeProvider';
 
 interface AppShellProps {
   activeWorkspace: WorkspaceId;
@@ -28,6 +29,7 @@ const SIMULATION_MODES: readonly { id: UiSimulationMode; label: string }[] = [
 ];
 
 export const AppShell: React.FC<AppShellProps> = (props) => {
+  const { theme, toggleTheme } = useTheme();
   const {
     activeWorkspace,
     onSelectWorkspace,
@@ -48,10 +50,10 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
             type="button"
             className="focus-brand"
             onClick={() => onSelectWorkspace('home')}
-            aria-label="VerbaTrail 首页（暂定名称）"
+            aria-label="VerbaTrail 首页"
           >
             <span className="focus-brand-mark" aria-hidden="true">V</span>
-            <span>VerbaTrail <small>暂定</small></span>
+            <span>VerbaTrail</span>
           </button>
 
           <nav className="focus-nav-links" aria-label="主导航">
@@ -80,6 +82,9 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
           </nav>
 
           <div className="focus-nav-tools">
+            <button type="button" className="focus-theme-toggle" onClick={toggleTheme} aria-label={`切换至${theme === 'premium' ? '曜黑香槟金' : '深海蓝暖纸白'}主题`} aria-pressed={theme === 'noir'} title={`当前：${theme === 'premium' ? 'Premium Academic' : 'Noir & Champagne'}；切换主题`}>
+              <span aria-hidden="true">{theme === 'premium' ? '☾' : '☼'}</span><span>{theme === 'premium' ? '曜黑' : '暖白'}</span>
+            </button>
             <div className="focus-mode-switch" role="group" aria-label="数据模式">
               <button
                 type="button"

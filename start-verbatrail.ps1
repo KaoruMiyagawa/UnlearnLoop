@@ -12,9 +12,9 @@ $backendPort = 18000
 $frontendPort = 15173
 $backendUrl = "http://127.0.0.1:$backendPort"
 $frontendUrl = "http://127.0.0.1:$frontendPort/"
-$runRoot = Join-Path $env:LOCALAPPDATA 'UnlearnLoop\run'
-$logRoot = Join-Path $env:LOCALAPPDATA 'UnlearnLoop\logs'
-$statePath = Join-Path $runRoot 'stage5c-integration.json'
+$runRoot = Join-Path $env:LOCALAPPDATA 'VerbaTrail\run'
+$logRoot = Join-Path $env:LOCALAPPDATA 'VerbaTrail\logs'
+$statePath = Join-Path $runRoot 'verbatrail.json'
 $launchState = $null
 $newlyStartedBackendPid = 0
 $newlyStartedFrontendPid = 0
@@ -48,7 +48,7 @@ function Stop-VerifiedProcess([int]$ProcessId, [string]$Kind, $State) {
     $process = Get-ProcessDetails $ProcessId
     if (-not $process) { return }
     if (-not (Test-ManagedProcess $process $Kind $State)) {
-        Write-Warning "未停止 PID $ProcessId：进程信息与 UnlearnLoop 启动记录不匹配。"
+        Write-Warning "未停止 PID $ProcessId：进程信息与 VerbaTrail 启动记录不匹配。"
         return
     }
     Stop-Process -Id $ProcessId -Force
@@ -75,7 +75,7 @@ if ($Stop) {
     }
     if ($remaining.Count -eq 0) {
         Remove-Item -LiteralPath $statePath -Force
-        Write-Host 'UnlearnLoop 启动记录已清除。数据库和日志均已保留。'
+        Write-Host 'VerbaTrail 启动记录已清除。数据库和日志均已保留。'
     } else {
         Write-Warning "仍有进程未停止（PID $($remaining -join ', ')）；启动记录已保留以供检查。"
     }
@@ -92,8 +92,8 @@ function Get-ListenerProcesses([int]$Port) {
 
 function Resolve-PythonExecutable {
     $candidates = @(
-        (Join-Path $backendRoot '.venv\Scripts\python.exe'),
-        'D:\Temp\unlearnloop-stage5c2-final-venv\Scripts\python.exe'
+        (Join-Path $projectRoot '.venv\Scripts\python.exe'),
+        (Join-Path $backendRoot '.venv\Scripts\python.exe')
     )
     $systemPython = Get-Command python -ErrorAction SilentlyContinue
     if ($systemPython) { $candidates += $systemPython.Source }
@@ -294,7 +294,7 @@ try {
         throw "首页 HTTP 可访问，但端口 $frontendPort 的监听进程身份与本项目启动记录不符。"
     }
     $launchState | ConvertTo-Json | Set-Content -LiteralPath $statePath
-    Write-Host 'UnlearnLoop 已启动并通过本机 HTTP 检查。'
+    Write-Host 'VerbaTrail 已启动并通过本机 HTTP 检查。'
     Write-Host '模型：FakeModelProvider（不发起远程模型请求）'
     Write-Host '数据库：沿用 backend/.env、项目 .env 或 DATABASE_URL；未设置时使用 backend/unlearnloop.db。启动不会清空已有数据。'
     Write-Host "后端健康检查：$backendUrl/api/v1/health"

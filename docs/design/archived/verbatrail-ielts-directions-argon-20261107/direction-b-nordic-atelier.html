@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VerbaTrail · Direction B: Nordic Editorial & Ice Cobalt</title>
+  <style>
+    :root {
+      --bg-mist: #F5F7FA;
+      --bg-paper: #FFFFFF;
+      --bg-ice: #EDF2F9;
+      --ink-navy: #0A1428;
+      --ink-slate: #3B4A64;
+      --ink-muted: #6E7E96;
+      --line-soft: #E1E7F0;
+      --line-strong: #C8D3E3;
+      --cobalt: #1E40AF;
+      --cobalt-bright: #2563EB;
+      --cobalt-tint: #EFF6FF;
+      --teal: #0F766E;
+      --teal-tint: #F0FDFA;
+      --amber: #B45309;
+      --amber-tint: #FFFBEB;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-whisper: 0 4px 20px -4px rgba(10, 20, 40, 0.04), 0 1px 2px rgba(10, 20, 40, 0.02);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "PingFang SC", sans-serif;
+      --font-serif: "Georgia", "Charter", "Cambria", serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-mist);
+      color: var(--ink-navy);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Frosted Mist Header */
+    .nordic-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(245, 247, 250, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .nordic-header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .n-brand {
+      appearance: none;
+      background: none;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      color: var(--ink-navy);
+    }
+
+    .n-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--ink-navy);
+      color: #FFFFFF;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .n-title {
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .n-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--bg-paper);
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid var(--line-soft);
+    }
+
+    .n-tab {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink-slate);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .n-tab.active {
+      background: var(--ink-navy);
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    .n-container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 36px 28px 88px;
+    }
+
+    /* Editorial Top Target Strip */
+    .target-ribbon {
+      background: var(--bg-paper);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-lg);
+      padding: 20px 26px;
+      box-shadow: var(--shadow-whisper);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .ribbon-scores {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .score-pill {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 13.5px;
+      color: var(--ink-slate);
+      padding-right: 16px;
+      border-right: 1px solid var(--line-soft);
+    }
+
+    .score-pill:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .score-pill strong {
+      font-size: 16px;
+      color: var(--ink-navy);
+    }
+
+    /* Asymmetric Editorial Grid */
+    .editorial-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .paper-card {
+      background: var(--bg-paper);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-whisper);
+      padding: 30px;
+    }
+
+    .ice-callout {
+      background: var(--bg-ice);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin: 18px 0 22px;
+      font-size: 14px;
+      color: var(--ink-slate);
+      display: grid;
+      gap: 6px;
+    }
+
+    .btn-cobalt {
+      appearance: none;
+      border: none;
+      background: var(--cobalt);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-cobalt:hover {
+      background: var(--cobalt-bright);
+    }
+
+    .btn-quiet {
+      appearance: none;
+      border: 1px solid var(--line-soft);
+      background: var(--bg-paper);
+      color: var(--ink-slate);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 9px 15px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    .btn-quiet:hover {
+      border-color: var(--line-strong);
+      color: var(--ink-navy);
+    }
+
+    .tag-ice {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--cobalt-tint);
+      color: var(--cobalt);
+    }
+
+    .tag-teal {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--teal-tint);
+      color: var(--teal);
+    }
+
+    .reading-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.9fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 960px) {
+      .editorial-grid,
+      .reading-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nordic-header-inner,
+      .n-container {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .paper-card {
+        padding: 22px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="nordic-header">
+    <div class="nordic-header-inner">
+      <button type="button" class="n-brand" onclick="setPage('dashboard')">
+        <span class="n-mark">VT</span>
+        <span class="n-title">VerbaTrail</span>
+      </button>
+
+      <nav class="n-nav" aria-label="Main Views">
+        <button type="button" class="n-tab active" data-p="dashboard" onclick="setPage('dashboard')">Overview</button>
+        <button type="button" class="n-tab" data-p="reading" onclick="setPage('reading')">Reading</button>
+        <button type="button" class="n-tab" data-p="review" onclick="setPage('review')">Review</button>
+        <button type="button" class="n-tab" data-p="profile" onclick="setPage('profile')">Profile</button>
+      </nav>
+
+      <a href="./index.html" style="font-size:12.5px;color:var(--ink-slate);text-decoration:none;font-weight:600;">
+        ← Compare 3 Directions
+      </a>
+    </div>
+  </header>
+
+  <main class="n-container" id="nordic-root"></main>
+
+  <script>
+    const state = {
+      page: 'dashboard',
+      module: 'Academic',
+      readingAns: 'NOT GIVEN',
+      readingChecked: false,
+      reviewDone: false
+    };
+
+    function setPage(p) {
+      state.page = p;
+      document.querySelectorAll('.n-tab').forEach(b => {
+        b.classList.toggle('active', b.dataset.p === p);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      render();
+    }
+
+    function renderDashboard() {
+      return `
+        <!-- Minimalist Target Ribbon -->
+        <section class="target-ribbon" aria-label="IELTS Target Bar">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span class="tag-ice">Target: Overall Band 8.0</span>
+            <button type="button" class="btn-quiet" style="padding:4px 12px;font-size:12.5px;" onclick="state.module = state.module === 'Academic' ? 'General Training' : 'Academic'; render();">
+              Module: <strong>${state.module}</strong> (Switch)
+            </button>
+            <span style="font-size:12px;color:var(--ink-muted);">UKVI / Life Skills Compatible</span>
+          </div>
+
+          <div class="ribbon-scores">
+            <div class="score-pill"><span>Listening</span><strong>8.0 → 8.5</strong></div>
+            <div class="score-pill"><span>Reading</span><strong>7.5 → 8.5</strong></div>
+            <div class="score-pill"><span>Writing</span><strong>7.0 → 7.5</strong></div>
+            <div class="score-pill"><span>Speaking</span><strong>7.0 → 7.5</strong></div>
+          </div>
+        </section>
+
+        <div class="editorial-grid">
+          <!-- Primary Focus Card: Continue Today's Study -->
+          <section class="paper-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span class="tag-ice">Continue Today’s Study</span>
+              <span style="font-size:13px;color:var(--ink-muted);">Estimated 10 mins</span>
+            </div>
+
+            <h1 style="font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:6px 0 10px;">
+              ${state.module} Reading Passage 3 · Distinguishing Contradiction from Omission
+            </h1>
+
+            <div class="ice-callout">
+              <div><strong>Current Task:</strong> Read Paragraphs A–C on Paleoclimate Proxy Models and resolve Question 27 (T/F/NG).</div>
+              <div><strong>Why this matters:</strong> Eliminating over-inference on unstated comparisons is your fastest path from Reading 7.5 to 8.5.</div>
+              <div><strong>After completion:</strong> Instant sentence-level evidence pinpointing and a 4-day spaced verification schedule.</div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="btn-cobalt" onclick="setPage('reading')">
+                Resume Reading Session →
+              </button>
+              <button type="button" class="btn-quiet" onclick="setPage('review')">
+                Open Spaced Review (2)
+              </button>
+            </div>
+          </section>
+
+          <!-- Right Column: Four Skills & Secondary Gateways -->
+          <div style="display:grid;gap:16px;">
+            <section class="paper-card" style="padding:22px 24px;">
+              <h2 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-muted);margin:0 0 12px;">
+                Four-Skill Studios
+              </h2>
+              <div style="display:grid;gap:8px;">
+                ${[
+                  { name: 'Reading', sub: 'Passage 3 Inference', band: '7.5 → 8.5', target: 'reading' },
+                  { name: 'Listening', sub: 'Part 4 Signposting', band: '8.0 → 8.5', target: 'profile' },
+                  { name: 'Writing', sub: 'Task 2 Hedging & Register', band: '7.0 → 7.5', target: 'review' },
+                  { name: 'Speaking', sub: 'Part 3 Speculative Depth', band: '7.0 → 7.5', target: 'profile' }
+                ].map(s => `
+                  <button
+                    type="button"
+                    class="btn-quiet"
+                    style="display:flex;justify-content:space-between;align-items:center;text-align:left;padding:10px 14px;"
+                    onclick="setPage('${s.target}')"
+                  >
+                    <span><strong>${s.name}</strong> <span style="color:var(--ink-muted);font-size:12.5px;">· ${s.sub}</span></span>
+                    <span style="font-weight:700;color:var(--cobalt);font-size:12.5px;">${s.band}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </section>
+
+            <section class="paper-card" style="padding:18px 24px;">
+              <div style="font-size:12.5px;font-weight:600;color:var(--ink-muted);margin-bottom:10px;">
+                SECONDARY RESOURCES
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <button type="button" class="btn-quiet" style="font-size:12.5px;padding:6px 11px;" onclick="setPage('review')">Vocabulary</button>
+                <button type="button" class="btn-quiet" style="font-size:12.5px;padding:6px 11px;" onclick="setPage('review')">Grammar</button>
+                <button type="button" class="btn-quiet" style="font-size:12.5px;padding:6px 11px;" onclick="setPage('review')">Review</button>
+                <button type="button" class="btn-quiet" style="font-size:12.5px;padding:6px 11px;" onclick="setPage('profile')">Mock Tests</button>
+                <button type="button" class="btn-quiet" style="font-size:12.5px;padding:6px 11px;" onclick="setPage('profile')">Learning Profile</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderReading() {
+      return `
+        <div class="reading-split">
+          <article class="paper-card" style="padding:36px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+              <span class="tag-ice">IELTS ${state.module} · Passage 3</span>
+              <span style="font-size:13px;color:var(--ink-muted);">Paragraphs [A]–[B]</span>
+            </div>
+            <h1 style="font-family:var(--font-serif);font-size:23px;margin:0 0 18px;">
+              Proxy Reconstruction in Paleoclimatology
+            </h1>
+            <p style="font-family:var(--font-serif);font-size:16px;line-height:1.8;color:var(--ink-slate);">
+              <strong>[A]</strong> Numerical general circulation models (GCMs) serve as the cornerstone of climate projection. Yet when researchers hindcast pre-industrial temperature anomalies across millennial timescales, purely mechanistic equations encounter boundary-condition drift.
+            </p>
+            <p style="font-family:var(--font-serif);font-size:16px;line-height:1.8;color:var(--ink-slate);margin-bottom:0;">
+              <strong>[B]</strong> Contemporary syntheses demonstrate that winter precipitation biases can skew single ice-core ratios, prompting modellers to weight multi-proxy ensembles. <span style="${state.readingChecked ? 'background:#DBEAFE;padding:2px 4px;border-radius:4px;color:var(--ink-navy);' : ''}">Crucially, while ensemble weighting narrows variance across the North Atlantic, researchers have yet to establish whether it yields superior predictive skill in tropical monsoon basins compared with unadjusted dynamical runs.</span>
+            </p>
+          </article>
+
+          <aside class="paper-card">
+            <span class="tag-ice">Question 27 · TRUE / FALSE / NOT GIVEN</span>
+            <p style="font-weight:600;font-size:15px;margin:14px 0;">
+              “Multi-proxy ensemble weighting has been proven to produce more accurate forecasts than unadjusted models in tropical monsoon regions.”
+            </p>
+
+            <div style="display:flex;gap:8px;margin-bottom:18px;">
+              ${['TRUE', 'FALSE', 'NOT GIVEN'].map(choice => `
+                <button
+                  type="button"
+                  class="btn-quiet"
+                  style="flex:1;${state.readingAns === choice ? 'background:var(--ink-navy);color:#FFF;border-color:var(--ink-navy);' : ''}"
+                  onclick="state.readingAns='${choice}';render();"
+                >${choice}</button>
+              `).join('')}
+            </div>
+
+            <button type="button" class="btn-cobalt" style="width:100%;" onclick="state.readingChecked=true;render();">
+              Check Answer & Highlight Evidence
+            </button>
+
+            ${
+              state.readingChecked
+                ? `
+                <div class="ice-callout" style="margin-top:18px;margin-bottom:0;">
+                  <strong style="color:var(--cobalt);">✓ Evidence Mapped to Paragraph [B]</strong>
+                  <div>The phrase <em>“have yet to establish whether it yields superior predictive skill”</em> confirms the comparison is unresolved in the text—hence <strong>NOT GIVEN</strong>, not FALSE.</div>
+                </div>
+                `
+                : ''
+            }
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderReview() {
+      return `
+        <div style="max-width:780px;margin:0 auto;">
+          <section class="paper-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span class="tag-ice">Long-Term Memory Verification</span>
+              <span style="font-size:13px;color:var(--ink-muted);">Next Schedule: +14 Days upon pass</span>
+            </div>
+            <h1 style="font-size:21px;margin:0 0 10px;">
+              Writing Task 2 Register · Calibrated Hedging Verb
+            </h1>
+            <p style="color:var(--ink-slate);font-size:14.5px;">
+              Verify that you can select the non-absolute C1 verb in a new urban-policy context:
+            </p>
+            <div class="ice-callout" style="font-family:var(--font-serif);font-size:16px;color:var(--ink-navy);">
+              “While tiered congestion tariffs cannot wholly abolish commuter delays, empirical evidence shows they substantially <strong>[ mitigate / eradicate ]</strong> peak-hour bottlenecks.”
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <button type="button" class="btn-cobalt" onclick="state.reviewDone=true;render();">
+                Confirm “mitigate” & Schedule +14d Review →
+              </button>
+              ${state.reviewDone ? `<span class="tag-teal">✓ Promoted to 14-Day Stable Cycle</span>` : ''}
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function renderProfile() {
+      return `
+        <div style="max-width:920px;margin:0 auto;">
+          <section class="paper-card">
+            <span class="tag-ice">Band 8.0 Scholar Growth Dossier</span>
+            <h1 style="font-size:23px;margin:10px 0 6px;">Four-Skill Evidence & Error Evolution</h1>
+            <p style="color:var(--ink-muted);font-size:14px;margin:0 0 22px;">
+              All diagnostic weights represent heuristic pedagogical judgments rather than statistical probabilities.
+            </p>
+
+            <div style="display:grid;gap:14px;">
+              <div style="padding:18px;border:1px solid var(--line-soft);border-radius:var(--radius-md);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong>Reading 7.5 → 8.5 · T/F/NG Scope Calibration</strong>
+                  <span class="tag-ice">1 Fresh Passage Left</span>
+                </div>
+                <p style="font-size:14px;color:var(--ink-slate);margin:6px 0 0;">
+                  Resolved tendency to equate unstated comparisons with FALSE contradictions.
+                </p>
+              </div>
+
+              <div style="padding:18px;border:1px solid var(--line-soft);border-radius:var(--radius-md);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong>Writing 7.0 → 7.5 · C1 Concession & Hedging</strong>
+                  <span class="tag-teal">Operational Stability Achieved</span>
+                </div>
+                <p style="font-size:14px;color:var(--ink-slate);margin:6px 0 0;">
+                  Verified across 3 independent essay prompts and 14-day spaced retention check.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function render() {
+      const el = document.getElementById('nordic-root');
+      if (state.page === 'dashboard') el.innerHTML = renderDashboard();
+      else if (state.page === 'reading') el.innerHTML = renderReading();
+      else if (state.page === 'review') el.innerHTML = renderReview();
+      else el.innerHTML = renderProfile();
+    }
+
+    render();
+  </script>
+</body>
+</html>

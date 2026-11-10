@@ -1,4 +1,4 @@
-"""Pydantic request and response schemas for UnlearnLoop /api/v1 endpoints."""
+"""Pydantic request and response schemas for VerbaTrail /api/v1 endpoints."""
 
 from datetime import date, datetime
 from typing import Any, Literal

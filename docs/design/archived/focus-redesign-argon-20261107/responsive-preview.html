@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnlearnLoop · 桌面端与窄屏双视口预览</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #E5E7EB;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #111827;
+    }
+    .preview-grid {
+      display: flex;
+      gap: 28px;
+      padding: 24px;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+      flex-wrap: wrap;
+    }
+    .frame-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .frame-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4B5563;
+      display: flex;
+      justify-content: space-between;
+    }
+    iframe {
+      border: 1px solid #D1D5DB;
+      border-radius: 16px;
+      background: #F8F9FA;
+      box-shadow: 0 12px 32px rgba(17, 24, 39, 0.08);
+    }
+    .desktop-frame {
+      width: 1024px;
+      max-width: calc(100vw - 48px);
+      height: 860px;
+    }
+    .mobile-frame {
+      width: 390px;
+      height: 860px;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-grid">
+    <div class="frame-wrap">
+      <div class="frame-label">
+        <span>桌面端视图 (Desktop · 1024px)</span>
+        <a href="./index.html" style="color:#1D4ED8;text-decoration:none;">单窗口全屏打开 →</a>
+      </div>
+      <iframe class="desktop-frame" src="./index.html" title="UnlearnLoop 桌面端预览"></iframe>
+    </div>
+
+    <div class="frame-wrap">
+      <div class="frame-label">
+        <span>窄屏 / 移动端视图 (Mobile · 390px)</span>
+      </div>
+      <iframe class="mobile-frame" src="./index.html" title="UnlearnLoop 窄屏预览"></iframe>
+    </div>
+  </div>
+</body>
+</html>

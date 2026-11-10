@@ -82,7 +82,7 @@ function ResourceNotice<T>({
   onRetry: () => void;
 }) {
   if (state.status === 'loading') {
-    return <div role="status" className="wb-alert info">正在从 UnlearnLoop API 加载…</div>;
+    return <div role="status" className="wb-alert info">正在从 VerbaTrail 服务加载…</div>;
   }
   if (state.status === 'error') {
     const error = getErrorView(state.error);
@@ -462,7 +462,7 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
           <header className="focus-page-header">
             <div className="focus-eyebrow">LEARN AT YOUR PACE</div>
             <h1 className="focus-page-title">从一个问题开始，继续向前。</h1>
-            <p className="focus-page-subtitle">选择你想学习的知识，UnlearnLoop 会根据你的作答安排下一步。</p>
+            <p className="focus-page-subtitle">选择你想学习的知识，VerbaTrail 会根据你的作答安排下一步。</p>
           </header>
           <ReviewHomeEntry onNavigateWorkspace={onNavigateWorkspace} />
           {sessionLoadError !== null && <div role="alert" className="wb-alert danger">恢复上次会话失败 · {getErrorView(sessionLoadError).code}：{getErrorView(sessionLoadError).message}</div>}
@@ -517,14 +517,14 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
           </div></section>}
           {session && <>
             <div className="focus-session-meta"><span>{session.topic_title}</span><span>{session.exam_variant ?? '原有学习'}</span><span className="focus-meta-separator">·</span><StateBadge label="学习状态" value={session.knowledge_state_status ?? 'unknown'} /><button type="button" className="wb-btn sm" disabled={Boolean(draft.trim()) || operation.kind === 'loading'} onClick={() => { setSession(null); setSelectedTopicId(''); setAttempts([]); setAttemptResult(null); window.sessionStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY); }}>选择其他阅读任务</button></div>
-            <details className="focus-disclosure focus-learning-materials">
+            <div className="verbatrail-reading-layout"><details open className="focus-disclosure focus-learning-materials">
               <summary>查看相关学习材料</summary>
               <div className="focus-disclosure-content">
                 <ResourceNotice state={materialsResource.state} emptyMessage="该知识点目前没有服务端学习材料。" onRetry={() => void materialsResource.retry()} />
                 {materialsResource.state.status === 'success' && materialsResource.state.data.filter(material => !session.exam_variant || material.id === session.current_question?.material_id).map((material) => <article className="wb-material" key={material.id}><h3>{material.title}</h3><p>{material.summary}</p><pre>{material.content_body}</pre></article>)}
               </div>
             </details>
-            {activeQuestion && session.status !== 'completed' ? <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-question-meta"><span className="focus-eyebrow">{activeQuestion.question_role} · {activeQuestion.question_type}</span><span className="wb-badge blue">服务端题目</span></div><h2 className="focus-question-prompt">{activeQuestion.prompt_text}</h2>{activeQuestion.context_snippet && <pre className="wb-code-block focus-code">{activeQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="real-answer">你的答案或推理过程</label><textarea id="real-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small className="focus-char-count">{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary focus-primary-action" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交作答</button><button type="button" className="wb-btn" disabled={!draft} onClick={() => setDraft('')}>清空草稿</button></div></div></section> : <section className="wb-card"><div className="wb-card-body">{session.status === 'completed' ? <p>此会话已由服务端结束。</p> : submittedQuestionAlreadyCurrent ? <p>该题已有作答记录；等待服务端下一步或派发新题，不会重复显示为可作答题目。</p> : <p>当前会话暂无可作答题目。请查看服务端返回的下一步动作。</p>}</div></section>}
+            {activeQuestion && session.status !== 'completed' ? <section className="wb-card focus-question-card"><div className="wb-card-body"><div className="focus-question-meta"><span className="focus-eyebrow">{activeQuestion.question_role} · {activeQuestion.question_type}</span><span className="wb-badge blue">服务端题目</span></div><h2 className="focus-question-prompt">{activeQuestion.prompt_text}</h2>{activeQuestion.context_snippet && <pre className="wb-code-block focus-code">{activeQuestion.context_snippet}</pre>}<label className="wb-field-label" htmlFor="real-answer">你的答案或推理过程</label><textarea id="real-answer" className="wb-textarea focus-textarea" maxLength={2000} value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="写下你的思路。提交失败时，草稿会保留。" disabled={operation.kind === 'loading'} />{draft.length > 1900 && <small className="focus-char-count">{draft.length}/2000</small>}<div className="wb-btn-group"><button type="button" className="wb-btn primary focus-primary-action" disabled={!draft.trim() || operation.kind === 'loading' || sessionLoadError !== null} onClick={() => void submitPreparedAttempt(false)}>提交作答</button><button type="button" className="wb-btn" disabled={!draft} onClick={() => setDraft('')}>清空草稿</button></div></div></section> : <section className="wb-card"><div className="wb-card-body">{session.status === 'completed' ? <p>此会话已由服务端结束。</p> : submittedQuestionAlreadyCurrent ? <p>该题已有作答记录；等待服务端下一步或派发新题，不会重复显示为可作答题目。</p> : <p>当前会话暂无可作答题目。请查看服务端返回的下一步动作。</p>}</div></section>}</div>
             {attemptResult && <section className="wb-card">
               <div className="wb-card-head"><h2 className="wb-card-title">最近一次作答评价</h2><span className={`wb-badge ${attemptResult.is_correct === true ? 'green' : attemptResult.is_correct === false ? 'amber' : 'slate'}`}>{attemptResult.is_correct === true ? '正确' : attemptResult.is_correct === false ? '未通过' : '待判定'}</span></div>
               <div className="wb-card-body">

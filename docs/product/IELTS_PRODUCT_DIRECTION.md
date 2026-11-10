@@ -1,6 +1,6 @@
 # VerbaTrail 产品方向（暂定名）
 
-更新日期：2026-11-09。此文档记录 UnlearnLoop 转型方案；GitHub 仓库、历史数据和 Python 内容仍保留原名与原样。
+更新日期：2026-11-09。此文档记录 VerbaTrail 的 IELTS 产品方向；GitHub 仓库 URL、历史数据和 Python 技术追溯标识暂保留原样。
 
 ## 产品承诺与边界
 

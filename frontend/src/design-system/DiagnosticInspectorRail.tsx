@@ -75,7 +75,7 @@ export const DiagnosticInspectorRail: React.FC<DiagnosticInspectorRailProps> = (
                 尚未采集到当前会话的原始作答证据
               </strong>
               <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                UnlearnLoop 拒绝在没有任何证据时预判学习者错误原因。请先在左侧学习工作区提交第 1 步初始作答，或恢复默认交互演示状态。
+                VerbaTrail 不会在没有任何证据时预判学习者错误原因。请先在左侧学习工作区提交第 1 步初始作答，或恢复默认交互演示状态。
               </p>
               <div className="wb-btn-group">
                 <button type="button" className="wb-btn primary sm" onClick={onRestoreNormalMode}>

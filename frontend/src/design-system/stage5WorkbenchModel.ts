@@ -499,7 +499,7 @@ export const INITIAL_LOOP_STAGE_SNAPSHOTS: Record<LoopStageId, LoopStageSnapshot
     rawAttemptNote: '针对性练习正确区分了显式起始边界 range(1, 4) 的左闭右开语义。',
     agentToolName: 'assign_transfer_verification',
     agentDecisionReason:
-      '学习者在针对性练习 q_py_loop_practice_01 中正确输出 6，H1 风险从 86% 缓解至 35%。但根据 UnlearnLoop 核心不变量：同结构练习答对不等于掌握，必须通过新情境迁移验证题才能晋升 stable。',
+      '学习者在针对性练习 q_py_loop_practice_01 中正确输出 6，H1 风险从 86% 缓解至 35%。但根据 VerbaTrail 核心不变量：同结构练习答对不等于掌握，必须通过新情境迁移验证题才能晋升 stable。',
     agentNextExpectation:
       '提交针对性练习答案后，系统将切换会话至 transfer_checking 并派发迁移验证题 #1。',
     task: {

@@ -1,4 +1,4 @@
-"""State-constrained Diagnostic Agent decision engine for UnlearnLoop Stage 3.
+"""State-constrained Diagnostic Agent decision engine for VerbaTrail Stage 3.
 
 Orchestrates:
 1. Context gathering via whitelisted read tools (`read_material_and_question`, `query_attempts_and_evidence`)
@@ -60,7 +60,7 @@ from app.persistence.models import (
 )
 from app.persistence.repositories import LearningRepository
 
-SYSTEM_PROMPT_V1 = """You are the UnlearnLoop Diagnostic Agent.
+SYSTEM_PROMPT_V1 = """You are the VerbaTrail Diagnostic Agent.
 You operate strictly as a domain-state-constrained decision maker, NOT a free-form chat assistant.
 Rules:
 1. Maintain multiple competing error hypotheses when evidence is insufficient; never force a single premature conclusion.

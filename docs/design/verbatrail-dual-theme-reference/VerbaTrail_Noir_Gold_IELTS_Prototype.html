@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>VerbaTrail — Noir & Champagne • IELTS 8.0</title>
+<meta name="description" content="VerbaTrail Noir & Champagne black-gold interactive IELTS design concept. Offline standalone prototype." />
+<style>
+:root{
+ --ink:#142939; --deep:#132c3d; --deep2:#1d4052; --paper:#f7f6f2; --snow:#fffefb; --line:#e4e6e3;
+ --muted:#74818a; --sage:#547c78; --teal:#2f716e; --mint:#dde9e5; --gold:#c4ac7e; --quiet:#eef0ec; --danger:#ac6758;
+ --serif: "Iowan Old Style", "Baskerville", "Palatino Linotype", "Songti SC", "Noto Serif CJK SC", Georgia,serif;
+ --sans: Inter, "Segoe UI Variable", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial,sans-serif;
+ --shadow:0 18px 55px rgba(18,41,57,.045);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #76b4b0;outline-offset:3px}button:disabled{cursor:not-allowed;opacity:.52}
+.shell{min-height:100vh;display:grid;grid-template-columns:247px minmax(0,1fr)}.sidebar{background:#f9f9f6;border-right:1px solid #e6e8e4;padding:35px 21px 24px;display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:12px;padding:0 12px 33px}.brand-mark{width:35px;height:35px;border:1.8px solid var(--deep);border-radius:12px;display:grid;place-items:center;transform:rotate(-10deg);position:relative}.brand-mark:after{content:"";width:12px;height:12px;border:2px solid var(--gold);border-radius:50%;position:absolute;right:3px;top:3px}.brand-mark span{transform:rotate(10deg);font:italic 26px var(--serif);margin-top:-3px}.brand-name{font-family:var(--serif);font-size:22px;letter-spacing:-.9px;font-weight:650;line-height:1}.brand-sub{font-size:9px;color:#879092;letter-spacing:2.2px;margin-top:6px;text-transform:uppercase}.nav-group{margin:6px 0 21px}.nav-label{font-size:9px;font-weight:750;letter-spacing:2.4px;color:#a2a9ab;padding:0 13px;margin:0 0 12px}.nav-btn{display:flex;width:100%;align-items:center;gap:12px;border:none;background:transparent;color:#66757a;text-align:left;padding:11px 13px;border-radius:11px;margin-bottom:3px;transition:background .2s,color .2s}.nav-btn .ico{width:18px;height:18px;flex-shrink:0}.nav-btn.active{background:#e9eeeb;color:#1c464a;font-weight:700}.nav-btn:hover:not(:disabled){background:#edf0ec;color:var(--deep)}.nav-btn .soon{margin-left:auto;font-size:9px;color:#9caaa8;letter-spacing:.1px}.sidebar-bottom{margin-top:auto;padding:18px 17px 17px;background:#e9efec;border-radius:15px}.goal-cap{font-size:10px;color:#637c7b;font-weight:650;letter-spacing:1.6px}.goal-num{font:normal 45px/1 var(--serif);letter-spacing:-2px;margin:12px 0 5px}.goal-foot{font-size:11px;color:#688080}.goal-footer{font-size:10px;color:#9ca6a4;margin-top:17px;text-align:center;letter-spacing:.25px}
+.main{min-width:0}.topbar{height:82px;border-bottom:1px solid #e6e8e5;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,4.6vw,80px);background:rgba(247,246,242,.94);position:sticky;top:0;z-index:12;backdrop-filter:blur(16px)}.breadcrumbs{display:flex;gap:10px;align-items:center;color:#8b979b;font-size:11px;letter-spacing:.7px}.breadcrumbs b{color:#4c6469;font-weight:650}.topt-right{display:flex;align-items:center;gap:15px}.mode-control{border:1px solid #d9dfdc;background:#fffefb;padding:9px 31px 9px 13px;border-radius:9px;color:#37545b;font-size:11px;font-weight:650;max-width:180px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2357787c' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}.avatar{width:36px;height:36px;border-radius:50%;background:var(--deep);color:#fff;display:grid;place-items:center;font-family:var(--serif);font-size:18px}.demo-tag{border:1px solid #dce4de;border-radius:7px;font-size:10px;color:#6b7d7d;background:#eff2eb;padding:7px 10px;white-space:nowrap}.container{max-width:1450px;margin:0 auto;padding:clamp(28px,4.5vw,66px) clamp(24px,4.6vw,80px) 90px}.page{display:none;animation:fade .22s ease}.page.active{display:block}@keyframes fade{from{opacity:.55;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}.eyebrow{font-size:10px;letter-spacing:2.6px;color:#728585;font-weight:750;text-transform:uppercase}.display{font:normal clamp(38px,4.4vw,65px)/1.13 var(--serif);letter-spacing:-2.1px}.display em{font-weight:400;color:var(--sage)}.lede{color:#78878c;font-size:14px;line-height:1.95;max-width:620px}.subheading{font:normal clamp(23px,2.1vw,30px)/1.3 var(--serif);letter-spacing:-.6px}.section-top{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:22px}.small-note{font-size:11px;color:#839195;line-height:1.8}.plain-link{border:0;padding:0;background:transparent;color:#4e7775;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px}.plain-link:hover{text-decoration:underline}.caption{color:#869293;font-size:11px;line-height:1.75}.panel{background:var(--snow);border:1px solid #e8e9e4;border-radius:15px;box-shadow:var(--shadow)}
+.hero{margin-top:32px;min-height:348px;border-radius:19px;padding:clamp(28px,3.2vw,50px);background:linear-gradient(116deg,#162d3c 0%,#1a3948 58%,#244959 100%);position:relative;overflow:hidden;display:flex;align-items:center}.hero:before{content:"";position:absolute;right:-62px;top:-205px;width:540px;height:540px;border:1px solid rgba(227,217,184,.21);border-radius:50%}.hero:after{content:"";position:absolute;right:24px;top:-124px;width:395px;height:395px;border:1px solid rgba(227,217,184,.16);border-radius:50%}.hero-inner{position:relative;z-index:2;max-width:600px}.hero .eyebrow{color:#c0cfcc}.hero h2{font:normal clamp(35px,4vw,56px)/1.1 var(--serif);color:#f9f6ed;letter-spacing:-1.1px;margin:20px 0}.hero h2 em{font-weight:400;color:#d6c295}.hero p{color:#c4d2d0;font-size:13px;line-height:1.9;max-width:405px;margin:0 0 25px}.hero-orb{position:absolute;right:8%;top:50%;transform:translateY(-50%);width:247px;height:247px;border-radius:50%;border:1px solid rgba(211,218,203,.3);display:grid;place-items:center;z-index:1}.hero-orb:before{content:"";position:absolute;width:185px;height:185px;border:1px dashed rgba(212,200,167,.28);border-radius:50%;transform:rotate(22deg)}.hero-orb:after{content:"";position:absolute;width:285px;height:285px;border:1px solid rgba(211,218,203,.14);border-radius:50%}.orb-num{font:normal 106px/1 var(--serif);color:#ede9d7;letter-spacing:-9px;margin-right:10px}.orb-num span{font:normal 35px var(--serif);color:#bca87e}.orb-caption{position:absolute;bottom:33px;color:#d1c7ad;font-size:9px;letter-spacing:2.3px}.primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;background:var(--deep);color:white;border-radius:8px;padding:13px 18px;font-size:12px;font-weight:700;transition:transform .2s,background .2s}.primary:hover{background:#285363;transform:translateY(-1px)}.primary.light{background:#eeeae0;color:#1e3946}.primary.light:hover{background:white}.outline{border:1px solid #d7dfdb;background:var(--snow);color:#375a60;padding:12px 16px;border-radius:8px;font-size:12px;font-weight:700}.outline:hover{border-color:#9aacaa}.microline{display:flex;align-items:center;gap:13px;color:#a4bebc;font-size:10px;letter-spacing:1px;margin-top:24px}.microline i{display:block;width:26px;height:1px;background:#c6b687}
+.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,1fr);gap:38px;margin-top:46px}.task-list{border-top:1px solid var(--line)}.task-row{display:flex;align-items:center;gap:16px;width:100%;padding:19px 0;background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)}.task-row:hover .task-arrow{transform:translateX(4px)}.task-name,.task-sub{display:block}.task-number{font:normal 20px var(--serif);color:#b5c3bb;width:26px;flex-shrink:0}.task-info{flex:1}.task-name{font-weight:720;color:var(--deep);font-size:13px}.task-sub{font-size:11px;margin-top:6px;color:#8a979b}.task-duration{color:#83908e;font-size:10px;margin-right:10px}.task-arrow{color:#5d827d;transition:transform .2s}.aside-quote{padding:31px 30px;background:#edf1ed;border-radius:15px;min-height:266px;position:relative;overflow:hidden}.aside-quote:after{content:"V";font:italic 240px var(--serif);color:#e1e9e3;position:absolute;right:2px;bottom:-94px;line-height:1}.aside-quote > *{position:relative;z-index:1}.aside-quote p{font:normal 23px/1.4 var(--serif);letter-spacing:-.3px;max-width:280px;margin:25px 0}.aside-quote .quote-bar{width:34px;height:2px;background:var(--gold)}.skills{margin-top:52px}.skill-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.skill-card{border:1px solid #e4e7e4;border-radius:12px;background:var(--snow);padding:20px 18px 17px;min-height:173px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;color:var(--ink);transition:transform .2s,border .2s}.skill-card:hover:not(:disabled){transform:translateY(-3px);border-color:#b3c5c1}.skill-card .ico{color:#628481}.skill-card h4{margin:20px 0 4px;font-size:14px;font-weight:750}.skill-card p{font-size:10px;color:#8b9898;line-height:1.65;margin:0}.skill-foot{margin-top:auto;padding-top:14px;color:#5e807a;font-size:10px;font-weight:750}.skill-card:disabled{opacity:.75}.skill-card:disabled .skill-foot{color:#9ca7a3}
+.page-header{display:flex;align-items:start;justify-content:space-between;gap:25px;margin-bottom:30px}.page-header h1{font:normal clamp(37px,3.6vw,54px)/1.14 var(--serif);letter-spacing:-1.4px;margin:12px 0}.page-header p{color:#7d8a8d;line-height:1.9;margin:0;max-width:650px}.pill{border-radius:99px;border:1px solid #dce6e1;color:#5d8279;background:#edf3ee;padding:8px 13px;font-size:10px;white-space:nowrap;font-weight:700}.reading-toolbar{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:16px 23px;margin-bottom:15px}.reading-meta{display:flex;gap:15px;align-items:center;font-size:11px;color:#83908e;flex-wrap:wrap}.reading-meta strong{color:#526e6e;font-weight:750}.reading-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(350px,.92fr);gap:16px;align-items:start}.passage,.question-panel{background:var(--snow);border:1px solid #e6e9e5;border-radius:14px;overflow:hidden}.passage{padding:33px clamp(25px,3vw,46px);min-height:580px}.passage .doc-eyebrow{font-size:9px;letter-spacing:2.4px;color:#89a09b;font-weight:750}.passage h2{font:normal 32px/1.22 var(--serif);letter-spacing:-.7px;margin:16px 0 13px}.passage-by{font-size:10px;color:#879394;border-bottom:1px solid #e7e8e2;padding-bottom:23px;margin-bottom:28px}.passage-body{font:normal 15px/2 var(--serif);color:#304653}.passage-body p{margin:0 0 22px}.passage-body p::first-letter{font-size:21px}.question-panel{padding:28px}.question-panel .q-title{font:normal 22px var(--serif);margin:8px 0 8px}.q-desc{font-size:11px;color:#8b9798;margin:0 0 24px;line-height:1.8}.question{border-top:1px solid #e8eae5;padding:21px 0 19px}.question-no{color:#8b9c99;font-size:9px;font-weight:800;letter-spacing:1.7px}.question-prompt{font-size:13px;line-height:1.8;font-weight:700;margin:10px 0 14px}.answer{display:flex;gap:11px;align-items:start;padding:10px 11px;border:1px solid #e7ebe6;border-radius:8px;margin:8px 0;color:#52666a;font-size:12px;line-height:1.65;cursor:pointer}.answer:hover{background:#f7f9f5}.answer input{accent-color:var(--teal);margin-top:2px}.answer.is-correct{border-color:#bcd6c8;background:#eff7ef}.answer.is-wrong{border-color:#d9b6a9;background:#fff2ed}.feedback{font-size:11px;line-height:1.8;padding:12px 14px;background:#f1f5f1;border-left:2px solid #729a8d;border-radius:4px;margin-top:12px;color:#426765}.feedback.bad{background:#fcf4ef;border-color:#c48b7b;color:#8c5547}.review-footer{border-top:1px solid var(--line);padding-top:19px;margin-top:14px;display:flex;justify-content:space-between;gap:12px;align-items:center}.score-note{font-size:12px;color:#5c7e77;line-height:1.65}.score-note.err{color:#ae7060}
+.review-intro{display:grid;grid-template-columns:1fr 305px;gap:20px;margin-bottom:35px}.review-big{padding:29px 34px}.review-big .review-stat{font:normal 56px/1 var(--serif);margin:8px 0}.review-big p{color:#8e9998;font-size:12px;line-height:1.8;margin:0}.review-side{background:#e9efea;border-radius:13px;padding:30px}.review-side p{font:normal 20px/1.35 var(--serif);margin:20px 0 8px}.review-section-title{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:15px}.review-item{display:flex;align-items:center;gap:18px;padding:21px 23px;background:var(--snow);border:1px solid #e8ebe5;border-radius:12px;margin:10px 0}.review-circle{background:#e9efea;border-radius:50%;height:43px;width:43px;display:grid;place-items:center;color:#60817d;flex-shrink:0}.review-item-body{flex:1;min-width:0}.review-item-title{font-size:13px;font-weight:700}.review-item-desc{font-size:11px;color:#8c9999;margin-top:7px;line-height:1.7}.review-item .primary,.review-item .outline{padding:10px 13px}.review-item.completed{opacity:.62}
+.profile-lead{border-radius:17px;background:var(--deep);padding:35px;display:flex;justify-content:space-between;align-items:center;gap:22px;color:#f4f4e9}.profile-lead h2{font:normal 33px/1.15 var(--serif);margin:12px 0 10px}.profile-lead p{color:#bad0ce;max-width:460px;line-height:1.85;font-size:12px;margin:0}.profile-target{border-left:1px solid #496471;padding-left:35px;min-width:190px}.profile-target span{display:block;color:#abc4c0;font-size:10px;letter-spacing:2px}.profile-target b{font:normal 66px/1.3 var(--serif);color:#efe8d6}.profile-sections{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:23px;margin-top:26px}.profile-panel{padding:26px 28px}.profile-panel h3{font:normal 23px var(--serif);margin:0 0 21px}.metric-row{display:flex;justify-content:space-between;padding:15px 0;border-top:1px solid #eef0ec;align-items:center;gap:12px}.metric-name{font-size:12px;font-weight:690}.metric-sub{font-size:10px;color:#8c9798;margin-top:5px}.metric-state{font-size:10px;color:#6e8783;background:#edf4ee;padding:7px 10px;border-radius:99px}.timeline{border-left:1px solid #dce5df;margin:15px 0 0 7px;padding-left:20px}.timeline-item{position:relative;padding:0 0 25px}.timeline-item:before{content:"";position:absolute;left:-25px;top:5px;background:#78988b;width:9px;height:9px;border:3px solid var(--snow);border-radius:100%;box-sizing:content-box}.timeline-item small{font-size:10px;color:#879493}.timeline-item h4{margin:7px 0;font-size:12px}.timeline-item p{font-size:11px;color:#899595;line-height:1.8;margin:0}.empty-evidence{padding:28px 0;text-align:center;color:#8c9999;font-size:12px;line-height:1.9}.empty-evidence svg{color:#8da5a0;margin-bottom:10px}
+.modal-scrim{display:none;position:fixed;inset:0;z-index:50;background:rgba(14,32,42,.52);padding:24px;align-items:center;justify-content:center;backdrop-filter:blur(5px)}.modal-scrim.open{display:flex}.dialog{background:var(--snow);border-radius:17px;width:min(95vw,490px);max-height:min(94vh,720px);overflow:auto;box-shadow:0 30px 90px rgba(0,0,0,.2);padding:31px 33px}.dialog .modal-top{display:flex;justify-content:space-between;align-items:center}.icon-button{border:0;background:transparent;color:#788989;font-size:24px}.dialog h2{font:normal 28px var(--serif);margin:17px 0 6px}.dialog p{font-size:12px;line-height:1.9;color:#809090;margin:0 0 21px}.form-field{margin:20px 0}.form-field label{display:block;font-size:11px;font-weight:750;color:#627a7a;margin-bottom:8px}.form-field select,.form-field input{width:100%;background:#fcfdfb;border:1px solid #dce5df;border-radius:9px;padding:12px;color:#2b4952}.modal-actions{display:flex;gap:10px;justify-content:flex-end;padding-top:14px}.dialog .answer{font-size:13px}
+.toast{position:fixed;right:25px;bottom:25px;background:#173645;color:white;z-index:80;border-radius:12px;padding:13px 17px;font-size:12px;box-shadow:0 15px 40px rgba(0,0,0,.14);display:none;max-width:340px;line-height:1.7}.toast.show{display:block}.mobile-nav{display:none}
+@media(max-width:1230px){.sidebar{width:209px;padding-left:12px;padding-right:12px}.shell{grid-template-columns:209px minmax(0,1fr)}.container{padding-left:34px;padding-right:34px}.topbar{padding-left:34px;padding-right:34px}.hero-orb{right:3%;opacity:.53}.skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.reading-layout{grid-template-columns:1fr}.passage{min-height:auto}.question-panel{padding:30px}.review-intro{grid-template-columns:1fr 260px}}
+@media(max-width:850px){.shell{display:block}.sidebar{display:none}.main{padding-bottom:74px}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(255,254,251,.96);backdrop-filter:blur(20px);border-top:1px solid #e1e7e1;justify-content:space-around;padding:7px 8px max(8px,env(safe-area-inset-bottom))}.mobile-nav button{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;color:#81908b;font-size:9px;padding:5px 9px;min-width:55px}.mobile-nav button.active{color:#285d5a;font-weight:800}.mobile-nav svg{width:20px;height:20px}.topbar{height:68px;padding:0 22px}.container{padding:31px 22px 55px}.dashboard-grid{grid-template-columns:1fr;gap:22px}.aside-quote{min-height:205px}.hero{margin-top:26px}.hero-orb{opacity:.34;right:-55px}.hero-inner{max-width:520px}}
+@media(max-width:550px){.topbar{height:65px;padding:0 17px}.breadcrumbs{font-size:10px}.demo-tag{font-size:9px;padding:5px 7px}.avatar{display:none}.topt-right{gap:7px}.mode-control{max-width:121px;padding-left:8px;padding-right:20px;font-size:10px;background-position:right 5px center}.container{padding:28px 17px 64px}.display{font-size:42px;letter-spacing:-1.6px}.hero{padding:30px 25px;min-height:335px}.hero h2{font-size:38px;max-width:315px}.hero-orb{display:none}.hero p{max-width:315px}.section-top{align-items:center}.section-top .subheading{font-size:25px}.skill-grid{gap:10px}.skill-card{padding:17px 13px;min-height:160px}.skill-card h4{font-size:13px}.dashboard-grid{margin-top:37px}.page-header{display:block}.page-header h1{font-size:42px}.page-header .pill{display:inline-block;margin-top:13px}.reading-toolbar{padding:13px 15px;align-items:start}.reading-meta{gap:8px;font-size:10px}.passage{padding:25px 21px}.passage h2{font-size:28px}.passage-body{font-size:14px;line-height:1.95}.question-panel{padding:24px 19px}.review-footer{flex-direction:column;align-items:stretch}.review-intro{grid-template-columns:1fr}.review-big,.review-side{padding:25px}.review-side p{font-size:20px}.review-item{flex-wrap:wrap;padding:17px;gap:12px}.review-item .primary,.review-item .outline{width:100%}.profile-lead{display:block;padding:28px}.profile-lead h2{font-size:30px}.profile-target{margin-top:26px;padding-left:0;padding-top:20px;border-left:0;border-top:1px solid #496471}.profile-sections{grid-template-columns:1fr}.profile-panel{padding:23px}.dialog{padding:25px 21px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* VERBATRAIL / NOIR & CHAMPAGNE — independent alternative visual concept.
+   The reading article retains an editorial ivory paper surface to reduce fatigue. */
+:root{
+  --ink:#efe9df;--deep:#171819;--deep2:#2a2825;--paper:#111314;--snow:#1d1f20;
+  --line:#363633;--muted:#ada69b;--sage:#d8bd82;--teal:#d6b977;--mint:#36312a;
+  --gold:#dabb7c;--quiet:#242524;--danger:#e5a08d;
+  --shadow:0 18px 52px rgba(0,0,0,.22);
+}
+body{
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse 88% 40% at 86% -12%,rgba(178,141,66,.10),transparent 72%),
+    linear-gradient(180deg,#151718 0%,#111314 54%,#101112 100%);
+}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #eed59b;outline-offset:3px}
+::selection{background:#bf9955;color:#171819}
+.sidebar{
+  background:linear-gradient(165deg,#1b1d1e 0%,#121415 58%,#101112 100%);
+  border-right:1px solid rgba(216,189,130,.19);
+}
+.sidebar:before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#947a4c 45%,#e0c893 75%,transparent)}
+.brand{padding-bottom:44px}
+.brand-mark{border-color:#bd9c62;background:rgba(197,160,90,.09);color:#ecd19b;box-shadow:inset 0 0 0 4px rgba(222,183,119,.04)}
+.brand-mark:after{border-color:#e9c88c}
+.brand-name{color:#f2e4c9}
+.brand-sub{color:#8e8576}
+.nav-label{color:#897e6b}
+.nav-btn{color:#a7a49c;border-radius:8px;border-left:2px solid transparent;padding-left:11px}
+.nav-btn .ico{color:#9e9686}
+.nav-btn.active{
+  background:linear-gradient(90deg,rgba(191,153,80,.19),rgba(202,166,103,.035));
+  color:#f4ddb0;border-left-color:#d3b372;
+}
+.nav-btn.active .ico{color:#d9bd81}
+.nav-btn:hover:not(:disabled){background:rgba(214,187,136,.08);color:#f0dec0}
+.nav-btn .soon{color:#79776f}
+.sidebar-bottom{background:linear-gradient(145deg,#2b2823,#211f1c);border:1px solid rgba(220,185,115,.31);box-shadow:inset 0 1px rgba(255,246,220,.04);position:relative;overflow:hidden}
+.sidebar-bottom:before{content:"";position:absolute;width:180px;height:180px;right:-124px;top:-125px;border:1px solid rgba(211,177,105,.25);border-radius:50%}
+.goal-cap{color:#c9ac73}
+.goal-num{color:#f5e8c8}
+.goal-foot{color:#b5ab98}
+.sidebar-bottom .plain-link{color:#ebcd8e}
+.goal-footer{color:#756e61}
+.topbar{background:rgba(17,19,20,.9);border-color:rgba(224,194,137,.14);box-shadow:0 4px 30px rgba(0,0,0,.12)}
+.breadcrumbs{color:#88837a}.breadcrumbs b{color:#d9c294}
+.mode-control{
+  color:#e4d3ae;background-color:#252524;border-color:#4d4536;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23dabb7c' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+}
+.mode-control option{background:#202120;color:#f1eadb}
+.avatar{background:#dabb7c;color:#1b1c1d;border:1px solid #f2d69f}
+.demo-tag{background:rgba(209,174,105,.07);color:#bcb09b;border:1px solid #4b4030}
+.container{max-width:1480px}
+.eyebrow{color:#ba9b63}
+.display{color:#f1e8d8;letter-spacing:-2.4px}
+.display em{color:#e0c18a;font-weight:400}
+.lede{color:#ada9a0}
+.small-note,.caption{color:#8e8b83}
+.subheading{color:#ede5d7}
+.plain-link{color:#d7bb82}
+.panel{background:linear-gradient(160deg,#222323,#1b1d1e);border-color:#383631}
+.hero{
+  min-height:370px;
+  border:1px solid rgba(221,185,112,.49);
+  border-radius:16px;
+  background:
+    radial-gradient(ellipse 53% 85% at 83% 45%,rgba(176,134,66,.29),transparent 75%),
+    radial-gradient(ellipse 85% 130% at -22% 105%,rgba(187,141,66,.11),transparent 75%),
+    linear-gradient(117deg,#171819 0%,#22211e 50%,#161716 100%);
+  box-shadow:0 22px 70px rgba(0,0,0,.23),inset 0 1px rgba(247,218,158,.12);
+}
+.hero:before{border-color:rgba(241,204,135,.19);right:-60px}
+.hero:after{border-color:rgba(231,192,113,.17)}
+.hero-inner:before{content:"";height:2px;width:62px;display:block;margin-bottom:20px;background:linear-gradient(90deg,#e5c886,#77603b)}
+.hero .eyebrow{color:#deca9d}
+.hero h2{color:#f3ede3;letter-spacing:-1.5px}
+.hero h2 em{color:#eccd8f}
+.hero p{color:#bfb7a8}
+.hero-orb{border-color:rgba(239,202,131,.29);background:radial-gradient(circle,rgba(245,205,126,.075),transparent 70%)}
+.hero-orb:before{border-color:rgba(243,215,157,.27)}
+.hero-orb:after{border-color:rgba(242,201,118,.14)}
+.orb-num{color:#f6e7be;text-shadow:0 0 56px rgba(232,187,94,.18)}
+.orb-num span{color:#dcba7a}
+.orb-caption{color:#d9bc7e}
+.primary{background:linear-gradient(145deg,#ddbe80,#b89453);color:#161818;border-color:#e6c98d;box-shadow:0 5px 20px rgba(194,149,74,.08);font-weight:800}
+.primary:hover{background:linear-gradient(145deg,#f1d4a0,#c5a368);color:#101112;transform:translateY(-1px)}
+.primary.light{background:#e5cfaa;color:#23201a}
+.primary.light:hover{background:#f7e6c8}
+.outline{background:rgba(213,180,114,.06);border-color:#655438;color:#e7cf9f}
+.outline:hover{background:rgba(213,180,114,.13);border-color:#bd9c61}
+.microline{color:#c0a877}.microline i{background:#d5b777}
+.task-list{border-color:#3b3832}
+.task-row{border-color:#36342e;color:#f1e8da}
+.task-number{color:#977b4c}
+.task-name{color:#f1e5d1}
+.task-sub,.task-duration{color:#a69e8f}
+.task-arrow{color:#cfad70}
+.task-row:hover{background:linear-gradient(90deg,rgba(224,189,120,.075),transparent)}
+.aside-quote{
+  background:linear-gradient(145deg,#29251e,#222321 75%);
+  border:1px solid #4f4231;
+  box-shadow:inset 0 1px rgba(255,224,166,.08);
+  color:#eaddc4;
+}
+.aside-quote:after{color:rgba(219,176,100,.055)}
+.aside-quote .quote-bar{background:#dbb878}
+.aside-quote .eyebrow{color:#d7b878}
+.aside-quote .caption{color:#ada08b}
+.skill-card{background:linear-gradient(154deg,#232424,#1c1d1d);border-color:#3c3932;color:#efe8dc;border-radius:11px}
+.skill-card:hover:not(:disabled){border-color:#b49760;box-shadow:0 10px 35px rgba(0,0,0,.18)}
+.skill-card .ico{color:#d6b778}
+.skill-card h4{color:#efe6d5}
+.skill-card p{color:#a49e92}
+.skill-foot{color:#d9b97a}
+.skill-card:disabled .skill-foot{color:#8a8172}
+.page-header h1{color:#f1e8da}
+.page-header p{color:#aaa59b}
+.pill{color:#dec187;border-color:#594934;background:rgba(195,154,78,.1)}
+.reading-toolbar{background:#222321;border-color:#3e3c37}
+.reading-meta{color:#aca394}.reading-meta strong{color:#e2c38a}
+/* Editorial ivory passage is intentional: long English paragraphs should never be gold-on-black. */
+.passage{
+  background:#f1ebdf;
+  color:#2c2c2a;
+  border-color:#9d875f;
+  box-shadow:0 13px 42px rgba(0,0,0,.19);
+}
+.passage .doc-eyebrow{color:#8a6c3d}
+.passage h2{color:#262822}
+.passage-by{color:#80796c;border-color:#d4cbbc}
+.passage-body{color:#414540}
+.question-panel{background:linear-gradient(153deg,#242523,#1c1d1d);border-color:#494234}
+.question-panel .q-title{color:#f2e4cd}
+.q-desc{color:#aea596}
+.question{border-color:#403b32}
+.question-no{color:#c7a76a}
+.question-prompt{color:#ede7db}
+.answer{border-color:#494438;background:#262724;color:#d2cabc}
+.answer:hover{background:#302b25;border-color:#b49862}
+.answer:has(input:checked){background:#403727;border-color:#d7b778;color:#f6e4c7}
+.answer input{accent-color:#d9b776}
+.answer.is-correct{border-color:#85a58f;background:#23392c;color:#d8efd9}
+.answer.is-wrong{border-color:#be806f;background:#472d29;color:#f5d3cd}
+.feedback{background:#26392f;border-color:#90b39b;color:#d3e7d5}
+.feedback.bad{background:#462b29;border-color:#d79383;color:#f3c8bb}
+.review-footer{border-color:#443e32}
+.score-note{color:#d9c08e}
+.score-note.err{color:#e9a393}
+.review-big{background:linear-gradient(145deg,#282825,#1b1d1e)}
+.review-big .review-stat{color:#f1d8a1}
+.review-big p{color:#b0a99e}
+.review-side{background:linear-gradient(145deg,#352c20,#232320);border:1px solid #604e35;color:#e6d6b7}
+.review-side .eyebrow{color:#d6b577}
+.review-item{background:linear-gradient(110deg,#242522,#1d1e1d);border-color:#474033}
+.review-circle{background:#373022;color:#dbbd86}
+.review-item-title{color:#f0e5d4}
+.review-item-desc{color:#ada59b}
+.review-item.completed{opacity:.7}
+.profile-lead{
+  background:
+    radial-gradient(circle at 85% 50%,rgba(210,165,79,.19),transparent 45%),
+    linear-gradient(125deg,#1c1d1d,#28251f);
+  border:1px solid #90724a;
+}
+.profile-lead h2{color:#f5e8d2}
+.profile-lead p{color:#c5b8a3}
+.profile-target{border-color:#6a5434}
+.profile-target span{color:#dec58c}
+.profile-target b{color:#f5d99c}
+.profile-panel{background:#212321}
+.profile-panel h3{color:#efe4d0}
+.metric-row{border-color:#3d3932}
+.metric-name{color:#efe5d6}
+.metric-sub{color:#a29d92}
+.metric-state{color:#ddc18a;background:#383125}
+.timeline{border-color:#5d4e36}
+.timeline-item:before{background:#c6a76a;border-color:#252623}
+.timeline-item small{color:#baab8e}
+.timeline-item h4{color:#efe6d7}
+.timeline-item p{color:#aca49a}
+.empty-evidence{color:#b6a895}
+.empty-evidence svg{color:#d0b57b}
+.modal-scrim{background:rgba(2,3,3,.76)}
+.dialog{background:linear-gradient(150deg,#292a27,#1c1d1d);border:1px solid #75603f;color:#f1e6d6;box-shadow:0 35px 100px rgba(0,0,0,.6)}
+.icon-button{color:#d2ba88}
+.dialog h2{color:#f4e6cf}
+.dialog p{color:#b7ad9e}
+.form-field label{color:#d1b67d}
+.form-field select,.form-field input{background:#252625;border-color:#66563b;color:#f0e3d0}
+.form-field select option{background:#292929;color:#fff2dc}
+.toast{background:#30271d;color:#f0dfbf;border:1px solid #bb985b;pointer-events:none}
+@media(max-width:850px){
+  .mobile-nav{background:rgba(21,22,22,.97);border-color:#59462e;box-shadow:0 -6px 25px rgba(0,0,0,.17)}
+  .mobile-nav button{color:#a8a092}
+  .mobile-nav button.active{color:#f0ce8f}
+  .toast{bottom:calc(86px + env(safe-area-inset-bottom));right:15px;left:15px;max-width:none}
+}
+@media(max-width:550px){
+  .hero{min-height:350px}
+  .hero-inner:before{margin-bottom:12px}
+  .hero h2{font-size:37px}
+  .review-item{border-color:#504535}
+}
+
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" aria-label="主导航">
+    <div class="brand"><div class="brand-mark"><span>V</span></div><div><div class="brand-name">VerbaTrail</div><div class="brand-sub">IELTS ACADEMY</div></div></div>
+    <div class="nav-group"><div class="nav-label">YOUR SPACE</div><button class="nav-btn active" data-go="home"><span class="ico" data-icon="home"></span>Overview</button><button class="nav-btn" data-go="reading"><span class="ico" data-icon="book"></span>Practice</button></div>
+    <div class="nav-group"><div class="nav-label">THE FOUR SKILLS</div><button class="nav-btn" disabled><span class="ico" data-icon="headphones"></span>Listening <span class="soon">Soon</span></button><button class="nav-btn" data-go="reading"><span class="ico" data-icon="book"></span>Reading</button><button class="nav-btn" disabled><span class="ico" data-icon="edit"></span>Writing <span class="soon">Soon</span></button><button class="nav-btn" disabled><span class="ico" data-icon="mic"></span>Speaking <span class="soon">Soon</span></button></div>
+    <div class="nav-group"><div class="nav-label">YOUR GROWTH</div><button class="nav-btn" data-go="review"><span class="ico" data-icon="refresh"></span>Review</button><button class="nav-btn" data-go="profile"><span class="ico" data-icon="chart"></span>Learning profile</button></div>
+    <div class="sidebar-bottom"><div class="goal-cap">YOUR TARGET BAND</div><div class="goal-num js-target">8.0</div><div class="goal-foot">Aiming higher, one step at a time.</div><button class="plain-link" style="margin-top:15px" data-modal="settings">Edit your goal <span data-icon="arrow" style="width:13px;height:13px"></span></button></div>
+    <div class="goal-footer">DESIGN CONCEPT · NOT LIVE DATA</div>
+  </aside>
+  <main class="main" id="main">
+    <header class="topbar"><div class="breadcrumbs"><span>VerbaTrail</span><span>/</span><b id="crumb">Overview</b></div><div class="topt-right"><span class="demo-tag">设计样机 · 示例数据</span><select class="mode-control" id="exam-mode" aria-label="考试类型"><option value="academic">IELTS Academic</option><option value="general">General Training</option></select><div class="avatar" aria-hidden="true">V</div></div></header>
+    <div class="container">
+      <section class="page active" id="page-home" aria-labelledby="home-title">
+        <div class="eyebrow">A MORE INTENTIONAL WAY TO LEARN</div><h1 class="display" id="home-title" style="margin:15px 0 0">A little better,<br><em>every single day.</em></h1><p class="lede">不是机械刷题，而是理解每一次失误、确认每一次进步。为你的 IELTS Band <span class="js-target">8.0</span> 目标，建立一条有证据的成长路径。</p>
+        <div class="hero"><div class="hero-inner"><div class="eyebrow">YOUR NEXT MEANINGFUL STEP</div><h2>Read with clarity.<br><em>Answer with confidence.</em></h2><p>通过一组真实风格的原创阅读练习，发现理解偏差，获得清楚的反馈，再决定下一步。</p><button class="primary light" data-go="reading">Start reading practice <span data-icon="arrow" style="width:15px;height:15px"></span></button><div class="microline"><i></i><span id="hero-mode">ACADEMIC · PRACTICE MODE</span></div></div><div class="hero-orb" aria-hidden="true"><div class="orb-num" id="hero-target">8<span>.0</span></div><div class="orb-caption">TARGET BAND</div></div></div>
+        <div class="dashboard-grid"><section aria-labelledby="plan-title"><div class="section-top"><div><div class="eyebrow">THE DAILY RHYTHM</div><h2 class="subheading" id="plan-title" style="margin:10px 0 0">Today's focus</h2></div><span class="small-note">精选任务 · 示例安排</span></div><div class="task-list"><button class="task-row" data-go="reading"><span class="task-number">01</span><span class="task-info"><span class="task-name">Reading · Evidence & inference</span><span class="task-sub">练习从原文判断事实与推断</span></span><span class="task-duration">20 MIN</span><span class="task-arrow" data-icon="arrow"></span></button><button class="task-row" data-go="review"><span class="task-number">02</span><span class="task-info"><span class="task-name">Review · Uncertain answers</span><span class="task-sub">回顾容易混淆的阅读判断题</span></span><span class="task-duration">8 MIN</span><span class="task-arrow" data-icon="arrow"></span></button><button class="task-row" data-modal="coming"><span class="task-number">03</span><span class="task-info"><span class="task-name">Vocabulary · Academic phrases</span><span class="task-sub">学术表达与精准替换训练 · 规划中</span></span><span class="task-duration">SOON</span><span class="task-arrow" data-icon="arrow"></span></button></div></section><aside class="aside-quote"><div class="eyebrow">OUR LEARNING PHILOSOPHY</div><p>Progress is not a score.<br>It is the evidence of what you can do.</p><div class="quote-bar"></div><div class="caption" style="margin-top:15px;color:#6b817b">比一次答对更重要的，是在新情境中依然能够理解与运用。</div></aside></div>
+        <div class="skills"><div class="section-top"><div><div class="eyebrow">A COMPLETE FOUNDATION</div><h2 class="subheading" style="margin:10px 0 0">Four skills. One direction.</h2></div><span class="small-note">Current level · Not assessed</span></div><div class="skill-grid"><button class="skill-card" disabled><span class="ico" data-icon="headphones"></span><h4>Listening</h4><p>精听、场景理解与听觉辨音</p><span class="skill-foot">COMING SOON</span></button><button class="skill-card" data-go="reading"><span class="ico" data-icon="book"></span><h4>Reading</h4><p>论据定位、逻辑理解与同义替换</p><span class="skill-foot">START PRACTISING <span data-icon="arrow" style="width:12px;height:12px;display:inline-flex;vertical-align:middle"></span></span></button><button class="skill-card" disabled><span class="ico" data-icon="edit"></span><h4>Writing</h4><p>结构、论证、词汇与语法精度</p><span class="skill-foot">COMING SOON</span></button><button class="skill-card" disabled><span class="ico" data-icon="mic"></span><h4>Speaking</h4><p>流利度、发音、自然表达与拓展</p><span class="skill-foot">COMING SOON</span></button></div></div>
+      </section>
+      <section class="page" id="page-reading" aria-labelledby="reading-title"><div class="page-header"><div><div class="eyebrow">THE READING STUDIO / 01</div><h1 id="reading-title">Reading, <em style="color:var(--sage)">reimagined.</em></h1><p>左边专注于理解文章，右边专注于作答。提交后获得清晰的规则反馈；真实 Agent 诊断将在产品接入后提供。</p></div><span class="pill">ORIGINAL PRACTICE · NOT AN OFFICIAL TEST</span></div><div class="reading-toolbar panel"><div class="reading-meta"><span><strong id="reading-mode-label">ACADEMIC</strong></span><span>Practice set 01</span><span>3 questions</span></div><button class="plain-link" id="reset-reading">Reset answers <span data-icon="refresh" style="width:12px;height:12px"></span></button></div><div class="reading-layout"><article class="passage"><div class="doc-eyebrow">READING PASSAGE · ORIGINAL MATERIAL</div><h2 id="passage-title"></h2><div class="passage-by" id="passage-subtitle"></div><div class="passage-body" id="passage-body"></div></article><section class="question-panel" aria-labelledby="questions-title"><div class="eyebrow">YOUR QUESTIONS</div><h2 class="q-title" id="questions-title">Think. Then decide.</h2><p class="q-desc">请先独立选择答案，再查看解析。本原型的评分仅使用本地示例答案键。</p><form id="reading-form"><div id="question-list"></div><div class="review-footer"><div class="score-note" id="reading-result" aria-live="polite">准备好后提交答案</div><button class="primary" type="submit">Check answers <span data-icon="arrow" style="width:14px;height:14px"></span></button></div></form></section></div><p class="caption" style="margin-top:16px">设计说明：完整产品将在此处接入服务端作答、证据链、Agent 诊断与针对性练习；本 HTML 演示不连接后端，不计算雅思官方 Band 分数。</p></section>
+      <section class="page" id="page-review" aria-labelledby="review-title"><div class="page-header"><div><div class="eyebrow">LEARN IT. RETAIN IT.</div><h1 id="review-title">The art of <em style="color:var(--sage)">remembering.</em></h1><p>复习不是重复看答案，而是在间隔之后重新检验理解。真实产品会由服务端根据学习证据安排复习。</p></div><span class="pill">SPACED RETRIEVAL · PROTOTYPE</span></div><div class="review-intro"><div class="panel review-big"><div class="eyebrow">DUE IN THIS DESIGN EXAMPLE</div><div class="review-stat" id="due-number">2</div><p>待复习的学习线索。已完成的任务会在这个交互样机中暂时标记为完成；刷新不会写入真实学习记录。</p></div><div class="review-side"><div class="eyebrow">A BETTER KIND OF REPETITION</div><p>Revisit the thought,<br>not just the answer.</p><div class="caption">间隔复习 × 独立证据 × 有节奏的提高</div></div></div><div class="review-section-title"><h2 class="subheading" style="margin:0">Due for review</h2><span class="caption">示例待办</span></div><div id="review-list"></div><div class="review-section-title" style="margin-top:35px"><h2 class="subheading" style="margin:0">Coming up</h2><span class="caption">下一次复习</span></div><div class="review-item" style="opacity:.75"><div class="review-circle" data-icon="clock"></div><div class="review-item-body"><div class="review-item-title">Academic word partnerships</div><div class="review-item-desc">预计 3 天后 · 尚未到期 · 此处不可提前开始</div></div><button class="outline" disabled>Not due yet</button></div></section>
+      <section class="page" id="page-profile" aria-labelledby="profile-title"><div class="page-header"><div><div class="eyebrow">YOUR EVIDENCE OF GROWTH</div><h1 id="profile-title">Beyond the <em style="color:var(--sage)">score.</em></h1><p>成长档案应该告诉你：已经验证了什么、还不确定什么、下一步该练习什么，而不是展示未经验证的漂亮数字。</p></div><button class="outline" data-modal="settings">Adjust my target</button></div><div class="profile-lead"><div><div class="eyebrow" style="color:#a7c6bf">YOUR LEARNING JOURNEY</div><h2>Building confidence,<br>one proof at a time.</h2><p>四科当前能力暂未正式测定。此处只展示你在设计样机中完成的临时练习，不生成虚假的 Band 预测。</p></div><div class="profile-target"><span>OVERALL TARGET</span><b class="js-target">8.0</b><span id="profile-mode">IELTS ACADEMIC</span></div></div><div class="profile-sections"><section class="profile-panel panel"><h3>Four skills</h3><div class="metric-row"><div><div class="metric-name">Listening</div><div class="metric-sub">待评估 · 完整模块规划中</div></div><span class="metric-state">NOT ASSESSED</span></div><div class="metric-row"><div><div class="metric-name">Reading</div><div class="metric-sub" id="profile-reading-sub">原创练习已开放 · 未做过练习</div></div><span class="metric-state" id="profile-reading-status">PRACTICE READY</span></div><div class="metric-row"><div><div class="metric-name">Writing</div><div class="metric-sub">待评估 · 完整模块规划中</div></div><span class="metric-state">NOT ASSESSED</span></div><div class="metric-row"><div><div class="metric-name">Speaking</div><div class="metric-sub">待评估 · 完整模块规划中</div></div><span class="metric-state">NOT ASSESSED</span></div><div style="padding-top:24px"><button class="primary" data-go="reading">Continue reading <span data-icon="arrow" style="width:13px;height:13px"></span></button></div></section><section class="profile-panel panel"><h3>Learning evidence</h3><div class="caption">以下仅为本次打开样机后产生的交互记录，不是服务端真实档案。</div><div id="profile-events" class="timeline"><div class="empty-evidence"><div data-icon="chart" style="width:26px;height:26px;margin:0 auto"></div><div>尚无练习证据。<br>完成一组阅读题后，这里会出现记录。</div></div></div></section></div></section>
+    </div>
+  </main>
+</div>
+<nav class="mobile-nav" aria-label="移动导航"><button data-go="home" class="active"><span data-icon="home"></span>Home</button><button data-go="reading"><span data-icon="book"></span>Practice</button><button data-go="review"><span data-icon="refresh"></span>Review</button><button data-go="profile"><span data-icon="chart"></span>Profile</button></nav>
+<div class="modal-scrim" id="modal" role="presentation"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><div class="modal-top"><div class="eyebrow" id="dialog-eyebrow">YOUR LEARNING SETUP</div><button class="icon-button" id="dialog-close" aria-label="关闭">×</button></div><div id="dialog-body"></div></div></div><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const icons={
+ home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+ book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+ headphones:'<path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M5 14h2a2 2 0 0 1 2 2v4H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zM17 14h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4v-4a2 2 0 0 1 2-2z"/>',
+ edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4z"/>',
+ mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/>',
+ refresh:'<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.7 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.3-2"/>',
+ chart:'<path d="M3 3v18h18"/><path d="m6 16 5-6 4 3 5-7"/>',
+ arrow:'<path d="M5 12h14m-6-6 6 6-6 6"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ check:'<path d="m5 12 4 4L19 6"/>',
+ shield:'<path d="m12 22 7-4V6l-7-4-7 4v12z"/>',
+}
+function svg(name){return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.arrow}</svg>`}
+function fillIcons(root=document){root.querySelectorAll('[data-icon]').forEach(el=>{el.innerHTML=svg(el.dataset.icon)})}
+const state={page:'home',mode:'academic',target:8,submissions:[],reviews:[false,false]};
+const passages={
+ academic:{label:'ACADEMIC',title:'The value of quiet spaces',subtitle:'Social science · Adapted original practice passage',body:[
+ 'As cities become increasingly dense, urban planners are reconsidering the importance of quiet public spaces. These areas are not necessarily silent; rather, they offer relief from the constant demands of traffic, advertising and crowded streets. Researchers have suggested that even brief encounters with calmer environments may help people regain their attention after mentally demanding activities.',
+ 'A small number of cities have begun to create networks of quiet routes linking parks, libraries and pedestrian streets. Such routes are designed not simply as shortcuts but as places where walking itself becomes a restorative activity. Although the approach has attracted interest, the evidence concerning its long-term impact remains limited. Many early studies rely on participants reporting how they feel immediately after a walk.',
+ 'Supporters argue that these routes could make urban life more accessible to people who are sensitive to noise. Critics, however, point out that attractive routes do little to reduce the underlying sources of noise. They also warn that improvements may benefit wealthier districts first unless access is considered during planning.'
+ ],questions:[
+ {prompt:'Researchers have conclusively proved that quiet routes improve long-term mental health.',options:['TRUE','FALSE','NOT GIVEN'],correct:1,explanation:'文章明确指出长期影响的证据仍然有限（the evidence concerning its long-term impact remains limited），因此断言“已被确凿证明”与原文相反。'},
+ {prompt:'What is one limitation of the early studies mentioned in the passage?',options:['They use only satellite images.','They often depend on immediate self-reports.','They exclude walking as an activity.'],correct:1,explanation:'第二段指出 many early studies rely on participants reporting how they feel immediately after a walk。'},
+ {prompt:'All cities with quiet routes have introduced legal limits on traffic noise.',options:['TRUE','FALSE','NOT GIVEN'],correct:2,explanation:'文章提到规划和噪音来源，但没有说明所有建设安静路线的城市都实施了法律限噪规定，属于 NOT GIVEN。'}
+ ]},
+ general:{label:'GENERAL TRAINING',title:'Riverside Community Library',subtitle:'Community information · Original public notice',body:[
+ 'Riverside Community Library is introducing a new membership system from 1 December. Residents may continue to borrow up to eight books for three weeks at no charge. Non-residents can apply for an annual membership for a small fee, but all visitors are welcome to use the reading rooms and attend free public talks.',
+ 'A new online catalogue will allow members to reserve books before visiting. Reserved items will be held behind the main desk for four days. Members who cannot collect an item during this period should cancel the reservation online so that other readers may borrow it.',
+ 'The library is also expanding its opening hours on Thursday evenings, when it will remain open until 8 p.m. Weekend hours are unchanged. Children under twelve must be accompanied by an adult when using the media room, although they may borrow books independently with a valid membership card.'
+ ],questions:[
+ {prompt:'Non-residents must pay a fee to enter the reading rooms.',options:['TRUE','FALSE','NOT GIVEN'],correct:1,explanation:'公告明确说明 all visitors are welcome to use the reading rooms，即阅览室对所有访客开放；付费只与非居民年度借阅会员有关。'},
+ {prompt:'How long are reserved books kept for collection?',options:['Three days','Four days','One week'],correct:1,explanation:'第二段明确写着 Reserved items will be held ... for four days。'},
+ {prompt:'Weekend opening hours will be extended from 1 December.',options:['TRUE','FALSE','NOT GIVEN'],correct:1,explanation:'第三段说 Weekend hours are unchanged，周末开放时间不变。'}
+ ]}
+};
+function navigate(page){if(!['home','reading','review','profile'].includes(page))return;state.page=page;document.querySelectorAll('.page').forEach(el=>el.classList.toggle('active',el.id===`page-${page}`));document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('active',b.dataset.go===page && (b.closest('.mobile-nav') || (b.classList.contains('nav-btn') && !(page==='reading' && b.textContent.trim()==='Practice')))));document.getElementById('crumb').textContent=({home:'Overview',reading:'Reading studio',review:'Review',profile:'Learning profile'})[page];if(page==='reading')renderReading();if(page==='review')renderReviews();if(page==='profile')renderProfile();window.scrollTo({top:0,behavior:'instant'})}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),3600)}
+function syncMode(){document.getElementById('exam-mode').value=state.mode;document.getElementById('hero-mode').textContent=(state.mode==='academic'?'ACADEMIC':'GENERAL TRAINING')+' · PRACTICE MODE';document.getElementById('profile-mode').textContent='IELTS '+(state.mode==='academic'?'ACADEMIC':'GENERAL TRAINING');document.querySelectorAll('.js-target').forEach(el=>el.textContent=state.target.toFixed(1));document.getElementById('hero-target').innerHTML=state.target.toFixed(1).replace('.','<span>.')+'</span>';renderReading()}
+function renderReading(){const p=passages[state.mode];document.getElementById('reading-mode-label').textContent=p.label;document.getElementById('passage-title').textContent=p.title;document.getElementById('passage-subtitle').textContent=p.subtitle;document.getElementById('passage-body').innerHTML=p.body.map(t=>'<p>'+t+'</p>').join('');document.getElementById('question-list').innerHTML=p.questions.map((q,i)=>`<div class="question"><div class="question-no">QUESTION ${String(i+1).padStart(2,'0')}</div><div class="question-prompt">${q.prompt}</div>${q.options.map((a,j)=>`<label class="answer" id="ans-${i}-${j}"><input type="radio" name="q${i}" value="${j}" aria-label="${a}"/><span>${a}</span></label>`).join('')}<div id="feedback-${i}"></div></div>`).join('');document.getElementById('reading-result').textContent='准备好后提交答案';document.getElementById('reading-result').className='score-note'}
+function submitReading(e){e.preventDefault();const p=passages[state.mode];let correct=0;let missing=0;const answers=[];p.questions.forEach((q,i)=>{let checked=document.querySelector(`input[name="q${i}"]:checked`);if(!checked){missing++;answers.push(null)}else{answers.push(Number(checked.value));if(Number(checked.value)===q.correct)correct++}});if(missing){toast(`还有 ${missing} 道题未作答，请先完成。`);return}p.questions.forEach((q,i)=>{const yes=answers[i]===q.correct;const el=document.getElementById(`ans-${i}-${answers[i]}`);el.classList.add(yes?'is-correct':'is-wrong');document.getElementById(`feedback-${i}`).innerHTML=`<div class="feedback ${yes?'':'bad'}"><strong>${yes?'Correct · 理解准确':'Not quite · 再看一次原文'}</strong><br>${q.explanation}</div>`});const result=document.getElementById('reading-result');result.innerHTML=`本组练习 ${correct}/${p.questions.length} 正确<br><small>非官方成绩 · 不推算 Band</small>`;result.className='score-note'+(correct<2?' err':'');state.submissions.unshift({mode:state.mode,correct,total:p.questions.length,time:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}),note:correct===p.questions.length?'三道题均回答正确':'本组练习尚有需要验证的理解偏差'});toast('已完成本地演示练习。学习证据仅保存在本次打开的页面中。')}
+function renderReviews(){const items=[{title:'True / False / Not Given',desc:'判断题 · 对比原文陈述与题干推断 · 约 3 分钟',topic:'阅读逻辑'}, {title:'Evidence before assumptions',desc:'阅读证据 · 区分已知事实和未经提及的信息 · 约 4 分钟',topic:'精准定位'}];document.getElementById('due-number').textContent=state.reviews.filter(x=>!x).length;document.getElementById('review-list').innerHTML=items.map((r,i)=>`<div class="review-item ${state.reviews[i]?'completed':''}"><div class="review-circle">${svg(state.reviews[i]?'check':'refresh')}</div><div class="review-item-body"><div class="review-item-title">${r.title}</div><div class="review-item-desc">${r.desc}</div></div><button class="${state.reviews[i]?'outline':'primary'}" ${state.reviews[i]?'disabled':''} data-review="${i}">${state.reviews[i]?'Reviewed':'Start review'} ${state.reviews[i]?'':svg('arrow')}</button></div>`).join('')}
+function renderProfile(){const events=document.getElementById('profile-events');if(!state.submissions.length){events.innerHTML='<div class="empty-evidence"><div data-icon="chart" style="width:26px;height:26px;margin:0 auto"></div><div>尚无练习证据。<br>完成一组阅读题后，这里会出现记录。</div></div>';fillIcons(events);document.getElementById('profile-reading-sub').textContent='原创练习已开放 · 未做过练习';document.getElementById('profile-reading-status').textContent='PRACTICE READY';return}document.getElementById('profile-reading-sub').textContent=`本次会话完成 ${state.submissions.length} 组原创练习`;document.getElementById('profile-reading-status').textContent='PRACTICED';events.innerHTML=state.submissions.slice(0,5).map(e=>`<div class="timeline-item"><small>${e.time} · ${e.mode==='academic'?'Academic':'General Training'} · 演示记录</small><h4>Reading · ${e.correct}/${e.total} correct</h4><p>${e.note}。这不等同于经验证的 IELTS Band 分数。</p></div>`).join('')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function openModal(type){let eyebrow='YOUR LEARNING SETUP';let body='';if(type==='settings'){body=`<h2 id="dialog-title">Make it yours.</h2><p>选择考试类型和总分目标。此处仅修改当前设计样机，不会保存至真实服务器。</p><form id="settings-form"><div class="form-field"><label for="settings-mode">Exam type</label><select id="settings-mode"><option value="academic" ${state.mode==='academic'?'selected':''}>IELTS Academic</option><option value="general" ${state.mode==='general'?'selected':''}>IELTS General Training</option></select></div><div class="form-field"><label for="settings-target">Target overall band</label><select id="settings-target">${Array.from({length:11},(_,i)=>(4+i*.5).toFixed(1)).map(v=>`<option value="${v}" ${Number(v)===state.target?'selected':''}>${v}</option>`).join('')}</select></div><div class="modal-actions"><button class="outline" type="button" id="cancel-modal">Cancel</button><button class="primary" type="submit">Save preferences</button></div></form>`}else if(type==='coming'){eyebrow='A GLIMPSE AHEAD';body='<h2 id="dialog-title">Thoughtfully in progress.</h2><p>这里会逐步加入 Vocabulary、Grammar、Listening、Writing、Speaking 与 Mock Tests。设计样机不会假装它们已经可用。</p><div class="modal-actions"><button class="primary" id="cancel-modal">Got it</button></div>'}else if(type.startsWith('review')){eyebrow='A MOMENT TO RECALL';const i=Number(type.split(':')[1]);body=`<h2 id="dialog-title">Recall with evidence.</h2><p>${i===0?'选出对“未提及信息”最准确的理解。':'根据简短材料判断哪种陈述有证据支持。'} 这是本地交互样机，不会更新正式复习计划。</p><form id="review-form" data-index="${i}"><div class="question-prompt">${i===0?'原文只提到一项研究“仍在进行”。题干说“该研究已经证明效果”。下列哪项最符合证据？':'原文写“图书馆周四营业至晚上八点”。以下哪项可以从原文直接得知？'}</div>${(i===0?['TRUE：原文支持该断言','FALSE：原文与该断言矛盾','NOT GIVEN：原文没有提到相关信息']:['图书馆每天都营业到八点','图书馆周四营业到八点','周四是图书馆唯一开放的日子']).map((x,j)=>`<label class="answer"><input name="review-q" type="radio" value="${j}"><span>${x}</span></label>`).join('')}<div class="modal-actions"><button class="outline" type="button" id="cancel-modal">Close</button><button class="primary" type="submit">Submit review</button></div></form>`}document.getElementById('dialog-eyebrow').textContent=eyebrow;document.getElementById('dialog-body').innerHTML=body;document.getElementById('modal').classList.add('open');document.getElementById('cancel-modal')?.addEventListener('click',closeModal);document.getElementById('settings-form')?.addEventListener('submit',e=>{e.preventDefault();state.mode=document.getElementById('settings-mode').value;state.target=Number(document.getElementById('settings-target').value);syncMode();closeModal();toast('已更新设计样机设置（仅当前页面）。')});document.getElementById('review-form')?.addEventListener('submit',e=>{e.preventDefault();let sel=e.target.querySelector('input[name="review-q"]:checked');if(!sel){toast('请选择一个答案。');return}const idx=Number(e.target.dataset.index);const correct=idx===0?1:1;if(Number(sel.value)===correct){state.reviews[idx]=true;closeModal();renderReviews();toast('演示复习正确，样机已标记完成。此操作不产生真实保持证据。')}else{toast('这次答案不对。再从原文明确支持的内容出发思考。')}})}
+document.addEventListener('click',e=>{const go=e.target.closest('[data-go]');if(go && !go.disabled){navigate(go.dataset.go);return}const modal=e.target.closest('[data-modal]');if(modal){openModal(modal.dataset.modal);return}const rv=e.target.closest('[data-review]');if(rv){openModal('review:'+rv.dataset.review)}});
+document.getElementById('exam-mode').addEventListener('change',e=>{state.mode=e.target.value;syncMode();toast('已切换考试类型，当前为设计样机。')});document.getElementById('reading-form').addEventListener('submit',submitReading);document.getElementById('reset-reading').addEventListener('click',()=>{renderReading();toast('题目已重置。')});document.getElementById('dialog-close').addEventListener('click',closeModal);document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});fillIcons();syncMode();renderReviews();
+</script>
+</body>
+</html>

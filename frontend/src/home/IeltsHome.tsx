@@ -47,10 +47,14 @@ export const IeltsHome: React.FC<{ onNavigate: (workspace: WorkspaceId) => void 
   const available = catalog.filter(item => item.availability === 'available');
   const planned = catalog.filter(item => item.availability === 'planned');
   return <div className="ielts-home">
-    <p className="eyebrow">VERBATRAIL · 暂定名称</p>
+    <p className="eyebrow">VERBATRAIL · IELTS ACADEMY</p>
     <h1>让每一次练习，都留下进步的证据。</h1>
     <p className="home-intro">从真实阅读任务开始。系统会记录作答、检查证据，并在证据不足时继续追问。</p>
     {loading ? <p role="status">正在读取已保存的考试目标…</p> : error && !profile ? <div role="alert">{error} <button onClick={() => location.reload()}>重试</button></div> : profile && <>
+      <section className="verbatrail-home-hero" aria-label="备考目标与今日主任务">
+        <div><p className="eyebrow">YOUR NEXT MEANINGFUL STEP</p><h2>Read with clarity.<br /><em>Answer with confidence.</em></h2><p>以 IELTS Overall {profile.target_overall_band?.toFixed(1) ?? '8.0'} 为目标，通过阅读、证据与练习稳步前进。</p><button type="button" className="verbatrail-hero-action" onClick={() => onNavigate(profile.selection_persisted ? 'learning' : 'profile')}>开始阅读练习 <span aria-hidden="true">→</span></button></div>
+        <div className="verbatrail-band-mark" aria-label={`目标总分 ${profile.target_overall_band?.toFixed(1) ?? '8.0'}`}><strong>{(profile.target_overall_band ?? 8).toFixed(1)}</strong><span>OVERALL TARGET</span></div>
+      </section>
       <section className="exam-goal" aria-labelledby="exam-goal-heading">
         <div><p className="eyebrow">你的备考方向</p><h2 id="exam-goal-heading">选择考试类型</h2></div>
         <div className="exam-choice-row">{available.map(item => <button key={item.code} className={`exam-choice ${profile.selection_persisted && profile.exam_variant === item.code ? 'selected' : ''}`} onClick={() => update(item.code as 'academic' | 'general_training')} disabled={saving} aria-pressed={profile.selection_persisted && profile.exam_variant === item.code}>{item.label}<span>{item.code === 'academic' ? '学术学习与高等教育' : '日常、工作与移民场景'}</span></button>)}</div>

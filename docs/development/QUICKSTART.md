@@ -1,38 +1,51 @@
-# 本地快速启动（IELTS 开发分支）
+# VerbaTrail 本地快速启动
 
-本指南面向本机开发和受控试用，不是生产部署指南。需要 Python 3.11+、Node.js、npm、Git；命令使用 Windows PowerShell，从仓库根目录开始。
+本指南适用于 Windows 本机开发，不是生产部署方案。需要 Python 3.11+、Node.js、npm 和 Git。命令从 `D:\Projects\VerbaTrail` 仓库根目录开始。
 
-1. 安装依赖：
+## 安装依赖
 
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\python -m pip install -r backend/requirements.txt
-   cd frontend
-   npm ci
-   cd ..
-   ```
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python -m pip install -r backend/requirements.txt
+cd frontend
+npm ci
+cd ..
+```
 
-2. 在一个终端启动后端：
+## 启动后端
 
-   ```powershell
-   $env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
-   $env:MODEL_PROVIDER = 'fake'
-   $env:ALLOW_REMOTE_MODEL_CALLS = 'false'
-   cd backend
-   ..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
-   ```
+在第一个 PowerShell 终端运行：
 
-   路径相对于 `backend/`；选择不存在的新文件。开发模式启动会自动升级配置的数据库并导入内容包，不会先自动备份已有库。使用已有数据前自行备份并验证可恢复。API 文档：`http://127.0.0.1:18000/docs`。
+```powershell
+$env:DATABASE_URL = 'sqlite:///./verbatrail-local.db'
+$env:APP_NAME = 'VerbaTrail'
+$env:MODEL_PROVIDER = 'fake'
+$env:ALLOW_REMOTE_MODEL_CALLS = 'false'
+cd backend
+..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
+```
 
-3. 在第二个终端，从仓库根目录运行：
+`DATABASE_URL` 相对于 `backend/` 目录。第一次启动会运行 Alembic 迁移并导入内容包。为现有数据库建立并验证可恢复备份后再启动使用；本示例选择全新 `backend/verbatrail-local.db`，不会使用归档的 `backend/unlearnloop.db`。API 文档：`http://127.0.0.1:18000/docs`。
 
-   ```powershell
-   cd frontend
-   npm run dev
-   ```
+## 启动前端
 
-   打开 `http://127.0.0.1:15173`。确认这两个端口空闲；如使用其他端口，需相应设置前端 `VITE_API_BASE_URL` 与后端 `CORS_ORIGINS`。停止各终端中的服务使用 Ctrl+C。
+在第二个终端运行：
 
-4. 首页保存 Academic 或 General Training 模式，选择 Reading。默认 FakeProvider 是离线模拟，不会发起远程模型调用。前端的 Demo 是独立演示界面；Real 表示连接后端，**不意味着使用了真实大模型**。
+```powershell
+cd D:\Projects\VerbaTrail\frontend
+npm run dev
+```
 
-运行测试见[中文 README](../../README.md#验证与目录)。不要把 `.env`、数据库、用户答案或 API 密钥提交到仓库。服务默认仅适合本机可信环境：learner ID 不提供认证；迁移备份、导出/删除和供应链风险见 [MVP 审查](MVP_FINAL_AUDIT.md)。
+访问 `http://127.0.0.1:15173`。结束服务时在对应终端按 Ctrl+C。`./start-verbatrail.ps1` 可在 Windows 统一启动服务；脚本只管理它自己记录且命令行/路径均匹配的进程，不接管其他服务。
+
+如端口被占用，不要结束未知进程；选择未占用端口并同步修改 Vite 配置、`VITE_API_BASE_URL` 与后端 `CORS_ORIGINS`。
+
+## 数据、模型与模式
+
+- `FakeModelProvider` 为离线模拟，不会调用真实模型；远程模型调用默认关闭。
+- 前端 Demo 是演示界面；Real 使用后端 API，并不代表使用了真实大模型。
+- 服务端启动会迁移配置中的数据库。旧数据库已在整合备份中另存，开发默认使用独立数据库文件。
+- 不提交 `.env`、API key、学习者答案、SQLite 数据库、日志或本地环境目录。
+- 项目默认监听 loopback；`learner_id` 不构成认证，当前不可当作多用户生产服务。
+
+更多测试命令见[中文 README](../../README.md#测试与工程检查)。

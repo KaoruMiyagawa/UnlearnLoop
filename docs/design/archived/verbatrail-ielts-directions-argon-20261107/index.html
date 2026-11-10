@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VerbaTrail · IELTS Band 8.0 视觉与信息架构原型总览</title>
+  <style>
+    :root {
+      --navy: #0B1629;
+      --navy-mid: #162642;
+      --gold: #C89D3C;
+      --mist: #F4F6FA;
+      --ink: #0F172A;
+      --slate: #475569;
+      --border: #E2E8F0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--mist);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .hub-header {
+      background: var(--navy);
+      color: #FFFFFF;
+      padding: 20px 28px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hub-header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .scheme-cards {
+      max-width: 1400px;
+      margin: 22px auto 16px;
+      padding: 0 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .s-card {
+      background: #FFFFFF;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .s-card.active {
+      border-color: var(--navy);
+      box-shadow: 0 8px 24px rgba(11, 22, 41, 0.08);
+    }
+
+    .rec-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #FBF6E9;
+      color: #B8860B;
+      border: 1px solid #EBD9B0;
+    }
+
+    .viewport-bar {
+      max-width: 1400px;
+      margin: 0 auto 14px;
+      padding: 0 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .vp-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      color: var(--slate);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .vp-btn.active {
+      background: var(--navy);
+      color: #FFFFFF;
+      border-color: var(--navy);
+    }
+
+    .frame-stage {
+      display: flex;
+      justify-content: center;
+      padding: 0 28px 48px;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 1360px;
+      height: 820px;
+      border: 1px solid #CBD5E1;
+      border-radius: 16px;
+      background: #FFFFFF;
+      box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);
+      transition: max-width 0.25s ease;
+    }
+
+    iframe.narrow {
+      max-width: 412px;
+    }
+
+    @media (max-width: 960px) {
+      .scheme-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hub-header">
+    <div class="hub-header-inner">
+      <div>
+        <div style="font-size:12px;color:#E2C675;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">
+          VerbaTrail · High-End IELTS Band 8.0 Mastery Platform
+        </div>
+        <h1 style="margin:4px 0 0;font-size:21px;font-weight:700;">
+          三套高保真视觉与信息架构方案对比（含桌面端与窄屏适配预览）
+        </h1>
+      </div>
+      <a id="open-direct-link" href="./direction-a-oxford-prestige.html" target="_blank" style="color:#0B1629;background:#E2C675;padding:9px 16px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13.5px;">
+        全屏独立打开当前方案 ↗
+      </a>
+    </div>
+  </header>
+
+  <section class="scheme-cards" aria-label="三套方案选择">
+    <div class="s-card active" id="card-a" onclick="selectDirection('a', './direction-a-oxford-prestige.html')">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong>方案 A · Naval & Gold Academic Prestige</strong>
+          <span class="rec-badge">★ 推荐主方案</span>
+        </div>
+        <p style="font-size:13px;color:var(--slate);margin:0 0 10px;">
+          深海军蓝顶栏与 Band 8.0 靶心横幅 + 雾白画布 + 细微鎏金徽章 + 经典学术衬线体阅读工作台。兼顾国际教育权威感与极佳的学习专注度。
+        </p>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--navy);">点击下方预览 · 或直接打开 direction-a-oxford-prestige.html</div>
+    </div>
+
+    <div class="s-card" id="card-b" onclick="selectDirection('b', './direction-b-nordic-atelier.html')">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong>方案 B · Nordic Editorial & Ice Cobalt</strong>
+          <span style="font-size:11px;color:var(--slate);">现代极简沙龙风</span>
+        </div>
+        <p style="font-size:13px;color:var(--slate);margin:0 0 10px;">
+          全雾白毛玻璃顶栏 + 墨蓝高对比排版 + 冷萃钴蓝强调色。采用轻量化目标条与非对称编辑部式卡片流，轻盈通透。
+        </p>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--navy);">点击切换预览 · direction-b-nordic-atelier.html</div>
+    </div>
+
+    <div class="s-card" id="card-c" onclick="selectDirection('c', './direction-c-nocturne-scholar.html')">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong>方案 C · Deep Ink Studio & Warm Alabaster</strong>
+          <span style="font-size:11px;color:var(--slate);">深度沉浸研究风</span>
+        </div>
+        <p style="font-size:13px;color:var(--slate);margin:0 0 10px;">
+          左侧深邃学院墨蓝常驻指挥轨（锚定 Band 8.0 目标）+ 右侧低眩光暖羊皮纸阅读台，适合长时间沉浸式精读与复盘。
+        </p>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--navy);">点击切换预览 · direction-c-nocturne-scholar.html</div>
+    </div>
+  </section>
+
+  <div class="viewport-bar">
+    <div style="font-size:13px;color:var(--slate);">
+      提示：可在下方预览窗内直接点击切换 <strong>Dashboard / Reading Studio / Memory Review / Band 8 Dossier</strong> 四个完整页面及做题反馈状态。
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button type="button" class="vp-btn active" id="vp-desktop" onclick="setViewport('desktop')">桌面端视口 (Desktop)</button>
+      <button type="button" class="vp-btn" id="vp-narrow" onclick="setViewport('narrow')">窄屏自适应视口 (390px)</button>
+    </div>
+  </div>
+
+  <div class="frame-stage">
+    <iframe id="preview-frame" src="./direction-a-oxford-prestige.html" title="VerbaTrail Prototype Preview"></iframe>
+  </div>
+
+  <script>
+    function selectDirection(id, url) {
+      ['a', 'b', 'c'].forEach(k => {
+        document.getElementById('card-' + k).classList.toggle('active', k === id);
+      });
+      document.getElementById('preview-frame').src = url;
+      document.getElementById('open-direct-link').href = url;
+    }
+
+    function setViewport(mode) {
+      const frame = document.getElementById('preview-frame');
+      frame.classList.toggle('narrow', mode === 'narrow');
+      document.getElementById('vp-desktop').classList.toggle('active', mode === 'desktop');
+      document.getElementById('vp-narrow').classList.toggle('active', mode === 'narrow');
+    }
+  </script>
+</body>
+</html>

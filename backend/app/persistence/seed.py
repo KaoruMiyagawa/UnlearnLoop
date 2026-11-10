@@ -1,4 +1,4 @@
-"""Idempotent content pack importer for UnlearnLoop Stage 2.
+"""Idempotent content pack importer for VerbaTrail Stage 2.
 
 Loads structured JSON learning content packs into the subject-agnostic schema
 without duplicating records or overwriting learner progress.
