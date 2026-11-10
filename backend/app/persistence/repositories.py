@@ -405,6 +405,8 @@ class LearningRepository:
         eval_status_enum = AttemptEvaluationStatus(evaluation_status)
         question_snapshot = {
             "question_id": question.id,
+            "diagnostic_version": (question.evaluation_rubric or {}).get("diagnostic_version"),
+            "diagnostic_protocol": (question.evaluation_rubric or {}).get("diagnostic_protocol"),
             "version": question.version,
             "question_role": question.question_role,
             "question_type": question.question_type,
@@ -914,6 +916,7 @@ class LearningRepository:
             select(func.count(DecisionEvent.id)).where(
                 DecisionEvent.diagnostic_case_id == diagnostic_case_id,
                 DecisionEvent.action == "select_diagnostic_followup",
+                DecisionEvent.event_type != "diagnostic_step_completed",
             )
         )
         return int(count or 0)

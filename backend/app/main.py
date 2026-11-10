@@ -49,6 +49,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                         session,
                         pack_path=Path(__file__).parent / "content" / "ielts_reading_english_pack.json",
                     )
+                    import_content_pack(
+                        session,
+                        pack_path=Path(__file__).parent / "content" / "ielts_tfng_diagnostic_pack.json",
+                    )
                     session.commit()
                 except Exception:
                     session.rollback()

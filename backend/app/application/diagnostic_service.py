@@ -91,6 +91,8 @@ class DiagnosticAppService:
             isinstance(self.model_provider, FakeModelProvider)
             or self.model_provider.provider_name == "fake"
         )
+        rules = any((q.evaluation_rubric or {}).get("diagnostic_protocol") == "tfng-v1"
+                    for q in self.repo.list_questions_for_topic(diag_case.topic.id))
         return DiagnosticCaseResponse(
             id=diag_case.id,
             session_id=diag_case.session_id,
@@ -100,9 +102,9 @@ class DiagnosticAppService:
             uncertainty_note=diag_case.uncertainty_note,
             followup_turn_count=followup_turns,
             tokens_used=tokens_used,
-            model_provider_name=self.model_provider.provider_name,
-            is_mock_provider=is_mock,
-            execution_mode="mock" if is_mock else "live",
+            model_provider_name="rules:tfng-v1" if rules else self.model_provider.provider_name,
+            is_mock_provider=False if rules else is_mock,
+            execution_mode="rules" if rules else "mock" if is_mock else "live",
             hypotheses=hypotheses_dto,
             evidence_count=len(evidence_links),
             created_at=diag_case.created_at,
@@ -158,7 +160,11 @@ class DiagnosticAppService:
                 current_state=sess.status,
             )
 
-        if sess.current_question_id and not any(
+        replaying = bool(idempotency_key and self.db.scalar(select(DecisionEvent).where(
+            DecisionEvent.diagnostic_case_id == case_id,
+            DecisionEvent.idempotency_key == idempotency_key,
+        )))
+        if not replaying and sess.current_question_id and not any(
             attempt.question_id == sess.current_question_id
             for attempt in self.repo.list_attempts_for_session(sess.id)
         ):
@@ -203,11 +209,14 @@ class DiagnosticAppService:
             isinstance(self.model_provider, FakeModelProvider)
             or self.model_provider.provider_name == "fake"
         )
+        rules = any((q.evaluation_rubric or {}).get("diagnostic_protocol") == "tfng-v1"
+                    for q in self.repo.list_questions_for_topic(sess.topic_id))
         return DiagnosticStepResponse(
             session_id=step_result.session_id,
             diagnostic_case_id=step_result.diagnostic_case_id,
             case_status=step_result.case_status,
             executed_tool=step_result.executed_tool,
+            decision_reason=(self.db.get(DecisionEvent, step_result.decision_event_id).reason if rules else None),
             selected_intervention=step_result.selected_intervention,
             selected_question_id=step_result.selected_question_id,
             next_question=next_q_dto,
@@ -219,9 +228,9 @@ class DiagnosticAppService:
             max_followup_turns=step_result.max_followup_turns,
             tokens_used_in_case=step_result.tokens_used_in_case,
             session_token_budget=step_result.session_token_budget,
-            model_provider_name=self.model_provider.provider_name,
-            is_mock_provider=is_mock,
-            execution_mode="mock" if is_mock else "live",
+            model_provider_name="rules:tfng-v1" if rules else self.model_provider.provider_name,
+            is_mock_provider=False if rules else is_mock,
+            execution_mode="rules" if rules else "mock" if is_mock else "live",
             degraded_mode=step_result.degraded_mode,
             degradation_reason=step_result.degradation_reason,
             knowledge_state_status=step_result.knowledge_state_status,

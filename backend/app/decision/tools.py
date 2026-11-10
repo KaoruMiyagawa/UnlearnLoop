@@ -378,8 +378,18 @@ class AgentToolExecutor:
             )
             answered_ids = {attempt.question_id for attempt in self.repo.list_attempts_for_session(learning_session.id)}
             practice_qs = [question for question in practice_qs if question.id not in answered_ids]
+            tfng = any((q.evaluation_rubric or {}).get("diagnostic_protocol") == "tfng-v1"
+                       for q in self.repo.list_questions_for_topic(learning_session.topic_id))
+            if tfng:
+                # Never silently choose the first practice in this diagnostic protocol.
+                supported = {h.error_code for h in diag_case.hypotheses if h.status == "supported"}
+                practice_qs = [q for q in practice_qs
+                               if q.id == args.practice_question_id
+                               and set((q.evaluation_rubric or {}).get("target_error_codes", []))
+                               and set(q.evaluation_rubric["target_error_codes"]) <= supported
+                               and set(q.evaluation_rubric["target_error_codes"]) == set(args.target_error_codes)]
             if not practice_qs:
-                reason = "没有尚未作答的针对性练习；保留不确定性，等待补充材料或人工介入。"
+                reason = args.practice_reason + " 没有可用且匹配诊断的未作答训练；保留不确定性。"
                 learning_session.current_question_id = None
                 evt = self.repo.transition_diagnostic_case(
                     diag_case, DiagnosticCaseStatus.INSUFFICIENT_EVIDENCE,

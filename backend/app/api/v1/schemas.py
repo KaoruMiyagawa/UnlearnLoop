@@ -330,6 +330,7 @@ class DiagnosticStepResponse(BaseModel):
     diagnostic_case_id: str
     case_status: DiagnosticCaseStatus
     executed_tool: str
+    decision_reason: str | None = None
     selected_intervention: str | None = None
     selected_question_id: str | None = None
     next_question: SanitizedQuestionResponse | None = None
