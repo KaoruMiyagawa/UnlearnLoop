@@ -1,80 +1,71 @@
-# UnlearnLoop
+# VerbaTrail
 
-**Start with mistakes. Verify understanding in a new context.**
+**Turn mistakes into clues. Verify understanding in a new context.**
 
-[中文](README.md) · [Quick start](docs/development/QUICKSTART.md) · [Architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
+VerbaTrail is building an AI Agent-driven English learning and IELTS preparation platform, with **IELTS Overall Band 8.0** as a learning goal—not a score prediction or guarantee.
 
-![Stage](https://img.shields.io/badge/stage-early%20development-blue) ![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6)
+[简体中文](README.md) · [Latest application branch](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation) · [Chinese README on that branch](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/README.md)
 
-UnlearnLoop explores evidence-driven learning: retain competing explanations for an error, gather evidence through follow-up and practice, and check understanding in a new context. Hypotheses and heuristic weights are provisional, not certain diagnoses.
+> **Main branch status:** `main` retains an earlier project baseline and does not yet contain the latest integrated IELTS Reading application or dual-theme UI. The screenshots and latest capability status below refer to the separate [`feat/verbatrail-consolidation`](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation) branch. It has not been merged into `main` and is not a production release.
 
-## Current status: distinguish the branches
+## Product direction
 
-| Scope | Actual state |
-| --- | --- |
-| **This `main` branch** | Stage 4 backend APIs, domain rules and persistence cover sessions, attempts, diagnosis, interventions, transfer and profile. The frontend is a placeholder with a health check, not a connected end-to-end learning UI. A confirmed database dependency defect is described below. |
-| **[IELTS development branch](https://github.com/KaoruMiyagawa/UnlearnLoop/tree/feat/ielts-pivot)** | Academic and General Training reading and the learning interface passed the specified isolated IELTS-1 acceptance; they are **not merged into main**. See its [acceptance report](https://github.com/KaoruMiyagawa/UnlearnLoop/blob/feat/ielts-pivot/docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md). |
-| **Model and deployment** | Acceptance used an offline FakeModelProvider; real AI personalization and production release have not been validated. |
+Typical practice tools stop after marking an answer right or wrong. VerbaTrail focuses on what an error may indicate, what evidence is still needed, and whether understanding transfers to a new question.
 
-<p align="center"><img src="https://raw.githubusercontent.com/KaoruMiyagawa/UnlearnLoop/feat/ielts-pivot/docs/development/ielts-1-browser-evidence/14-gt-reading-mobile.png" alt="Actual browser screenshot from the unmerged IELTS development branch" width="390"></p>
-<p align="center"><sub>Actual browser capture from the IELTS branch, not the current main interface</sub></p>
-
-## Learning loop
+**Error DNA** is a planned product concept for organizing recurring, verifiable error signals. The latest development branch implements related foundations: competing hypotheses and evidence, state-driven follow-up, targeted practice, an independent transfer task, knowledge states and spaced-review scheduling. There is no calibrated Error DNA learner profile; long-term retention outcomes, real-model personalization quality and official IELTS scoring remain unvalidated.
 
 ```mermaid
 flowchart LR
-    A[Answer] --> B[Evaluation and diagnosis]
-    B --> C[Competing hypotheses and evidence]
-    C --> D[Follow-up]
+    A[Answer] --> B[Server evaluation]
+    B --> C[Candidate explanations and evidence]
+    C --> D[Discriminating follow-up]
     D --> E[Targeted practice]
     E --> F[Independent transfer task]
-    F --> G[Knowledge state and review]
+    F --> G[Knowledge state and review plan]
 ```
 
-This is the intended flow, subject to server state, available tasks and branch implementation. A transfer pass does not prove long-term retention. The main-branch UI does not yet connect the complete flow.
+This illustrates the product learning loop. Available steps depend on the code branch, server session state and assigned questions; it does not mean `main` contains the complete flow.
 
-## Architecture and local setup
+## Capability status
 
-React, TypeScript and Vite provide the placeholder frontend; FastAPI coordinates domain and application services, with SQLite, SQLAlchemy and Alembic for persistence and a model provider abstraction. See [current architecture](docs/architecture/CURRENT_ARCHITECTURE.md).
+| Capability | Current `main` | Latest consolidated branch |
+| --- | --- | --- |
+| IELTS Reading | Does not contain the latest integrated Reading workspace | Academic and General Training Reading tasks and learning flow implemented; passed IELTS-1 stage acceptance |
+| Diagnosis and practice | Retains earlier backend learning and diagnostic foundations | Competing hypotheses, evidence, follow-up, targeted practice and independent transfer; FakeModelProvider runs are simulations |
+| Review and learning profile | Does not contain the latest integrated pages | Server-backed review tasks, history, knowledge states and related evidence are displayed |
+| Premium / Noir themes | Does not include the dual-theme application UI | Premium Academic and Noir & Champagne are integrated into one React app |
+| Listening, Writing, Speaking, Vocabulary, Grammar, Mock Tests | Planned | Planned; not delivered as complete features |
+| UKVI, Life Skills | Planned | Planned; usable exam flows are not delivered |
+| Real AI diagnosis, band prediction, official scoring | Unvalidated | Unvalidated; the project does not claim these capabilities passed quality evaluation |
 
-**Known main-branch defect:** `get_session_factory` in `backend/app/api/v1/dependencies.py` refers to `create_db_engine` without importing it. Direct invocation raises `NameError`, so database APIs using that dependency cannot be considered operational. A fix requires separate review and integration; this homepage update changes documentation only.
+### Real captures from the latest development branch
 
-Requirements: Python 3.11+, Node.js and npm. On Windows PowerShell:
+These are from an isolated Headless Chrome acceptance run. The Reading workflow used FakeModelProvider and does not demonstrate real-model performance. Narrow-screen captures are in the [acceptance evidence directory](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence).
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python -m pip install -r backend/requirements.txt
-cd frontend
-npm ci
-cd ..
-```
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/home-premium.png" alt="Premium Academic home acceptance capture" width="100%"><br><sub>Premium Academic · Home</sub></td>
+    <td><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/home-noir.png" alt="Noir and Champagne home acceptance capture" width="100%"><br><sub>Noir &amp; Champagne · Home</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/academic-reading-premium.png" alt="Academic Reading workspace acceptance capture" width="100%"><br><sub>Academic Reading · passage and server-provided question</sub></td>
+  </tr>
+</table>
 
-In a backend terminal:
+## Technology and development links
 
-```powershell
-$env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
-$env:MODEL_PROVIDER = 'fake'
-$env:ALLOW_REMOTE_MODEL_CALLS = 'false'
-cd backend
-..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
-```
+The latest branch uses React, TypeScript, Vite, FastAPI, SQLAlchemy, SQLite and Alembic. The frontend renders server-provided tasks and states; the backend manages learning flows, persistence, diagnosis and review. The [architecture guide](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/architecture/CURRENT_ARCHITECTURE.md) describes that development branch, not code already present on `main`.
 
-In another terminal, run `cd frontend` and `npm run dev`, then visit `http://127.0.0.1:15173`. API docs: `http://127.0.0.1:18000/docs`. Development startup migrates the configured database and seeds content; use a new file and back up existing data. See the [quick start](docs/development/QUICKSTART.md). This is a trusted local MVP; `learner_id` is not authentication.
+- [Quick-start guide for the latest version](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/development/QUICKSTART.md)
+- [Implementation status and roadmap](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/development/ROADMAP.md)
+- [Browser acceptance report](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/README.md)
 
-## Tests and layout
+The latest branch baseline has 80 backend and 40 frontend tests passing, with TypeScript typecheck and production build passing. Tests and browser acceptance use fixed fixtures and FakeModelProvider; real-model performance and production deployment still require separate validation.
 
-```powershell
-cd backend
-..\.venv\Scripts\python -m pytest
-cd ../frontend
-npm run typecheck
-npm run build
-```
+## Roadmap
 
-`backend/` holds the API, services, persistence and tests; `frontend/` holds the placeholder interface and health client; `docs/` contains product, architecture, design and roadmap documents. The IELTS branch's 80 backend tests, 40 frontend tests and browser acceptance describe that branch, not features already on main.
+- Stabilize and review Academic / General Training Reading, Review, learning profile and dual-theme experience.
+- Plan Listening, Writing, Speaking, Vocabulary, Grammar, Mock Tests, UKVI and Life Skills incrementally.
+- Establish separate privacy, budget and quality gates for Error DNA, real models, score estimates and long-term learning outcomes.
 
-## Roadmap and contributing
-
-Review integration of the learning interface and IELTS branch; address backup and restore, data export/deletion, dependency risks and authorization before broader use. Future work includes more content and skills, accessibility, quality automation and real-model evaluation with clear consent, budget and privacy boundaries. See the [roadmap](docs/development/ROADMAP.md).
-
-Issues and contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). **No open-source license is currently declared.** Do not assume permission to reuse or redistribute; the maintainer must choose a license.
+Please open an issue to discuss improvements. No open-source license is currently declared; do not assume reuse or redistribution is permitted.

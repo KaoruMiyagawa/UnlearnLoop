@@ -1,95 +1,71 @@
-# UnlearnLoop
+# VerbaTrail
 
-**从错误出发，用新情境中的证据验证理解。**
+**把错误变成线索，在新情境中验证理解。**
 
-[English](README_EN.md) · [快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [贡献说明](CONTRIBUTING.md)
+VerbaTrail 正在建设一款 AI Agent 驱动的英语学习与 IELTS 备考平台，以 **IELTS Overall Band 8.0** 为学习目标。8.0 是学习目标，不是分数预测或保证。
 
-![Stage](https://img.shields.io/badge/stage-early%20development-blue) ![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6)
+[English](README_EN.md) · [最新应用开发分支](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation) · [该分支中文 README](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/README.md)
 
-UnlearnLoop 是一个探索证据驱动学习的项目。普通刷题通常止步于对错；UnlearnLoop 希望保留多个可能的错误原因，通过追问和练习收集证据，再用新情境检验学习是否迁移。候选假设与启发式权重是待验证的工作判断，不是确定结论。
+> **主线状态：** 当前 `main` 保留较早的项目基线，尚未包含最新 IELTS Reading 应用界面与双主题整合。以下截图及最新功能状态来自独立开发分支 [`feat/verbatrail-consolidation`](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation)，尚未合并至 `main`，也不代表生产发布。
 
-## 当前状态：请区分两个分支
+## 产品方向
 
-| 范围 | 真实状态 |
-| --- | --- |
-| **本页 `main`** | Stage 4 后端包含学习会话、作答、诊断、干预、迁移与档案相关 API、领域规则和持久化；前端是工作空间占位界面，除健康检查外未连接完整学习流程。数据库依赖存在已确认缺陷，见下方说明。 |
-| **[IELTS 开发分支](https://github.com/KaoruMiyagawa/UnlearnLoop/tree/feat/ielts-pivot)** | Academic / General Training 阅读和学习界面已在隔离环境通过 IELTS-1 阶段验收，**尚未合并到 main**。详见[分支验收报告](https://github.com/KaoruMiyagawa/UnlearnLoop/blob/feat/ielts-pivot/docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md)。 |
-| **模型与部署** | 阶段验收使用 FakeModelProvider 离线模拟；真实 AI 个性化诊断与生产发布尚未验收。 |
+普通刷题工具常在显示正误后结束。VerbaTrail 关注错误可能说明什么、还需要哪些证据，以及理解能否迁移到新问题。
 
-<p align="center"><img src="https://raw.githubusercontent.com/KaoruMiyagawa/UnlearnLoop/feat/ielts-pivot/docs/development/ielts-1-browser-evidence/14-gt-reading-mobile.png" alt="IELTS 开发分支的真实浏览器截图，非 main 当前界面" width="390"></p>
-<p align="center"><sub>真实浏览器截图：IELTS 开发分支，尚未合并到 main</sub></p>
-
-## 学习流程
+**Error DNA** 是规划中的产品概念，用于整理可验证的重复错误线索。最新开发分支已经实现相关基础：服务端竞争假设与证据、状态驱动追问、针对性练习、独立迁移题、知识状态和间隔复习安排。当前没有经过校准的 Error DNA 学习画像；长期记忆效果、真实模型个性化质量和官方 IELTS 评分均未验证。
 
 ```mermaid
 flowchart LR
-    A[作答] --> B[评价与错误诊断]
-    B --> C[竞争假设与证据]
+    A[作答] --> B[服务端评价]
+    B --> C[候选错误假设与证据]
     C --> D[区分性追问]
     D --> E[针对性练习]
     E --> F[独立新题迁移验证]
-    F --> G[知识状态与复习安排]
+    F --> G[知识状态与复习计划]
 ```
 
-这是项目目标流程，具体执行受服务端状态、可用题目和当前分支实现约束；一次迁移通过不代表长期保持。`main` 的界面尚未接通此完整流程。
+这是产品学习流程示意。实际可用环节取决于代码分支、服务端会话状态和题目；不表示 `main` 已包含完整流程。
 
-## 架构
+## 功能状态
 
-```mermaid
-flowchart LR
-    UI[React / TypeScript / Vite 占位界面] -->|健康检查| API[FastAPI / REST API]
-    API --> APP[应用服务与领域规则]
-    APP --> DB[(SQLite / SQLAlchemy / Alembic)]
-    APP --> EVAL[内容与评价]
-    APP --> AGENT[诊断决策与模型适配层]
-```
+| 能力 | `main` 当前版本 | 最新整合分支 |
+| --- | --- | --- |
+| IELTS Reading | 尚无最新整合版阅读工作台 | Academic 与 General Training 阅读任务和学习流程已实现，并通过 IELTS-1 阶段验收 |
+| 诊断与练习 | 保留早期后端学习与诊断基础 | 有竞争假设、证据、追问、针对性练习和独立迁移验证；流程使用 FakeModelProvider 时仅为模拟 |
+| Review 与学习档案 | 尚无最新整合版页面 | 服务端复习任务、历史、知识状态与相关证据页面已接入 |
+| Premium / Noir 主题 | 尚未包含双主题应用界面 | Premium Academic 与 Noir & Champagne 已集成到同一 React 应用 |
+| Listening、Writing、Speaking、Vocabulary、Grammar、Mock Tests | 规划中 | 规划中，未作为完整功能交付 |
+| UKVI、Life Skills | 规划中 | 规划中，未作为可用考试流程交付 |
+| 真实 AI 诊断、Band 预测、官方评分 | 未验证 | 未验证；项目不宣称这些能力已通过质量评估 |
 
-后端管理学习状态与持久化；模型通过适配层调用，远程调用默认关闭。参见[当前架构与边界](docs/architecture/CURRENT_ARCHITECTURE.md)。
+### 最新开发分支的真实截图
 
-**已知主线缺陷：** `backend/app/api/v1/dependencies.py` 的 `get_session_factory` 引用了未导入的 `create_db_engine`，直接调用会引发 `NameError`，因此依赖该函数的数据库 API 不可视为可用。修复需另行审阅和集成；本次主页更新仅修改文档。
+截图来自独立 Headless Chrome 验收。阅读流程使用 FakeModelProvider，不代表真实模型效果；窄屏截图也记录在[验收证据目录](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence)。
 
-## 本地运行
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/home-premium.png" alt="Premium Academic 首页验收截图" width="100%"><br><sub>Premium Academic · 首页</sub></td>
+    <td><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/home-noir.png" alt="Noir and Champagne 首页验收截图" width="100%"><br><sub>Noir &amp; Champagne · 首页</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/academic-reading-premium.png" alt="Academic Reading 工作台验收截图" width="100%"><br><sub>Academic Reading · 阅读文章与服务端题目</sub></td>
+  </tr>
+</table>
 
-需要 Python 3.11+、Node.js 与 npm。以下 PowerShell 示例选择独立数据库；启动会自动迁移并导入内容，使用已有数据库前请先备份。完整步骤见[快速启动](docs/development/QUICKSTART.md)。
+## 技术与开发入口
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python -m pip install -r backend/requirements.txt
-cd frontend
-npm ci
-cd ..
-```
+最新开发分支采用 React、TypeScript、Vite、FastAPI、SQLAlchemy、SQLite 和 Alembic。前端读取服务端任务与状态；后端管理学习流程、数据写入、诊断与复习。该架构说明描述的是[最新开发分支](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/architecture/CURRENT_ARCHITECTURE.md)，不应误认为已全部进入 `main`。
 
-在后端终端：
+- [最新版本快速启动指南](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/development/QUICKSTART.md)
+- [当前实现与开发路线图](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/development/ROADMAP.md)
+- [最新分支的浏览器验收记录](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/verbatrail-consolidation/docs/development/consolidation-browser-evidence/README.md)
 
-```powershell
-$env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
-$env:MODEL_PROVIDER = 'fake'
-$env:ALLOW_REMOTE_MODEL_CALLS = 'false'
-cd backend
-..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
-```
+最新分支的工程基线为后端 80 项、前端 40 项测试通过，TypeScript typecheck 与 production build 通过。测试及浏览器验收使用固定样例和 FakeModelProvider；真实模型效果与生产部署仍需单独验证。
 
-另开终端运行 `cd frontend`、`npm run dev`，打开 `http://127.0.0.1:15173`；API 文档为 `http://127.0.0.1:18000/docs`。仅在本机可信环境使用：`learner_id` 是筛选标识，不是身份认证。
+## 后续方向
 
-## 测试与目录
+- 稳定并审阅 Academic / General Training 阅读、复习、学习档案与双主题体验。
+- 逐步规划 Listening、Writing、Speaking、Vocabulary、Grammar、Mock Tests、UKVI 和 Life Skills。
+- 为 Error DNA、真实模型、分数估计与长期学习效果建立独立的隐私、预算和质量验证。
 
-```powershell
-cd backend
-..\.venv\Scripts\python -m pytest
-cd ../frontend
-npm run typecheck
-npm run build
-```
-
-`backend/` 包含 API、领域和应用服务、持久化及测试；`frontend/` 包含界面和健康检查客户端；`docs/` 包含产品、架构、设计和路线图。IELTS 分支的 80 项后端、40 项前端及浏览器验收是**该分支**的结果，不代表 `main` 已包含这些功能。
-
-## 路线图
-
-- 审阅并安全集成开发分支的学习界面与 IELTS 阅读能力，不把分支验收等同于主线已交付。
-- 在更广泛试用前处理备份与恢复、数据导出删除、依赖风险及身份授权边界。
-- 扩充内容与技能，完善可访问性和质量门禁；在明确授权、预算和隐私边界下单独评估真实模型。早期规划见[开发路线图](docs/development/ROADMAP.md)。
-
-## 贡献与许可证
-
-欢迎通过 issue 讨论；提交前请阅读[贡献说明](CONTRIBUTING.md)。仓库目前**没有声明开源许可证**，不应假设已授予开源使用或再分发许可；许可证选择由维护者决定。
+欢迎先通过 issue 讨论改进。当前仓库尚未声明开源许可证，请勿假定可以自由使用或再分发。
