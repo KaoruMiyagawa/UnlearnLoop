@@ -1,66 +1,77 @@
 # VerbaTrail
 
-**从错误出发，在新情境中验证理解。**
+**把错误变成线索，在新情境中验证理解。**
 
-[English](README_EN.md) · [快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [开发路线图](docs/development/ROADMAP.md) · [参与贡献](CONTRIBUTING.md)
+AI Agent 驱动的英语学习与 IELTS 备考平台，以 **IELTS Overall Band 8.0** 为学习目标。8.0 是备考目标，不是分数预测或保证。
 
-![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6) ![Storage](https://img.shields.io/badge/storage-SQLite-003B57)
+[English](README_EN.md) · [最新应用分支](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation) · [快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [路线图](docs/development/ROADMAP.md)
 
-VerbaTrail 是面向英语学习与 IELTS 备考的自适应学习软件。普通刷题工具通常在显示正误后结束；VerbaTrail 还会保留可能的错误原因，继续收集证据，再用针对性练习和独立新题检查理解是否迁移。
+> GitHub 默认分支 `main` 目前还没有最新 IELTS 应用版本。最新整合成果在 [`feat/verbatrail-consolidation`](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation)；尚未合并到 `main`，也不是生产发布。
 
-系统维护的是可修正的学习假设和服务端状态，不把一次答对包装成掌握，也不以未经校准的分数制造确定感。
+## 产品方向
 
-> **当前工作树：** 本地 `feat/verbatrail-consolidation` 整合分支，以已通过 IELTS-1 阶段验收的 `feat/ielts-pivot` 为代码基线。整合尚未 Push 或合并到 GitHub 的 `main`。远程仓库地址暂时仍为 `KaoruMiyagawa/UnlearnLoop`。
+VerbaTrail 希望帮助学习者理解错误背后的原因，而非只累计题量。我们将 **Error DNA** 作为产品方向：持续整理可验证的错误线索，形成能被新问题检验的学习假设。
 
-## 学习闭环
+当前代码已实现这条方向的基础环节：后端记录竞争假设与证据，根据会话状态安排追问和针对性练习，并通过独立新题验证迁移；服务端也管理知识状态与间隔复习计划。**目前没有经过校准的 Error DNA 学习画像、官方 IELTS 评分或真实模型诊断质量保证。**长期复习安排已实现，长期记忆效果尚未经过学习研究验证。
 
 ```mermaid
 flowchart LR
     A[作答] --> B[服务端评价]
-    B --> C[竞争假设与证据]
+    B --> C[候选错误假设与证据]
     C --> D[区分性追问]
     D --> E[针对性练习]
-    E --> F[独立新情境迁移验证]
-    F --> G[更新知识状态与复习安排]
+    E --> F[独立新题迁移验证]
+    F --> G[更新知识状态与复习计划]
 ```
 
-具体路径由服务端的会话状态、评价结果和可用题目决定；不是每次作答都会经过所有环节。
+实际流程由服务端状态和可用任务决定；并非每次作答都会执行全部步骤。
 
-## 当前实现状态
+## 功能状态
 
-| 能力 | 状态 |
+| 能力 | 当前状态 |
 | --- | --- |
-| IELTS Reading | Academic 与 General Training 模式、原创英文阅读材料、服务端任务选择、作答与独立学习会话已实现并通过 IELTS-1 阶段验收。 |
-| 学习引擎 | 会话、答案、诊断案例、候选原因、证据、追问、定向练习、独立迁移验证和知识状态更新由后端业务流程管理。 |
-| 复习与档案 | 服务端 ReviewItem、到期信息、历史记录、知识状态、迁移/延迟复习证据和未知状态展示已实现。 |
-| UI | 单一 React 应用支持 Premium Academic 与 Noir & Champagne 两套主题；阅读区在两种主题下均保留暖象牙白底色。偏好保存在浏览器本地。 |
-| Demo / Real | Demo 是隔离演示界面；Real 读取后端 API。Real 代表真实后端数据流，不表示请求了真实大模型。 |
-| Agent / 模型 | 后端 Agent 决策流程和 FakeModelProvider 可用于离线模拟。真实模型个性化诊断质量、成本、稳定性及生产部署尚未通过本项目验收。 |
-| 其他技能 | Listening、Writing、Speaking、Vocabulary、Grammar、Mock Tests、UKVI 和 Life Skills 仍处于规划或建设中，不应视为已交付功能。 |
+| Reading | **已实现：** IELTS Academic 与 General Training 阅读模式、原创英文材料、服务端任务选择与作答流程。 |
+| 诊断与练习 | **基础流程已实现：** 服务端 Agent 工作流、竞争假设、证据、追问、定向练习及迁移验证；FakeModelProvider 只模拟模型响应。 |
+| Review 与学习档案 | **已实现：** 真实 ReviewItem、到期信息、历史、知识状态、迁移/延迟复习证据及未知状态展示。 |
+| 双主题界面 | **已实现：** 单套 React 应用提供 Premium Academic 与 Noir & Champagne；偏好本地保存，阅读文章保持暖象牙白底色。 |
+| Listening、Writing、Speaking | **规划中：** 当前不是完整四科备考产品。 |
+| Vocabulary、Grammar、Mock Tests | **规划中：** 暂无完整学习流程。 |
+| UKVI、Life Skills | **规划中：** 尚未作为可用考试流程交付。 |
+| 真实模型诊断与分数预测 | **未验证：** 不宣称真实 AI 个性化质量、官方评分或 Band 预测能力。 |
 
-IELTS-1 阶段验收记录为后端 80 项测试、前端 40 项测试、typecheck、production build 及隔离 Headless Chrome 浏览器流程通过。该结论不是生产环境发布验收，也不证明 FakeModelProvider 具备真实 AI 个性化诊断能力。主题 UI 另有[浏览器视觉验收记录](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)。
+### 验收截图
 
-<p align="center"><img src="docs/development/theme-visual-acceptance/premium-reading-mobile.png" alt="Premium Academic 主题下的手机阅读工作台验收截图" width="390"></p>
-<p align="center"><sub>隔离浏览器验收截图；诊断流程使用 FakeModelProvider。</sub></p>
+以下截图来自隔离 Headless Chrome 浏览器验收，不是设计稿。阅读工作流使用 FakeModelProvider，不代表真实模型效果。
 
-## 架构
+<table>
+  <tr>
+    <td><img src="docs/development/consolidation-browser-evidence/home-premium.png" alt="Premium Academic 首页" width="100%"><br><sub>Premium Academic · 首页</sub></td>
+    <td><img src="docs/development/consolidation-browser-evidence/home-noir.png" alt="Noir and Champagne 首页" width="100%"><br><sub>Noir &amp; Champagne · 首页</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/development/consolidation-browser-evidence/academic-reading-premium.png" alt="Academic Reading 工作台" width="100%"><br><sub>Academic Reading · 文章与服务端题目</sub></td>
+  </tr>
+</table>
+
+[浏览器验收记录与手机截图](docs/development/consolidation-browser-evidence/README.md) · [IELTS-1 双主题视觉验收](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+
+## 技术架构
 
 ```mermaid
 flowchart LR
-    UI[React / TypeScript / Vite] -->|REST /api/v1| API[FastAPI]
+    UI[React / TypeScript / Vite] -->|REST API| API[FastAPI]
     API --> APP[应用服务与领域规则]
     APP --> DB[(SQLAlchemy / SQLite)]
-    APP --> MIG[Alembic 迁移]
-    APP --> EVAL[阅读题评价与内容包]
-    APP --> AGENT[证据驱动的诊断决策]
-    AGENT --> PROVIDER[FakeModelProvider / 可配置模型适配层]
+    APP --> MIG[Alembic]
+    APP --> AGENT[服务端诊断与评价流程]
+    AGENT --> MODEL[FakeModelProvider / 模型适配接口]
 ```
 
-前端呈现服务端派发的任务和状态。后端负责写入事务、幂等恢复、评价、诊断决策、迁移验证和复习安排。Alembic `0001`–`0004` 迁移与历史内容均保留。完整边界见[当前架构说明](docs/architecture/CURRENT_ARCHITECTURE.md)。
+前端呈现服务端任务和状态；后端负责会话、作答、幂等恢复、诊断、迁移验证、知识状态与复习计划。SQLite 是本地开发默认配置，Alembic 历史迁移保留在仓库中。架构边界见[当前架构说明](docs/architecture/CURRENT_ARCHITECTURE.md)。
 
-## 本地安装与启动
+## 本地启动
 
-需要 Python 3.11+、Node.js、npm 和 Git。Windows PowerShell 示例从仓库根目录运行：
+需要 Python 3.11+、Node.js、npm 和 Git。以下命令从仓库根目录开始：
 
 ```powershell
 python -m venv .venv
@@ -70,7 +81,7 @@ npm ci
 cd ..
 ```
 
-在第一个终端启动后端：
+在第一个终端启动后端（数据库路径相对于 `backend/`）：
 
 ```powershell
 $env:DATABASE_URL = 'sqlite:///./verbatrail-local.db'
@@ -81,8 +92,6 @@ cd backend
 ..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
 ```
 
-`DATABASE_URL` 路径相对于 `backend/`。首次开发启动会执行 Alembic 迁移并导入内容；对任何已有数据库先做可恢复备份。这个示例使用新的本地数据库，不会选用归档的 `unlearnloop.db`。
-
 在第二个终端启动前端：
 
 ```powershell
@@ -90,11 +99,9 @@ cd frontend
 npm run dev
 ```
 
-打开 `http://127.0.0.1:15173`，API 文档在 `http://127.0.0.1:18000/docs`。也可在 Windows 使用 `./start-verbatrail.ps1`。服务默认仅监听本机；`learner_id` 是筛选标识，不提供身份认证或多用户安全边界。
+打开 `http://127.0.0.1:15173`；API 文档位于 `http://127.0.0.1:18000/docs`。开发启动会对所配置数据库运行迁移；使用已有数据库前应先建立并验证备份。详细端口与数据说明见[快速启动指南](docs/development/QUICKSTART.md)。
 
-详细设置、停止服务、数据库注意事项和隔离端口说明见[快速启动指南](docs/development/QUICKSTART.md)。
-
-## 测试与工程检查
+## 测试
 
 ```powershell
 cd backend
@@ -103,34 +110,25 @@ cd ../frontend
 node --test tests/*.test.mjs
 npm run typecheck
 npm run build
-git diff --check
 ```
 
-后端测试使用 pytest 临时 SQLite；前端流程测试使用 Node.js 内置测试运行器。自动化测试使用固定样例与 FakeModelProvider，不调用付费模型。真实浏览器验收证据和范围限制存于 `docs/development/`。
+当前基线：后端 80 项、前端 40 项测试通过。测试使用固定样例和 FakeModelProvider，不调用付费模型；这些结果不验证真实模型的个性化诊断能力。
 
 ## 项目结构
 
 ```text
-backend/               FastAPI、应用/领域服务、内容包、Alembic 迁移、pytest 测试
-frontend/              React 工作区、主题令牌、API Client、前端流程测试
-docs/architecture/     当前架构与原目标设计
-docs/design/           双主题参考、已采纳设计及归档原型
-docs/development/      快速启动、路线图、阶段验收与视觉证据
-docs/archive/          尚有参考价值但已被新计划替代的规划稿
+backend/               FastAPI、应用/领域服务、内容包、Alembic 迁移与 pytest
+frontend/              React 页面、主题令牌、API Client 与前端流程测试
+docs/architecture/     当前系统架构
+docs/design/           双主题原型、设计系统与历史方案
+docs/development/      快速启动、阶段验收、浏览器证据与路线图
+docs/archive/          被新方案取代但仍有参考价值的资料
 ```
-
-## 设计资料
-
-选定的产品界面方向是清晰、克制的学术阅读体验，提供 Premium Academic 和 Noir & Champagne 两套主题。双主题 HTML 原型、handoff 和参考图位于 [`docs/design/verbatrail-dual-theme-reference/`](docs/design/verbatrail-dual-theme-reference/)。Argon 的 Focus 原型及 Oxford、Nordic、Nocturne 方案作为历史设计材料保存在 `docs/design/archived/`，未采用方案不代表当前产品功能。
 
 ## 路线图
 
-- **已完成阶段验收：** Stage 3/4 核心诊断与 API、Stage 5 学习工作区/复习/档案、IELTS-1 Academic 与 General Training 阅读闭环、双主题 UI。
-- **整合后待处理：** 将本地整合分支审阅后安全纳入正式远程主线；完善备份恢复与数据控制，并完成干净环境安装回归。
-- **规划中：** 扩展 Listening、Writing、Speaking、Vocabulary、Grammar、Mock Tests、UKVI 与 Life Skills；真实模型、评分和估分须单独经过隐私、预算与质量门禁。
+- **当前开发：** 整合并稳定 IELTS Academic / General Training Reading、Review、学习档案与双主题体验。
+- **后续规划：** 扩展 Listening、Writing、Speaking、Vocabulary、Grammar、Mock Tests、UKVI 和 Life Skills。
+- **独立质量门禁：** 真实模型、评分与 Band 估计须另行验证隐私、预算、可靠性和准确度。
 
-路线图以代码与测试为准，不把规划文档中的未来阶段标成已实现。详见[开发路线图](docs/development/ROADMAP.md)及[IELTS 实施计划](docs/development/IELTS_IMPLEMENTATION_PLAN.md)。
-
-## 贡献与许可证
-
-欢迎先通过 issue 讨论缺陷与建议，开发提交请遵守[贡献指南](CONTRIBUTING.md)，并为状态变化补充测试。目前仓库没有声明开源许可证；请勿假定可以自由使用或再分发。
+完整状态见[开发路线图](docs/development/ROADMAP.md)。欢迎先通过 issue 讨论改进，并遵循[贡献指南](CONTRIBUTING.md)。目前未声明开源许可证，请勿假定可以自由再分发。
