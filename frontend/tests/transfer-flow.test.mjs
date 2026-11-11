@@ -2,6 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getTransferPresentation } from '../src/learning-workspace/transferFlow.ts';
 import { clearPendingAttempt, describeNextAction, prepareAttemptIntent, readPendingAttempt, restoreSessionFromServer, storePendingAttempt } from '../src/learning-workspace/learningFlow.ts';
+
+test('TFNG transfer verification is presented without claiming long-term retention', () => {
+  const result = { question_role: 'transfer_check', is_correct: true, next_action: 'transfer_verified', knowledge_state_status: 'transfer_verified' };
+  assert.equal(getTransferPresentation(null, [], result).passed, true);
+  assert.match(describeNextAction('transfer_verified').description, /不代表长期保持/);
+});
 import { submitAttempt } from '../src/api/sessions.ts';
 
 const originalFetch = globalThis.fetch;

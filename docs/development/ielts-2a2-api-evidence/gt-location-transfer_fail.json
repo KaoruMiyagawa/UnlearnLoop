@@ -1,0 +1,1033 @@
+[
+  {
+    "method": "put",
+    "url": "/api/v1/profile/exam-preparation",
+    "request": {
+      "exam_variant": "general_training"
+    },
+    "status": 200,
+    "response": {
+      "learner_id": "default_learner",
+      "selection_persisted": true,
+      "exam_variant": "general_training",
+      "selection_status": "available",
+      "goal_type": "band",
+      "target_overall_band": 8.0,
+      "target_skill_bands": {
+        "listening": 8.0,
+        "reading": 8.0,
+        "writing": 8.0,
+        "speaking": 8.0
+      },
+      "target_outcome": null,
+      "exam_date": null,
+      "actual_level_status": "not_assessed",
+      "current_skill_bands": {
+        "listening": null,
+        "reading": null,
+        "writing": null,
+        "speaking": null
+      },
+      "spec_version": "ielts-spec-catalog-2026-03"
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions",
+    "request": {
+      "topic_id": "ielts-tfng-gt-reading-english",
+      "exam_variant": "general_training"
+    },
+    "status": 201,
+    "response": {
+      "id": "sess_4a03b1911a4d47c0",
+      "topic_id": "ielts-tfng-gt-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "learner_id": "default_learner",
+      "exam_variant": "general_training",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "active",
+      "knowledge_state_status": null,
+      "topic_mastered": false,
+      "current_question_id": "ielts-tfng-gt-initial",
+      "current_question": {
+        "id": "ielts-tfng-gt-initial",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-initial",
+        "parent_question_id": null,
+        "question_role": "initial",
+        "question_type": "multiple_choice",
+        "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "active_diagnostic_case_id": null,
+      "latest_attempt_result": null,
+      "can_dispatch_transfer": false,
+      "attempts_count": 0,
+      "started_at": "2026-11-11T02:52:13.593973Z",
+      "updated_at": "2026-11-11T02:52:13.593975Z",
+      "completed_at": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-initial",
+      "submitted_answer": "FALSE",
+      "idempotency_key": "sess_4a03b1911a4d47c0-initial"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_8fd287729fe6428a",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "question_id": "ielts-tfng-gt-initial",
+      "question_role": "initial",
+      "is_correct": false,
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "next_action": "diagnose",
+      "next_question": {
+        "id": "ielts-tfng-gt-initial",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-initial",
+        "parent_question_id": null,
+        "question_role": "initial",
+        "question_type": "multiple_choice",
+        "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "knowledge_state_status": "needs_diagnosis",
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/hypotheses",
+    "request": null,
+    "status": 200,
+    "response": []
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/step",
+    "request": {
+      "idempotency_key": "sess_4a03b1911a4d47c0-step0"
+    },
+    "status": 200,
+    "response": {
+      "session_id": "sess_4a03b1911a4d47c0",
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "case_status": "question_selected",
+      "executed_tool": "select_diagnostic_followup",
+      "decision_reason": "TFNG v1 规则：先用新短文定位任务检验定位能力，避免把 TFNG 逻辑错误与定位错误混在一起。",
+      "selected_intervention": "ask_followup",
+      "selected_question_id": "ielts-tfng-gt-locate",
+      "next_question": {
+        "id": "ielts-tfng-gt-locate",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-locate",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence gives the rule about bags?",
+        "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "explanation_text": null,
+      "uncertainty_level": "insufficient_evidence",
+      "uncertainty_note": "微任务证据有限，原因尚未确认。",
+      "confidence_is_heuristic": true,
+      "followup_turns_used": 1,
+      "max_followup_turns": 2,
+      "tokens_used_in_case": 0,
+      "session_token_budget": 4096,
+      "model_provider_name": "rules:tfng-v1",
+      "is_mock_provider": false,
+      "execution_mode": "rules",
+      "degraded_mode": false,
+      "degradation_reason": null,
+      "knowledge_state_status": "needs_diagnosis",
+      "hypotheses": [
+        {
+          "id": "hyp_79978d16dc68440e",
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "candidate",
+          "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+          "evidence_count": 1,
+          "evidence_links": [
+            {
+              "id": "evi_c67510bca81a4c2a",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            }
+          ]
+        },
+        {
+          "id": "hyp_386c5bf981984328",
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "candidate",
+          "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+          "evidence_count": 1,
+          "evidence_links": [
+            {
+              "id": "evi_991e2270fde4442b",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-locate",
+      "submitted_answer": "A",
+      "idempotency_key": "sess_4a03b1911a4d47c0-locate"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_fb43e65158714821",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "question_id": "ielts-tfng-gt-locate",
+      "question_role": "diagnostic_followup",
+      "is_correct": false,
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "next_action": "diagnose_step",
+      "next_question": {
+        "id": "ielts-tfng-gt-locate",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-locate",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence gives the rule about bags?",
+        "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/step",
+    "request": {
+      "idempotency_key": "sess_4a03b1911a4d47c0-step1"
+    },
+    "status": 200,
+    "response": {
+      "session_id": "sess_4a03b1911a4d47c0",
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "case_status": "question_selected",
+      "executed_tool": "select_diagnostic_followup",
+      "decision_reason": "TFNG v1 规则：直接给出相关证据，检验未提及与明确否定的逻辑区别；与前一道定位题合并判断。",
+      "selected_intervention": "ask_followup",
+      "selected_question_id": "ielts-tfng-gt-logic",
+      "next_question": {
+        "id": "ielts-tfng-gt-logic",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-logic",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Statement: The team measured water temperature in December. Use only the supplied evidence.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "explanation_text": null,
+      "uncertainty_level": "insufficient_evidence",
+      "uncertainty_note": "微任务证据有限，原因尚未确认。",
+      "confidence_is_heuristic": true,
+      "followup_turns_used": 2,
+      "max_followup_turns": 2,
+      "tokens_used_in_case": 0,
+      "session_token_budget": 4096,
+      "model_provider_name": "rules:tfng-v1",
+      "is_mock_provider": false,
+      "execution_mode": "rules",
+      "degraded_mode": false,
+      "degradation_reason": null,
+      "knowledge_state_status": "needs_diagnosis",
+      "hypotheses": [
+        {
+          "id": "hyp_79978d16dc68440e",
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "candidate",
+          "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+          "evidence_count": 1,
+          "evidence_links": [
+            {
+              "id": "evi_c67510bca81a4c2a",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            }
+          ]
+        },
+        {
+          "id": "hyp_386c5bf981984328",
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "supported",
+          "missing_evidence_desc": "需要独立任务和更多证据验证。",
+          "evidence_count": 2,
+          "evidence_links": [
+            {
+              "id": "evi_991e2270fde4442b",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            },
+            {
+              "id": "evi_a54441935f074ad4",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-locate:v1:att_fb43e65158714821",
+              "relation": "supports",
+              "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-logic",
+      "submitted_answer": "NOT GIVEN",
+      "idempotency_key": "sess_4a03b1911a4d47c0-logic"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_f86e99ff02844e7a",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "question_id": "ielts-tfng-gt-logic",
+      "question_role": "diagnostic_followup",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "diagnose_step",
+      "next_question": {
+        "id": "ielts-tfng-gt-logic",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-logic",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Statement: The team measured water temperature in December. Use only the supplied evidence.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/hypotheses",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "hyp_79978d16dc68440e",
+        "diagnostic_case_id": "diag_21475d1f02034eb8",
+        "error_code": "true_false_not_given",
+        "name": "未提及与否定的逻辑混淆",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "candidate",
+        "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+        "created_at": "2026-11-11T02:52:13.679900",
+        "updated_at": "2026-11-11T02:52:13.679902"
+      },
+      {
+        "id": "hyp_386c5bf981984328",
+        "diagnostic_case_id": "diag_21475d1f02034eb8",
+        "error_code": "passage_location",
+        "name": "相关原文定位困难",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "supported",
+        "missing_evidence_desc": "需要独立任务和更多证据验证。",
+        "created_at": "2026-11-11T02:52:13.680524",
+        "updated_at": "2026-11-11T02:52:13.739161"
+      }
+    ]
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/evidence",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "evi_c67510bca81a4c2a",
+        "hypothesis_id": "hyp_79978d16dc68440e",
+        "attempt_id": "att_8fd287729fe6428a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:13.682648"
+      },
+      {
+        "id": "evi_991e2270fde4442b",
+        "hypothesis_id": "hyp_386c5bf981984328",
+        "attempt_id": "att_8fd287729fe6428a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:13.683956"
+      },
+      {
+        "id": "evi_a54441935f074ad4",
+        "hypothesis_id": "hyp_386c5bf981984328",
+        "attempt_id": "att_fb43e65158714821",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-locate:v1:att_fb43e65158714821",
+        "relation": "supports",
+        "summary": "本次独立微任务表现与该候选原因相容；尚未确认。",
+        "reliability_note": "版本化追问规则；证据仍需独立验证。",
+        "created_at": "2026-11-11T02:52:13.736975"
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/step",
+    "request": {
+      "idempotency_key": "sess_4a03b1911a4d47c0-practice-step"
+    },
+    "status": 200,
+    "response": {
+      "session_id": "sess_4a03b1911a4d47c0",
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "case_status": "intervention_selected",
+      "executed_tool": "assign_targeted_practice",
+      "decision_reason": "TFNG v1：passage_location 获得支持，另一原因被削弱；选择对应训练，仍不确认能力缺陷。",
+      "selected_intervention": "targeted_practice",
+      "selected_question_id": "ielts-tfng-gt-practice-location",
+      "next_question": {
+        "id": "ielts-tfng-gt-practice-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-practice-location",
+        "parent_question_id": null,
+        "question_role": "targeted_practice",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence gives the registration deadline?",
+        "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "explanation_text": null,
+      "uncertainty_level": "insufficient_evidence",
+      "uncertainty_note": "尚需独立验证；本阶段不评定长期掌握。",
+      "confidence_is_heuristic": true,
+      "followup_turns_used": 2,
+      "max_followup_turns": 2,
+      "tokens_used_in_case": 0,
+      "session_token_budget": 4096,
+      "model_provider_name": "rules:tfng-v1",
+      "is_mock_provider": false,
+      "execution_mode": "rules",
+      "degraded_mode": false,
+      "degradation_reason": null,
+      "knowledge_state_status": "needs_diagnosis",
+      "hypotheses": [
+        {
+          "id": "hyp_79978d16dc68440e",
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "lowered",
+          "missing_evidence_desc": "需要独立任务和更多证据验证。",
+          "evidence_count": 2,
+          "evidence_links": [
+            {
+              "id": "evi_c67510bca81a4c2a",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            },
+            {
+              "id": "evi_627dedd0cd4842a1",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-logic:v1:att_f86e99ff02844e7a",
+              "relation": "contradicts",
+              "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。"
+            }
+          ]
+        },
+        {
+          "id": "hyp_386c5bf981984328",
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "supported",
+          "missing_evidence_desc": "需要独立任务和更多证据验证。",
+          "evidence_count": 2,
+          "evidence_links": [
+            {
+              "id": "evi_991e2270fde4442b",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            },
+            {
+              "id": "evi_a54441935f074ad4",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-gt-locate:v1:att_fb43e65158714821",
+              "relation": "supports",
+              "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/hypotheses",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "hyp_79978d16dc68440e",
+        "diagnostic_case_id": "diag_21475d1f02034eb8",
+        "error_code": "true_false_not_given",
+        "name": "未提及与否定的逻辑混淆",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "lowered",
+        "missing_evidence_desc": "需要独立任务和更多证据验证。",
+        "created_at": "2026-11-11T02:52:13.679900",
+        "updated_at": "2026-11-11T02:52:13.806782"
+      },
+      {
+        "id": "hyp_386c5bf981984328",
+        "diagnostic_case_id": "diag_21475d1f02034eb8",
+        "error_code": "passage_location",
+        "name": "相关原文定位困难",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "supported",
+        "missing_evidence_desc": "需要独立任务和更多证据验证。",
+        "created_at": "2026-11-11T02:52:13.680524",
+        "updated_at": "2026-11-11T02:52:13.739161"
+      }
+    ]
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_21475d1f02034eb8/evidence",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "evi_c67510bca81a4c2a",
+        "hypothesis_id": "hyp_79978d16dc68440e",
+        "attempt_id": "att_8fd287729fe6428a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:13.682648"
+      },
+      {
+        "id": "evi_991e2270fde4442b",
+        "hypothesis_id": "hyp_386c5bf981984328",
+        "attempt_id": "att_8fd287729fe6428a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-initial:v1:att_8fd287729fe6428a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:13.683956"
+      },
+      {
+        "id": "evi_a54441935f074ad4",
+        "hypothesis_id": "hyp_386c5bf981984328",
+        "attempt_id": "att_fb43e65158714821",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-locate:v1:att_fb43e65158714821",
+        "relation": "supports",
+        "summary": "本次独立微任务表现与该候选原因相容；尚未确认。",
+        "reliability_note": "版本化追问规则；证据仍需独立验证。",
+        "created_at": "2026-11-11T02:52:13.736975"
+      },
+      {
+        "id": "evi_627dedd0cd4842a1",
+        "hypothesis_id": "hyp_79978d16dc68440e",
+        "attempt_id": "att_f86e99ff02844e7a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-gt-logic:v1:att_f86e99ff02844e7a",
+        "relation": "contradicts",
+        "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。",
+        "reliability_note": "版本化追问规则；证据仍需独立验证。",
+        "created_at": "2026-11-11T02:52:13.804546"
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-practice-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_4a03b1911a4d47c0-practice"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_8e4e0335f4aa4b01",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "question_id": "ielts-tfng-gt-practice-location",
+      "question_role": "targeted_practice",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "transfer_check",
+      "next_question": {
+        "id": "ielts-tfng-gt-transfer-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence explains what to bring?",
+        "context_snippet": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "knowledge_state_status": "insufficient_evidence",
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-transfer-location",
+      "submitted_answer": "A",
+      "idempotency_key": "sess_4a03b1911a4d47c0-transfer"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_db7016005e704923",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "question_id": "ielts-tfng-gt-transfer-location",
+      "question_role": "transfer_check",
+      "is_correct": false,
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "next_action": "transfer_failed_needs_practice",
+      "next_question": {
+        "id": "ielts-tfng-gt-transfer-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence explains what to bring?",
+        "context_snippet": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "knowledge_state_status": "needs_practice",
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-transfer-location",
+      "submitted_answer": "A",
+      "idempotency_key": "sess_4a03b1911a4d47c0-transfer"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_db7016005e704923",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "question_id": "ielts-tfng-gt-transfer-location",
+      "question_role": "transfer_check",
+      "is_correct": false,
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "next_action": "transfer_failed_needs_practice",
+      "next_question": {
+        "id": "ielts-tfng-gt-transfer-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence explains what to bring?",
+        "context_snippet": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_21475d1f02034eb8",
+      "knowledge_state_status": "needs_practice",
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/sessions/sess_4a03b1911a4d47c0",
+    "request": null,
+    "status": 200,
+    "response": {
+      "id": "sess_4a03b1911a4d47c0",
+      "topic_id": "ielts-tfng-gt-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "learner_id": "default_learner",
+      "exam_variant": "general_training",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "transfer_checking",
+      "knowledge_state_status": "needs_practice",
+      "topic_mastered": false,
+      "current_question_id": "ielts-tfng-gt-transfer-location",
+      "current_question": {
+        "id": "ielts-tfng-gt-transfer-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence explains what to bring?",
+        "context_snippet": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "active_diagnostic_case_id": "diag_21475d1f02034eb8",
+      "latest_attempt_result": {
+        "attempt_id": "att_db7016005e704923",
+        "session_id": "sess_4a03b1911a4d47c0",
+        "question_id": "ielts-tfng-gt-transfer-location",
+        "question_role": "transfer_check",
+        "is_correct": false,
+        "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+        "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+        "next_action": "transfer_failed_needs_practice",
+        "next_question": {
+          "id": "ielts-tfng-gt-transfer-location",
+          "topic_id": "ielts-tfng-gt-reading-english",
+          "material_id": "ielts-tfng-gt-material-transfer-location",
+          "parent_question_id": null,
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence explains what to bring?",
+          "context_snippet": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "difficulty": 1,
+          "version": 1
+        },
+        "diagnostic_case_id": "diag_21475d1f02034eb8",
+        "knowledge_state_status": "needs_practice",
+        "evaluation_source": "rule_check",
+        "mastery_note": null
+      },
+      "can_dispatch_transfer": true,
+      "attempts_count": 5,
+      "started_at": "2026-11-11T02:52:13.593973",
+      "updated_at": "2026-11-11T02:52:13.874722",
+      "completed_at": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/reviews",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "rev_07c10b660cb8421f",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "topic_title": "TFNG · evidence and logic",
+        "session_id": "sess_4a03b1911a4d47c0",
+        "learner_id": "default_learner",
+        "trigger_reason": "Transfer verification question 'ielts-tfng-gt-transfer-location' failed; preserve a short-interval follow-up.",
+        "scheduled_for": "2026-11-12T00:00:00Z",
+        "status": "pending",
+        "created_at": "2026-11-11T02:52:13.896857Z",
+        "completed_at": null,
+        "review_stage": 0,
+        "review_session_id": null,
+        "question_id": null,
+        "current_question": null,
+        "review_question": null,
+        "attempt_id": null,
+        "is_correct": null,
+        "submitted_at": null,
+        "evaluation_summary": null,
+        "review_outcome": null,
+        "retention_verified": false,
+        "retention_eligible": false,
+        "decision_event_id": "evt_b2317cb02b3d46aa",
+        "knowledge_state_id": "kst_7694c58c32604c76",
+        "message": null,
+        "is_due": false
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/reviews/rev_07c10b660cb8421f/start",
+    "request": null,
+    "status": 200,
+    "response": {
+      "id": "rev_07c10b660cb8421f",
+      "topic_id": "ielts-tfng-gt-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "learner_id": "default_learner",
+      "trigger_reason": "Transfer verification question 'ielts-tfng-gt-transfer-location' failed; preserve a short-interval follow-up.",
+      "scheduled_for": "2026-11-12T00:00:00Z",
+      "status": "pending",
+      "created_at": "2026-11-11T02:52:13.896857Z",
+      "completed_at": null,
+      "review_stage": 0,
+      "review_session_id": "sess_c573128322844ed4",
+      "question_id": "ielts-tfng-gt-review-location",
+      "current_question": {
+        "id": "ielts-tfng-gt-review-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells guests where to collect badges?",
+        "context_snippet": "[1] The event begins at noon. [2] Guests collect badges at the front desk. [3] Lunch is served upstairs.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "review_question": {
+        "id": "ielts-tfng-gt-review-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells guests where to collect badges?",
+        "context_snippet": "[1] The event begins at noon. [2] Guests collect badges at the front desk. [3] Lunch is served upstairs.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "attempt_id": null,
+      "is_correct": null,
+      "submitted_at": null,
+      "evaluation_summary": null,
+      "review_outcome": null,
+      "retention_verified": false,
+      "retention_eligible": false,
+      "decision_event_id": "evt_b2317cb02b3d46aa",
+      "knowledge_state_id": "kst_7694c58c32604c76",
+      "message": "已派发服务端复习题；延迟保持需以提交作答后的评价为准。",
+      "is_due": true
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_c573128322844ed4/attempts",
+    "request": {
+      "question_id": "ielts-tfng-gt-review-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_4a03b1911a4d47c0-remediation-review"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_7f803f08203d47f8",
+      "session_id": "sess_c573128322844ed4",
+      "question_id": "ielts-tfng-gt-review-location",
+      "question_role": "review",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "review_passed_without_retention",
+      "next_question": {
+        "id": "ielts-tfng-gt-review-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells guests where to collect badges?",
+        "context_snippet": "[1] The event begins at noon. [2] Guests collect badges at the front desk. [3] Lunch is served upstairs.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": null,
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/reviews/rev_07c10b660cb8421f",
+    "request": null,
+    "status": 200,
+    "response": {
+      "id": "rev_07c10b660cb8421f",
+      "topic_id": "ielts-tfng-gt-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "session_id": "sess_4a03b1911a4d47c0",
+      "learner_id": "default_learner",
+      "trigger_reason": "Transfer verification question 'ielts-tfng-gt-transfer-location' failed; preserve a short-interval follow-up.",
+      "scheduled_for": "2026-11-12T00:00:00Z",
+      "status": "completed",
+      "created_at": "2026-11-11T02:52:13.896857Z",
+      "completed_at": "2026-11-13T00:00:00Z",
+      "review_stage": 0,
+      "review_session_id": "sess_c573128322844ed4",
+      "question_id": "ielts-tfng-gt-review-location",
+      "current_question": null,
+      "review_question": {
+        "id": "ielts-tfng-gt-review-location",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "material_id": "ielts-tfng-gt-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells guests where to collect badges?",
+        "context_snippet": "[1] The event begins at noon. [2] Guests collect badges at the front desk. [3] Lunch is served upstairs.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "attempt_id": "att_7f803f08203d47f8",
+      "is_correct": true,
+      "submitted_at": "2026-11-13T00:00:00Z",
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "review_outcome": "passed_without_retention_baseline",
+      "retention_verified": false,
+      "retention_eligible": false,
+      "decision_event_id": "evt_a59df51ffc004642",
+      "knowledge_state_id": "kst_7694c58c32604c76",
+      "message": null,
+      "is_due": false
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/profile/knowledge-states",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "kst_7694c58c32604c76",
+        "learner_id": "default_learner",
+        "topic_id": "ielts-tfng-gt-reading-english",
+        "topic_title": "TFNG · evidence and logic",
+        "topic_slug": "ielts-tfng-gt-reading-english",
+        "status": "needs_practice",
+        "confidence_is_heuristic": true,
+        "unresolved_error_codes": [],
+        "transition_reason": "Failed transfer check 'ielts-tfng-gt-transfer-location'.",
+        "last_transfer_attempt_id": null,
+        "updated_at": "2026-11-11T02:52:13.901218",
+        "retention_status": "not_verified",
+        "retention_evidence_count": 0,
+        "last_reviewed_at": "2026-11-13T00:00:00Z",
+        "last_retention_verified_at": null,
+        "unresolved_error_reasons": []
+      }
+    ]
+  },
+  {
+    "database_evidence": {
+      "knowledge_status": "needs_practice",
+      "last_transfer_attempt_id": null,
+      "attempts": [
+        {
+          "id": "att_8fd287729fe6428a",
+          "question_id": "ielts-tfng-gt-initial",
+          "version": 1,
+          "correct": false
+        },
+        {
+          "id": "att_fb43e65158714821",
+          "question_id": "ielts-tfng-gt-locate",
+          "version": 1,
+          "correct": false
+        },
+        {
+          "id": "att_f86e99ff02844e7a",
+          "question_id": "ielts-tfng-gt-logic",
+          "version": 1,
+          "correct": true
+        },
+        {
+          "id": "att_8e4e0335f4aa4b01",
+          "question_id": "ielts-tfng-gt-practice-location",
+          "version": 1,
+          "correct": true
+        },
+        {
+          "id": "att_db7016005e704923",
+          "question_id": "ielts-tfng-gt-transfer-location",
+          "version": 1,
+          "correct": false
+        }
+      ],
+      "reviews": [
+        {
+          "id": "rev_07c10b660cb8421f",
+          "hypothesis_id": "hyp_386c5bf981984328",
+          "status": "completed",
+          "attempt_id": "att_7f803f08203d47f8",
+          "retention_verified": false,
+          "outcome": "passed_without_retention_baseline"
+        }
+      ]
+    }
+  }
+]

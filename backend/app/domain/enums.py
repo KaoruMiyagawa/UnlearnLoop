@@ -114,6 +114,7 @@ class KnowledgeMasteryStatus(StrEnum):
     INSUFFICIENT_EVIDENCE = "insufficient_evidence"
     NEEDS_DIAGNOSIS = "needs_diagnosis"
     NEEDS_PRACTICE = "needs_practice"
+    TRANSFER_VERIFIED = "transfer_verified"
     STABLE = "stable"
 
 

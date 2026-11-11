@@ -106,6 +106,7 @@ export function describeNextAction(action: string): NextActionPresentation {
     case 'transfer_retry_blocked':
       return { title: '需要未尝试过的迁移题', description: '服务端没有将同题重答作为掌握证据。', tone: 'warning' };
     case 'mastery_achieved':
+    case 'transfer_verified':
       return { title: '本次独立迁移验证通过', description: '当前验证通过不代表长期保持；会话仍需单独结束。', tone: 'success' };
     case 'transfer_unavailable':
       return { title: '独立迁移证据不足', description: '暂无未见过的新情境题。系统保留不确定性，不使用旧题确认掌握。', tone: 'warning' };

@@ -66,6 +66,7 @@ export type KnowledgeMasteryStatus =
   | 'insufficient_evidence'
   | 'needs_diagnosis'
   | 'needs_practice'
+  | 'transfer_verified'
   | 'stable';
 
 export interface SubsystemReadiness {

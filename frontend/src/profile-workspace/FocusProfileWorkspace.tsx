@@ -15,6 +15,7 @@ function formatDate(value?: string | null): string {
 function learningStatus(value: KnowledgeState['status']): string {
   switch (value) {
     case 'stable': return '当前迁移验证通过';
+    case 'transfer_verified': return '独立迁移验证通过';
     case 'needs_practice': return '需要继续学习';
     case 'needs_diagnosis': return '需要进一步诊断';
     case 'insufficient_evidence': return '证据还不充分';

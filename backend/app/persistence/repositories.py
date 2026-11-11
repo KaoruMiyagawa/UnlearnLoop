@@ -194,6 +194,24 @@ class LearningRepository:
             )
             .order_by(Question.difficulty, Question.id)
         ).all()
+        if item.hypothesis_id:
+            hypothesis = self.session.get(Hypothesis, item.hypothesis_id)
+        else:
+            hypothesis = None
+        if (hypothesis and (hypothesis.diagnostic_case.trigger_attempt.question_snapshot_json or {})
+                .get('diagnostic_protocol') == 'tfng-v1'):
+            state = self.session.get(KnowledgeState, item.knowledge_state_id) if item.knowledge_state_id else None
+            event = self.session.get(DecisionEvent, item.decision_event_id) if item.decision_event_id else None
+            trigger_id = (event.payload_json or {}).get('trigger_attempt_id') if event else None
+            trigger = self.session.get(Attempt, trigger_id) if trigger_id else None
+            if trigger is None and state and state.last_transfer_attempt_id:
+                trigger = self.session.get(Attempt, state.last_transfer_attempt_id)
+            version = (trigger.question_snapshot_json or {}).get('diagnostic_version') if trigger else None
+            candidates = [q for q in candidates if hypothesis is not None and
+                          version is not None and
+                          (q.evaluation_rubric or {}).get('diagnostic_protocol') == 'tfng-v1' and
+                          (q.evaluation_rubric or {}).get('diagnostic_version') == version and
+                          (q.evaluation_rubric or {}).get('target_error_codes') == [hypothesis.error_code]]
         prior_attempts = self.session.scalars(
             select(Attempt)
             .join(LearningSession, Attempt.session_id == LearningSession.id)
@@ -719,7 +737,7 @@ class LearningRepository:
             )
             if prior_failed_attempt_id is not None:
                 is_retried_transfer = True
-            if target_enum == KnowledgeMasteryStatus.STABLE:
+            if target_enum in (KnowledgeMasteryStatus.STABLE, KnowledgeMasteryStatus.TRANSFER_VERIFIED):
                 key = transfer_context_key(transfer_attempt.question.prompt_text, transfer_attempt.question.context_snippet)
                 other_attempts = list(self.session.scalars(
                     select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)

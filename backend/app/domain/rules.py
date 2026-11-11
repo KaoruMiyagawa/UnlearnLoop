@@ -292,7 +292,7 @@ def validate_mastery_transition(
             "KnowledgeState transition must reference a recorded DecisionEvent."
         )
 
-    if target_enum == KnowledgeMasteryStatus.STABLE:
+    if target_enum in (KnowledgeMasteryStatus.STABLE, KnowledgeMasteryStatus.TRANSFER_VERIFIED):
         if verified_transfer_attempt_role is None:
             raise UnverifiedMasteryError(
                 "Cannot mark KnowledgeState as 'stable' without a verified transfer_check attempt."

@@ -100,7 +100,7 @@ class LearningAppService:
     def _schedule_review(
         self, *, learner_id: str, topic_id: str, session_id: str,
         trigger_attempt_id: str, reason: str, stage: int = 0,
-        retention_eligible: bool = True,
+        retention_eligible: bool = True, hypothesis_id: str | None = None,
     ) -> ReviewItem:
         due_at = self._now() + timedelta(days=self._review_interval(stage))
         schedule_key = f"{'retention' if retention_eligible else 'remediation'}:{trigger_attempt_id}:stage:{stage}"
@@ -123,6 +123,14 @@ class LearningAppService:
             review_stage=stage,
         )
         item.retention_eligible = retention_eligible
+        if hypothesis_id is None:
+            case = self.repo.latest_diagnostic_case(session_id)
+            if case and self._is_tfng_session(case.session):
+                supported = [h for h in case.hypotheses if h.status == HypothesisStatus.SUPPORTED.value]
+                if len(supported) == 1:
+                    hypothesis_id = supported[0].id
+        if hypothesis_id is not None:
+            item.hypothesis_id = hypothesis_id
         knowledge_state = self.repo.get_knowledge_state(learner_id, topic_id)
         if item.knowledge_state_id is None and knowledge_state is not None:
             item.knowledge_state_id = knowledge_state.id
@@ -320,8 +328,32 @@ class LearningAppService:
         ks_enum = KnowledgeMasteryStatus(ks.status)
         return ks_enum, (ks_enum == KnowledgeMasteryStatus.STABLE)
 
+    def _is_tfng_session(self, sess: LearningSession) -> bool:
+        initial = next((a for a in self.repo.list_attempts_for_session(sess.id)
+                        if a.attempt_role == QuestionRole.INITIAL.value), None)
+        if initial is not None:
+            return initial.question_snapshot_json.get('diagnostic_protocol') == 'tfng-v1'
+        return any(q.question_role == QuestionRole.INITIAL.value and
+                   (q.evaluation_rubric or {}).get('diagnostic_protocol') == 'tfng-v1'
+                   for q in self.repo.list_questions_for_topic(sess.topic_id))
+
     def _select_fresh_transfer_question(self, sess: LearningSession) -> Question | None:
         candidates = self.repo.fresh_transfer_questions(sess)
+        if self._is_tfng_session(sess):
+            case = self.repo.latest_diagnostic_case(sess.id)
+            states = {h.error_code: h.status for h in case.hypotheses} if case else {}
+            targets = [code for code, other in (('true_false_not_given', 'passage_location'),
+                                                ('passage_location', 'true_false_not_given'))
+                       if states.get(code) == 'supported' and states.get(other) == 'lowered']
+            if len(targets) != 1:
+                return None
+            initial = next((a for a in self.repo.list_attempts_for_session(sess.id)
+                            if a.attempt_role == QuestionRole.INITIAL.value), None)
+            version = initial.question_snapshot_json.get('diagnostic_version') if initial else None
+            candidates = [q for q in candidates if version and
+                          (q.evaluation_rubric or {}).get('diagnostic_protocol') == 'tfng-v1' and
+                          (q.evaluation_rubric or {}).get('diagnostic_version') == version and
+                          (q.evaluation_rubric or {}).get('target_error_codes') == targets]
         return candidates[0] if candidates else None
 
     def _enter_transfer(self, sess: LearningSession, reason: str) -> Question | None:
@@ -584,7 +616,10 @@ class LearningAppService:
             )
 
         ks = self.repo.get_knowledge_state(sess.learner_id, sess.topic_id)
-        if ks is None or ks.status != KnowledgeMasteryStatus.STABLE.value:
+        if ks is not None and ks.status == KnowledgeMasteryStatus.TRANSFER_VERIFIED.value:
+            event_type = "session_completed_without_mastery"
+            default_reason = "Independent transfer passed; delayed retention remains unverified."
+        elif ks is None or ks.status != KnowledgeMasteryStatus.STABLE.value:
             # Ensure ending a session without passing transfer check leaves KnowledgeState in needs_practice (never stable)
             if ks is None:
                 ks = self.repo.update_knowledge_state(
@@ -957,16 +992,17 @@ class LearningAppService:
                     next_action = "transfer_retry_blocked"
                 else:
                     # Clean independent transfer verification: promote to STABLE
+                    tfng = self._is_tfng_session(sess)
                     ks = self.repo.update_knowledge_state(
                         session_id=sess.id,
                         topic_id=sess.topic_id,
-                        target_status=KnowledgeMasteryStatus.STABLE,
+                        target_status=(KnowledgeMasteryStatus.TRANSFER_VERIFIED if tfng else KnowledgeMasteryStatus.STABLE),
                         reason=f"Passed independent fresh transfer verification '{question.id}'.",
                         transfer_attempt_id=attempt.id,
                         learner_id=sess.learner_id,
                     )
                     ks_status = ks.status
-                    next_action = "mastery_achieved"
+                    next_action = "transfer_verified" if tfng else "mastery_achieved"
                     self._schedule_review(
                         learner_id=sess.learner_id, topic_id=sess.topic_id,
                         session_id=sess.id, trigger_attempt_id=attempt.id,
@@ -1011,7 +1047,7 @@ class LearningAppService:
             if not attempt.is_correct:
                 review_item.review_outcome = "failed"
                 review_item.retention_verified = False
-                if state is not None and state.status == KnowledgeMasteryStatus.STABLE.value:
+                if state is not None and state.status in (KnowledgeMasteryStatus.STABLE.value, KnowledgeMasteryStatus.TRANSFER_VERIFIED.value):
                     state = self.repo.update_knowledge_state(
                         session_id=sess.id, topic_id=sess.topic_id, learner_id=sess.learner_id,
                         target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
@@ -1029,11 +1065,11 @@ class LearningAppService:
                     learner_id=sess.learner_id, topic_id=sess.topic_id, session_id=sess.id,
                     trigger_attempt_id=attempt.id,
                     reason="Review failed; retain a short-interval follow-up while diagnosis proceeds.",
-                    retention_eligible=False,
+                    retention_eligible=False, hypothesis_id=review_item.hypothesis_id,
                 )
                 next_action = "review_failed_needs_diagnosis"
             elif (review_item.retention_eligible and state is not None
-                    and state.status == KnowledgeMasteryStatus.STABLE.value
+                    and state.status in (KnowledgeMasteryStatus.STABLE.value, KnowledgeMasteryStatus.TRANSFER_VERIFIED.value)
                     and now >= self._as_utc(review_item.scheduled_for)):
                 review_item.review_outcome = "passed_delayed"
                 review_item.retention_verified = True
@@ -1056,7 +1092,7 @@ class LearningAppService:
                     trigger_attempt_id=attempt.id,
                     reason="Delayed review passed; schedule the next spaced retention check.",
                     stage=min(review_item.review_stage + 1, len(self.review_intervals_days) - 1),
-                    retention_eligible=True,
+                    retention_eligible=True, hypothesis_id=review_item.hypothesis_id,
                 )
             else:
                 review_item.review_outcome = "passed_without_retention_baseline"
@@ -1134,7 +1170,7 @@ class LearningAppService:
             next_question=next_q_dto,
             diagnostic_case_id=diagnostic_case_id,
             knowledge_state_status=knowledge_state_status,
-            mastery_note="本次独立迁移验证通过；长期保持尚未验证。" if next_action == "mastery_achieved" else None,
+            mastery_note="本次独立迁移验证通过；长期保持尚未验证。" if next_action in ("mastery_achieved", "transfer_verified") else None,
         )
 
     def list_attempts_for_session(self, session_id: str) -> list[AttemptSummaryResponse]:
