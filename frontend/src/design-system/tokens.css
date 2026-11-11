@@ -740,3 +740,9 @@ html[data-theme="noir"] .verbatrail-home-hero:after { border-color: rgba(214,194
 @media (max-width: 900px) { .verbatrail-reading-layout { grid-template-columns: 1fr; } .focus-question-card { position: static; max-height: none; } .focus-learning-materials { max-height: 55vh; } }
 @media (max-width: 700px) { .focus-top-nav-inner { flex-wrap: wrap; padding: 10px 14px; gap: 8px; } .focus-brand { margin-right: auto; } .focus-nav-tools { gap: 6px; } .focus-stage { padding: 26px 14px 72px; } .verbatrail-home-hero { min-height: 280px; margin: 22px 0 30px; padding: 24px; } .verbatrail-band-mark { width: 108px; height: 108px; } .verbatrail-band-mark strong { font-size: 40px; } .verbatrail-home-hero:after { right: -100px; } }
 @media (max-width: 420px) { .focus-top-nav-inner { padding-inline: 10px; } .focus-nav-links { order: 3; flex-basis: 100%; } .focus-nav-tab { padding: 7px 9px; font-size: 12px; } .focus-health-dot { display: none; } .focus-theme-toggle { min-height: 34px; padding-inline: 8px; } .verbatrail-home-hero { align-items: flex-start; } .verbatrail-band-mark { position: absolute !important; right: 18px; bottom: 18px; opacity: .8; } }
+
+@media (max-width: 540px) {
+  .focus-nav-links { order: 3; flex-basis: 100%; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; margin: 0; overflow: visible; }
+  .focus-nav-tab { min-height: 44px; min-width: 0; padding: 5px 2px; border-radius: 8px; white-space: normal; }
+  .focus-theme-toggle { min-height: 44px; }
+}

@@ -1,10 +1,14 @@
 import React from 'react';
-import {
+import type {
   DecisionTimelineItemView,
   LoopStageId,
   LoopStageSnapshot,
   UiSimulationMode,
 } from './stage5WorkbenchModel';
+
+export function DiagnosticInspectorRailFrame(props: React.ComponentPropsWithoutRef<'aside'>) {
+  return <aside {...props} />;
+}
 
 interface DiagnosticInspectorRailProps {
   snapshot: LoopStageSnapshot;
@@ -90,7 +94,7 @@ export const DiagnosticInspectorRail: React.FC<DiagnosticInspectorRailProps> = (
   }
 
   return (
-    <aside aria-label="实时 Agent 诊断与证据检视器">
+    <DiagnosticInspectorRailFrame aria-label="实时 Agent 诊断与证据检视器">
       <div className="wb-card">
         <div className="wb-card-head">
           <div>
@@ -330,6 +334,6 @@ export const DiagnosticInspectorRail: React.FC<DiagnosticInspectorRailProps> = (
           )}
         </div>
       </div>
-    </aside>
+    </DiagnosticInspectorRailFrame>
   );
 };

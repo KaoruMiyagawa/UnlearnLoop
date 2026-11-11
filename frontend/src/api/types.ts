@@ -281,6 +281,7 @@ export interface DiagnosticStepResponse extends ModelExecutionMetadata {
   selected_question_id?: string | null;
   next_question?: SanitizedQuestion | null;
   explanation_text?: string | null;
+  decision_reason?: string | null;
   uncertainty_level: UncertaintyLevel;
   uncertainty_note?: string | null;
   confidence_is_heuristic?: boolean;

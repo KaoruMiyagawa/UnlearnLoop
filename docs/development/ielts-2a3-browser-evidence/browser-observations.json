@@ -1,0 +1,84 @@
+{
+  "observations": [
+    {
+      "screenshot": "premium-desktop",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "scrollWidth": 1425,
+      "theme": "premium",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n已在新情境通过迁移题。保持证据单独记录。\n本会话延迟保持\n本次延迟保持已验证\n2026年11月13日 16:00 · 本次到期独立作答的证据\n下一次复习\n尚未到期\n2026年11月16日 16:00 · 保持验证",
+      "foreground": "rgb(82, 102, 106)",
+      "background": "rgb(255, 254, 251)",
+      "bodyTextContrast": 6
+    },
+    {
+      "screenshot": "noir-desktop",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "scrollWidth": 1425,
+      "theme": "noir",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n已在新情境通过迁移题。保持证据单独记录。\n本会话延迟保持\n本次延迟保持已验证\n2026年11月13日 16:00 · 本次到期独立作答的证据\n下一次复习\n尚未到期\n2026年11月16日 16:00 · 保持验证",
+      "foreground": "rgb(193, 187, 174)",
+      "background": "rgb(25, 27, 25)",
+      "bodyTextContrast": 9.06
+    },
+    {
+      "scenario": "Academic logic → transfer → delayed review passed",
+      "sessionId": "sess_dab204711a774cb8",
+      "draftRetainedOnThemeAndReload": true,
+      "requestErrorsRecovered": true,
+      "keyboardFocusVisible": true
+    },
+    {
+      "screenshot": "premium-mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollWidth": 390,
+      "theme": "premium",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n已在新情境通过迁移题。保持证据单独记录。\n本会话延迟保持\n尚无延迟保持证据\n下一次复习\n尚未到期\n2026年11月14日 16:00 · 保持验证",
+      "foreground": "rgb(82, 102, 106)",
+      "background": "rgb(255, 254, 251)",
+      "bodyTextContrast": 6
+    },
+    {
+      "screenshot": "noir-mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollWidth": 390,
+      "theme": "noir",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n需要继续练习\n本会话延迟保持\n最近一次复习未通过\n2026年11月15日 16:00\n下一次复习\n尚未到期\n2026年11月16日 16:00 · 巩固练习",
+      "foreground": "rgb(193, 187, 174)",
+      "background": "rgb(25, 27, 25)",
+      "bodyTextContrast": 9.06
+    },
+    {
+      "scenario": "General Training location → transfer → delayed review failed",
+      "sessionId": "sess_028c9ed52fec4c0e"
+    },
+    {
+      "scenario": "Academic transfer failure",
+      "sessionId": "sess_7ed196b7c1f34a7a"
+    },
+    {
+      "scenario": "Academic transfer unavailable after prior use",
+      "sessionId": "sess_a3d2542ed1c848e2"
+    }
+  ],
+  "browserErrors": []
+}

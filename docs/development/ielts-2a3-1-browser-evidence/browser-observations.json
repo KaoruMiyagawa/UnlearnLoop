@@ -1,0 +1,161 @@
+{
+  "observations": [
+    {
+      "screenshot": "premium-desktop",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "scrollWidth": 1425,
+      "theme": "premium",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n本会话延迟保持\n本次延迟保持已验证\n2026年11月13日 16:00",
+      "overviewHeight": 80,
+      "conclusion": "当前诊断假设\n规则模式\n未提及与否定的逻辑混淆\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n保持验证 · 2026年11月16日 16:00 · 尚未到期\n\n到期后可开始复习。",
+      "collapsedEvidence": true,
+      "foreground": "rgb(82, 102, 106)",
+      "background": "rgb(255, 254, 251)",
+      "bodyTextContrast": 6
+    },
+    {
+      "screenshot": "noir-desktop",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "scrollWidth": 1425,
+      "theme": "noir",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n本会话延迟保持\n本次延迟保持已验证\n2026年11月13日 16:00",
+      "overviewHeight": 80,
+      "conclusion": "当前诊断假设\n规则模式\n未提及与否定的逻辑混淆\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n保持验证 · 2026年11月16日 16:00 · 尚未到期\n\n到期后可开始复习。",
+      "collapsedEvidence": true,
+      "foreground": "rgb(193, 187, 174)",
+      "background": "rgb(25, 27, 25)",
+      "bodyTextContrast": 9.06
+    },
+    {
+      "screenshot": "premium-expanded-desktop",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "scrollWidth": 1425,
+      "theme": "premium",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n本会话延迟保持\n本次延迟保持已验证\n2026年11月13日 16:00",
+      "overviewHeight": 80,
+      "conclusion": "当前诊断假设\n规则模式\n未提及与否定的逻辑混淆\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n保持验证 · 2026年11月16日 16:00 · 尚未到期\n\n到期后可开始复习。",
+      "collapsedEvidence": false,
+      "foreground": "rgb(82, 102, 106)",
+      "background": "rgb(255, 254, 251)",
+      "bodyTextContrast": 6
+    },
+    {
+      "scenario": "Academic logic → transfer → delayed review passed",
+      "sessionId": "sess_5111fb04508b4e32",
+      "draftRetainedOnThemeAndReload": true,
+      "requestErrorsRecovered": true,
+      "keyboardFocusVisible": true,
+      "keyboardDisclosureOpened": true,
+      "technicalNoteInAudit": true
+    },
+    {
+      "screenshot": "premium-training-mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollWidth": 390,
+      "theme": "premium",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n需要进一步诊断\n本会话延迟保持\n尚无延迟保持证据",
+      "overviewHeight": 56,
+      "conclusion": "当前诊断假设\n规则模式\n相关原文定位困难\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n尚需独立验证；本阶段不评定长期掌握。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n暂无复习安排。\n\n已安排一道针对当前错误假设的练习。\n\n继续针对性训练",
+      "collapsedEvidence": true,
+      "foreground": "rgb(82, 102, 106)",
+      "background": "rgb(255, 254, 251)",
+      "bodyTextContrast": 6
+    },
+    {
+      "screenshot": "premium-mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollWidth": 390,
+      "theme": "premium",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n本会话延迟保持\n尚无延迟保持证据",
+      "overviewHeight": 56,
+      "conclusion": "当前诊断假设\n规则模式\n相关原文定位困难\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n保持验证 · 2026年11月14日 16:00 · 尚未到期\n\n到期后可开始复习。",
+      "collapsedEvidence": true,
+      "foreground": "rgb(82, 102, 106)",
+      "background": "rgb(255, 254, 251)",
+      "bodyTextContrast": 6
+    },
+    {
+      "screenshot": "noir-due-mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollWidth": 390,
+      "theme": "noir",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n独立迁移已通过\n本会话延迟保持\n尚无延迟保持证据",
+      "overviewHeight": 56,
+      "conclusion": "当前诊断假设\n规则模式\n相关原文定位困难\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n保持验证 · 2026年11月14日 16:00 · 已到期\n\n前往复习",
+      "collapsedEvidence": true,
+      "foreground": "rgb(193, 187, 174)",
+      "background": "rgb(25, 27, 25)",
+      "bodyTextContrast": 9.06
+    },
+    {
+      "screenshot": "noir-mobile",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollWidth": 390,
+      "theme": "noir",
+      "heading": "Error DNA",
+      "label": "error-dna-title",
+      "overview": "主题知识状态\n需要继续练习\n本会话延迟保持\n最近一次复习未通过\n2026年11月15日 16:00",
+      "overviewHeight": 76,
+      "conclusion": "当前诊断假设\n规则模式\n相关原文定位困难\n\n当前证据更支持这个假设，判断可能随新作答调整。\n\n依据题目规则与作答证据。",
+      "next": "下一步\n\n巩固练习 · 2026年11月16日 16:00 · 尚未到期\n\n仍需继续练习，当前暂无已分配的训练题。",
+      "collapsedEvidence": true,
+      "foreground": "rgb(193, 187, 174)",
+      "background": "rgb(25, 27, 25)",
+      "bodyTextContrast": 9.06
+    },
+    {
+      "scenario": "General Training location → transfer → delayed review failed",
+      "sessionId": "sess_c519bd41ab984284",
+      "touchNavigation": true,
+      "navMinHeight": 44
+    },
+    {
+      "scenario": "Academic transfer failure",
+      "sessionId": "sess_eec609c0581f4cfc"
+    },
+    {
+      "scenario": "Academic transfer unavailable after prior use",
+      "sessionId": "sess_edd02e8929984f99"
+    }
+  ],
+  "browserErrors": []
+}

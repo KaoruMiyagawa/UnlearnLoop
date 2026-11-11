@@ -5,6 +5,7 @@ import { getReview, listReviews, startReview } from '../api/reviews';
 import { listLearningHistory } from '../api/profile';
 import type { AttemptResult, LearningHistoryEvent, ReviewItem, SubmitAttemptRequest } from '../api/types';
 import { useApiResource } from '../learning-workspace/useApiResource';
+import { questionTypeLabel } from '../learning-workspace/errorDna';
 import type { WorkspaceId } from '../app-shell/navigation';
 
 const LEARNER_ID = 'default_learner';
@@ -220,7 +221,7 @@ export const FocusReviewWorkspace: React.FC<{
   return <div className="focus-page focus-review-page">
     <div className="focus-page-content">
       <header className="focus-page-header">
-        <div className="focus-eyebrow">SPACED REVIEW · REAL API</div>
+        <div className="focus-eyebrow">间隔复习</div>
         <h1 className="focus-page-title">用一次新的作答，检查理解是否还在。</h1>
         <p className="focus-page-subtitle">任务时间和到期状态来自服务端。完成复习需要回答服务端派发的新题。</p>
       </header>
@@ -237,7 +238,7 @@ export const FocusReviewWorkspace: React.FC<{
           {materials.state.status === 'loading' && <p role="status">正在读取本题材料…</p>}
           {materials.state.status === 'error' && <p role="alert">材料读取失败。<button onClick={() => void materials.retry()}>重试</button></p>}
           {materials.state.status === 'success' && materials.state.data.filter(material => material.id === activeQuestion.material_id).map(material => <article className="wb-material" key={material.id}><h3>{material.title}</h3><pre>{material.content_body}</pre></article>)}
-            <div className="focus-review-meta">服务端派发 · {activeQuestion.question_type} · 计划时间 {formatDate(activeReview.scheduled_for)}</div>
+            <div className="focus-review-meta">{questionTypeLabel(activeQuestion.question_type)} · 计划时间 {formatDate(activeReview.scheduled_for)}</div>
             <h3>{activeQuestion.prompt_text}</h3>
             {activeQuestion.context_snippet && <pre className="focus-code">{activeQuestion.context_snippet}</pre>}
             <label className="focus-field-label" htmlFor="review-answer">写下答案或推理过程</label>
