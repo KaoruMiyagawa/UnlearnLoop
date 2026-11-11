@@ -5,11 +5,14 @@ from app.evaluation.reading_error_taxonomy import TAXONOMY_VERSION
 
 
 def tfng_proposal(session, case, repo):
-    questions = repo.list_questions_for_topic(session.topic_id)
-    initial = next((q for q in questions if q.question_role == "initial"), None)
-    if (initial is None or (initial.evaluation_rubric or {}).get("diagnostic_protocol") != "tfng-v1"
-            or initial.evaluation_rubric.get("diagnostic_version") != TAXONOMY_VERSION):
+    snapshot = case.trigger_attempt.question_snapshot_json or {}
+    if (snapshot.get("diagnostic_protocol"), snapshot.get("diagnostic_version")) != ("tfng-v1", TAXONOMY_VERSION):
         return None
+    questions = [
+        q for q in repo.list_questions_for_topic(session.topic_id)
+        if (q.evaluation_rubric or {}).get("diagnostic_protocol") == "tfng-v1"
+        and q.evaluation_rubric.get("diagnostic_version") == TAXONOMY_VERSION
+    ]
     answered = {a.question_id for a in repo.list_attempts_for_session(session.id)}
     followups = {q.id.rsplit("-", 1)[-1]: q for q in questions if q.question_role == "diagnostic_followup"}
     for stage in ("locate", "logic"):

@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.decision.heuristics import rank_followup_questions
+from app.decision.matching_headings import MatchingHeadingsRules, attempt_protocol
 from app.decision.tfng_rules import tfng_proposal
 from app.decision.schemas import (
     AgentDecisionProposal,
@@ -225,6 +226,20 @@ class DiagnosticAgentEngine:
             raise DomainRuleViolationError(
                 f"Attempt {attempt_id} does not exist or does not belong to session {session_id}."
             )
+
+        pinned_case = self.session.get(DiagnosticCase, diagnostic_case_id) if diagnostic_case_id else None
+        if diagnostic_case_id and (pinned_case is None or pinned_case.session_id != session_id):
+            raise DomainRuleViolationError("The diagnostic case does not belong to this session.")
+        trigger = pinned_case.trigger_attempt if pinned_case else attempt
+        if trigger.group_version_id is not None:
+            if pinned_case is None:
+                raise DomainRuleViolationError("Matching Headings requires the existing diagnostic case.")
+            return MatchingHeadingsRules(self.repo).step(
+                learning_session, pinned_case, idempotency_key=idempotency_key, settings=self.settings,
+            )
+        protocol, version = attempt_protocol(trigger)
+        if protocol is not None and (protocol, version) != ("tfng-v1", TAXONOMY_VERSION):
+            raise DomainRuleViolationError("Insufficient evidence: unsupported diagnostic protocol or version.")
 
         question = self.session.get(Question, attempt.question_id)
         topic = self.session.get(KnowledgeTopic, learning_session.topic_id)

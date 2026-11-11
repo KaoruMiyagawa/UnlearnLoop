@@ -771,7 +771,8 @@ def test_real_database_dependency_path_without_overrides_and_engine_reuse(
             resp1 = client.get("/api/v1/topics")
             assert resp1.status_code == 200
             topics = resp1.json()
-            assert len(topics) == 11  # Includes the two versioned TFNG diagnostic topics.
+            assert len(topics) == 13  # Adds two Matching Headings topics to the existing eleven.
+            assert {"ielts-mh-academic", "ielts-mh-general-training"} <= {topic["id"] for topic in topics}
 
             # Verify Engine was cached once and is reused across subsequent requests
             assert len(_ENGINE_CACHE) == 1

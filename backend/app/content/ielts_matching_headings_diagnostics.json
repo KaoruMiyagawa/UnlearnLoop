@@ -1,0 +1,582 @@
+{
+  "initial": {
+    "ielts-mh-academic-initial": {
+      "protocol": "matching-headings",
+      "version": "1",
+      "source_group_id": "mh-street-heat",
+      "role": "initial",
+      "targets": [
+        "main_idea_vs_detail",
+        "surface_keyword_matching"
+      ],
+      "distractors": {
+        "paragraph-a": {
+          "i": [
+            "surface_keyword_matching"
+          ]
+        },
+        "paragraph-b": {
+          "iii": [
+            "main_idea_vs_detail",
+            "surface_keyword_matching"
+          ]
+        },
+        "paragraph-c": {
+          "v": [
+            "main_idea_vs_detail",
+            "surface_keyword_matching"
+          ]
+        }
+      }
+    },
+    "ielts-mh-gt-initial": {
+      "protocol": "matching-headings",
+      "version": "1",
+      "source_group_id": "mh-tool-library",
+      "role": "initial",
+      "targets": [
+        "main_idea_vs_detail",
+        "surface_keyword_matching"
+      ],
+      "distractors": {
+        "paragraph-a": {
+          "i": [
+            "main_idea_vs_detail",
+            "surface_keyword_matching"
+          ]
+        },
+        "paragraph-b": {
+          "i": [
+            "surface_keyword_matching"
+          ]
+        },
+        "paragraph-c": {
+          "iv": [
+            "main_idea_vs_detail",
+            "surface_keyword_matching"
+          ]
+        }
+      }
+    }
+  },
+  "questions": {
+    "ielts-mh-academic": [
+      {
+        "id": "ielts-mh-academic-diagnostic",
+        "question_role": "diagnostic_followup",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail Phase 3 reading exercise",
+            "license": "Repository terms; no separate redistribution licence declared",
+            "review_status": "Author checked option meaning, target isolation and evidence mapping; external review pending"
+          },
+          "display": {
+            "id": "ielts-mh-academic-diagnostic-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-diagnostic-passage",
+              "content_version": "1",
+              "title": "Two ways to read a research note",
+              "paragraphs": [
+                {
+                  "id": "p1",
+                  "text": "When researchers compared seed survival in several gardens, the same variety performed well in cool and warm sites but poorly in very dry ones. The team marked each plot with a blue tag so that students could find it later. The comparison mattered because testing in one garden would not have revealed the variety's limits."
+                },
+                {
+                  "id": "p2",
+                  "text": "The technicians discussed sensor drift before the field trial, but the sensors themselves were left unchanged. The improvement came from comparing every reading with an independent reference. That comparison exposed misleading readings without altering the original instruments."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "probe-main-distractor",
+                "text": "How the team marked the plots"
+              },
+              {
+                "id": "probe-main-heading",
+                "text": "What testing across several sites revealed"
+              },
+              {
+                "id": "probe-main-other",
+                "text": "A new way to dry seeds"
+              },
+              {
+                "id": "probe-keyword-distractor",
+                "text": "Eliminating sensor drift by changing the instruments"
+              },
+              {
+                "id": "probe-keyword-heading",
+                "text": "Finding misleading readings through a separate check"
+              },
+              {
+                "id": "probe-keyword-other",
+                "text": "How to select cheaper sensors"
+              }
+            ],
+            "items": [
+              {
+                "id": "probe-main",
+                "paragraph_id": "p1"
+              },
+              {
+                "id": "probe-keyword",
+                "paragraph_id": "p2"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "1",
+            "answers": {
+              "probe-main": "probe-main-heading",
+              "probe-keyword": "probe-keyword-heading"
+            },
+            "explanations": {
+              "probe-main": "The correct heading covers the paragraph's central point. The distractor describes a single detail.",
+              "probe-keyword": "The correct heading preserves the paragraph's meaning. The distractor repeats its words but changes the claim."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "diagnostic_followup",
+              "targets": [
+                "main_idea_vs_detail",
+                "surface_keyword_matching"
+              ],
+              "probes": {
+                "probe-main": {
+                  "target": "main_idea_vs_detail",
+                  "relations": {
+                    "probe-main-heading": "contradicts",
+                    "probe-main-distractor": "supports",
+                    "probe-main-other": "neutral"
+                  }
+                },
+                "probe-keyword": {
+                  "target": "surface_keyword_matching",
+                  "relations": {
+                    "probe-keyword-heading": "contradicts",
+                    "probe-keyword-distractor": "supports",
+                    "probe-keyword-other": "neutral"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-academic-main-practice",
+        "question_role": "targeted_practice",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail Phase 3 reading exercise",
+            "license": "Repository terms; no separate redistribution licence declared",
+            "review_status": "Author checked option meaning, target isolation and evidence mapping; external review pending"
+          },
+          "display": {
+            "id": "ielts-mh-academic-main-practice-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-main-practice-passage",
+              "content_version": "1",
+              "title": "Finding the claim behind an example",
+              "paragraphs": [
+                {
+                  "id": "p1",
+                  "text": "A survey found that benches near trees were used more often at midday than benches in open areas. One bench beside a fountain was particularly popular. The researchers concluded that the main pattern across the park was a preference for sheltered places when the sun was strongest."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "main-practice-distractor",
+                "text": "Why one bench near a fountain was popular"
+              },
+              {
+                "id": "main-practice-heading",
+                "text": "A general preference for shade at midday"
+              },
+              {
+                "id": "main-practice-other",
+                "text": "How fountain water is recycled"
+              }
+            ],
+            "items": [
+              {
+                "id": "main-practice",
+                "paragraph_id": "p1"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "1",
+            "answers": {
+              "main-practice": "main-practice-heading"
+            },
+            "explanations": {
+              "main-practice": "The correct heading covers the paragraph's central point. The distractor describes a single detail."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "targeted_practice",
+              "targets": [
+                "main_idea_vs_detail"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-academic-keyword-practice",
+        "question_role": "targeted_practice",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail Phase 3 reading exercise",
+            "license": "Repository terms; no separate redistribution licence declared",
+            "review_status": "Author checked option meaning, target isolation and evidence mapping; external review pending"
+          },
+          "display": {
+            "id": "ielts-mh-academic-keyword-practice-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-keyword-practice-passage",
+              "content_version": "1",
+              "title": "Checking meaning when titles share words",
+              "paragraphs": [
+                {
+                  "id": "p1",
+                  "text": "The new flood map was labelled provisional because some neighbourhoods had little recent survey data. Rather than removing those areas from the map, the team shaded them differently so readers could see where the estimates were less certain."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "keyword-practice-distractor",
+                "text": "Removing neighbourhoods from a provisional flood map"
+              },
+              {
+                "id": "keyword-practice-heading",
+                "text": "Making uncertainty visible to map readers"
+              },
+              {
+                "id": "keyword-practice-other",
+                "text": "Choosing the colours for river signs"
+              }
+            ],
+            "items": [
+              {
+                "id": "keyword-practice",
+                "paragraph_id": "p1"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "1",
+            "answers": {
+              "keyword-practice": "keyword-practice-heading"
+            },
+            "explanations": {
+              "keyword-practice": "The correct heading preserves the paragraph's meaning. The distractor repeats its words but changes the claim."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "targeted_practice",
+              "targets": [
+                "surface_keyword_matching"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "ielts-mh-general-training": [
+      {
+        "id": "ielts-mh-gt-diagnostic",
+        "question_role": "diagnostic_followup",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail Phase 3 reading exercise",
+            "license": "Repository terms; no separate redistribution licence declared",
+            "review_status": "Author checked option meaning, target isolation and evidence mapping; external review pending"
+          },
+          "display": {
+            "id": "ielts-mh-gt-diagnostic-group",
+            "section_id": "gt-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-diagnostic-passage",
+              "content_version": "1",
+              "title": "Two ways to read a workplace notice",
+              "paragraphs": [
+                {
+                  "id": "p1",
+                  "text": "The distribution room used to organise packages by the time they arrived. Staff now group them by delivery district, so a driver can collect everything for one route together. A stripe of orange tape marks the first storage bay, but the same system applies throughout the room."
+                },
+                {
+                  "id": "p2",
+                  "text": "The workshop notice repeats the word booking because some readers assume a booking is compulsory. In fact, visitors can attend without booking if there is space. A reservation only guarantees that a seat will be held until the start time."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "probe-main-distractor",
+                "text": "Where staff put orange tape"
+              },
+              {
+                "id": "probe-main-heading",
+                "text": "A new arrangement that makes route collection easier"
+              },
+              {
+                "id": "probe-main-other",
+                "text": "How to choose a faster delivery vehicle"
+              },
+              {
+                "id": "probe-keyword-distractor",
+                "text": "Why every visitor must make a booking"
+              },
+              {
+                "id": "probe-keyword-heading",
+                "text": "When a reservation is helpful but optional"
+              },
+              {
+                "id": "probe-keyword-other",
+                "text": "How to pay for workshop materials"
+              }
+            ],
+            "items": [
+              {
+                "id": "probe-main",
+                "paragraph_id": "p1"
+              },
+              {
+                "id": "probe-keyword",
+                "paragraph_id": "p2"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "1",
+            "answers": {
+              "probe-main": "probe-main-heading",
+              "probe-keyword": "probe-keyword-heading"
+            },
+            "explanations": {
+              "probe-main": "The correct heading covers the paragraph's central point. The distractor describes a single detail.",
+              "probe-keyword": "The correct heading preserves the paragraph's meaning. The distractor repeats its words but changes the claim."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "diagnostic_followup",
+              "targets": [
+                "main_idea_vs_detail",
+                "surface_keyword_matching"
+              ],
+              "probes": {
+                "probe-main": {
+                  "target": "main_idea_vs_detail",
+                  "relations": {
+                    "probe-main-heading": "contradicts",
+                    "probe-main-distractor": "supports",
+                    "probe-main-other": "neutral"
+                  }
+                },
+                "probe-keyword": {
+                  "target": "surface_keyword_matching",
+                  "relations": {
+                    "probe-keyword-heading": "contradicts",
+                    "probe-keyword-distractor": "supports",
+                    "probe-keyword-other": "neutral"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-gt-main-practice",
+        "question_role": "targeted_practice",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail Phase 3 reading exercise",
+            "license": "Repository terms; no separate redistribution licence declared",
+            "review_status": "Author checked option meaning, target isolation and evidence mapping; external review pending"
+          },
+          "display": {
+            "id": "ielts-mh-gt-main-practice-group",
+            "section_id": "gt-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-main-practice-passage",
+              "content_version": "1",
+              "title": "Separating the main instruction from one example",
+              "paragraphs": [
+                {
+                  "id": "p1",
+                  "text": "When returning a borrowed picnic kit, use the checklist attached to its lid. It covers every item, from cups to blankets. If the red bottle opener is missing, note it on the form just as you would any other missing item. Staff use the same form to prepare kits for the next group."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "main-practice-distractor",
+                "text": "What to do about the red bottle opener only"
+              },
+              {
+                "id": "main-practice-heading",
+                "text": "Checking the full contents when returning a kit"
+              },
+              {
+                "id": "main-practice-other",
+                "text": "How to choose a place for a picnic"
+              }
+            ],
+            "items": [
+              {
+                "id": "main-practice",
+                "paragraph_id": "p1"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "1",
+            "answers": {
+              "main-practice": "main-practice-heading"
+            },
+            "explanations": {
+              "main-practice": "The correct heading covers the paragraph's central point. The distractor describes a single detail."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "targeted_practice",
+              "targets": [
+                "main_idea_vs_detail"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-gt-keyword-practice",
+        "question_role": "targeted_practice",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail Phase 3 reading exercise",
+            "license": "Repository terms; no separate redistribution licence declared",
+            "review_status": "Author checked option meaning, target isolation and evidence mapping; external review pending"
+          },
+          "display": {
+            "id": "ielts-mh-gt-keyword-practice-group",
+            "section_id": "gt-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-keyword-practice-passage",
+              "content_version": "1",
+              "title": "Choosing a heading by meaning rather than repeated words",
+              "paragraphs": [
+                {
+                  "id": "p1",
+                  "text": "The notice mentions tickets several times because a ticket is issued after each repair request. A ticket is simply a reference number for checking progress. It does not confirm a repair date, and the office will contact you separately once a date is available."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "keyword-practice-distractor",
+                "text": "A repair date guaranteed by a ticket"
+              },
+              {
+                "id": "keyword-practice-heading",
+                "text": "Using a reference to track a repair request"
+              },
+              {
+                "id": "keyword-practice-other",
+                "text": "Buying tickets at the office"
+              }
+            ],
+            "items": [
+              {
+                "id": "keyword-practice",
+                "paragraph_id": "p1"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "1",
+            "answers": {
+              "keyword-practice": "keyword-practice-heading"
+            },
+            "explanations": {
+              "keyword-practice": "The correct heading preserves the paragraph's meaning. The distractor repeats its words but changes the claim."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "targeted_practice",
+              "targets": [
+                "surface_keyword_matching"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

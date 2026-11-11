@@ -31,11 +31,12 @@ from app.domain.enums import (
     InterventionAction,
     KnowledgeMasteryStatus,
     QuestionRole,
+    QuestionType,
     SessionStatus,
     UncertaintyLevel,
 )
 from app.domain.exceptions import DomainRuleViolationError
-from app.persistence.models import Attempt, DiagnosticCase, Hypothesis, LearningSession
+from app.persistence.models import Attempt, DecisionEvent, DiagnosticCase, Hypothesis, LearningSession, Question, ReadingGroupVersion
 from app.persistence.repositories import LearningRepository
 
 
@@ -61,6 +62,42 @@ class AgentToolExecutor:
 
     def __init__(self, repo: LearningRepository) -> None:
         self.repo = repo
+
+    def dispatch_reading_group(
+        self, *, session: LearningSession, case: DiagnosticCase, attempt: Attempt,
+        question: Question, group: ReadingGroupVersion, expected_version: str,
+        targets: list[str], reason: str, uncertainty_note: str,
+    ) -> DecisionEvent:
+        """Dispatch the exact question selected by an audited rule protocol."""
+        if (
+            case.session_id != session.id or attempt.session_id != session.id
+            or question.topic_id != session.topic_id
+            or question.question_type != QuestionType.MATCHING_HEADINGS.value
+            or group.question_type != question.question_type
+            or group.exam_variant != session.exam_variant
+            or question.reading_group_version_id != group.id or expected_version != group.id
+            or question.question_role not in {QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value}
+        ):
+            raise IllegalAgentToolCallError("The reading-group dispatch does not match the fixed rule protocol.")
+        session.current_question_id = question.id
+        if question.question_role == QuestionRole.DIAGNOSTIC_FOLLOWUP.value:
+            case.current_followup_question_id = question.id
+            status = DiagnosticCaseStatus.QUESTION_SELECTED
+            action = AgentToolName.SELECT_DIAGNOSTIC_FOLLOWUP
+            intervention = InterventionAction.ASK_FOLLOWUP
+        else:
+            self.repo.transition_session_status(session, SessionStatus.INTERVENING)
+            status = DiagnosticCaseStatus.INTERVENTION_SELECTED
+            action = AgentToolName.ASSIGN_TARGETED_PRACTICE
+            intervention = InterventionAction.TARGETED_PRACTICE
+        return self.repo.transition_diagnostic_case(
+            case, status, action=action.value, reason=reason,
+            uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+            uncertainty_note=uncertainty_note, selected_intervention=intervention,
+            payload_json={"selected_question_id": question.id, "group_version_id": group.id,
+                          "trigger_attempt_id": case.trigger_attempt_id, "decision_input_attempt_id": attempt.id,
+                          "target_error_codes": targets},
+        )
 
     # ------------------------------------------------------------------
     # Tool 1: read_material_and_question (Read-Only Context Tool)
@@ -378,8 +415,7 @@ class AgentToolExecutor:
             )
             answered_ids = {attempt.question_id for attempt in self.repo.list_attempts_for_session(learning_session.id)}
             practice_qs = [question for question in practice_qs if question.id not in answered_ids]
-            tfng = any((q.evaluation_rubric or {}).get("diagnostic_protocol") == "tfng-v1"
-                       for q in self.repo.list_questions_for_topic(learning_session.topic_id))
+            tfng = (diag_case.trigger_attempt.question_snapshot_json or {}).get("diagnostic_protocol") == "tfng-v1"
             if tfng:
                 # Never silently choose the first practice in this diagnostic protocol.
                 supported = {h.error_code for h in diag_case.hypotheses if h.status == "supported"}

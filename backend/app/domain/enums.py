@@ -20,6 +20,7 @@ class QuestionType(StrEnum):
     CODE_TRACE = "code_trace"
     CODE_WRITING = "code_writing"
     MULTIPLE_CHOICE = "multiple_choice"
+    MATCHING_HEADINGS = "matching_headings"
 
 
 class SessionStatus(StrEnum):

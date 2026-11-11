@@ -24,7 +24,7 @@ from app.domain.exceptions import (
 from app.model_provider import ModelProviderError
 from app.observability import RequestIdMiddleware
 from app.persistence.migrations_runner import upgrade_database
-from app.persistence.seed import import_content_pack
+from app.persistence.seed import import_content_pack, load_matching_headings_diagnostic_pack
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -52,6 +52,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     import_content_pack(
                         session,
                         pack_path=Path(__file__).parent / "content" / "ielts_tfng_diagnostic_pack.json",
+                    )
+                    import_content_pack(
+                        session,
+                        pack_data=load_matching_headings_diagnostic_pack(session),
                     )
                     session.commit()
                 except Exception:

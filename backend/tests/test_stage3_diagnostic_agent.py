@@ -1158,8 +1158,8 @@ def test_migration_0001_to_0002_upgrade_data_integrity(
         )
         factory = create_session_factory(engine)
 
-        with transactional_session(factory) as session:
-            import_content_pack(session)
+        from tests.conftest import seed_historical_question
+        seed_historical_question(engine, "topic_py_var_assign", "py-var-assign", "q_py_var_initial_01")
         # Historical ORM mappings include columns that did not exist at revision 0001.
         # Insert through the actual 0001 schema to keep this migration test meaningful.
         from sqlalchemy import text

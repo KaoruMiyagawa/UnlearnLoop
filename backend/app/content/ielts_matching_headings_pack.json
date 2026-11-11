@@ -1,0 +1,134 @@
+{
+  "pack_id": "verbatrail-matching-headings-v1",
+  "domain_code": "ielts_academic",
+  "topics": [
+    {
+      "id": "ielts-mh-academic",
+      "slug": "ielts-mh-academic",
+      "domain_code": "ielts_academic",
+      "title": "Matching Headings · Measuring street heat",
+      "summary": "An original Academic reading exercise on how scientists compare street temperatures.",
+      "difficulty_level": 2,
+      "questions": [
+        {
+          "id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "question_type": "matching_headings",
+          "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+          "standard_answer": "",
+          "answer_explanation": "",
+          "version": 1,
+          "reading_group": {
+            "exam_variant": "academic",
+            "provenance": {
+              "source": "Original VerbaTrail practice text written for IELTS-2B.1",
+              "license": "Repository terms; no separate redistribution licence declared",
+              "review_status": "Author checked heading uniqueness and distractors; external review pending"
+            },
+            "display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "allow_reuse": false,
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {"id": "a", "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."},
+                  {"id": "b", "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."},
+                  {"id": "c", "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."}
+                ]
+              },
+              "options": [
+                {"id": "i", "text": "Separating changes over time from differences between streets"},
+                {"id": "ii", "text": "Why one local reading can conceal differences along a route"},
+                {"id": "iii", "text": "Designing a cheaper portable instrument"},
+                {"id": "iv", "text": "What outdoor measurements cannot tell us about people's needs"},
+                {"id": "v", "text": "A comparison of temperatures on different floors"}
+              ],
+              "items": [
+                {"id": "paragraph-a", "paragraph_id": "a"},
+                {"id": "paragraph-b", "paragraph_id": "b"},
+                {"id": "paragraph-c", "paragraph_id": "c"}
+              ]
+            },
+            "private_rules": {
+              "rules_version": "1",
+              "answers": {"paragraph-a": "ii", "paragraph-b": "i", "paragraph-c": "iv"},
+              "explanations": {
+                "paragraph-a": "The whole paragraph explains why a single station cannot capture variation along a pedestrian route.",
+                "paragraph-b": "The reverse walk and reference sensor are ways to distinguish timing effects from location effects, rather than ways to reduce instrument cost.",
+                "paragraph-c": "Indoor heat is one example of a limit of street surveys. The paragraph concerns who needs help, not measured differences between floors."
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "ielts-mh-general-training",
+      "slug": "ielts-mh-general-training",
+      "domain_code": "ielts_general_training",
+      "title": "Matching Headings · The neighbourhood tool library",
+      "summary": "An original General Training reading exercise based on instructions for a local borrowing service.",
+      "difficulty_level": 2,
+      "questions": [
+        {
+          "id": "ielts-mh-gt-initial",
+          "question_role": "initial",
+          "question_type": "matching_headings",
+          "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+          "standard_answer": "",
+          "answer_explanation": "",
+          "version": 1,
+          "reading_group": {
+            "exam_variant": "general_training",
+            "provenance": {
+              "source": "Original VerbaTrail practice text written for IELTS-2B.1",
+              "license": "Repository terms; no separate redistribution licence declared",
+              "review_status": "Author checked heading uniqueness and distractors; external review pending"
+            },
+            "display": {
+              "id": "mh-tool-library",
+              "section_id": "general-training-reading",
+              "display_schema_version": "1",
+              "allow_reuse": false,
+              "passage": {
+                "id": "mh-tool-library-passage",
+                "content_version": "1",
+                "title": "A guide to borrowing from Cedar Lane Tool Library",
+                "paragraphs": [
+                  {"id": "a", "text": "Before your first loan, bring proof of your address to the library desk. A volunteer will create your membership and show you how to find an item in the catalogue. If you register during a busy Saturday session, you may need to wait until the next opening to collect anything. You can still browse that day and make a list of the tools you want."},
+                  {"id": "b", "text": "If another member has the tool you need, leave your name on its waiting list. We will send a message when it comes back. Please confirm that you still want it by the end of the next opening session, so that we can offer it to someone else if your plans have changed. There is no need to call every day to check whether the item is back."},
+                  {"id": "c", "text": "Bring each item back to the desk, together with the parts listed on its label. Wait while a volunteer checks them, even if you are in a hurry. If something has broken during the loan, describe what happened and leave the tool with us. That lets us label it for inspection before the next member takes it home."}
+                ]
+              },
+              "options": [
+                {"id": "i", "text": "How to collect an item without becoming a member"},
+                {"id": "ii", "text": "Checking and reporting issues at the end of a loan"},
+                {"id": "iii", "text": "What to do when the tool you want is on loan"},
+                {"id": "iv", "text": "How volunteers repair damaged equipment"},
+                {"id": "v", "text": "Getting set up to borrow for the first time"}
+              ],
+              "items": [
+                {"id": "paragraph-a", "paragraph_id": "a"},
+                {"id": "paragraph-b", "paragraph_id": "b"},
+                {"id": "paragraph-c", "paragraph_id": "c"}
+              ]
+            },
+            "private_rules": {
+              "rules_version": "1",
+              "answers": {"paragraph-a": "v", "paragraph-b": "iii", "paragraph-c": "ii"},
+              "explanations": {
+                "paragraph-a": "The paragraph covers registering and preparing for a first loan. Browsing while waiting does not mean a loan without membership.",
+                "paragraph-b": "The waiting list, notification and confirmation deadline all address an item that another member currently has.",
+                "paragraph-c": "The main instructions concern returning, checking and reporting. Inspection is mentioned but no repairs are described."
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

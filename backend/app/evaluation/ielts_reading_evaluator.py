@@ -1,5 +1,6 @@
 """Objective evaluator for original IELTS reading practice items."""
 from app.domain.enums import EvidenceRelation, EvidenceSourceType, HypothesisStatus, QuestionRole
+from app.domain.reading_groups import HeadingAnswerKey, HeadingResult, MatchingHeadingsGroup, evaluate_headings
 from app.evaluation.rule_evaluator import RuleEvaluationResult, RuleEvidenceDraft, RuleHypothesisDraft
 from app.evaluation.reading_error_taxonomy import READING_ERROR_CATEGORIES, TAXONOMY_VERSION
 from app.persistence.models import Attempt, KnowledgeTopic, Question
@@ -7,6 +8,11 @@ from app.persistence.models import Attempt, KnowledgeTopic, Question
 
 class IeltsReadingEvaluator:
     """Match configured answer keys; treat wrong-answer mappings as tentative evidence."""
+    def evaluate_group(
+        self, *, group: MatchingHeadingsGroup, key: HeadingAnswerKey, answers: dict[str, str]
+    ) -> HeadingResult:
+        return evaluate_headings(group, key, answers)
+
     def evaluate_attempt(self, *, attempt: Attempt, question: Question, topic: KnowledgeTopic) -> RuleEvaluationResult:
         rubric = question.evaluation_rubric or {}
         accepted = {" ".join(str(v).casefold().split()) for v in rubric.get("accepted_answers", [question.standard_answer])}

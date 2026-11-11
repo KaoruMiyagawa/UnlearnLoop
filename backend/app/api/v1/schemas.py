@@ -3,7 +3,7 @@
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.domain.enums import (
     DiagnosticCaseStatus,
@@ -16,6 +16,7 @@ from app.domain.enums import (
     SessionStatus,
     UncertaintyLevel,
 )
+from app.domain.reading_groups import HeadingResult
 
 # ---------------------------------------------------------------------------
 # Common / Base Schemas
@@ -108,6 +109,8 @@ class SanitizedQuestionResponse(BaseModel):
     context_snippet: str | None = None
     difficulty: int
     version: int
+    group_version_id: str | None = None
+    group_display: dict[str, Any] | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -131,6 +134,7 @@ class CreateSessionRequest(BaseModel):
         description="Optional specific initial question ID to start with.",
     )
     exam_variant: str | None = Field(default=None, max_length=32)
+    question_type: QuestionType | None = None
 
 
 class SessionActionRequest(BaseModel):
@@ -193,17 +197,37 @@ class SessionDetailResponse(BaseModel):
 class SubmitAttemptRequest(BaseModel):
     """Payload for submitting an answer to the current question."""
 
+    model_config = ConfigDict(extra="forbid")
+
     question_id: str = Field(min_length=1, max_length=64, description="Question ID.")
-    submitted_answer: str = Field(
+    group_version_id: str | None = Field(default=None, max_length=64)
+    submitted_answer: str | None = Field(
+        default=None,
         min_length=1,
         max_length=2000,
         description="Raw user-submitted answer or reasoning trace.",
     )
+    structured_answer: dict[str, str] | None = Field(default=None, min_length=1, max_length=100)
     idempotency_key: str | None = Field(
         default=None,
         max_length=128,
         description="Optional client idempotency key to prevent duplicate submissions.",
     )
+
+    @model_validator(mode="after")
+    def exactly_one_answer(self):
+        if (self.submitted_answer is None) == (self.structured_answer is None):
+            raise ValueError("Provide exactly one of submitted_answer and structured_answer.")
+        return self
+
+
+class ReadingGroupEvaluation(HeadingResult):
+    group_version_id: str
+    content_version: str
+    display_schema_version: str
+    evaluation_rule_version: str
+    rule_version_id: str
+    evaluation_source: Literal["rule_check"] = "rule_check"
 
 
 class AttemptSummaryResponse(BaseModel):
@@ -214,6 +238,8 @@ class AttemptSummaryResponse(BaseModel):
     question_id: str
     question_role: str
     submitted_answer: str
+    structured_answer: dict[str, str] | None = None
+    group_evaluation: ReadingGroupEvaluation | None = None
     is_correct: bool | None = None
     evaluation_status: str
     evaluation_summary: str | None = None
@@ -229,6 +255,8 @@ class AttemptDetailResponse(BaseModel):
     question_role: str
     question_version: int
     submitted_answer: str
+    structured_answer: dict[str, str] | None = None
+    group_evaluation: ReadingGroupEvaluation | None = None
     is_correct: bool | None = None
     evaluation_status: str
     evaluation_summary: str | None = None
@@ -254,6 +282,7 @@ class AttemptResultResponse(BaseModel):
     knowledge_state_status: str | None = None
     evaluation_source: str = "rule_check"
     mastery_note: str | None = None
+    group_evaluation: ReadingGroupEvaluation | None = None
 
 
 SessionDetailResponse.model_rebuild()
@@ -279,6 +308,20 @@ class HypothesisResponse(BaseModel):
     updated_at: datetime
 
 
+class ReadingEvidenceSource(BaseModel):
+    attempt_id: str
+    item_id: str
+    paragraph_id: str
+    question_id: str
+    group_version_id: str
+    rule_version_id: str
+    evaluation_rule_version: str
+    diagnostic_protocol: str
+    diagnostic_version: str
+    selected_heading_id: str
+    is_correct: bool
+
+
 class EvidenceLinkResponse(BaseModel):
     """Evidence linked to an error hypothesis."""
 
@@ -287,6 +330,8 @@ class EvidenceLinkResponse(BaseModel):
     attempt_id: str | None = None
     source_type: EvidenceSourceType
     source_ref: str
+    decision_event_id: str | None = None
+    observation: ReadingEvidenceSource | None = None
     relation: EvidenceRelation
     summary: str
     reliability_note: str | None = None
@@ -330,6 +375,7 @@ class DiagnosticStepResponse(BaseModel):
     diagnostic_case_id: str
     case_status: DiagnosticCaseStatus
     executed_tool: str
+    decision_event_id: str | None = None
     decision_reason: str | None = None
     selected_intervention: str | None = None
     selected_question_id: str | None = None

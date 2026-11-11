@@ -37,6 +37,7 @@ def create_session(
         learner_id=payload.learner_id,
         initial_question_id=payload.initial_question_id,
         exam_variant=payload.exam_variant,
+        question_type=payload.question_type,
     )
 
 
@@ -142,6 +143,8 @@ def submit_attempt(
         session_id=session_id,
         question_id=payload.question_id,
         submitted_answer=payload.submitted_answer,
+        structured_answer=payload.structured_answer,
+        group_version_id=payload.group_version_id,
         idempotency_key=payload.idempotency_key,
     )
 

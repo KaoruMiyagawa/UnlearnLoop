@@ -1,8 +1,10 @@
 """Application service orchestrating learning topics, sessions, attempts, and reviews."""
 
 from datetime import datetime, timedelta, timezone
+import json
 from typing import Any, Callable
 
+from pydantic import ValidationError
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -15,6 +17,7 @@ from app.api.v1.schemas import (
     KnowledgeStateResponse,
     LearningHistoryEventResponse,
     LearningMaterialResponse,
+    ReadingGroupEvaluation,
     ReviewItemResponse,
     SanitizedQuestionResponse,
     SessionDetailResponse,
@@ -26,7 +29,9 @@ from app.api.v1.schemas import (
     UnresolvedErrorReasonResponse,
 )
 from app.config import Settings
+from app.decision.matching_headings import MatchingHeadingsRules, published_rules, supported_protocol
 from app.application.exceptions import (
+    ApplicationError,
     EntityNotFoundError,
     IdempotencyConflictError,
     InvalidSessionOperationError,
@@ -50,9 +55,11 @@ from app.domain.exceptions import (
     UnverifiedMasteryError,
 )
 from app.domain.rules import validate_mastery_transition, validate_session_transition
+from app.domain.reading_groups import HeadingAnswerKey, MatchingHeadingsGroup
+from app.evaluation.ielts_reading_evaluator import IeltsReadingEvaluator
 from app.evaluation.registry import evaluator_for_domain
 from app.domain.exams import EXAM_CATALOG_VERSION, domain_for_variant
-from app.persistence.models import ExamPreparationProfile
+from app.persistence.models import ExamPreparationProfile, ReadingGroupVersion, ReadingRuleVersion
 from app.persistence.models import (
     Attempt,
     DecisionEvent,
@@ -263,6 +270,7 @@ class LearningAppService:
         learner_id: str = "default_learner",
         initial_question_id: str | None = None,
         exam_variant: str | None = None,
+        question_type: QuestionType | None = None,
     ) -> SessionDetailResponse:
         """Create and initialize a new learning session."""
         topic = self.repo.get_topic_by_id(topic_id)
@@ -281,16 +289,23 @@ class LearningAppService:
                     f"Question '{init_q.id}' has role '{init_q.question_role}'; "
                     "session initial_question_id must have question_role='initial'."
                 )
+            if question_type is not None and init_q.question_type != question_type.value:
+                raise DomainRuleViolationError("The requested initial question does not match question_type.")
             selected_q_id = init_q.id
         else:
             initial_qs = self.repo.list_questions_for_topic(
                 topic.id, role=QuestionRole.INITIAL
             )
+            if question_type is not None:
+                initial_qs = [q for q in initial_qs if q.question_type == question_type.value]
             if not initial_qs:
                 raise DomainRuleViolationError(
                     f"Topic '{topic.slug}' has no initial questions configured."
                 )
             selected_q_id = initial_qs[0].id
+        selected_question = self.repo.get_question_by_id(selected_q_id)
+        if selected_question.question_type == QuestionType.MATCHING_HEADINGS.value and not selected_question.reading_group_version_id:
+            raise DomainRuleViolationError("Matching Headings requires a published reading group.")
 
         if topic.domain_code.startswith("ielts_"):
             profile = self.db.get(ExamPreparationProfile, learner_id)
@@ -408,6 +423,12 @@ class LearningAppService:
         current_question = self.repo.get_question_by_id(sess.current_question_id) if sess.current_question_id else None
         if current_question:
             current_q_dto = self.sanitize_question(current_question)
+            if sess.current_group_version_id:
+                group = self._assigned_reading_group(sess, current_question)
+                current_q_dto.group_version_id = group.id
+                current_q_dto.group_display = group.display_json
+            elif current_question.reading_group_version_id:
+                raise DomainRuleViolationError("The assigned reading group version was not pinned for this session.")
 
         # Find latest active or incomplete diagnostic case
         active_diag = (
@@ -664,17 +685,31 @@ class LearningAppService:
         self,
         session_id: str,
         question_id: str,
-        submitted_answer: str,
+        submitted_answer: str | None = None,
         idempotency_key: str | None = None,
+        group_version_id: str | None = None,
+        structured_answer: dict[str, str] | None = None,
     ) -> AttemptResultResponse:
         """Record and evaluate a user attempt, updating diagnostic and mastery states."""
         sess = self.repo.get_session(session_id)
         if sess is None:
             raise EntityNotFoundError("LearningSession", session_id)
 
+        if (submitted_answer is None) == (structured_answer is None):
+            raise DomainRuleViolationError("Provide exactly one of submitted_answer and structured_answer.")
+        if structured_answer is not None:
+            return self._submit_reading_group(sess, question_id, group_version_id, structured_answer, idempotency_key or None)
+        if sess.current_group_version_id or group_version_id:
+            if group_version_id != sess.current_group_version_id:
+                raise DomainRuleViolationError("The submitted reading group version does not match the assigned version.")
+            raise DomainRuleViolationError("Matching Headings requires structured_answer.")
+
         question = self.repo.get_question_by_id(question_id)
         if question is None:
             raise EntityNotFoundError("Question", question_id)
+
+        if question.question_type == QuestionType.MATCHING_HEADINGS.value or question.reading_group_version_id:
+            raise DomainRuleViolationError("The assigned reading group version was not pinned for this session.")
 
         if question.topic_id != sess.topic_id:
             raise DomainRuleViolationError(
@@ -698,6 +733,7 @@ class LearningAppService:
                     existing_attempt.session_id != sess.id
                     or existing_attempt.question_id != question.id
                     or existing_attempt.submitted_answer != submitted_answer
+                    or existing_attempt.group_version_id is not None
                 ):
                     raise IdempotencyConflictError(
                         idempotency_key,
@@ -828,7 +864,7 @@ class LearningAppService:
                 ))
             if existing is None:
                 raise
-            if (existing.session_id, existing.question_id, existing.submitted_answer) != (session_id, question_id, submitted_answer):
+            if existing.group_version_id is not None or (existing.session_id, existing.question_id, existing.submitted_answer) != (session_id, question_id, submitted_answer):
                 raise IdempotencyConflictError(idempotency_key or "review-attempt", "This review question already has a different submitted answer.")
             stored_result = self._stored_attempt_result(session_id, existing.id)
             if stored_result is not None:
@@ -839,7 +875,7 @@ class LearningAppService:
                     current_state="review_submission_in_progress",
                 )
             return self._build_attempt_result(self.repo.get_session(session_id), existing, question)
-        if (attempt.session_id, attempt.question_id, attempt.submitted_answer) != (session_id, question_id, submitted_answer):
+        if attempt.group_version_id is not None or (attempt.session_id, attempt.question_id, attempt.submitted_answer) != (session_id, question_id, submitted_answer):
             raise IdempotencyConflictError(idempotency_key or "", "Idempotency key belongs to a different answer intent.")
         stored = self._stored_attempt_result(sess.id, attempt.id)
         if stored:
@@ -1126,6 +1162,229 @@ class LearningAppService:
         self.db.commit()
         return result
 
+    def _assigned_reading_group(self, session: LearningSession, question: Question) -> ReadingGroupVersion:
+        group = self.db.get(ReadingGroupVersion, session.current_group_version_id) if session.current_group_version_id else None
+        current = self.db.get(ReadingGroupVersion, question.reading_group_version_id) if question.reading_group_version_id else None
+        if (
+            group is None
+            or current is None
+            or group.exam_variant != session.exam_variant
+            or group.group_id != current.group_id
+            or group.question_type != current.question_type
+            or group.question_type != question.question_type
+        ):
+            raise DomainRuleViolationError("The assigned reading group version is unavailable or incompatible.")
+        return group
+
+    def _submit_reading_group(
+        self,
+        session: LearningSession,
+        question_id: str,
+        group_version_id: str | None,
+        answers: dict[str, str],
+        idempotency_key: str | None,
+    ) -> AttemptResultResponse:
+        session_id = session.id
+
+        def replay(attempt: Attempt) -> AttemptResultResponse:
+            # Dict equality ignores JSON member ordering, unlike legacy text comparison.
+            if (
+                attempt.session_id != session_id
+                or attempt.question_id != question_id
+                or attempt.group_version_id != group_version_id
+                or attempt.structured_answer_json != answers
+            ):
+                raise IdempotencyConflictError(idempotency_key or "", "Key belongs to a different answer intent.")
+            result = self._stored_attempt_result(session_id, attempt.id)
+            if result is None:
+                raise ApplicationError("The original group result is unavailable.", code="GROUP_RESULT_UNAVAILABLE", status_code=409)
+            return result
+
+        def attempt_by_key() -> Attempt | None:
+            if not idempotency_key:
+                return None
+            return self.db.scalar(select(Attempt).where(Attempt.idempotency_key == idempotency_key))
+
+        existing = attempt_by_key()
+        if existing is not None:
+            return replay(existing)
+        question = self.repo.get_question_by_id(question_id)
+        if (
+            question is None
+            or question.id != session.current_question_id
+            or question.topic_id != session.topic_id
+            or question.question_type != QuestionType.MATCHING_HEADINGS.value
+        ):
+            raise DomainRuleViolationError("Submit structured answers only to the assigned Matching Headings question.")
+        role = QuestionRole(question.question_role)
+        active_status = {
+            QuestionRole.INITIAL: SessionStatus.ACTIVE,
+            QuestionRole.DIAGNOSTIC_FOLLOWUP: SessionStatus.DIAGNOSING,
+            QuestionRole.TARGETED_PRACTICE: SessionStatus.INTERVENING,
+        }.get(role)
+        if active_status is None:
+            raise DomainRuleViolationError("Matching Headings transfer and review are not available yet.")
+        if not group_version_id or group_version_id != session.current_group_version_id:
+            raise DomainRuleViolationError("The submitted reading group version does not match the assigned version.")
+        group = self._assigned_reading_group(session, question)
+        rule = self.db.get(ReadingRuleVersion, group.rule_version_id)
+        evaluator = evaluator_for_domain(session.topic.domain_code)
+        if rule is None or not isinstance(evaluator, IeltsReadingEvaluator):
+            raise DomainRuleViolationError("No scoring rule is available for this reading group.")
+        try:
+            display = MatchingHeadingsGroup.model_validate(group.display_json)
+            key = HeadingAnswerKey.model_validate(rule.private_rules_json)
+        except ValidationError:
+            raise DomainRuleViolationError("The published reading group or its scoring rule is invalid.") from None
+        try:
+            score = evaluator.evaluate_group(group=display, key=key, answers=answers)
+        except ValueError as exc:
+            raise DomainRuleViolationError(str(exc)) from exc
+        evaluation = ReadingGroupEvaluation(
+            **score.model_dump(),
+            group_version_id=group.id,
+            content_version=group.content_version,
+            display_schema_version=group.display_schema_version,
+            evaluation_rule_version=rule.rules_version,
+            rule_version_id=rule.id,
+        )
+
+        # Serialize valid submissions for the same assignment, including requests
+        # with different keys. The no-op write takes the row lock (SQLite writer
+        # lock) without changing the session's timestamps on a replay.
+        claim = self.db.execute(
+            update(LearningSession)
+            .where(
+                LearningSession.id == session_id,
+                LearningSession.status == active_status.value,
+                LearningSession.current_question_id == question_id,
+                LearningSession.current_group_version_id == group_version_id,
+            )
+            .values(updated_at=LearningSession.updated_at)
+            .execution_options(synchronize_session=False)
+        )
+        existing = attempt_by_key()
+        if existing is not None:
+            return replay(existing)
+        prior = self.db.scalar(select(Attempt).where(
+            Attempt.session_id == session_id,
+            Attempt.question_id == question_id,
+            Attempt.group_version_id == group_version_id,
+        ))
+        if prior is not None:
+            if not idempotency_key and prior.idempotency_key is None and prior.structured_answer_json == answers:
+                return replay(prior)
+            raise ApplicationError("This reading group has already been submitted.", code="GROUP_ALREADY_SUBMITTED", status_code=409)
+        if claim.rowcount != 1:
+            raise InvalidSessionOperationError("The reading group assignment is no longer active.")
+
+        protocol = MatchingHeadingsRules(self.repo)
+        case = None
+        diagnostics = published_rules(self.db, group)
+        if role != QuestionRole.INITIAL:
+            case = self.repo.latest_diagnostic_case(session_id)
+            expected_status, action = {
+                QuestionRole.DIAGNOSTIC_FOLLOWUP: (DiagnosticCaseStatus.QUESTION_SELECTED, "select_diagnostic_followup"),
+                QuestionRole.TARGETED_PRACTICE: (DiagnosticCaseStatus.INTERVENTION_SELECTED, "assign_targeted_practice"),
+            }[role]
+            if case is None or case.status != expected_status.value or not supported_protocol(case.trigger_attempt):
+                raise InvalidSessionOperationError("The reading group was not authorized for this diagnostic stage.")
+            initial_group = self.db.get(ReadingGroupVersion, case.trigger_attempt.group_version_id)
+            source = published_rules(self.db, initial_group) if initial_group else None
+            dispatch = next((event for event in reversed(case.decision_events)
+                             if event.action == action and event.event_type == "diagnostic_case_transition"), None)
+            payload = dispatch.payload_json if dispatch else {}
+            if (
+                source is None
+                or payload.get("selected_question_id") != question.id
+                or payload.get("group_version_id") != group.id
+                or not protocol.compatible_task(session, source, question, group, payload.get("target_error_codes", []))
+            ):
+                raise DomainRuleViolationError("The diagnostic question does not match its recorded dispatch.")
+
+        summary = f"标题匹配正确 {score.correct_count}/{score.total_count} 项。"
+        correct = score.outcome == "correct"
+        try:
+            attempt = self.repo.record_attempt(
+                session_id=session_id,
+                question_id=question_id,
+                submitted_answer=json.dumps(answers, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+                is_correct=correct,
+                evaluation_status=AttemptEvaluationStatus.EVALUATED,
+                evaluation_summary=summary,
+                idempotency_key=idempotency_key,
+                submitted_at=self._now(),
+                reading_group=group,
+                structured_answer=answers,
+                item_evaluation=evaluation.model_dump(mode="json"),
+                evaluation_rule_version=rule.rules_version,
+                diagnostic_protocol=diagnostics.protocol if diagnostics else None,
+                diagnostic_version=diagnostics.version if diagnostics else None,
+            )
+        except IntegrityError:
+            self.db.rollback()
+            existing = attempt_by_key()
+            if existing is None:
+                raise
+            return replay(existing)
+        # The row lock excludes a same-session writer. The repository can
+        # still find a key concurrently used in a different session.
+        if attempt.session_id != session_id or attempt.question_id != question_id:
+            return replay(attempt)
+
+        next_action = "reading_group_scored"
+        if role == QuestionRole.INITIAL and not correct:
+            next_action = "insufficient_evidence"
+            note = "逐项评分仅说明哪些匹配正确。当前没有可用于标题匹配的诊断协议。"
+            self.repo.transition_session_status(session, SessionStatus.DIAGNOSING)
+            case = self.repo.create_diagnostic_case(
+                session_id=session_id, trigger_attempt_id=attempt.id, uncertainty_note=note,
+            )
+            self.repo.transition_diagnostic_case(
+                case, DiagnosticCaseStatus.INITIAL_EVALUATED,
+                action="record_reading_group_score", reason=summary,
+            )
+            if diagnostics and supported_protocol(attempt) and protocol.observe_initial(case, attempt, diagnostics):
+                next_action = "diagnose"
+            else:
+                if diagnostics and supported_protocol(attempt):
+                    note = "错选项暂无已审核的原因映射，证据不足。"
+                self.repo.transition_diagnostic_case(
+                    case, DiagnosticCaseStatus.INSUFFICIENT_EVIDENCE,
+                    action="reading_group_diagnosis_unavailable", reason=note, uncertainty_note=note,
+                    uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                )
+        elif role == QuestionRole.DIAGNOSTIC_FOLLOWUP:
+            protocol.observe_followup(case, attempt, diagnostics)
+            next_action = "diagnose"
+        elif role == QuestionRole.TARGETED_PRACTICE:
+            next_action = "matching_headings_transfer_pending" if correct else "matching_headings_practice_incomplete"
+            note = "本次训练通过，仍待独立迁移验证。" if correct else "本次训练未通过，候选原因仍待进一步验证。"
+            if correct:
+                case.uncertainty_note = note
+            else:
+                self.repo.transition_diagnostic_case(
+                    case, DiagnosticCaseStatus.NEEDS_EVIDENCE, action=next_action, reason=note,
+                    uncertainty_note=note, uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                )
+
+        case_id = case.id if case else None
+        result = AttemptResultResponse(
+            attempt_id=attempt.id, session_id=session_id, question_id=question_id,
+            question_role=attempt.attempt_role, is_correct=correct,
+            evaluation_summary=summary, feedback_text=summary, next_action=next_action,
+            diagnostic_case_id=case_id, group_evaluation=evaluation,
+        )
+        self.repo.append_decision_event(
+            session_id=session_id, diagnostic_case_id=case_id,
+            event_type="attempt_evaluated", action="record_attempt_result", to_state=session.status,
+            reason="Persist the reading group score and original retry response.",
+            uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+            payload_json={"attempt_id": attempt.id, "evaluation_source": "rule_check", "result": result.model_dump(mode="json")},
+        )
+        self.db.commit()
+        return result
+
     def _stored_attempt_result(self, session_id: str, attempt_id: str) -> AttemptResultResponse | None:
         events = self.db.scalars(select(DecisionEvent).where(
             DecisionEvent.session_id == session_id, DecisionEvent.action == "record_attempt_result",
@@ -1187,6 +1446,8 @@ class LearningAppService:
                 question_id=a.question_id,
                 question_role=a.attempt_role,
                 submitted_answer=a.submitted_answer,
+                structured_answer=a.structured_answer_json,
+                group_evaluation=a.item_evaluation_json,
                 is_correct=a.is_correct,
                 evaluation_status=a.evaluation_status,
                 evaluation_summary=a.evaluation_summary,
@@ -1209,6 +1470,8 @@ class LearningAppService:
             question_role=att.attempt_role,
             question_version=att.question_version,
             submitted_answer=att.submitted_answer,
+            structured_answer=att.structured_answer_json,
+            group_evaluation=att.item_evaluation_json,
             is_correct=att.is_correct,
             evaluation_status=att.evaluation_status,
             evaluation_summary=att.evaluation_summary,

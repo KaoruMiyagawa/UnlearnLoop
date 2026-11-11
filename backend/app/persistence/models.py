@@ -34,7 +34,7 @@ from sqlalchemy import (
     inspect,
     text,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
 from app.domain.enums import (
     AttemptEvaluationStatus,
@@ -50,7 +50,7 @@ from app.domain.enums import (
     SessionStatus,
     UncertaintyLevel,
 )
-from app.domain.exceptions import ImmutableRecordError
+from app.domain.exceptions import DomainRuleViolationError, ImmutableRecordError
 from app.persistence.database import Base
 
 
@@ -176,6 +176,35 @@ class LearningMaterial(Base):
     questions: Mapped[list["Question"]] = relationship(back_populates="material")
 
 
+class ReadingRuleVersion(Base):
+    """Private, immutable rule payload. Never include this in a learner DTO."""
+
+    __tablename__ = "reading_rule_versions"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    rules_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    private_rules_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class ReadingGroupVersion(Base):
+    """Immutable public content version with a server-only scoring rule reference."""
+
+    __tablename__ = "reading_group_versions"
+    __table_args__ = (UniqueConstraint("group_id", "content_hash", name="uq_reading_group_content"),)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    group_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    question_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    exam_variant: Mapped[str] = mapped_column(String(32), nullable=False)
+    content_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    display_schema_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    display_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    rule_version_id: Mapped[str] = mapped_column(ForeignKey("reading_rule_versions.id", ondelete="RESTRICT"), nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    provenance_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
 class Question(Base):
     """Question item supporting initial, diagnostic_followup, targeted_practice, and transfer_check."""
 
@@ -190,6 +219,7 @@ class Question(Base):
         primary_key=True,
         default=lambda: new_id("q"),
     )
+    reading_group_version_id: Mapped[str | None] = mapped_column(ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True)
     topic_id: Mapped[str] = mapped_column(
         String(64),
         ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
@@ -274,6 +304,7 @@ class LearningSession(Base):
         ForeignKey("questions.id", ondelete="SET NULL"),
         nullable=True,
     )
+    current_group_version_id: Mapped[str | None] = mapped_column(ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True)
     status: Mapped[str] = mapped_column(
         String(32),
         nullable=False,
@@ -392,6 +423,11 @@ class Attempt(Base):
         default=QuestionRole.INITIAL.value,
     )
     submitted_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    group_version_id: Mapped[str | None] = mapped_column(ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True)
+    structured_answer_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    group_snapshot_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    item_evaluation_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    evaluation_rule_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     is_correct: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     evaluation_status: Mapped[str] = mapped_column(
         String(32),
@@ -412,6 +448,30 @@ class Attempt(Base):
 
     session: Mapped["LearningSession"] = relationship(back_populates="attempts")
     question: Mapped["Question"] = relationship(back_populates="attempts")
+
+
+@event.listens_for(LearningSession.current_question_id, "set")
+def _mark_question_assignment(target: LearningSession, _value: Any, _old: Any, _initiator: Any) -> None:
+    # An explicit re-dispatch may choose the same question ID again.
+    target.__dict__["_reading_assignment_pending"] = True
+
+
+@event.listens_for(Session, "before_flush")
+def _pin_assigned_reading_group(db: Session, _context: Any, _instances: Any) -> None:
+    """Pin content when any existing dispatch path changes the current question."""
+    for obj in db.new.union(db.dirty):
+        if not isinstance(obj, LearningSession):
+            continue
+        if obj not in db.new and not obj.__dict__.get("_reading_assignment_pending"):
+            continue
+        question = db.get(Question, obj.current_question_id) if obj.current_question_id else None
+        version_id = question.reading_group_version_id if question else None
+        if version_id:
+            version = db.get(ReadingGroupVersion, version_id)
+            if version is None or version.exam_variant != obj.exam_variant or version.question_type != question.question_type:
+                raise DomainRuleViolationError("Assigned reading content does not match the session exam variant.")
+        obj.current_group_version_id = version_id
+        obj.__dict__.pop("_reading_assignment_pending", None)
 
 
 class DiagnosticCase(Base):
@@ -939,6 +999,10 @@ def _prevent_attempt_snapshot_mutation(
         "attempt_role",
         "submitted_at",
         "idempotency_key",
+        "group_version_id",
+        "structured_answer_json",
+        "group_snapshot_json",
+        "evaluation_rule_version",
     )
     for field_name in immutable_fields:
         hist = state.attrs[field_name].history
@@ -950,11 +1014,19 @@ def _prevent_attempt_snapshot_mutation(
     eval_status_hist = state.attrs["evaluation_status"].history
     old_statuses = eval_status_hist.deleted or [target.evaluation_status]
     if old_statuses and old_statuses[0] == AttemptEvaluationStatus.EVALUATED.value:
-        for eval_field in ("evaluation_status", "is_correct", "evaluation_summary"):
+        for eval_field in ("evaluation_status", "is_correct", "evaluation_summary", "item_evaluation_json"):
             if state.attrs[eval_field].history.has_changes():
                 raise ImmutableRecordError(
                     f"Attempt.{eval_field} cannot be overwritten once evaluation_status is 'evaluated'."
                 )
+
+
+@event.listens_for(ReadingGroupVersion, "before_update")
+@event.listens_for(ReadingGroupVersion, "before_delete")
+@event.listens_for(ReadingRuleVersion, "before_update")
+@event.listens_for(ReadingRuleVersion, "before_delete")
+def _prevent_reading_version_mutation(_mapper: Any, _connection: Any, _target: Any) -> None:
+    raise ImmutableRecordError("Reading content and rule versions are immutable.")
 
 
 @event.listens_for(ModelCall, "before_update")

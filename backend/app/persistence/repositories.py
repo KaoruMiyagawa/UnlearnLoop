@@ -41,6 +41,7 @@ from app.persistence.models import (
     LearningSession,
     ModelCall,
     Question,
+    ReadingGroupVersion,
     ReviewItem,
     utc_now,
 )
@@ -370,6 +371,8 @@ class LearningRepository:
         self, learning_session: LearningSession, *, agent_selected: bool = False,
     ) -> None:
         attempts = self.list_attempts_for_session(learning_session.id)
+        if learning_session.current_group_version_id or any(attempt.group_version_id for attempt in attempts):
+            raise DomainRuleViolationError("Matching Headings independent transfer is not available yet.")
         case = self.latest_diagnostic_case(learning_session.id)
         practices = [attempt for attempt in attempts if attempt.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
         validate_transfer_entry(
@@ -394,6 +397,12 @@ class LearningRepository:
         evaluation_summary: str | None = None,
         idempotency_key: str | None = None,
         submitted_at: datetime | None = None,
+        reading_group: ReadingGroupVersion | None = None,
+        structured_answer: dict[str, str] | None = None,
+        item_evaluation: dict[str, Any] | None = None,
+        evaluation_rule_version: str | None = None,
+        diagnostic_protocol: str | None = None,
+        diagnostic_version: str | None = None,
     ) -> Attempt:
         """Record an immutable learner attempt linked to its Question and LearningSession."""
         if idempotency_key:
@@ -423,14 +432,15 @@ class LearningRepository:
         eval_status_enum = AttemptEvaluationStatus(evaluation_status)
         question_snapshot = {
             "question_id": question.id,
-            "diagnostic_version": (question.evaluation_rubric or {}).get("diagnostic_version"),
-            "diagnostic_protocol": (question.evaluation_rubric or {}).get("diagnostic_protocol"),
+            "diagnostic_version": diagnostic_version if reading_group else (question.evaluation_rubric or {}).get("diagnostic_version"),
+            "diagnostic_protocol": diagnostic_protocol if reading_group else (question.evaluation_rubric or {}).get("diagnostic_protocol"),
+            "rule_version_id": reading_group.rule_version_id if reading_group else None,
             "version": question.version,
             "question_role": question.question_role,
             "question_type": question.question_type,
             "prompt_text": question.prompt_text,
             "context_snippet": question.context_snippet,
-            "standard_answer": question.standard_answer,
+            "standard_answer": question.standard_answer if reading_group is None else None,
             "material_id": question.material_id,
             "material_fingerprint": self._reading_material_fingerprint(question),
         }
@@ -441,6 +451,11 @@ class LearningRepository:
             question_snapshot_json=question_snapshot,
             attempt_role=question.question_role,
             submitted_answer=submitted_answer,
+            group_version_id=reading_group.id if reading_group else None,
+            structured_answer_json=structured_answer,
+            group_snapshot_json=reading_group.display_json if reading_group else None,
+            item_evaluation_json=item_evaluation,
+            evaluation_rule_version=evaluation_rule_version,
             is_correct=is_correct,
             evaluation_status=eval_status_enum.value,
             evaluation_summary=evaluation_summary,

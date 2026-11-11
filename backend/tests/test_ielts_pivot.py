@@ -117,8 +117,8 @@ def test_migration_0003_to_0004_keeps_python_session_without_exam_snapshot(tmp_p
     try:
         upgrade_database(database_url=url, engine=engine, revision="0003_evidence_based_reviews")
         factory = create_session_factory(engine)
-        with transactional_session(factory) as db:
-            import_content_pack(db)
+        from tests.conftest import seed_historical_question
+        seed_historical_question(engine, "topic_py_for_loop", "py-for-loop", "q_py_loop_initial_01")
         with engine.begin() as connection:
             connection.execute(text("INSERT INTO learning_sessions (id, learner_id, topic_id, current_question_id, status, started_at, updated_at) VALUES ('legacy-python-session', 'legacy-learner', 'topic_py_for_loop', 'q_py_loop_initial_01', 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"))
             connection.execute(text("INSERT INTO attempts (id, session_id, question_id, question_version, question_snapshot_json, attempt_role, submitted_answer, is_correct, evaluation_status, submitted_at) VALUES ('legacy-python-attempt', 'legacy-python-session', 'q_py_loop_initial_01', 1, '{}', 'initial', 'legacy answer', 0, 'evaluated', CURRENT_TIMESTAMP)"))
