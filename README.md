@@ -1,59 +1,66 @@
 # VerbaTrail
 
-**把错误变成线索，在新情境中验证理解。**
+**VerbaTrail —— 让语言学习真正因人而异。**
 
-AI Agent 驱动的英语学习与 IELTS 备考平台，以 **IELTS Overall Band 8.0** 为学习目标。8.0 是备考目标，不是分数预测或保证。
+通过自适应学习、持续反馈与逐步发展的学习 Agent，帮助学习者从当前水平出发，建立理解、表达和真实运用语言的能力。
 
-[English](README_EN.md) · [最新应用分支](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation) · [快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [路线图](docs/development/ROADMAP.md)
+**首个目标场景：IELTS Overall Band 8.0。** 这是学习目标，不是当前水平、分数预测或结果保证。长期愿景是帮助学习者真正掌握一门语言，而不只提高考试答题正确率。
 
-> GitHub 默认分支 `main` 目前还没有最新 IELTS 应用版本。最新整合成果在 [`feat/verbatrail-consolidation`](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/verbatrail-consolidation)；尚未合并到 `main`，也不是生产发布。
+[English](README_EN.md) · [当前开发分支](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](docs/development/ROADMAP.md)
 
-## 产品方向
+> **当前状态：** IELTS Academic / General Training 的部分阅读学习、Matching Headings、错误反馈、针对性训练、独立迁移和首轮延迟复习已有实现。IELTS-2B.1 Phase 6 综合验收为 **FAIL**：已知旧版迁移/复习评分证据缺少有效性标记和学习状态重算机制。新内容版本已修正并阻止相关旧版本继续产生新验证，但历史记录的可信度处理尚未完成。当前开发分支的 Phase 4–6 修改仍在本地，未提交；该分支也未合并到 `main`。这不是生产发布。
 
-VerbaTrail 希望帮助学习者理解错误背后的原因，而非只累计题量。我们将 **Error DNA** 作为产品方向：持续整理可验证的错误线索，形成能被新问题检验的学习假设。
+## 产品愿景
 
-当前代码已实现这条方向的基础环节：后端记录竞争假设与证据，根据会话状态安排追问和针对性练习，并通过独立新题验证迁移；服务端也管理知识状态与间隔复习计划。**目前没有经过校准的 Error DNA 学习画像、官方 IELTS 评分或真实模型诊断质量保证。**长期复习安排已实现，长期记忆效果尚未经过学习研究验证。
+VerbaTrail 围绕学习者的目标、当前能力证据和可用时间，逐步安排适合的输入、练习、表达、反馈与复习。IELTS Overall 8.0 是首个明确目标场景；产品长期关注的是语言理解、交流和跨情境运用能力。
+
+目标产品关系如下。除下文标明已实现的 Reading 与学习流程外，统一学习者模型、个性化规划和跨技能 Agent 决策仍是规划能力。
 
 ```mermaid
 flowchart LR
-    A[作答] --> B[服务端评价]
-    B --> C[候选错误假设与证据]
-    C --> D[区分性追问]
-    D --> E[针对性练习]
-    E --> F[独立新题迁移验证]
-    F --> G[更新知识状态与复习计划]
+    L[语言学习系统] --> P[学习者档案与能力证据]
+    P --> A[自适应学习 Agent]
+    A --> I[输入：阅读 · 听力 · 词汇 · 语法]
+    A --> O[输出：口语 · 写作 · 交流]
+    I --> F[反馈与错误诊断]
+    O --> F
+    F -. Error DNA：候选原因与证据 .-> T[新语境迁移与长期复习]
+    T --> N[个性化学习计划]
+    N --> A
 ```
 
-实际流程由服务端状态和可用任务决定；并非每次作答都会执行全部步骤。
+**Error DNA 是反馈与错误诊断能力之一，不是整个产品。** 它帮助整理作答中观察到的错误、候选解释及验证证据；规则流程和 FakeModelProvider 不等于经过验证的真实 AI 语义诊断。一次作答、一次迁移通过或一次复习通过，都不能单独证明长期掌握。
 
-## 功能状态
+## 当前功能状态
 
-| 能力 | 当前状态 |
+| 能力 | 状态与边界 |
 | --- | --- |
-| Reading | **已实现：** IELTS Academic 与 General Training 阅读模式、原创英文材料、服务端任务选择与作答流程。 |
-| 诊断与练习 | **基础流程已实现：** 服务端 Agent 工作流、竞争假设、证据、追问、定向练习及迁移验证；FakeModelProvider 只模拟模型响应。 |
-| Review 与学习档案 | **已实现：** 真实 ReviewItem、到期信息、历史、知识状态、迁移/延迟复习证据及未知状态展示。 |
-| 双主题界面 | **已实现：** 单套 React 应用提供 Premium Academic 与 Noir & Champagne；偏好本地保存，阅读文章保持暖象牙白底色。 |
-| Listening、Writing、Speaking | **规划中：** 当前不是完整四科备考产品。 |
-| Vocabulary、Grammar、Mock Tests | **规划中：** 暂无完整学习流程。 |
-| UKVI、Life Skills | **规划中：** 尚未作为可用考试流程交付。 |
-| 真实模型诊断与分数预测 | **未验证：** 不宣称真实 AI 个性化质量、官方评分或 Band 预测能力。 |
+| IELTS Reading | **有限范围已实现：** Academic 与 General Training 的原创阅读内容、TFNG 流程及 Matching Headings 题组作答和逐项评价。不是完整 Reading 题型覆盖。 |
+| 反馈与 Error DNA | **部分实现：** 已有特定 Reading 路径的候选假设、证据、区分性追问和定向训练。状态由服务端规则流程支持；不代表真实模型教学效果或全语言学习者画像。 |
+| 迁移与复习 | **首轮流程已实现，但有质量阻断：** Matching Headings 独立迁移和首轮延迟复习有服务端记录。Phase 6 发现旧版题组答案依据有误，历史证据有效性标记与状态重算尚未完成，详见[最终验收报告](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)。 |
+| 学习历史与档案 | **基础能力已实现：** 展示现有服务端会话、知识状态、迁移与复习记录；受上述历史证据问题影响，不能据此确认所有旧状态准确。 |
+| 双主题界面 | **已实现：** 一套 React 应用支持 Premium Academic 与 Noir & Champagne。 |
+| Listening、Writing、Speaking | **规划中：** 尚未交付完整学习流程。 |
+| Vocabulary、Grammar、理解与表达训练 | **规划中：** 尚无统一跨技能能力模型和完整训练体系。 |
+| 学习者模型、个性化计划与自适应 Agent | **规划中：** 目前没有完整的初始能力评估或跨技能学习计划。 |
+| IELTS 模考、UKVI、Life Skills、其他语言 | **尚未实现：** 属于后续方向；当前产品只实现部分英语 IELTS 阅读场景。 |
+| 真实模型教学质量、官方评分、Band 预测 | **未验证 / 未实现：** 不承诺真实 AI 个性化效果、官方分数或 IELTS 8.0 结果。 |
 
-### 验收截图
+### 主题与实际界面
 
-以下截图来自隔离 Headless Chrome 浏览器验收，不是设计稿。阅读工作流使用 FakeModelProvider，不代表真实模型效果。
+以下是项目浏览器验收中的真实截图，来自早期 IELTS-1 隔离验收，展示当时的首页和阅读界面，并不代表 IELTS-2B.1 Phase 6 通过，也不覆盖当前全部能力状态。
 
 <table>
   <tr>
     <td><img src="docs/development/consolidation-browser-evidence/home-premium.png" alt="Premium Academic 首页" width="100%"><br><sub>Premium Academic · 首页</sub></td>
-    <td><img src="docs/development/consolidation-browser-evidence/home-noir.png" alt="Noir and Champagne 首页" width="100%"><br><sub>Noir &amp; Champagne · 首页</sub></td>
+    <td><img src="docs/development/consolidation-browser-evidence/home-noir.png" alt="Noir & Champagne 首页" width="100%"><br><sub>Noir &amp; Champagne · 首页</sub></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="docs/development/consolidation-browser-evidence/academic-reading-premium.png" alt="Academic Reading 工作台" width="100%"><br><sub>Academic Reading · 文章与服务端题目</sub></td>
+    <td colspan="2"><img src="docs/development/consolidation-browser-evidence/academic-reading-premium.png" alt="Academic 阅读工作台" width="100%"><br><sub>Academic Reading · 早期隔离浏览器验收</sub></td>
   </tr>
 </table>
 
-[浏览器验收记录与手机截图](docs/development/consolidation-browser-evidence/README.md) · [IELTS-1 双主题视觉验收](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+[IELTS-2B.1 Phase 6 当前截图与验收边界](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md) · [早期浏览器证据索引](docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
 
 ## 技术架构
 
@@ -61,17 +68,18 @@ flowchart LR
 flowchart LR
     UI[React / TypeScript / Vite] -->|REST API| API[FastAPI]
     API --> APP[应用服务与领域规则]
-    APP --> DB[(SQLAlchemy / SQLite)]
-    APP --> MIG[Alembic]
-    APP --> AGENT[服务端诊断与评价流程]
-    AGENT --> MODEL[FakeModelProvider / 模型适配接口]
+    APP --> DATA[SQLite / SQLAlchemy]
+    APP --> MIG[Alembic 迁移]
+    APP --> LEARN[会话 · 作答 · 评价]
+    APP --> AGENT[规则诊断与学习状态编排]
+    AGENT --> PROVIDER[FakeModelProvider / 模型适配接口]
 ```
 
-前端呈现服务端任务和状态；后端负责会话、作答、幂等恢复、诊断、迁移验证、知识状态与复习计划。SQLite 是本地开发默认配置，Alembic 历史迁移保留在仓库中。架构边界见[当前架构说明](docs/architecture/CURRENT_ARCHITECTURE.md)。
+当前后端管理学习会话、版本固定的阅读题组、结构化作答、评价快照、特定诊断流程、迁移和复习状态；React 通过 API Client 显示服务端状态。默认本地数据存储为 SQLite。统一学习者模型、跨技能策略规划和经过验证的实时模型 Agent 尚未实现。详情见[当前架构说明](docs/architecture/CURRENT_ARCHITECTURE.md)及[目标架构](docs/architecture/ARCHITECTURE.md)。
 
-## 本地启动
+## Windows 本地启动
 
-需要 Python 3.11+、Node.js、npm 和 Git。以下命令从仓库根目录开始：
+需要 Python 3.11+、Node.js、npm 和 Git。在仓库根目录执行：
 
 ```powershell
 python -m venv .venv
@@ -81,7 +89,7 @@ npm ci
 cd ..
 ```
 
-在第一个终端启动后端（数据库路径相对于 `backend/`）：
+在第一个 PowerShell 窗口启动后端（数据库路径相对于 `backend/`）：
 
 ```powershell
 $env:DATABASE_URL = 'sqlite:///./verbatrail-local.db'
@@ -92,16 +100,18 @@ cd backend
 ..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
 ```
 
-在第二个终端启动前端：
+在第二个窗口启动前端：
 
 ```powershell
 cd frontend
 npm run dev
 ```
 
-打开 `http://127.0.0.1:15173`；API 文档位于 `http://127.0.0.1:18000/docs`。开发启动会对所配置数据库运行迁移；使用已有数据库前应先建立并验证备份。详细端口与数据说明见[快速启动指南](docs/development/QUICKSTART.md)。
+访问 `http://127.0.0.1:15173`，API 文档位于 `http://127.0.0.1:18000/docs`。服务启动会迁移所配置的数据库；使用既有数据库前先备份并验证可恢复性。完整说明见[快速启动指南](docs/development/QUICKSTART.md)。这是本地开发配置，不是生产部署或多用户安全配置。
 
-## 测试
+## 测试与成熟度
+
+常用检查命令：
 
 ```powershell
 cd backend
@@ -112,23 +122,16 @@ npm run typecheck
 npm run build
 ```
 
-当前基线：后端 80 项、前端 40 项测试通过。测试使用固定样例和 FakeModelProvider，不调用付费模型；这些结果不验证真实模型的个性化诊断能力。
+IELTS-2B.1 Phase 6 本轮完整回归记录为后端 **159 passed**、前端 **47 passed**，TypeScript 检查、Production build、Alembic 单一 head、隔离 HTTP 与 Chrome 浏览器脚本均通过。**工程门禁通过不改变综合验收 FAIL 结论：旧版迁移/复习证据尚无可信度标记及重算机制。**测试使用规则和 FakeModelProvider；没有证明真实模型质量、外部专家审校、生产安全或完整 IELTS 覆盖。
 
-## 项目结构
+当前身份边界为本地单用户开发：`learner_id` 是筛选字段，不是认证。项目没有生产级账号认证或多租户隔离。项目也未声明开源许可证，请勿据此假定再分发权利。
 
-```text
-backend/               FastAPI、应用/领域服务、内容包、Alembic 迁移与 pytest
-frontend/              React 页面、主题令牌、API Client 与前端流程测试
-docs/architecture/     当前系统架构
-docs/design/           双主题原型、设计系统与历史方案
-docs/development/      快速启动、阶段验收、浏览器证据与路线图
-docs/archive/          被新方案取代但仍有参考价值的资料
-```
+## 文档与研发方向
 
-## 路线图
+- [产品方向](docs/product/IELTS_PRODUCT_DIRECTION.md)：以学习者为中心的语言学习愿景及能力规划。
+- [产品需求概要](docs/product/PRD.md)：当前范围、能力状态与产品边界。
+- [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [目标架构](docs/architecture/ARCHITECTURE.md)
+- [研发路线图](docs/development/ROADMAP.md) · [Windows 快速启动](docs/development/QUICKSTART.md)
+- [IELTS-2B.1 Phase 6 最终验收](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)：当前 FAIL 原因、修复、证据及未完成项。
 
-- **当前开发：** 整合并稳定 IELTS Academic / General Training Reading、Review、学习档案与双主题体验。
-- **后续规划：** 扩展 Listening、Writing、Speaking、Vocabulary、Grammar、Mock Tests、UKVI 和 Life Skills。
-- **独立质量门禁：** 真实模型、评分与 Band 估计须另行验证隐私、预算、可靠性和准确度。
-
-完整状态见[开发路线图](docs/development/ROADMAP.md)。欢迎先通过 issue 讨论改进，并遵循[贡献指南](CONTRIBUTING.md)。目前未声明开源许可证，请勿假定可以自由再分发。
+路线图从可信历史证据与状态重算开始，再逐步建立语言能力模型、初始评估和个性化学习规划；随后扩展其他技能、长期记忆与迁移，最后评估更多语言及智能教学能力。

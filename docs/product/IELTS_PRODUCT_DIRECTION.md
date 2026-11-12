@@ -1,62 +1,93 @@
-# VerbaTrail 产品方向（暂定名）
+# VerbaTrail 产品方向
 
-更新日期：2026-11-09。此文档记录 VerbaTrail 的 IELTS 产品方向；GitHub 仓库 URL、历史数据和 Python 技术追溯标识暂保留原样。
+更新日期：2026-11-12。文件名因早期 IELTS 项目沿用；本文件现描述 VerbaTrail 的整体产品方向。历史 IELTS 规划和验收记录保留原样，见 `docs/archive/`、`docs/ielts-0-baseline/` 与阶段验收文档。
 
-## 产品承诺与边界
+## 愿景与首个目标场景
 
-帮助英语学习者从有证据的当前水平出发，逐步准备 IELTS Academic 或 General Training，并把 Overall 8.0 作为默认可编辑目标。目标不是成绩承诺。系统反馈、诊断与未来的自动评分均须标明来源和不确定性；系统结果不是 IELTS 官方成绩。
+VerbaTrail 是以学习者为中心、由自适应学习 Agent 驱动的语言学习系统。通过学习者当前能力证据、个性化练习、持续反馈和复习，帮助学习者逐渐建立理解、表达和真实使用语言的能力。
 
-当前可选考试模式是 Academic 与 General Training。IELTS for UKVI Academic/General Training 与 Life Skills A1/A2/B1 在产品目录中显示为计划中，不可启动学习流程。UKVI 适用目的/考试安全要求由基础版本继承，不在题型上虚构差异；Life Skills 是听说及 Pass/Fail 体系，不生成 Band 或 Overall。
+首个明确目标场景是 **IELTS Overall Band 8.0**。这是学习者可设定的备考目标，不代表当前水平，不是分数预测，也不是成绩保证。长期愿景超越考试题目：帮助学习者真正掌握一门语言。
 
-## 学习闭环
+当前产品范围仍然有限：只实现部分英语 IELTS Reading 工作流和配套的诊断、训练、迁移、首轮复习能力。完整四科、统一语言能力评估、跨技能个性化计划、真实模型教学质量均未完成或未验证。
 
-1. 选择已开放考试版本和目标；目标、版本、日期在服务端保存，并在新会话快照考试目录版本。
-2. 从四科能力入口选择已开放训练。当前只有原创阅读 A/G 各一套小型服务端题组可运行，其余明确标为计划中。
-3. 服务端派题并保存题目版本、原始回答、确定性评价与来源。不同领域使用独立评价器；没有评价器时失败关闭。
-4. 错误只形成有来源的候选假设；证据不足可继续追问。Agent 派发的追问和练习使用现有状态机及服务端合法题目。
-5. 用不同材料的迁移题确认当前能力变化，再由已有复习调度安排延迟测验。当前迁移通过不等于长期保持。
-6. 复习、档案和历史沿用已有真实服务端数据。旧 Python 会话继续可读且没有考试版本，不会自动改成 IELTS。
+## 产品关系
 
-## 产品模式与核心能力
+```mermaid
+flowchart LR
+    LS[语言学习系统] --> LP[学习者档案与能力证据]
+    LP --> AA[自适应学习 Agent]
+    AA --> LI[语言输入：阅读 / 听力 / 词汇 / 语法]
+    AA --> LO[语言输出：口语 / 写作 / 交流]
+    LI --> FE[反馈与错误诊断]
+    LO --> FE
+    FE --> ED[Error DNA：候选错误模式与证据]
+    ED --> TR[新语境迁移]
+    TR --> MR[长期记忆与间隔复习]
+    MR --> PP[个性化学习计划]
+    PP --> AA
+```
 
-| 能力 | 当前实现 | 下一步产品要求 |
+图示是目标产品关系，不是现有完整架构。**Error DNA 是反馈能力的一部分**：记录可观察错误、维护竞争性候选原因，并以追问、练习及新情境任务收集证据。它不等于完整学习者模型，也不应凭一次错误确认稳定弱点。
+
+## 目标能力模块
+
+| 模块 | 产品职责 | 当前状态 |
 | --- | --- | --- |
-| 考试目录/目标 | A/G 可保存，四科目标默认 8.0，当前水平为待评估；其余五种计划中 | 目标日期编辑、目标审计历史、实际基线评估 |
-| Reading | 原创 Academic/GT 微型题组、服务端派题、客观答案键、作答持久化、现有诊断与迁移机制 | 完整题型和题组、题库审核、阅读题型专属反馈与覆盖统计 |
-| Listening | 未实现 | 授权音频、播放状态、逐空证据、播放规则版本 |
-| Writing | 未实现 | Task 1/2 作答版本、维度反馈及人工校准门槛 |
-| Speaking | 未实现 | 录音授权、转写、轮次和时间锚点、发音弃评机制 |
-| Agent 与复习 | 复用既有诊断、竞争性假设、追问、针对性练习、独立迁移、真实间隔复习 | IELTS 特定语言错误模式和经过评测的多技能证据映射 |
-| 词汇/语法/计划 | 未实现 | 与 Reading/Writing/Speaking 错误关联的可解释练习计划 |
-| 模考 | 未实现 | 版本化考试蓝图、计时和提交约束、非官方成绩标注 |
-| 档案 | 复用已有服务端复习与档案数据 | 四科独立能力证据、人工/自动评价来源分开呈现 |
+| Learner Profile | 目标、背景、偏好、当前能力证据、未知项和学习约束 | 现有档案及知识状态 API 提供基础记录；未形成完整、校准的语言能力模型 |
+| Assessment | 初始水平评估及持续能力评估 | 当前水平仍可为待评估；完整基线评估未实现 |
+| Learning Planner | 把目标、能力证据和可用时间组织成可解释的学习路线 | 未实现统一个性化计划 |
+| Language Input | 阅读、听力、词汇、语法与理解 | 部分 IELTS Reading 已实现；听力、词汇、语法体系未实现 |
+| Language Output | 写作、口语和真实交流表达 | 未实现完整学习流程 |
+| Adaptive Agent | 基于状态与证据选择下一项合适活动，并能解释依据和不确定性 | 已有受约束的后端诊断/派题流程；未有经过验证的跨技能自适应教学 Agent |
+| Error DNA | 整理错误观察、候选原因、支持/反证与后续验证 | 已在部分 TFNG 与 Matching Headings 流程中实现；质量边界见 Phase 6 验收 |
+| Memory & Review | 复习排程、到期任务、延迟证据与长期记忆追踪 | ReviewItem 与首轮延迟复习路径已有实现；历史旧版证据尚需可信度处理，多轮保持未建立 |
+| Transfer | 在新材料、新语境中检查能力能否迁移 | 部分 Reading 路径已有独立迁移；不等于稳定掌握 |
+| Progress & Goals | 显示目标、真实进展、证据来源和未知能力 | 已有考试目标与档案基础；没有校准 Band 估分或完整四科能力追踪 |
 
-## 评分及内容政策
+## 学习原则
 
-客观题只按题目版本内的审核答案键/规则评价。写作官方公开维度为 Task 1 的 Task Achievement、Task 2 的 Task Response、Coherence and Cohesion、Lexical Resource、Grammatical Range and Accuracy；口语维度为 Fluency and Coherence、Lexical Resource、Grammatical Range and Accuracy、Pronunciation。任何 AI 维度反馈都必须标成非官方，提供文本或音频证据锚点和弃评原因；未通过专家标注盲测前不显示 AI Band。
+1. 先区分目标与当前能力；没有评估证据时明确标记未知。
+2. 学习活动应能追溯到服务端题目版本、作答和评价来源。
+3. 初始错误只形成候选解释；证据不足时保留不确定状态。
+4. Agent 选择追问、训练或复习时，应检查合法内容与当前会话状态。
+5. 训练正确、独立迁移通过、延迟保持验证是不同证据，不相互替代。
+6. 人工、规则、FakeModelProvider 与真实模型输出必须分开标记；不把规则执行描述为经验证的 AI 语义理解。
+7. 学习计划应解释选择依据、可选行动和未知项，避免把 IELTS 目标分数伪装成当前能力。
 
-所有首发内容须原创或有明确许可记录。当前 Reading pack 为项目原创练习，不包含官方真题、官方录音、官方评分描述全文或商业题库。IELTS 名称只用于描述兼容的备考方向；发布前完成商标、版权和品牌审查。
+## 当前 IELTS 产品状态
 
-音频、作文、转写和学习记录按个人数据处理：默认本地 Fake provider、远程调用关闭；上传/录音前明确用途、地区、供应商、保留期和同意撤回。当前 learner_id 是本地筛选字段，不是登录或多用户鉴权。
+- Academic 与 General Training 是当前可用考试模式，但阅读内容规模有限。
+- TFNG 与 Matching Headings 有部分服务端流程；Matching Headings 有原创题组、结构化作答、逐项评价、诊断、训练、独立迁移和首轮延迟复习实现。
+- **IELTS-2B.1 Phase 6 综合验收为 FAIL。** Phase 4 早期版本的部分迁移/复习标题答案与文章不匹配。新版本已更正，并阻止受影响旧版本继续创建新的迁移/保持证据；但已有旧记录还没有有效性标记和知识状态重算流程。见 [`IELTS_2B1_FINAL_ACCEPTANCE.md`](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)。
+- 旧版历史记录仍可读；在有效性重算完成前，不能把旧状态当作已确认的真实能力。
+- Listening、Writing、Speaking、完整 Reading 题型、Vocabulary、Grammar、Mock Tests、UKVI、Life Skills 和多语言教学尚未实现。
+- FakeModelProvider 与规则诊断只支持隔离开发和流程验证，不能证明真实模型或产品级个性化有效。
 
-## 版本变化
+## 规划原则
 
-考试规范、题型元数据、评分规则、题目内容和评价器分别版本化。服务端 session 快照考试目录版本；新官方政策需要研究、内容审校、兼容性测试后发布，不回写历史成绩。上线前由产品负责人复核官方规则来源与更新时间。
+- 先解决证据可信度和状态重算，再扩展学习能力。
+- 内容包有独立 ID、版本、来源/授权和答案依据；新内容需单独审校。
+- 扩展其他语言时，将通用学习模型与 IELTS 考试规范分层；当前不宣称已支持其他语言。
+- UKVI 与 Life Skills 必须采用适合各自考试目标的独立目录与流程，不把 Life Skills Band 化，也不虚构与基础 IELTS 不同的题型。
+- 真实模型接入须经过隐私、成本、质量、拒答与人工对照评估；未完成前不作为产品能力承诺。
 
-## 当前需确认
+## 非目标与安全边界
 
-1. 正式品牌是否采用 VerbaTrail，以及中文名是否采用“语迹”。
-2. 首发地区/用途、语言和设备优先级；何时引入认证及云端账号。
-3. 是否允许任何远程文本/语音提供商、数据处理地区与费用上限。
-4. 内容编辑、专家评分校准、录音/作文保存期限、导出和删除策略。
+- 不承诺用户取得 IELTS 8.0，也不输出官方 IELTS 成绩。
+- 不根据单次答题或规则启发式生成统计概率、稳定标签或完整能力画像。
+- 当前 `learner_id` 是本地查询筛选字段，不是登录凭证；系统不是生产级多用户服务。
+- 本地默认 Fake provider、远程模型调用关闭。真实音频、作文和学习记录的远程处理在明确用途、供应商、地区、保留期和同意流程之前不应开放。
+- 当前原创 Reading 内容仍需独立编辑及 IELTS 专家审校；内部检查不等于外部认证。
 
-## 官方资料
+## 版本与官方规则
+
+题目内容、展示 schema、答案规则、考试目录和评价器分别追踪版本。更新规则时保留历史题目与 Attempt，不回写既有证据。IELTS 官方格式或适用要求需在发布相应产品版本前重新核查权威来源；仓库版本号不代表官方版本。
+
+参考资料：
 
 - [IELTS test types](https://ielts.org/take-a-test/test-types)
-- [Academic test format](https://ielts.org/take-a-test/test-types/ielts-academic-test)
-- [General Training format](https://ielts.org/take-a-test/test-types/ielts-general-training-test)
+- [IELTS Academic](https://ielts.org/take-a-test/test-types/ielts-academic-test)
+- [IELTS General Training](https://ielts.org/take-a-test/test-types/ielts-general-training-test)
 - [IELTS scoring](https://ielts.org/take-a-test/your-results/ielts-scoring-in-detail)
 - [IELTS Life Skills](https://ielts.org/take-a-test/test-types/ielts-life-skills)
 - [IELTS for UKVI](https://ielts.org/take-a-test/test-types/ielts-for-ukvi)
-
-以上官方页面需在每次发布考试目录时重新核实；本项目目录版本标识产品采用的规范快照，不声称官方版本号。
