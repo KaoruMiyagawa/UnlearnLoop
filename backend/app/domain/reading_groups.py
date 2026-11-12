@@ -82,7 +82,7 @@ class HeadingDiagnostics(StrictModel):
     protocol: str = Field(min_length=1)
     version: str = Field(min_length=1)
     source_group_id: str = Field(min_length=1)
-    role: Literal["initial", "diagnostic_followup", "targeted_practice"]
+    role: Literal["initial", "diagnostic_followup", "targeted_practice", "transfer_check", "review"]
     targets: list[HeadingError] = Field(min_length=1, max_length=2)
     task_versions: dict[str, str] = Field(default_factory=dict)
     distractors: dict[str, dict[str, list[HeadingError]]] = Field(default_factory=dict)
@@ -111,6 +111,9 @@ class HeadingDiagnostics(StrictModel):
                     or "supports" not in probe.relations.values()
                 ):
                     raise ValueError("Each probe must distinguish support from contrary evidence.")
+        elif self.role in {"targeted_practice", "transfer_check", "review"}:
+            if len(targets) != 1 or self.distractors or self.probes:
+                raise ValueError("Intervention, transfer, and review tasks must target one cause.")
         elif len(targets) != 1 or self.distractors or self.probes or self.task_versions:
             raise ValueError("Practice must target one cause without diagnostic mappings.")
 

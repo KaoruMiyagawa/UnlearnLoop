@@ -1,5 +1,6 @@
 import { ApiClientError, apiRequest } from './client.ts';
 import type {
+  AttemptAnswer,
   AttemptDetail,
   AttemptResult,
   AttemptSummary,
@@ -60,11 +61,25 @@ export const completeSession = (id: string, payload?: SessionActionRequest, sign
   postSessionAction(id, 'complete', payload, signal);
 
 export function createAttemptSubmission(
-  input: Omit<SubmitAttemptRequest, 'idempotency_key'> & { idempotency_key?: string | null },
+  input: AttemptAnswer & { question_id: string; idempotency_key?: string | null },
 ): Readonly<SubmitAttemptRequest> {
-  return Object.freeze({ ...input, idempotency_key: input.idempotency_key ?? crypto.randomUUID() });
+  const idempotency_key = input.idempotency_key ?? crypto.randomUUID();
+  if (input.structured_answer) {
+    return Object.freeze({
+      question_id: input.question_id,
+      group_version_id: input.group_version_id,
+      structured_answer: Object.freeze({ ...input.structured_answer }),
+      idempotency_key,
+    });
+  }
+  return Object.freeze({ question_id: input.question_id, submitted_answer: input.submitted_answer, idempotency_key });
 }
 
+export function attemptContent(payload: AttemptAnswer & { question_id: string }): string {
+  return JSON.stringify(payload.structured_answer
+    ? [payload.question_id, payload.group_version_id, Object.entries(payload.structured_answer).sort(([a], [b]) => a.localeCompare(b))]
+    : [payload.question_id, payload.submitted_answer]);
+}
 // Retained only for this page lifetime. The backend remains authoritative and
 // persists the same-key/same-content check across reloads and other clients.
 const submittedAttemptBodies = new Map<string, string>();
@@ -81,7 +96,7 @@ export function submitAttempt(
   const body = JSON.stringify(payload);
   if (payload.idempotency_key) {
     const requestIdentity = JSON.stringify([sessionId, payload.idempotency_key]);
-    const requestContent = JSON.stringify([payload.question_id, payload.submitted_answer]);
+    const requestContent = attemptContent(payload);
     const previousContent = submittedAttemptBodies.get(requestIdentity);
     if (previousContent !== undefined && previousContent !== requestContent) {
       return Promise.reject(new ApiClientError(409, {

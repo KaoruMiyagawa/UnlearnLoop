@@ -128,6 +128,14 @@ class ReviewStatus(StrEnum):
     CANCELLED = "cancelled"
 
 
+class EvidenceValidityStatus(StrEnum):
+    """Current evidentiary fitness without rewriting the original assessment."""
+
+    ELIGIBLE = "eligible"
+    INVALIDATED = "invalidated"
+    REVIEW_REQUIRED = "review_required"
+
+
 class ModelCallStatus(StrEnum):
     """Execution outcome status of a ModelProvider call (ARCHITECTURE.md Section 4 & 7)."""
 

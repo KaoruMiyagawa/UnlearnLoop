@@ -3,10 +3,25 @@
 from fastapi import APIRouter, Depends, Query
 
 from app.api.v1.dependencies import get_learning_service
-from app.api.v1.schemas import DashboardSummaryResponse, KnowledgeStateResponse, LearningHistoryEventResponse
+from app.api.v1.schemas import (
+    DashboardSummaryResponse, EvidenceRevalidationRequest, EvidenceRevalidationResponse,
+    KnowledgeStateResponse, LearningHistoryEventResponse,
+)
 from app.application.learning_service import LearningAppService
 
 router = APIRouter(tags=["profile"])
+
+
+@router.post(
+    "/profile/evidence-revalidation",
+    response_model=EvidenceRevalidationResponse,
+    summary="Start a fresh learning session to revalidate affected evidence",
+)
+def start_evidence_revalidation(
+    payload: EvidenceRevalidationRequest,
+    service: LearningAppService = Depends(get_learning_service),
+) -> EvidenceRevalidationResponse:
+    return service.start_evidence_revalidation(payload)
 
 
 @router.get(

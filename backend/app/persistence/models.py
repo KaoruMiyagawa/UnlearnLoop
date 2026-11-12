@@ -205,6 +205,39 @@ class ReadingGroupVersion(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
 
 
+class EvidenceValidityEvent(Base):
+    """Append-only audit event for whether stored evidence may support learning state."""
+
+    __tablename__ = "evidence_validity_events"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_evidence_validity_idempotency_key"),
+        CheckConstraint(
+            "status IN ('eligible', 'invalidated', 'review_required')",
+            name="ck_evidence_validity_status",
+        ),
+        Index("ix_evidence_validity_target", "target_type", "target_id", "audited_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("evv"))
+    target_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    target_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    group_version_id: Mapped[str | None] = mapped_column(
+        ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True
+    )
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    content_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    rules_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(256), nullable=False)
+    replacement_group_version_id: Mapped[str | None] = mapped_column(
+        ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True
+    )
+    affected_refs_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    idempotency_key: Mapped[str] = mapped_column(String(192), nullable=False)
+    audited_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
 class Question(Base):
     """Question item supporting initial, diagnostic_followup, targeted_practice, and transfer_check."""
 
@@ -855,6 +888,12 @@ class ReviewItem(Base):
     attempt_id: Mapped[str | None] = mapped_column(
         String(64), ForeignKey("attempts.id", ondelete="RESTRICT"), nullable=True
     )
+    trigger_attempt_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("attempts.id", ondelete="RESTRICT"), nullable=True
+    )
+    group_version_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True
+    )
     decision_event_id: Mapped[str | None] = mapped_column(
         String(64), ForeignKey("decision_events.id", ondelete="RESTRICT"), nullable=True
     )
@@ -873,6 +912,7 @@ class ReviewItem(Base):
     session: Mapped["LearningSession | None"] = relationship(foreign_keys=[session_id])
     review_session: Mapped["LearningSession | None"] = relationship(foreign_keys=[review_session_id])
     hypothesis: Mapped["Hypothesis | None"] = relationship()
+    trigger_attempt: Mapped["Attempt | None"] = relationship(foreign_keys=[trigger_attempt_id])
 
 
 class ModelCall(Base):
@@ -1045,3 +1085,11 @@ def _prevent_model_call_delete(
     raise ImmutableRecordError(
         "ModelCall audit records are append-only and cannot be deleted."
     )
+
+
+@event.listens_for(EvidenceValidityEvent, "before_update")
+@event.listens_for(EvidenceValidityEvent, "before_delete")
+def _prevent_evidence_validity_event_mutation(
+    _mapper: Any, _connection: Any, _target: EvidenceValidityEvent
+) -> None:
+    raise ImmutableRecordError("Evidence validity audit events are append-only.")

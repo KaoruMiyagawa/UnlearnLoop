@@ -3,6 +3,7 @@ import { listKnowledgeStates } from '../api/profile';
 import { listReviews } from '../api/reviews';
 import type { AsyncResourceState } from '../api/client';
 import type { AttemptResult, AttemptSummary, DiagnosticStepResponse, SanitizedQuestion, SessionDetail } from '../api/types';
+import { evidenceValidityLabel, learnerEvidenceValidityReason } from '../evidenceValidity';
 import { DiagnosticInspectorRailFrame } from '../design-system/DiagnosticInspectorRail';
 import {
   canRetryDiagnosticStep, canRunDiagnosticStep, diagnosticExecutionDescription, diagnosticStatusLabel,
@@ -57,7 +58,7 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
   const reviewItems = reviews.state.status === 'success' ? reviewsForSession(session, reviews.state.data.flat()) : [];
   const pendingReviews = reviewItems.filter(item => item.status === 'pending')
     .sort((a, b) => Date.parse(a.scheduled_for) - Date.parse(b.scheduled_for));
-  const dueReview = pendingReviews.find(item => item.is_due === true);
+  const dueReview = pendingReviews.find(item => item.is_due === true && !item.question_unavailable);
   const nextReview = dueReview ?? pendingReviews[0];
   const latestReview = reviewItems.filter(item => item.status === 'completed' && item.attempt_id)
     .sort((a, b) => Date.parse(b.submitted_at ?? b.completed_at ?? '') - Date.parse(a.submitted_at ?? a.completed_at ?? ''))[0];
@@ -73,7 +74,8 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
   const unavailableReason = transferUnavailable
     ? learnerDiagnosticText(transferDispatchNotice) ?? '暂无匹配的独立迁移题，迁移证据仍不足。'
     : undefined;
-  const transferPassed = attemptResult?.next_action === 'transfer_verified' || session.knowledge_state_status === 'transfer_verified';
+  const transferPassed = attemptResult?.next_action === 'transfer_verified'
+    || attemptResult?.next_action === 'matching_headings_transfer_verified' || session.knowledge_state_status === 'transfer_verified';
   const status = state?.status ?? session.knowledge_state_status;
 
   const refresh = () => {
@@ -107,6 +109,10 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
     : latestReview?.is_correct === true ? '复习通过，未取得保持证据'
     : '尚无延迟保持证据';
   const supported = data?.hypotheses.filter(item => item.status === 'supported' || item.status === 'confirmed') ?? [];
+  const supportedIds = new Set(supported.map(item => item.id));
+  const orderedHypotheses = [...(data?.hypotheses ?? [])].sort(
+    (a, b) => Number(supportedIds.has(b.id)) - Number(supportedIds.has(a.id)),
+  );
   const diagnosisLoading = Boolean(caseId) && (resource.status === 'idle' || resource.status === 'loading' || (resource.status === 'success' && !data));
   const diagnosisFailed = Boolean(caseId) && resource.status === 'error';
   const conclusion = diagnosisLoading ? '正在读取诊断'
@@ -144,7 +150,7 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
 
       <section className="error-dna-next" aria-labelledby="error-dna-next">
         <h3 id="error-dna-next">下一步</h3>
-        {nextReview && <p>{nextReview.retention_eligible ? '保持验证' : '巩固练习'} · {formatDate(nextReview.scheduled_for)} · {dueReview ? '已到期' : nextReview.is_due === false ? '尚未到期' : '到期状态待确认'}</p>}
+        {nextReview && <p>{nextReview.retention_eligible ? '保持验证' : '巩固练习'} · {formatDate(nextReview.scheduled_for)} · {nextReview.question_unavailable ? '暂无合格复习题' : nextReview.is_due ? '已到期' : nextReview.is_due === false ? '尚未到期' : '到期状态待确认'}</p>}
         {!nextReview && reviews.state.status === 'success' && timeline.length > 0 && <p>暂无复习安排。</p>}
         {unavailableReason && <p>{unavailableReason}</p>}
         {action && <p>{action.description}</p>}
@@ -177,7 +183,7 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
         {!data?.hypotheses.length && <p>暂无可展开的假设证据。</p>}
         {data && <>
           <div className="error-dna-cards">
-            {data.hypotheses.map(hypothesis => {
+            {orderedHypotheses.map(hypothesis => {
               const items = evidence.get(hypothesis.id) ?? [];
               return <article className="error-dna-cause" key={hypothesis.id}>
                 <div className="error-dna-section-heading">
@@ -185,13 +191,13 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
                   <span className="error-dna-chip" data-relation={hypothesis.status === 'supported' ? 'supports' : hypothesis.status === 'lowered' ? 'contradicts' : undefined}>{hypothesisStatusLabel(hypothesis.status)}</span>
                 </div>
                 <details className="error-dna-disclosure">
-                  <summary>证据详情 <small>支持 {items.filter(item => item.relation === 'supports').length} · 削弱 {items.filter(item => item.relation === 'contradicts').length}</small></summary>
+                  <summary>证据详情 <small>支持 {items.filter(item => item.relation === 'supports').length} · 削弱 {items.filter(item => item.relation === 'contradicts').length} · 中性 {items.filter(item => item.relation === 'neutral').length}</small></summary>
                   {learnerDiagnosticText(hypothesis.description) && <p>{learnerDiagnosticText(hypothesis.description)}</p>}
                   {learnerDiagnosticText(hypothesis.missing_evidence_desc) && <p><strong>仍需核实：</strong>{learnerDiagnosticText(hypothesis.missing_evidence_desc)}</p>}
                   {items.length ? <ul className="error-dna-evidence">
                     {items.map(item => <li key={item.id}>
                       <span className="error-dna-chip" data-relation={item.relation}>{item.relation === 'contradicts' ? '削弱' : evidenceRelationLabel(item.relation)}</span>
-                      <div>{learnerDiagnosticText(item.summary) ?? '原始证据见诊断记录。'}<small>{evidenceSourceLabel(item.source_type)}{learnerDiagnosticText(item.reliability_note) && ` · ${learnerDiagnosticText(item.reliability_note)}`}</small></div>
+                      <div>{learnerDiagnosticText(item.summary) ?? '原始证据见诊断记录。'}<small>{evidenceSourceLabel(item.source_type)}{learnerDiagnosticText(item.reliability_note) && ` · ${learnerDiagnosticText(item.reliability_note)}`}</small>{item.evidence_validity_status && item.evidence_validity_status !== 'eligible' && <small className="error-dna-evidence-warning">此证据当前{evidenceValidityLabel(item.evidence_validity_status)}：{learnerEvidenceValidityReason(item.evidence_validity_status, item.evidence_validity_reason)}</small>}</div>
                     </li>)}
                   </ul> : <p>尚无与此假设关联的证据。</p>}
                 </details>
@@ -220,7 +226,14 @@ export function ErrorDnaPanel({ session, attempts, attemptResult, activeQuestion
       {diagnosticDetail && <p>{diagnosticDetail}</p>}
       <p>{diagnosticStatusLabel(data.diagnosis.status)} · 案例 <code>{data.diagnosis.id}</code> · 原始作答 <code>{data.triggerAttempt.id}</code></p>
       <p>执行方式 <code>{data.diagnosis.execution_mode}</code> · 不确定性 <code>{data.diagnosis.uncertainty_level}</code></p>
-      <ul>{data.evidence.map(item => <li key={item.id}><code>{item.source_ref}</code> · {item.summary}{item.reliability_note && ` · ${item.reliability_note}`}</li>)}</ul>
+      <ul>{data.evidence.map(item => <li key={item.id}>
+        <code>{item.source_ref}</code> · {item.summary}{item.reliability_note && ` · ${item.reliability_note}`}
+        {item.observation && <p>
+          题项 <code>{item.observation.item_id}</code> · 段落 <code>{item.observation.paragraph_id}</code> · 所选标题 <code>{item.observation.selected_heading_id}</code>
+          <br />作答 <code>{item.observation.attempt_id}</code> · 题目 <code>{item.observation.question_id}</code>
+          <br />题组版本 <code>{item.observation.group_version_id}</code> · 评分规则 <code>{item.observation.rule_version_id}</code>（版本 {item.observation.evaluation_rule_version}）
+        </p>}
+      </li>)}</ul>
     </details>}
   </DiagnosticInspectorRailFrame>;
 }

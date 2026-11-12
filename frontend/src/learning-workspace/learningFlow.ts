@@ -1,6 +1,6 @@
 import { ApiClientError } from '../api/client.ts';
-import { createAttemptSubmission, getSession, listSessionAttempts, resumeSession } from '../api/sessions.ts';
-import type { AttemptResult, AttemptSummary, SessionDetail, SubmitAttemptRequest } from '../api/types.ts';
+import { attemptContent, createAttemptSubmission, getSession, listSessionAttempts, resumeSession } from '../api/sessions.ts';
+import type { AttemptAnswer, AttemptResult, AttemptSummary, SessionDetail, SubmitAttemptRequest } from '../api/types.ts';
 
 export type LearningVisualStage = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -26,10 +26,30 @@ export function readPendingAttempt(storage: Pick<Storage, 'getItem'>, sessionId:
   if (!raw) return null;
   const intent = JSON.parse(raw) as PendingAttemptIntent;
   if (intent.sessionId !== sessionId || typeof intent.payload?.question_id !== 'string'
-    || typeof intent.payload.submitted_answer !== 'string' || !intent.payload.idempotency_key) {
+    || !intent.payload.idempotency_key) {
     throw new Error('保存的作答请求无效；请重新读取服务端状态。');
   }
-  return { sessionId, payload: Object.freeze({ ...intent.payload }) };
+  return { sessionId, payload: restoreAttemptPayload(intent.payload) };
+}
+
+export function restoreAttemptPayload(payload: SubmitAttemptRequest): Readonly<SubmitAttemptRequest> {
+  const validText = typeof payload?.submitted_answer === 'string' && payload.structured_answer === undefined
+    && payload.group_version_id === undefined;
+  const validGroup = typeof payload?.group_version_id === 'string' && payload.submitted_answer === undefined
+    && payload.structured_answer && !Array.isArray(payload.structured_answer)
+    && typeof payload.structured_answer === 'object'
+    && Object.values(payload.structured_answer).every(value => typeof value === 'string');
+  if (typeof payload?.question_id !== 'string' || typeof payload.idempotency_key !== 'string' || !(validText || validGroup)) {
+    throw new Error('保存的作答请求无效；请重新读取服务端状态。');
+  }
+  return createAttemptSubmission(payload);
+}
+
+export function acceptedGroupAttempt(intent: PendingAttemptIntent, history: AttemptSummary[]): boolean {
+  const payload = intent.payload;
+  return Boolean(payload.structured_answer && history.some(attempt =>
+    attempt.session_id === intent.sessionId && attempt.question_id === payload.question_id
+    && attempt.group_evaluation?.group_version_id === payload.group_version_id));
 }
 
 export function clearPendingAttempt(storage: Pick<Storage, 'removeItem'>, sessionId: string): void {
@@ -41,12 +61,12 @@ export function prepareAttemptIntent(
   pending: PendingAttemptIntent | null,
   sessionId: string,
   questionId: string,
-  answer: string,
+  answer: string | AttemptAnswer,
   retryOriginal = false,
 ): PendingAttemptIntent {
+  const content = { question_id: questionId, ...(typeof answer === 'string' ? { submitted_answer: answer } : answer) };
   if (pending?.sessionId === sessionId) {
-    const matches = pending.payload.question_id === questionId
-      && pending.payload.submitted_answer === answer;
+    const matches = attemptContent(pending.payload) === attemptContent(content);
     if (retryOriginal || matches) return pending;
     throw new ApiClientError(409, {
       code: 'PENDING_SUBMISSION_EXISTS',
@@ -55,7 +75,7 @@ export function prepareAttemptIntent(
   }
   return {
     sessionId,
-    payload: createAttemptSubmission({ question_id: questionId, submitted_answer: answer }),
+    payload: createAttemptSubmission(content),
   };
 }
 
@@ -108,6 +128,16 @@ export function describeNextAction(action: string): NextActionPresentation {
     case 'mastery_achieved':
     case 'transfer_verified':
       return { title: '本次独立迁移验证通过', description: '当前验证通过不代表长期保持；会话仍需单独结束。', tone: 'success' };
+    case 'matching_headings_transfer_pending':
+      return { title: '专项训练已通过', description: '下一步由服务端安排独立迁移。', tone: 'success' };
+    case 'matching_headings_transfer_verified':
+      return { title: '本次独立迁移验证通过', description: '尚未完成延迟保持验证。复习时间见 Error DNA。', tone: 'success' };
+    case 'matching_headings_transfer_failed_needs_practice':
+      return { title: '本次独立迁移未通过', description: '仍需继续练习。', tone: 'warning' };
+    case 'matching_headings_retention_verified':
+      return { title: '本次获得延迟保持证据', description: '保持证据与本次复习记录关联。', tone: 'success' };
+    case 'matching_headings_review_failed':
+      return { title: '本次复习未通过', description: '当前需要继续练习。', tone: 'warning' };
     case 'transfer_unavailable':
       return { title: '独立迁移证据不足', description: '暂无未见过的新情境题。系统保留不确定性，不使用旧题确认掌握。', tone: 'warning' };
     case 'review_scheduled':
@@ -127,6 +157,7 @@ export function deriveLearningVisualStage(
   }
 
   if (session?.status === 'completed') {
+    if (session.knowledge_state_status === 'transfer_verified') return 5;
     if (session.knowledge_state_status === 'needs_practice') return 5;
     if (session.knowledge_state_status === 'needs_diagnosis') return 3;
     return 1;

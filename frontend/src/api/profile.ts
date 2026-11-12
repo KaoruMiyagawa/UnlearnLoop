@@ -1,5 +1,5 @@
 import { apiRequest } from './client.ts';
-import type { DashboardSummary, KnowledgeState, LearningHistoryEvent } from './types.ts';
+import type { DashboardSummary, EvidenceRevalidationRequest, EvidenceRevalidationResponse, KnowledgeState, LearningHistoryEvent } from './types.ts';
 
 function learnerQuery(learnerId?: string): string {
   if (learnerId === undefined) return '';
@@ -24,4 +24,15 @@ export function listLearningHistory(
   if (learnerId !== undefined) params.set('learner_id', learnerId);
   params.set('limit', String(limit));
   return apiRequest(`/api/v1/profile/history?${params.toString()}`, { method: 'GET', signal });
+}
+
+export function startEvidenceRevalidation(
+  request: EvidenceRevalidationRequest,
+  signal?: AbortSignal,
+): Promise<EvidenceRevalidationResponse> {
+  return apiRequest('/api/v1/profile/evidence-revalidation', {
+    method: 'POST',
+    body: JSON.stringify(request),
+    signal,
+  });
 }

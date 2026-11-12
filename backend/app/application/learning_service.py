@@ -14,6 +14,8 @@ from app.api.v1.schemas import (
     AttemptResultResponse,
     AttemptSummaryResponse,
     DashboardSummaryResponse,
+    EvidenceRevalidationRequest,
+    EvidenceRevalidationResponse,
     KnowledgeStateResponse,
     LearningHistoryEventResponse,
     LearningMaterialResponse,
@@ -41,6 +43,7 @@ from app.domain.enums import (
     DiagnosticCaseStatus,
     EvidenceRelation,
     EvidenceSourceType,
+    EvidenceValidityStatus,
     HypothesisStatus,
     KnowledgeMasteryStatus,
     QuestionRole,
@@ -60,6 +63,11 @@ from app.evaluation.ielts_reading_evaluator import IeltsReadingEvaluator
 from app.evaluation.registry import evaluator_for_domain
 from app.domain.exams import EXAM_CATALOG_VERSION, domain_for_variant
 from app.persistence.models import ExamPreparationProfile, ReadingGroupVersion, ReadingRuleVersion
+from app.application.evidence_validity import (
+    effective_knowledge_status,
+    evidence_reason,
+    evidence_status,
+)
 from app.persistence.models import (
     Attempt,
     DecisionEvent,
@@ -71,6 +79,7 @@ from app.persistence.models import (
     Hypothesis,
     Question,
     ReviewItem,
+    EvidenceValidityEvent,
 )
 from app.persistence.repositories import LearningRepository
 from app.persistence.models import utc_now
@@ -111,7 +120,12 @@ class LearningAppService:
     ) -> ReviewItem:
         due_at = self._now() + timedelta(days=self._review_interval(stage))
         schedule_key = f"{'retention' if retention_eligible else 'remediation'}:{trigger_attempt_id}:stage:{stage}"
-        if retention_eligible and stage == 0:
+        trigger_attempt = self.repo.get_attempt(trigger_attempt_id)
+        matching_headings = bool(
+            trigger_attempt and trigger_attempt.group_version_id
+            and (trigger_attempt.question_snapshot_json or {}).get("diagnostic_protocol") == "matching-headings"
+        )
+        if retention_eligible and stage == 0 and not matching_headings:
             superseded = self.repo.cancel_pending_review_items(
                 learner_id=learner_id, topic_id=topic_id, except_schedule_key=schedule_key,
             )
@@ -128,8 +142,12 @@ class LearningAppService:
             trigger_reason=reason, scheduled_for=due_at,
             schedule_key=schedule_key,
             review_stage=stage,
+            hypothesis_id=hypothesis_id,
+            trigger_attempt_id=trigger_attempt.id if trigger_attempt else None,
         )
         item.retention_eligible = retention_eligible
+        if item.trigger_attempt_id is None and trigger_attempt is not None:
+            item.trigger_attempt_id = trigger_attempt_id
         if hypothesis_id is None:
             case = self.repo.latest_diagnostic_case(session_id)
             if case and self._is_tfng_session(case.session):
@@ -138,6 +156,18 @@ class LearningAppService:
                     hypothesis_id = supported[0].id
         if hypothesis_id is not None:
             item.hypothesis_id = hypothesis_id
+        if matching_headings and item.group_version_id is None and item.session_id:
+            source_session = self.repo.get_session(item.session_id)
+            case = self.repo.latest_diagnostic_case(item.session_id)
+            selection = MatchingHeadingsRules(self.repo).select_independent_task(
+                source_session, case, QuestionRole.REVIEW,
+            ) if source_session and case else None
+            if selection is not None:
+                question, group, target, _source = selection
+                hypothesis = self.db.get(Hypothesis, item.hypothesis_id) if item.hypothesis_id else None
+                if hypothesis is not None and hypothesis.error_code == target:
+                    item.question_id = question.id
+                    item.group_version_id = group.id
         knowledge_state = self.repo.get_knowledge_state(learner_id, topic_id)
         if item.knowledge_state_id is None and knowledge_state is not None:
             item.knowledge_state_id = knowledge_state.id
@@ -182,6 +212,15 @@ class LearningAppService:
     def list_topics(self, domain_code: str | None = None) -> list[TopicSummaryResponse]:
         """List all available knowledge topics, optionally filtered by domain."""
         topics = self.repo.list_topics(domain_code=domain_code)
+        initial_types: dict[str, set[str]] = {}
+        if topics:
+            for topic_id, question_type in self.db.execute(
+                select(Question.topic_id, Question.question_type).where(
+                    Question.topic_id.in_([topic.id for topic in topics]),
+                    Question.question_role == QuestionRole.INITIAL.value,
+                ).distinct()
+            ):
+                initial_types.setdefault(topic_id, set()).add(question_type)
         return [
             TopicSummaryResponse(
                 id=t.id,
@@ -191,6 +230,7 @@ class LearningAppService:
                 summary=t.summary,
                 difficulty_level=t.difficulty_level,
                 prerequisite_ids=[p.id for p in t.prerequisites],
+                initial_question_types=sorted(initial_types.get(t.id, ())),
             )
             for t in topics
         ]
@@ -340,7 +380,7 @@ class LearningAppService:
         ks = self.repo.get_knowledge_state(learner_id, topic_id)
         if ks is None:
             return None, False
-        ks_enum = KnowledgeMasteryStatus(ks.status)
+        ks_enum = KnowledgeMasteryStatus(effective_knowledge_status(self.db, ks))
         return ks_enum, (ks_enum == KnowledgeMasteryStatus.STABLE)
 
     def _is_tfng_session(self, sess: LearningSession) -> bool:
@@ -413,6 +453,63 @@ class LearningAppService:
             )
         return question
 
+    def _dispatch_matching_headings_transfer(self, sess: LearningSession) -> TransferCheckDispatchResponse:
+        """Dispatch only the transfer group pinned by the active Matching Headings diagnosis."""
+        self.db.execute(
+            update(LearningSession).where(LearningSession.id == sess.id)
+            .values(updated_at=LearningSession.updated_at).execution_options(synchronize_session=False)
+        )
+        self.db.refresh(sess)
+        case = self.repo.latest_diagnostic_case(sess.id)
+        if case is None or not supported_protocol(case.trigger_attempt):
+            raise DomainRuleViolationError("Matching Headings transfer requires a supported diagnostic case.")
+        current = self.repo.get_question_by_id(sess.current_question_id) if sess.current_question_id else None
+        if sess.status == SessionStatus.TRANSFER_CHECKING.value and current and current.question_role == QuestionRole.TRANSFER_CHECK.value:
+            return TransferCheckDispatchResponse(
+                question=self.sanitize_question(current), session_status=SessionStatus(sess.status),
+                degraded=False, message="Restoring the already assigned Matching Headings transfer task.",
+                next_action="transfer_check",
+            )
+        if sess.status != SessionStatus.INTERVENING.value:
+            raise DomainRuleViolationError("Matching Headings transfer is available only after targeted practice.")
+        selection = MatchingHeadingsRules(self.repo).select_independent_task(
+            sess, case, QuestionRole.TRANSFER_CHECK,
+        )
+        if selection is None:
+            self.repo.append_decision_event(
+                session_id=sess.id, diagnostic_case_id=case.id,
+                event_type="transfer_question_unavailable", action="matching_headings_transfer_unavailable",
+                to_state=case.status, reason="No reviewed, independent transfer group matches the supported cause.",
+                uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                payload_json={"protocol": "matching-headings", "version": "1", "transfer_unavailable": True},
+                idempotency_key=f"mh-transfer-unavailable:{case.id}:{case.trigger_attempt_id}",
+            )
+            self.db.commit()
+            return TransferCheckDispatchResponse(
+                question=None, session_status=SessionStatus(sess.status), degraded=True,
+                message="No reviewed independent transfer group matches the supported diagnosis; verification remains pending.",
+                next_action="transfer_unavailable",
+            )
+        question, group, target, source = selection
+        self.repo.transition_session_status(sess, SessionStatus.TRANSFER_CHECKING)
+        sess.current_question_id = question.id
+        self.repo.transition_diagnostic_case(
+            case, DiagnosticCaseStatus.TRANSFER_CHECKING,
+            action="dispatch_matching_headings_transfer",
+            reason=f"按已支持原因 {target} 派发经审核的独立迁移材料。",
+            selected_intervention="transfer_check",
+            uncertainty_note="迁移通过仅证明当前新语境验证通过；仍需到期复习。",
+            payload_json={"selected_question_id": question.id, "group_version_id": group.id,
+                          "target_error_code": target, "protocol": source.protocol,
+                          "protocol_version": source.version},
+        )
+        self.db.commit()
+        return TransferCheckDispatchResponse(
+            question=self.sanitize_question(question), session_status=SessionStatus(sess.status),
+            degraded=False, message="A verified independent Matching Headings transfer task is now assigned.",
+            next_action="transfer_check",
+        )
+
     def get_session_detail(self, session_id: str) -> SessionDetailResponse:
         """Fetch session detail including current sanitized question, diagnostic case pointer, and mastery status."""
         sess = self.repo.get_session(session_id)
@@ -448,6 +545,17 @@ class LearningAppService:
             can_dispatch_transfer = True
         except DomainRuleViolationError:
             can_dispatch_transfer = False
+        transfer_unavailable_reason = None
+        if can_dispatch_transfer and active_diag and current_q_dto and current_q_dto.group_version_id:
+            exhausted = any(
+                event.action == "matching_headings_transfer_unavailable"
+                for event in active_diag.decision_events
+            )
+            if exhausted and sess.status == SessionStatus.INTERVENING.value and not MatchingHeadingsRules(
+                self.repo
+            ).select_independent_task(sess, active_diag, QuestionRole.TRANSFER_CHECK):
+                can_dispatch_transfer = False
+                transfer_unavailable_reason = "暂无符合当前诊断目标的独立迁移文章，本次迁移仍未验证。"
 
         return SessionDetailResponse(
             id=sess.id,
@@ -464,6 +572,7 @@ class LearningAppService:
             active_diagnostic_case_id=active_diag.id if active_diag else None,
             latest_attempt_result=latest_result,
             can_dispatch_transfer=can_dispatch_transfer,
+            transfer_unavailable_reason=transfer_unavailable_reason,
             attempts_count=len(sess.attempts),
             started_at=sess.started_at,
             updated_at=sess.updated_at,
@@ -1217,16 +1326,35 @@ class LearningAppService:
         ):
             raise DomainRuleViolationError("Submit structured answers only to the assigned Matching Headings question.")
         role = QuestionRole(question.question_role)
+        review_item = None
+        if role == QuestionRole.REVIEW:
+            review_item = self.repo.get_review_item_for_session(session.id)
+            if (
+                review_item is None or review_item.learner_id != session.learner_id
+                or review_item.status != ReviewStatus.PENDING.value
+                or review_item.question_id != question.id
+                or review_item.group_version_id != group_version_id
+                or self._now() < self._as_utc(review_item.scheduled_for)
+            ):
+                raise InvalidSessionOperationError("The pinned Matching Headings review is unavailable or not due.")
         active_status = {
             QuestionRole.INITIAL: SessionStatus.ACTIVE,
             QuestionRole.DIAGNOSTIC_FOLLOWUP: SessionStatus.DIAGNOSING,
             QuestionRole.TARGETED_PRACTICE: SessionStatus.INTERVENING,
+            QuestionRole.TRANSFER_CHECK: SessionStatus.TRANSFER_CHECKING,
+            QuestionRole.REVIEW: SessionStatus.REVIEWING,
         }.get(role)
         if active_status is None:
-            raise DomainRuleViolationError("Matching Headings transfer and review are not available yet.")
+            raise DomainRuleViolationError("Unsupported Matching Headings learning role.")
         if not group_version_id or group_version_id != session.current_group_version_id:
             raise DomainRuleViolationError("The submitted reading group version does not match the assigned version.")
         group = self._assigned_reading_group(session, question)
+        group_validity = evidence_status(self.db, "reading_group_version", group.id)
+        if group_validity != EvidenceValidityStatus.ELIGIBLE.value:
+            raise DomainRuleViolationError(
+                "This immutable reading version needs content correction or provenance review; "
+                "it cannot be newly scored as learner ability evidence."
+            )
         rule = self.db.get(ReadingRuleVersion, group.rule_version_id)
         evaluator = evaluator_for_domain(session.topic.domain_code)
         if rule is None or not isinstance(evaluator, IeltsReadingEvaluator):
@@ -1281,7 +1409,7 @@ class LearningAppService:
         protocol = MatchingHeadingsRules(self.repo)
         case = None
         diagnostics = published_rules(self.db, group)
-        if role != QuestionRole.INITIAL:
+        if role in {QuestionRole.DIAGNOSTIC_FOLLOWUP, QuestionRole.TARGETED_PRACTICE}:
             case = self.repo.latest_diagnostic_case(session_id)
             expected_status, action = {
                 QuestionRole.DIAGNOSTIC_FOLLOWUP: (DiagnosticCaseStatus.QUESTION_SELECTED, "select_diagnostic_followup"),
@@ -1301,6 +1429,40 @@ class LearningAppService:
                 or not protocol.compatible_task(session, source, question, group, payload.get("target_error_codes", []))
             ):
                 raise DomainRuleViolationError("The diagnostic question does not match its recorded dispatch.")
+        elif role == QuestionRole.TRANSFER_CHECK:
+            case = self.repo.latest_diagnostic_case(session_id)
+            dispatch = next((event for event in reversed(case.decision_events) if
+                             event.action == "dispatch_matching_headings_transfer"), None) if case else None
+            payload = dispatch.payload_json if dispatch else {}
+            initial_group = self.db.get(ReadingGroupVersion, case.trigger_attempt.group_version_id) if case and case.trigger_attempt.group_version_id else None
+            source = published_rules(self.db, initial_group) if initial_group else None
+            if (
+                case is None or case.status != DiagnosticCaseStatus.TRANSFER_CHECKING.value
+                or source is None or payload.get("selected_question_id") != question.id
+                or payload.get("group_version_id") != group.id
+                or payload.get("protocol") != source.protocol
+                or payload.get("protocol_version") != source.version
+                or not MatchingHeadingsRules(self.repo).task_matches(
+                    session, case, question, group, QuestionRole.TRANSFER_CHECK,
+                    payload.get("target_error_code", ""),
+                )
+            ):
+                raise DomainRuleViolationError("The Matching Headings transfer is not authorized by its recorded diagnostic dispatch.")
+        elif role == QuestionRole.REVIEW:
+            source_session = self.repo.get_session(review_item.session_id) if review_item and review_item.session_id else None
+            case = self.repo.latest_diagnostic_case(source_session.id) if source_session else None
+            trigger = self.repo.get_attempt(review_item.trigger_attempt_id) if review_item and review_item.trigger_attempt_id else None
+            target = self.db.get(Hypothesis, review_item.hypothesis_id).error_code if review_item and review_item.hypothesis_id and self.db.get(Hypothesis, review_item.hypothesis_id) else ""
+            if (
+                review_item is None or review_item.group_version_id != group.id
+                or review_item.trigger_attempt_id is None or trigger is None
+                or trigger.attempt_role not in {QuestionRole.TRANSFER_CHECK.value, QuestionRole.REVIEW.value}
+                or source_session is None or case is None
+                or not MatchingHeadingsRules(self.repo).task_matches(
+                    source_session, case, question, group, QuestionRole.REVIEW, target,
+                )
+            ):
+                raise DomainRuleViolationError("The Matching Headings review does not match its pinned review plan.")
 
         summary = f"标题匹配正确 {score.correct_count}/{score.total_count} 项。"
         correct = score.outcome == "correct"
@@ -1362,11 +1524,161 @@ class LearningAppService:
             note = "本次训练通过，仍待独立迁移验证。" if correct else "本次训练未通过，候选原因仍待进一步验证。"
             if correct:
                 case.uncertainty_note = note
+                supported_targets = [h.error_code for h in case.hypotheses
+                                     if h.status == HypothesisStatus.SUPPORTED.value]
+                self.repo.update_knowledge_state(
+                    session_id=session_id, topic_id=session.topic_id, learner_id=session.learner_id,
+                    target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                    unresolved_error_codes=supported_targets,
+                    reason="Matching Headings targeted practice passed; independent transfer remains outstanding.",
+                )
             else:
                 self.repo.transition_diagnostic_case(
                     case, DiagnosticCaseStatus.NEEDS_EVIDENCE, action=next_action, reason=note,
                     uncertainty_note=note, uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
                 )
+        elif role == QuestionRole.TRANSFER_CHECK:
+            dispatch = next((event for event in reversed(case.decision_events)
+                             if event.action == "dispatch_matching_headings_transfer"), None) if case else None
+            target = (dispatch.payload_json or {}).get("target_error_code") if dispatch else None
+            if correct and case and target:
+                unresolved = [h.error_code for h in case.hypotheses
+                              if h.error_code != target and h.status not in {
+                                  HypothesisStatus.RULED_OUT.value, HypothesisStatus.LOWERED.value,
+                              }]
+                state = self.repo.update_knowledge_state(
+                    session_id=session_id, topic_id=session.topic_id,
+                    target_status=KnowledgeMasteryStatus.TRANSFER_VERIFIED,
+                    reason="Matching Headings independent transfer passed; retention remains unverified.",
+                    learner_id=session.learner_id, unresolved_error_codes=unresolved,
+                    transfer_attempt_id=attempt.id,
+                )
+                self._schedule_review(
+                    learner_id=session.learner_id, topic_id=session.topic_id, session_id=session.id,
+                    trigger_attempt_id=attempt.id,
+                    reason="Independent Matching Headings transfer passed; schedule delayed retention evidence.",
+                    retention_eligible=True,
+                    hypothesis_id=next((h.id for h in case.hypotheses if h.error_code == target), None),
+                )
+                for hypothesis in case.hypotheses:
+                    self.repo.record_evidence(
+                        hypothesis_id=hypothesis.id, attempt_id=attempt.id,
+                        source_type=EvidenceSourceType.TRANSFER_ATTEMPT,
+                        source_ref=f"attempt:{attempt.id}",
+                        relation=EvidenceRelation.CONTRADICTS if hypothesis.error_code == target else EvidenceRelation.NEUTRAL,
+                        summary="独立新文章迁移作答通过。",
+                        reliability_note="迁移证据更新当前干预目标；不确认长期掌握或其他假设。",
+                    )
+                self.repo.transition_diagnostic_case(
+                    case, DiagnosticCaseStatus.RESOLVED, action="matching_headings_transfer_verified",
+                    reason="A separate article passed the targeted transfer check.",
+                    uncertainty_note="当前错误路径的迁移验证通过；未解决的其他假设保留，长期保持未验证。",
+                )
+                self.repo.transition_session_status(session, SessionStatus.COMPLETED)
+                next_action = "matching_headings_transfer_verified"
+            else:
+                targets = [h.error_code for h in case.hypotheses if h.status != HypothesisStatus.RULED_OUT.value] if case else []
+                self.repo.update_knowledge_state(
+                    session_id=session_id, topic_id=session.topic_id,
+                    target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                    reason="Matching Headings independent transfer did not pass; retain the failure evidence.",
+                    learner_id=session.learner_id, unresolved_error_codes=targets,
+                )
+                if case and case.status == DiagnosticCaseStatus.TRANSFER_CHECKING.value:
+                    for hypothesis in case.hypotheses:
+                        self.repo.record_evidence(
+                            hypothesis_id=hypothesis.id, attempt_id=attempt.id,
+                            source_type=EvidenceSourceType.TRANSFER_ATTEMPT,
+                            source_ref=f"attempt:{attempt.id}",
+                            relation=EvidenceRelation.SUPPORTS if hypothesis.error_code == target else EvidenceRelation.NEUTRAL,
+                            summary="独立新文章迁移作答未完全通过。",
+                            reliability_note="单次失败不能独立确认唯一原因。",
+                        )
+                    self.repo.transition_diagnostic_case(
+                        case, DiagnosticCaseStatus.NEEDS_EVIDENCE,
+                        action="matching_headings_transfer_failed",
+                        reason="Independent transfer failed; candidate causes remain unresolved.",
+                        uncertainty_note="迁移未通过；仍需练习或收集新证据。",
+                        uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                    )
+                self.repo.transition_session_status(session, SessionStatus.COMPLETED)
+                next_action = "matching_headings_transfer_failed_needs_practice"
+        elif role == QuestionRole.REVIEW:
+            assert review_item is not None
+            review_item.status = ReviewStatus.COMPLETED.value
+            review_item.completed_at = self._now()
+            review_item.attempt_id = attempt.id
+            state = self.repo.get_knowledge_state(session.learner_id, session.topic_id)
+            previous_status = state.status if state else None
+            origin = self.repo.get_session(review_item.session_id) if review_item.session_id else None
+            if correct and review_item.retention_eligible and state and state.status == KnowledgeMasteryStatus.TRANSFER_VERIFIED.value:
+                review_item.review_outcome = "passed_delayed"
+                review_item.retention_verified = True
+                next_action = "matching_headings_retention_verified"
+                event = self.repo.append_decision_event(
+                    session_id=session.id, event_type="delayed_retention_evaluated",
+                    from_state=state.status, to_state=state.status, action="verify_matching_headings_retention",
+                    reason="A due independent Matching Headings review passed; this is dated retention evidence, not permanent mastery.",
+                    payload_json={"review_item_id": review_item.id, "attempt_id": attempt.id,
+                                  "group_version_id": group.id, "trigger_attempt_id": review_item.trigger_attempt_id,
+                                  "retention_verified": True, "scheduled_for": self._as_utc(review_item.scheduled_for).isoformat(),
+                                  "submitted_at": self._now().isoformat()},
+                    idempotency_key=f"mh-review-result:{attempt.id}",
+                )
+                review_item.decision_event_id = event.id
+                self._schedule_review(
+                    learner_id=session.learner_id, topic_id=session.topic_id,
+                    session_id=origin.id if origin else session.id, trigger_attempt_id=attempt.id,
+                    reason="Matching Headings delayed review passed; schedule the next spaced check.",
+                    stage=min(review_item.review_stage + 1, len(self.review_intervals_days) - 1),
+                    retention_eligible=True, hypothesis_id=review_item.hypothesis_id,
+                )
+            else:
+                review_item.review_outcome = "failed" if not correct else "passed_without_retention_baseline"
+                review_item.retention_verified = False
+                next_action = "matching_headings_review_failed" if not correct else "review_passed_without_retention"
+                if not correct:
+                    if state and state.status in {KnowledgeMasteryStatus.TRANSFER_VERIFIED.value, KnowledgeMasteryStatus.STABLE.value}:
+                        state = self.repo.update_knowledge_state(
+                            session_id=origin.id if origin else session.id, topic_id=session.topic_id,
+                            learner_id=session.learner_id, target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                            unresolved_error_codes=[h.error_code for h in case.hypotheses if h.status != HypothesisStatus.RULED_OUT.value] if case else [],
+                            reason="A due Matching Headings review failed; earlier retention records remain historical and current knowledge needs practice.",
+                        )
+                    target_hypothesis = self.db.get(Hypothesis, review_item.hypothesis_id) if review_item.hypothesis_id else None
+                    for hypothesis in case.hypotheses if case else []:
+                        self.repo.record_evidence(
+                            hypothesis_id=hypothesis.id, attempt_id=attempt.id,
+                            source_type=EvidenceSourceType.RULE_CHECK,
+                            source_ref=f"review:{review_item.id}:attempt:{attempt.id}",
+                            relation=EvidenceRelation.SUPPORTS if target_hypothesis and hypothesis.id == target_hypothesis.id else EvidenceRelation.NEUTRAL,
+                            summary="到期独立复习未通过。",
+                            reliability_note="此复习结果更新当前保持证据，不改写过去的复习记录。",
+                        )
+                    self.repo.append_decision_event(
+                        session_id=session.id, event_type="delayed_retention_failed",
+                        from_state=previous_status, to_state=state.status if state else previous_status,
+                        action="matching_headings_retention_failed",
+                        reason="The delayed group answer failed; no retention verification is recorded for this review.",
+                        payload_json={"review_item_id": review_item.id, "attempt_id": attempt.id,
+                                      "group_version_id": group.id, "trigger_attempt_id": review_item.trigger_attempt_id,
+                                      "retention_verified": False},
+                    )
+                    self._schedule_review(
+                        learner_id=session.learner_id, topic_id=session.topic_id,
+                        session_id=origin.id if origin else session.id, trigger_attempt_id=attempt.id,
+                        reason="Matching Headings delayed review failed; retain remediation follow-up.",
+                        retention_eligible=False, hypothesis_id=review_item.hypothesis_id,
+                    )
+                else:
+                    self.repo.append_decision_event(
+                        session_id=session.id, event_type="review_practice_evaluated",
+                        to_state=state.status if state else "unknown", action="review_passed_without_retention",
+                        reason="The response passed but no eligible transfer baseline supports retention verification.",
+                        payload_json={"review_item_id": review_item.id, "attempt_id": attempt.id,
+                                      "retention_verified": False},
+                    )
+            self.repo.transition_session_status(session, SessionStatus.COMPLETED)
 
         case_id = case.id if case else None
         result = AttemptResultResponse(
@@ -1391,7 +1703,20 @@ class LearningAppService:
         ))
         for event in events:
             if event.payload_json.get("attempt_id") == attempt_id:
-                return AttemptResultResponse.model_validate(event.payload_json["result"])
+                stored = AttemptResultResponse.model_validate(event.payload_json["result"])
+                validity = evidence_status(self.db, "attempt", attempt_id)
+                if validity != EvidenceValidityStatus.ELIGIBLE.value:
+                    attempt = self.repo.get_attempt(attempt_id)
+                    current_state = self.repo.get_knowledge_state(
+                        attempt.session.learner_id, attempt.session.topic_id
+                    ) if attempt else None
+                    return stored.model_copy(update={
+                        "evidence_validity_status": validity,
+                        "evidence_validity_reason": evidence_reason(self.db, "attempt", attempt_id),
+                        "next_action": "evidence_revalidation_required" if validity == EvidenceValidityStatus.INVALIDATED.value else "evidence_provenance_review_required",
+                        "knowledge_state_status": effective_knowledge_status(self.db, current_state) if current_state else KnowledgeMasteryStatus.INSUFFICIENT_EVIDENCE.value,
+                    })
+                return stored
         return None
 
     def _build_attempt_result(
@@ -1451,6 +1776,8 @@ class LearningAppService:
                 is_correct=a.is_correct,
                 evaluation_status=a.evaluation_status,
                 evaluation_summary=a.evaluation_summary,
+                evidence_validity_status=evidence_status(self.db, "attempt", a.id),
+                evidence_validity_reason=evidence_reason(self.db, "attempt", a.id),
                 submitted_at=a.submitted_at,
             )
             for a in attempts
@@ -1478,6 +1805,8 @@ class LearningAppService:
             idempotency_key=att.idempotency_key,
             diagnostic_case_id=stored.diagnostic_case_id if stored else None,
             evaluation_source=stored.evaluation_source if stored else None,
+            evidence_validity_status=evidence_status(self.db, "attempt", att.id),
+            evidence_validity_reason=evidence_reason(self.db, "attempt", att.id),
             submitted_at=att.submitted_at,
         )
 
@@ -1495,6 +1824,10 @@ class LearningAppService:
         if sess is None:
             raise EntityNotFoundError("LearningSession", session_id)
 
+        if sess.current_group_version_id or any(a.group_version_id for a in self.repo.list_attempts_for_session(sess.id)):
+            self.repo.validate_transfer_readiness(sess)
+            return self._dispatch_matching_headings_transfer(sess)
+
         # Retried dispatches recover the already-assigned question even when
         # force_fresh=True. Never discard an unanswered item to manufacture freshness.
         current = self.repo.get_question_by_id(sess.current_question_id) if sess.current_question_id else None
@@ -1504,7 +1837,8 @@ class LearningAppService:
             and not any(attempt.question_id == current.id for attempt in history)):
             return TransferCheckDispatchResponse(
                 question=self.sanitize_question(current), session_status=SessionStatus(sess.status),
-                degraded=False, message="恢复尚未作答的服务端迁移验证题。",
+                degraded=False, message="Restoring the already assigned transfer task.",
+                next_action="transfer_check",
             )
         self.repo.validate_transfer_readiness(sess)
         chosen_q = self._enter_transfer(sess, "Server-authorized independent transfer dispatch.")
@@ -1523,6 +1857,26 @@ class LearningAppService:
     def _review_item_response(self, item: ReviewItem, message: str | None = None) -> ReviewItemResponse:
         question = self.repo.get_question_by_id(item.question_id) if item.question_id else None
         attempt = self.repo.get_attempt(item.attempt_id) if item.attempt_id else None
+        pending = item.status == ReviewStatus.PENDING.value
+        validity = evidence_status(self.db, "review_item", item.id)
+        validity_reason = evidence_reason(self.db, "review_item", item.id)
+        event = self.db.get(DecisionEvent, item.decision_event_id) if pending and item.decision_event_id else None
+        unavailable = bool(not item.review_session_id and event and event.action == "review_question_pool_exhausted")
+        review_question = self.sanitize_question(question) if question else None
+        if question and question.question_type == QuestionType.MATCHING_HEADINGS.value:
+            group = self.db.get(ReadingGroupVersion, item.group_version_id) if item.group_version_id else None
+            if review_question and group and item.review_session_id:
+                review_question.group_version_id = group.id
+                review_question.group_display = group.display_json
+            else:
+                review_question = None
+        if unavailable and message is None:
+            message = "题库中没有未作答且情境不同的复习题。任务仍保留待办，不会记为通过。"
+        if validity != EvidenceValidityStatus.ELIGIBLE.value:
+            review_question = None
+            if pending:
+                unavailable = True
+                message = validity_reason or "此复习任务的来源证据需要复核；不会继续创建保持验证。"
         return ReviewItemResponse(
             id=item.id, topic_id=item.topic_id, topic_title=item.topic.title,
             session_id=item.session_id, learner_id=item.learner_id,
@@ -1531,18 +1885,23 @@ class LearningAppService:
             completed_at=self._as_utc(item.completed_at) if item.completed_at else None,
             review_stage=item.review_stage, review_session_id=item.review_session_id,
             question_id=item.question_id,
-            current_question=self.sanitize_question(question) if question and item.status == ReviewStatus.PENDING.value else None,
-            review_question=self.sanitize_question(question) if question else None,
-            attempt_id=item.attempt_id, review_outcome=item.review_outcome,
+            current_question=review_question if pending and not unavailable else None,
+            review_question=review_question,
+            attempt_id=item.attempt_id, trigger_attempt_id=item.trigger_attempt_id,
+            group_version_id=item.group_version_id, review_outcome=item.review_outcome,
+            group_evaluation=attempt.item_evaluation_json if attempt else None,
+            question_unavailable=unavailable,
             is_correct=attempt.is_correct if attempt else None,
             submitted_at=self._as_utc(attempt.submitted_at) if attempt else None,
             evaluation_summary=attempt.evaluation_summary if attempt else None,
-            retention_verified=item.retention_verified,
-            retention_eligible=item.retention_eligible,
+            retention_verified=(item.retention_verified and validity == EvidenceValidityStatus.ELIGIBLE.value),
+            retention_eligible=(item.retention_eligible and validity == EvidenceValidityStatus.ELIGIBLE.value),
             decision_event_id=item.decision_event_id, message=message,
             is_due=(item.status == ReviewStatus.PENDING.value
                     and self._now() >= self._as_utc(item.scheduled_for)),
             knowledge_state_id=item.knowledge_state_id,
+            evidence_validity_status=validity,
+            evidence_validity_reason=validity_reason,
         )
 
     def list_reviews(
@@ -1565,12 +1924,50 @@ class LearningAppService:
             raise EntityNotFoundError("ReviewItem", review_id)
         if item.status != ReviewStatus.PENDING.value:
             raise DomainRuleViolationError("This review task has already been completed and cannot be started again.")
+        validity = evidence_status(self.db, "review_item", item.id)
+        if validity != EvidenceValidityStatus.ELIGIBLE.value:
+            raise DomainRuleViolationError(
+                "This historical review depends on evidence that is invalidated or requires provenance review; start a new learning session to revalidate instead."
+            )
         if self._now() < self._as_utc(item.scheduled_for):
             raise DomainRuleViolationError("This review task is not due yet.")
         if item.review_session_id:
             return self._review_item_response(item, "恢复已派发的复习题；请继续提交作答。")
 
-        question = self.repo.next_review_question(item)
+        selected_group = None
+        matching_source = None
+        if item.trigger_attempt_id:
+            trigger = self.repo.get_attempt(item.trigger_attempt_id)
+            if trigger and trigger.group_version_id and (trigger.question_snapshot_json or {}).get("diagnostic_protocol") == "matching-headings":
+                matching_source = self.repo.get_session(item.session_id) if item.session_id else None
+        if matching_source is not None:
+            case = self.repo.latest_diagnostic_case(matching_source.id)
+            rules = MatchingHeadingsRules(self.repo)
+            if case and item.question_id and item.group_version_id:
+                pinned_question = self.repo.get_question_by_id(item.question_id)
+                pinned_group = self.db.get(ReadingGroupVersion, item.group_version_id)
+                hypothesis = self.db.get(Hypothesis, item.hypothesis_id) if item.hypothesis_id else None
+                target = hypothesis.error_code if hypothesis else ""
+                selection = ((pinned_question, pinned_group, target, None)
+                             if pinned_question and pinned_group and rules.task_matches(
+                                 matching_source, case, pinned_question, pinned_group,
+                                 QuestionRole.REVIEW, target,
+                             ) else None)
+            else:
+                selection = rules.select_independent_task(
+                    matching_source, case, QuestionRole.REVIEW,
+                    exclude_review_item_id=item.id,
+                ) if case else None
+            if selection is not None:
+                question, selected_group, target, _source = selection
+                hypothesis = self.db.get(Hypothesis, item.hypothesis_id) if item.hypothesis_id else None
+                if hypothesis is None or hypothesis.error_code != target:
+                    question = None
+                    selected_group = None
+            else:
+                question = None
+        else:
+            question = self.repo.next_review_question(item)
         if question is None:
             if not item.session_id:
                 self.db.commit()
@@ -1595,6 +1992,10 @@ class LearningAppService:
                 exam_variant=source_session.exam_variant if source_session else None,
                 exam_spec_version=source_session.exam_spec_version if source_session else None,
             )
+            if selected_group is not None:
+                # The ReviewItem pins a content version when scheduled. Preserve that version
+                # even if the Question catalogue now points to a newer immutable revision.
+                review_session.current_group_version_id = selected_group.id
             claim = self.db.execute(
                 update(ReviewItem)
                 .where(
@@ -1603,7 +2004,8 @@ class LearningAppService:
                     ReviewItem.status == ReviewStatus.PENDING.value,
                     ReviewItem.review_session_id.is_(None),
                 )
-                .values(review_session_id=review_session.id, question_id=question.id)
+                .values(review_session_id=review_session.id, question_id=question.id,
+                        group_version_id=selected_group.id if selected_group else None)
             )
             if claim.rowcount != 1:
                 self.db.rollback()
@@ -1613,11 +2015,13 @@ class LearningAppService:
                 raise DomainRuleViolationError("This review task changed while the question was being dispatched.")
             item.review_session_id = review_session.id
             item.question_id = question.id
+            item.group_version_id = selected_group.id if selected_group else None
             dispatch_event = self.repo.append_decision_event(
                 session_id=review_session.id, event_type="review_question_dispatched",
                 to_state=review_session.status, action="dispatch_review_question",
                 reason="Dispatch an unseen review question for this due review task.",
                 payload_json={"review_item_id": item.id, "question_id": question.id,
+                              "group_version_id": item.group_version_id,
                               "source_session_id": item.session_id, "review_stage": item.review_stage,
                               "scheduled_for": self._as_utc(item.scheduled_for).isoformat()},
                 idempotency_key=f"review-dispatch:{item.id}",
@@ -1679,29 +2083,40 @@ class LearningAppService:
                 key=lambda item: self._as_utc(item.completed_at or item.created_at),
                 default=None,
             )
-            verified_reviews = [item for item in reviews if item.retention_verified]
+            verified_reviews = [item for item in reviews if item.retention_verified
+                                and evidence_status(self.db, "review_item", item.id) == EvidenceValidityStatus.ELIGIBLE.value]
             latest_verified_review = max(
                 verified_reviews,
                 key=lambda item: self._as_utc(item.completed_at or item.created_at),
                 default=None,
             )
-            if latest_review and latest_review.review_outcome == "failed":
+            if latest_review and evidence_status(self.db, "review_item", latest_review.id) != EvidenceValidityStatus.ELIGIBLE.value:
+                retention_status = "evidence_review_required"
+            elif latest_review and latest_review.review_outcome == "failed":
                 retention_status = "review_failed"
-            elif latest_review and latest_review.retention_verified:
+            elif latest_review and latest_review.retention_verified and evidence_status(self.db, "review_item", latest_review.id) == EvidenceValidityStatus.ELIGIBLE.value:
                 retention_status = "delayed_check_passed"
             elif pending_retention:
                 retention_status = "review_due"
-            elif any(item.retention_verified for item in reviews):
+            elif verified_reviews:
                 retention_status = "delayed_check_passed"
             else:
                 retention_status = "not_verified"
+            state_validity = evidence_status(self.db, "knowledge_state", ks.id)
+            state_validity_reason = evidence_reason(self.db, "knowledge_state", ks.id)
+            if ks.last_transfer_attempt_id:
+                transfer_validity = evidence_status(self.db, "attempt", ks.last_transfer_attempt_id)
+                if transfer_validity != EvidenceValidityStatus.ELIGIBLE.value:
+                    state_validity = transfer_validity
+                    state_validity_reason = evidence_reason(self.db, "attempt", ks.last_transfer_attempt_id) or state_validity_reason
+            state_attempt = self.repo.get_attempt(ks.last_transfer_attempt_id) if ks.last_transfer_attempt_id else None
             responses.append(KnowledgeStateResponse(
                 id=ks.id,
                 learner_id=ks.learner_id,
                 topic_id=ks.topic_id,
                 topic_title=ks.topic.title,
                 topic_slug=ks.topic.slug,
-                status=KnowledgeMasteryStatus(ks.status),
+                status=KnowledgeMasteryStatus(effective_knowledge_status(self.db, ks)),
                 confidence_is_heuristic=True,
                 unresolved_error_codes=list(ks.unresolved_error_codes or []),
                 unresolved_error_reasons=[
@@ -1718,7 +2133,7 @@ class LearningAppService:
                 last_transfer_attempt_id=ks.last_transfer_attempt_id,
                 updated_at=ks.updated_at,
                 retention_status=retention_status,
-                retention_evidence_count=sum(1 for item in reviews if item.retention_verified),
+                retention_evidence_count=len(verified_reviews),
                 last_reviewed_at=(
                     self._as_utc(latest_review.completed_at)
                     if latest_review and latest_review.completed_at else None
@@ -1727,6 +2142,13 @@ class LearningAppService:
                     self._as_utc(latest_verified_review.completed_at)
                     if latest_verified_review and latest_verified_review.completed_at else None
                 ),
+                evidence_validity_status=EvidenceValidityStatus(state_validity),
+                evidence_validity_reason=state_validity_reason,
+                revalidation_available=state_validity in {
+                    EvidenceValidityStatus.INVALIDATED.value,
+                    EvidenceValidityStatus.REVIEW_REQUIRED.value,
+                },
+                exam_variant=state_attempt.session.exam_variant if state_attempt else None,
             ))
         return responses
 
@@ -1755,12 +2177,16 @@ class LearningAppService:
             topic_title: str, title: str, summary: str, evidence_summary: str,
             session_id: str | None = None, attempt_id: str | None = None,
             review_id: str | None = None,
+            evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE,
+            evidence_validity_reason: str | None = None,
         ) -> None:
             events.append(LearningHistoryEventResponse(
                 id=event_id, kind=kind, occurred_at=self._as_utc(occurred_at),
                 topic_id=topic_id, topic_title=topic_title, title=title,
                 summary=summary, evidence_summary=evidence_summary,
                 session_id=session_id, attempt_id=attempt_id, review_id=review_id,
+                evidence_validity_status=evidence_validity_status,
+                evidence_validity_reason=evidence_validity_reason,
             ))
 
         attempts = self.db.scalars(
@@ -1785,6 +2211,8 @@ class LearningAppService:
                 continue
             kind, label = role_labels.get(attempt.attempt_role, ("answer", "学习作答"))
             passed = attempt.is_correct is True
+            attempt_validity = EvidenceValidityStatus(evidence_status(self.db, "attempt", attempt.id))
+            attempt_validity_reason = evidence_reason(self.db, "attempt", attempt.id)
             result_text = "通过" if passed else "需要继续练习" if attempt.is_correct is False else "评价尚未完成"
             if (attempt.attempt_role == QuestionRole.INITIAL.value
                     and (not passed or attempt.id in diagnostic_trigger_attempt_ids)):
@@ -1793,6 +2221,10 @@ class LearningAppService:
             elif attempt.attempt_role == QuestionRole.REVIEW.value:
                 label = "延迟复习作答"
                 result_text = "获得一次延迟复习证据。" if passed else "本次复习未通过，需要继续学习。"
+            if attempt_validity == EvidenceValidityStatus.INVALIDATED:
+                result_text = "历史上曾获通过评分；该内容版本已失效，当前不作为能力证据。"
+            elif attempt_validity == EvidenceValidityStatus.REVIEW_REQUIRED:
+                result_text = "历史作答仍可查看，但版本来源待核实，暂不作为能力证据。"
             add_event(
                 event_id=f"attempt:{attempt.id}", kind=kind,
                 occurred_at=attempt.submitted_at, topic_id=session.topic_id,
@@ -1800,6 +2232,8 @@ class LearningAppService:
                 evidence_summary=f"服务端作答记录 · {attempt.id} · 评价状态 {attempt.evaluation_status}",
                 session_id=session.id, attempt_id=attempt.id,
                 review_id=(review_by_attempt[attempt.id].id if attempt.id in review_by_attempt else None),
+                evidence_validity_status=attempt_validity,
+                evidence_validity_reason=attempt_validity_reason,
             )
 
         for case in cases:
@@ -1821,6 +2255,7 @@ class LearningAppService:
             "diagnostic_step_completed": ("diagnostic_update", "更新诊断判断", "系统根据新证据更新了可能原因和下一步安排。"),
             "transfer_verified": ("transfer_verified", "迁移验证通过", "新的应用情境验证通过；这表示当前迁移证据，不代表长期保持。"),
             "review_scheduled": ("review_scheduled", "安排后续复习", "系统根据已保存的学习证据安排了后续复习。"),
+            "evidence_validity_reconciled": ("evidence_reconciled", "重新核对历史学习证据", "部分历史验证证据已标记为失效或待复核；当前状态已根据仍有效的证据重新计算。"),
         }
         decisions = self.db.scalars(
             select(DecisionEvent)
@@ -1835,12 +2270,41 @@ class LearningAppService:
             if session is None:
                 continue
             kind, title, summary = projection
+            validity_status = EvidenceValidityStatus.ELIGIBLE
+            validity_reason = None
+            if event.event_type == "review_scheduled":
+                trigger_id = event.payload_json.get("trigger_attempt_id")
+                if trigger_id:
+                    validity_status = EvidenceValidityStatus(evidence_status(self.db, "attempt", trigger_id))
+                    if validity_status != EvidenceValidityStatus.ELIGIBLE:
+                        validity_reason = evidence_reason(self.db, "attempt", trigger_id)
+                        summary = "历史上曾安排复习；其触发验证证据现已失效或待复核，该计划不再构成保持验证。"
+            elif event.event_type == "transfer_verified":
+                transfer_id = (event.payload_json or {}).get("attempt_id") or (event.payload_json or {}).get("transfer_attempt_id")
+                if transfer_id:
+                    validity_status = EvidenceValidityStatus(evidence_status(self.db, "attempt", transfer_id))
+                    if validity_status != EvidenceValidityStatus.ELIGIBLE:
+                        validity_reason = evidence_reason(self.db, "attempt", transfer_id)
+                        summary = "历史上曾记录迁移通过；所依据的作答当前失效或待复核，不再证明当前迁移能力。"
+            elif event.event_type == "evidence_validity_reconciled":
+                invalidated_ids = (event.payload_json or {}).get("invalidated_attempt_ids", [])
+                source_statuses = [evidence_status(self.db, "attempt", attempt_id) for attempt_id in invalidated_ids]
+                validity_status = (
+                    EvidenceValidityStatus.INVALIDATED
+                    if EvidenceValidityStatus.INVALIDATED.value in source_statuses
+                    else EvidenceValidityStatus.REVIEW_REQUIRED
+                    if event.to_state == KnowledgeMasteryStatus.INSUFFICIENT_EVIDENCE.value
+                    else EvidenceValidityStatus.ELIGIBLE
+                )
+                validity_reason = event.reason
             add_event(
                 event_id=f"decision:{event.id}", kind=kind,
                 occurred_at=event.created_at, topic_id=session.topic_id,
                 topic_title=session.topic.title, title=title, summary=summary,
                 evidence_summary=f"服务端决策记录 · {event.id} · 不含内部提示词或执行载荷",
                 session_id=session.id,
+                evidence_validity_status=validity_status,
+                evidence_validity_reason=validity_reason,
             )
 
         return sorted(events, key=lambda item: item.occurred_at, reverse=True)[:max(1, min(limit, 200))]
@@ -1877,8 +2341,9 @@ class LearningAppService:
             if s.status in ("active", "diagnosing", "intervening", "transfer_checking", "reviewing")
         )
         comp_s = sum(1 for s in sessions if s.status == "completed")
-        mastered_topics = sum(1 for ks in k_states if ks.status == KnowledgeMasteryStatus.STABLE.value)
-        needs_practice_topics = sum(1 for ks in k_states if ks.status == KnowledgeMasteryStatus.NEEDS_PRACTICE.value)
+        effective_statuses = {ks.id: effective_knowledge_status(self.db, ks) for ks in k_states}
+        mastered_topics = sum(1 for ks in k_states if effective_statuses[ks.id] == KnowledgeMasteryStatus.STABLE.value)
+        needs_practice_topics = sum(1 for ks in k_states if effective_statuses[ks.id] == KnowledgeMasteryStatus.NEEDS_PRACTICE.value)
 
         recent_sessions_dto: list[SessionSummaryResponse] = []
         for s in sessions[:5]:
@@ -1913,6 +2378,10 @@ class LearningAppService:
                 status=r.status,
                 created_at=r.created_at,
                 completed_at=r.completed_at,
+                evidence_validity_status=evidence_status(self.db, "review_item", r.id),
+                evidence_validity_reason=evidence_reason(self.db, "review_item", r.id),
+                retention_verified=(r.retention_verified and evidence_status(self.db, "review_item", r.id) == EvidenceValidityStatus.ELIGIBLE.value),
+                retention_eligible=(r.retention_eligible and evidence_status(self.db, "review_item", r.id) == EvidenceValidityStatus.ELIGIBLE.value),
             )
             for r in reviews[:5]
         ]
@@ -1923,9 +2392,103 @@ class LearningAppService:
             active_sessions=active_s,
             completed_sessions=comp_s,
             total_attempts=total_att,
-            pending_reviews_count=len(reviews),
+            pending_reviews_count=sum(1 for r in reviews if evidence_status(self.db, "review_item", r.id) == EvidenceValidityStatus.ELIGIBLE.value),
             mastered_topics_count=mastered_topics,
             needs_practice_topics_count=needs_practice_topics,
             recent_sessions=recent_sessions_dto,
             pending_reviews=pending_reviews_dto,
+        )
+
+    def start_evidence_revalidation(
+        self, request: EvidenceRevalidationRequest,
+    ) -> EvidenceRevalidationResponse:
+        """Start a fresh standard Reading session for an affected knowledge state."""
+        idempotency_key = f"evidence-revalidation:{request.learner_id}:{request.idempotency_key}"
+        existing = self.db.scalar(select(DecisionEvent).where(DecisionEvent.idempotency_key == idempotency_key))
+        if existing:
+            session_id = existing.payload_json.get("revalidation_session_id")
+            if session_id:
+                return EvidenceRevalidationResponse(
+                    available=True, message="已恢复此前创建的重新验证学习会话。",
+                    session=self.get_session_detail(session_id), idempotency_key=request.idempotency_key,
+                )
+
+        topic = self.repo.get_topic_by_id(request.topic_id) or self.repo.get_topic_by_slug(request.topic_id)
+        if topic is None:
+            raise EntityNotFoundError("KnowledgeTopic", request.topic_id)
+        expected_domain = domain_for_variant(request.exam_variant)
+        if topic.domain_code != expected_domain:
+            raise DomainRuleViolationError("重新验证考试模式与学习主题不匹配。")
+        profile = self.db.get(ExamPreparationProfile, request.learner_id)
+        if profile is None or profile.exam_variant != request.exam_variant:
+            raise DomainRuleViolationError("请先保存对应的 IELTS 考试模式，再开始重新验证。")
+        state = self.repo.get_knowledge_state(request.learner_id, topic.id)
+        if state is None:
+            return EvidenceRevalidationResponse(
+                available=False, message="当前没有需要重新验证的历史学习状态。",
+                idempotency_key=request.idempotency_key,
+            )
+        state_validity = evidence_status(self.db, "knowledge_state", state.id)
+        if state.last_transfer_attempt_id:
+            attempt_validity = evidence_status(self.db, "attempt", state.last_transfer_attempt_id)
+            if attempt_validity != EvidenceValidityStatus.ELIGIBLE.value:
+                state_validity = attempt_validity
+        if state_validity == EvidenceValidityStatus.ELIGIBLE.value:
+            return EvidenceRevalidationResponse(
+                available=False, message="当前状态没有失效或待复核的迁移证据，无需启动历史重新验证。",
+                idempotency_key=request.idempotency_key,
+            )
+
+        questions = self.repo.list_questions_for_topic(topic.id, role=QuestionRole.INITIAL)
+        selected = None
+        for candidate in questions:
+            if candidate.question_type != QuestionType.MATCHING_HEADINGS.value or not candidate.reading_group_version_id:
+                continue
+            group = self.db.get(ReadingGroupVersion, candidate.reading_group_version_id)
+            if (group and group.exam_variant == request.exam_variant
+                    and evidence_status(self.db, "reading_group_version", group.id) == EvidenceValidityStatus.ELIGIBLE.value):
+                selected = candidate
+                break
+        if selected is None:
+            return EvidenceRevalidationResponse(
+                available=False,
+                message="没有可用于重新验证的、已登记且考试模式匹配的新题组。当前状态继续标记为待验证。",
+                idempotency_key=request.idempotency_key,
+            )
+
+        # Session and idempotency event share one transaction. If two requests
+        # race on the same key, the unique DecisionEvent key rolls back the
+        # losing session insert as well.
+        session = self.repo.create_session(
+            topic_id=topic.id, learner_id=request.learner_id,
+            current_question_id=selected.id, exam_variant=request.exam_variant,
+            exam_spec_version=EXAM_CATALOG_VERSION,
+        )
+        event = self.repo.append_decision_event(
+            session_id=session.id, event_type="evidence_revalidation_started",
+            to_state=session.status, action="start_evidence_revalidation",
+            reason="Start a new ordinary Matching Headings learning path after invalid historical verification evidence; no mastery is granted by this dispatch.",
+            payload_json={"knowledge_state_id": state.id, "topic_id": topic.id,
+                          "learner_id": request.learner_id, "exam_variant": request.exam_variant,
+                          "revalidation_session_id": session.id,
+                          "group_version_id": selected.reading_group_version_id},
+            idempotency_key=idempotency_key,
+        )
+        try:
+            self.db.commit()
+        except IntegrityError:
+            self.db.rollback()
+            existing = self.db.scalar(select(DecisionEvent).where(DecisionEvent.idempotency_key == idempotency_key))
+            recovered_id = existing.payload_json.get("revalidation_session_id") if existing else None
+            if recovered_id:
+                return EvidenceRevalidationResponse(
+                    available=True, message="并发请求已创建重新验证会话；返回原会话。",
+                    session=self.get_session_detail(recovered_id), idempotency_key=request.idempotency_key,
+                )
+            raise
+        return EvidenceRevalidationResponse(
+            available=True,
+            message="已创建新的 Matching Headings 学习会话。需要按正常流程作答、诊断和独立迁移；本次派题不会自动恢复掌握状态。",
+            session=self.get_session_detail(event.payload_json["revalidation_session_id"]),
+            idempotency_key=request.idempotency_key,
         )

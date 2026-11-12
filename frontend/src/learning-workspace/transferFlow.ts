@@ -11,6 +11,10 @@ export function getTransferPresentation(session: SessionDetail | null, attempts:
     question,
     result,
     canDispatch: session?.status === 'transfer_checking' && session.can_dispatch_transfer === true && !question,
-    passed: result?.is_correct === true && ((result.next_action === 'mastery_achieved' && result.knowledge_state_status === 'stable') || (result.next_action === 'transfer_verified' && result.knowledge_state_status === 'transfer_verified')),
+    passed: result?.is_correct === true && (
+      (result.next_action === 'mastery_achieved' && result.knowledge_state_status === 'stable')
+      || (result.next_action === 'transfer_verified' && result.knowledge_state_status === 'transfer_verified')
+      || result.next_action === 'matching_headings_transfer_verified'
+    ),
   };
 }

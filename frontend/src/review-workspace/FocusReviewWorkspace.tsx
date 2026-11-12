@@ -1,11 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ApiClientError } from '../api/client';
+import { learnerEvidenceValidityReason } from '../evidenceValidity';
 import { createAttemptSubmission, getSessionMaterial, submitAttempt } from '../api/sessions';
 import { getReview, listReviews, startReview } from '../api/reviews';
 import { listLearningHistory } from '../api/profile';
-import type { AttemptResult, LearningHistoryEvent, ReviewItem, SubmitAttemptRequest } from '../api/types';
+import type { AttemptResult, LearningHistoryEvent, ReviewItem, StructuredAnswer, SubmitAttemptRequest } from '../api/types';
 import { useApiResource } from '../learning-workspace/useApiResource';
 import { questionTypeLabel } from '../learning-workspace/errorDna';
+import { MatchingHeadingsQuestion, MatchingHeadingsResult } from '../learning-workspace/MatchingHeadingsQuestion';
+import { headingGroup, readHeadingDraft, storeHeadingDraft, validHeadingSelections } from '../learning-workspace/matchingHeadings';
+import { restoreAttemptPayload, SingleFlightGate } from '../learning-workspace/learningFlow';
 import type { WorkspaceId } from '../app-shell/navigation';
 
 const LEARNER_ID = 'default_learner';
@@ -22,7 +26,9 @@ interface PendingReviewAnswer {
 function readPendingAnswer(): PendingReviewAnswer | null {
   try {
     const value = window.sessionStorage.getItem(PENDING_REVIEW_ANSWER_KEY);
-    return value ? JSON.parse(value) as PendingReviewAnswer : null;
+    if (!value) return null;
+    const intent = JSON.parse(value) as PendingReviewAnswer;
+    return { ...intent, payload: restoreAttemptPayload(intent.payload) };
   } catch {
     return null;
   }
@@ -58,6 +64,7 @@ function reviewResultFromItem(item: ReviewItem): AttemptResult | null {
     feedback_text: item.evaluation_summary,
     next_action: nextAction,
     knowledge_state_status: undefined,
+    group_evaluation: item.group_evaluation,
   };
 }
 
@@ -71,45 +78,58 @@ export const FocusReviewWorkspace: React.FC<{
   const historyResource = useApiResource<LearningHistoryEvent[]>(loadHistory);
   const [activeReview, setActiveReview] = useState<ReviewItem | null>(null);
   const [draft, setDraft] = useState('');
+  const [headingDraft, setHeadingDraft] = useState<StructuredAnswer>({});
   const [pendingAnswer, setPendingAnswer] = useState<PendingReviewAnswer | null>(() => readPendingAnswer());
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const submitGate = useRef(new SingleFlightGate());
 
   const activeReviewId = activeReview?.id ?? null;
   const activeQuestion = activeReview?.status === 'pending' ? activeReview.current_question ?? null : null;
   const reviewSessionId = activeReview?.review_session_id;
-  const loadMaterials = useCallback(async (signal: AbortSignal) => reviewSessionId ? [await getSessionMaterial(reviewSessionId, signal)].filter((item): item is NonNullable<typeof item> => item !== null) : [], [reviewSessionId, activeQuestion?.id]);
+  const groupQuestion = activeQuestion?.question_type === 'matching_headings';
+  const loadMaterials = useCallback(async (signal: AbortSignal) => reviewSessionId && !groupQuestion ? [await getSessionMaterial(reviewSessionId, signal)].filter((item): item is NonNullable<typeof item> => item !== null) : [], [reviewSessionId, activeQuestion?.id, groupQuestion]);
   const materials = useApiResource(loadMaterials);
   const isPendingIntentForActive = pendingAnswer?.reviewId === activeReview?.id;
+  const applyReview = useCallback((item: ReviewItem) => {
+    const storage = window.sessionStorage;
+    const intent = readPendingAnswer();
+    const question = item.current_question;
+    setActiveReview(item);
+    setResult(reviewResultFromItem(item));
+    if (intent?.reviewId === item.id && item.attempt_id) {
+      storage.removeItem(PENDING_REVIEW_ANSWER_KEY);
+      if (intent.payload.group_version_id) {
+        storeHeadingDraft(storage, intent.sessionId, intent.payload.question_id, intent.payload.group_version_id, {});
+      } else storage.removeItem(`${DRAFT_PREFIX}${item.id}`);
+      setPendingAnswer(null);
+      setDraft('');
+      setHeadingDraft({});
+      setInfo('已从服务端恢复这次复习评价，没有重复提交。');
+      return;
+    }
+    const payload = intent?.reviewId === item.id ? intent.payload : undefined;
+    setPendingAnswer(intent);
+    setDraft(payload?.submitted_answer ?? storage.getItem(`${DRAFT_PREFIX}${item.id}`) ?? '');
+    setHeadingDraft(payload?.structured_answer && payload.question_id === question?.id && payload.group_version_id === question.group_version_id
+      ? { ...payload.structured_answer }
+      : item.review_session_id ? readHeadingDraft(storage, item.review_session_id, question) : {});
+    if (payload) setInfo('已读取服务端状态。尚未确认的作答可使用原请求安全恢复。');
+  }, []);
 
   useEffect(() => {
     if (!activeReviewId) return;
     const controller = new AbortController();
     void getReview(activeReviewId, LEARNER_ID, controller.signal).then((item) => {
       if (controller.signal.aborted) return;
-      setActiveReview(item);
-      setResult(reviewResultFromItem(item));
-      const intent = readPendingAnswer();
-      if (intent?.reviewId === item.id) {
-        setPendingAnswer(intent);
-        if (item.attempt_id) {
-          window.sessionStorage.removeItem(PENDING_REVIEW_ANSWER_KEY);
-          setPendingAnswer(null);
-          setInfo('已从服务端恢复这次复习评价，没有重复提交。');
-        } else {
-          setDraft(intent.payload.submitted_answer);
-          setInfo('找到一条尚未确认结果的作答。先读取了服务端状态；你可以用原作答和幂等键安全恢复。');
-        }
-      } else {
-        setDraft(window.sessionStorage.getItem(`${DRAFT_PREFIX}${item.id}`) ?? '');
-      }
+      applyReview(item);
     }).catch((reason: unknown) => {
       if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : '读取复习任务失败。');
     });
     return () => controller.abort();
-  }, [activeReviewId]);
+  }, [activeReviewId, applyReview]);
 
   useEffect(() => {
     const intent = readPendingAnswer();
@@ -133,10 +153,8 @@ export const FocusReviewWorkspace: React.FC<{
     setBusy(true); setError(null); setInfo(null); setResult(null);
     try {
       const started = await startReview(item.id, LEARNER_ID);
-      setActiveReview(started);
-      setResult(reviewResultFromItem(started));
+      applyReview(started);
       window.sessionStorage.setItem(ACTIVE_REVIEW_KEY, item.id);
-      setDraft(window.sessionStorage.getItem(`${DRAFT_PREFIX}${item.id}`) ?? '');
       if (!started.current_question) setInfo(started.message ?? '目前没有可派发的独立复习题，任务仍保留待办。');
       await pendingResource.retry();
     } catch (reason) {
@@ -146,55 +164,69 @@ export const FocusReviewWorkspace: React.FC<{
 
   const refreshAuthoritativeReview = async (reviewId: string) => {
     const item = await getReview(reviewId, LEARNER_ID);
-    setActiveReview(item);
-    setResult(reviewResultFromItem(item));
-    if (item.attempt_id) {
-      window.sessionStorage.removeItem(PENDING_REVIEW_ANSWER_KEY);
-      setPendingAnswer(null);
-    }
+    applyReview(item);
     await pendingResource.retry();
   };
 
   const sendAnswer = async (retryExisting: boolean) => {
-    if (!activeReview?.review_session_id || !activeQuestion || busy) return;
+    if (!activeReview?.review_session_id || !activeQuestion || !activeReview.is_due || busy || submitGate.current.isActive) return;
     let intent = pendingAnswer;
-    if (!retryExisting || intent?.reviewId !== activeReview.id) {
-      if (!draft.trim()) return;
+    if (retryExisting && intent?.reviewId !== activeReview.id) return;
+    if (!retryExisting) {
+      if (intent?.reviewId === activeReview.id) return;
+      const group = headingGroup(activeQuestion);
+      const version = activeQuestion.group_version_id;
+      const selections = group ? validHeadingSelections(group, headingDraft) : {};
+      if (groupQuestion ? !group || !version || Object.keys(selections).length !== group.items.length : !draft.trim()) return;
       intent = {
         reviewId: activeReview.id,
         sessionId: activeReview.review_session_id,
-        payload: createAttemptSubmission({ question_id: activeQuestion.id, submitted_answer: draft }),
+        payload: createAttemptSubmission({ question_id: activeQuestion.id,
+          ...(version ? { group_version_id: version, structured_answer: selections } : { submitted_answer: draft }),
+        }),
       };
       window.sessionStorage.setItem(PENDING_REVIEW_ANSWER_KEY, JSON.stringify(intent));
       setPendingAnswer(intent);
     }
+    if (!intent || !submitGate.current.tryAcquire()) return;
     setBusy(true); setError(null); setInfo(null);
     try {
       const attemptResult = await submitAttempt(intent.sessionId, intent.payload);
       setResult(attemptResult);
       const item = await getReview(intent.reviewId, LEARNER_ID);
-      setActiveReview(item);
-      window.sessionStorage.removeItem(PENDING_REVIEW_ANSWER_KEY);
-      window.sessionStorage.removeItem(`${DRAFT_PREFIX}${item.id}`);
-      setPendingAnswer(null);
-      setDraft('');
+      applyReview(item);
       setInfo('评价和复习状态已由服务端保存。');
       await pendingResource.retry();
     } catch (reason) {
       setError(reason instanceof ApiClientError ? `${reason.code} · ${reason.message}` : reason instanceof Error ? reason.message : '提交复习答案失败。');
       try {
         const item = await getReview(intent.reviewId, LEARNER_ID);
-        setActiveReview(item);
-        setResult(reviewResultFromItem(item));
+        applyReview(item);
         if (item.attempt_id) {
-          window.sessionStorage.removeItem(PENDING_REVIEW_ANSWER_KEY);
-          setPendingAnswer(null);
+          setError(null);
           setInfo('服务端已经记录了这次作答，已恢复结果；没有再次提交。');
           await pendingResource.retry();
         }
       } catch {
         setInfo('无法确认服务器是否完成处理。保留原作答和幂等键，重新读取状态后再恢复。');
       }
+    } finally { submitGate.current.release(); setBusy(false); }
+  };
+
+  const editPendingGroup = async () => {
+    if (!activeReviewId || !pendingAnswer?.payload.group_version_id || busy) return;
+    setBusy(true);
+    try {
+      const item = await getReview(activeReviewId, LEARNER_ID);
+      applyReview(item);
+      if (!item.attempt_id) {
+        window.sessionStorage.removeItem(PENDING_REVIEW_ANSWER_KEY);
+        setPendingAnswer(null);
+        setInfo('已保留草稿，可以编辑后重新提交。');
+      }
+      setError(null);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : '无法确认复习状态。');
     } finally { setBusy(false); }
   };
 
@@ -235,6 +267,17 @@ export const FocusReviewWorkspace: React.FC<{
           <button type="button" className="focus-button-quiet" disabled={busy} onClick={() => void recoverActiveReview()}>重新读取</button>
         </div>
         {activeQuestion && <div className="focus-review-question">
+          {groupQuestion && <MatchingHeadingsQuestion
+            question={activeQuestion} selections={headingDraft}
+            onChange={(selections) => {
+              if (!reviewSessionId || !activeQuestion.group_version_id) return;
+              setHeadingDraft(selections);
+              storeHeadingDraft(window.sessionStorage, reviewSessionId, activeQuestion.id, activeQuestion.group_version_id, selections);
+            }}
+            onSubmit={() => void sendAnswer(false)} submitLabel="提交复习作答"
+            focusId="review-answer" busy={busy} locked={!activeReview.is_due || isPendingIntentForActive}
+          />}
+          {!groupQuestion && <>
           {materials.state.status === 'loading' && <p role="status">正在读取本题材料…</p>}
           {materials.state.status === 'error' && <p role="alert">材料读取失败。<button onClick={() => void materials.retry()}>重试</button></p>}
           {materials.state.status === 'success' && materials.state.data.filter(material => material.id === activeQuestion.material_id).map(material => <article className="wb-material" key={material.id}><h3>{material.title}</h3><pre>{material.content_body}</pre></article>)}
@@ -243,21 +286,29 @@ export const FocusReviewWorkspace: React.FC<{
             {activeQuestion.context_snippet && <pre className="focus-code">{activeQuestion.context_snippet}</pre>}
             <label className="focus-field-label" htmlFor="review-answer">写下答案或推理过程</label>
             <textarea id="review-answer" className="focus-textarea" maxLength={2000} value={draft} onChange={(event) => changeDraft(event.target.value)} disabled={busy || Boolean(isPendingIntentForActive)} placeholder="写下你的思路；草稿会保留在当前浏览器会话中。" />
+          </>}
             {isPendingIntentForActive && <p className="focus-help">有一条尚未确认结果的作答。为避免产生第二种作答意图，请恢复原请求或先读取服务端状态。</p>}
             <div className="focus-actions">
               {isPendingIntentForActive
                 ? <button type="button" className="focus-button" disabled={busy} onClick={() => void sendAnswer(true)}>用原作答和幂等键恢复</button>
-                : <button type="button" className="focus-button" disabled={!draft.trim() || busy || !activeReview.is_due} onClick={() => void sendAnswer(false)}>提交复习作答</button>}
+                : !groupQuestion && <button type="button" className="focus-button" disabled={!draft.trim() || busy || !activeReview.is_due} onClick={() => void sendAnswer(false)}>提交复习作答</button>}
+              {groupQuestion && isPendingIntentForActive && <button type="button" className="focus-button-quiet" disabled={busy} onClick={() => void editPendingGroup()}>保留草稿并重新编辑</button>}
             </div>
             {!activeReview.is_due && <p className="focus-help">服务端尚未允许开始这项复习；页面不会提前提交。</p>}
+        </div>}
+        {activeReview.evidence_validity_status && activeReview.evidence_validity_status !== 'eligible' && <div role="status" className="focus-notice warning">
+          <strong>{activeReview.evidence_validity_status === 'invalidated' ? '这条历史评分目前不作为保持证据' : '这条历史记录的题目版本仍待核实'}</strong>
+          <p>原始作答和当时的评分仍保留为历史记录；当前学习状态不会把它当作有效的延迟保持验证。</p>
+          <details><summary>查看核对说明</summary><p>{learnerEvidenceValidityReason(activeReview.evidence_validity_status, activeReview.evidence_validity_reason)}</p></details>
         </div>}
         {!activeQuestion && activeReview.status === 'pending' && <div className="focus-empty"><strong>当前没有可用的独立复习题。</strong><p>{activeReview.message ?? '证据不足，任务仍保留待办，不会记为复习通过。'}</p></div>}
         {!activeQuestion && activeReview.status !== 'pending' && <div className={`focus-notice ${activeReview.retention_verified ? 'success' : activeReview.review_outcome === 'failed' ? 'warning' : 'neutral'}`}>
               <strong>{activeReview.retention_verified ? '本次获得延迟保持证据' : activeReview.review_outcome === 'failed' ? '本次复习未通过' : activeReview.review_outcome === 'passed_without_retention_baseline' ? '答对了，但不构成延迟保持证据' : '本次评价已保存'}</strong>
               <p>{activeReview.evaluation_summary ?? result?.evaluation_summary ?? '服务端未提供评价说明。'}</p>
+              {result && <MatchingHeadingsResult result={result} question={activeReview.review_question} />}
               {activeReview.retention_verified && <p>这是一次延迟复习证据，不代表已经证明长期保持。</p>}
               {activeReview.review_outcome === 'passed_without_retention_baseline' && <p>当前没有符合条件的迁移验证基线，因此服务端没有把这次正确作答记为保持通过。</p>}
-              {activeReview.review_outcome === 'failed' && <button className="focus-button" onClick={continueDiagnosis}>继续查看诊断</button>}
+              {activeReview.review_outcome === 'failed' && <><p>当前需要继续练习。</p><button className="focus-button" onClick={continueDiagnosis}>继续查看诊断</button></>}
               <p className="focus-review-meta">复习时间：{formatDate(activeReview.submitted_at)} · 计划时间：{formatDate(activeReview.scheduled_for)}</p>
         </div>}
         {activeReview.status === 'completed' && activeReview.retention_verified && pendingResource.state.status === 'success' && (() => {
@@ -275,7 +326,8 @@ export const FocusReviewWorkspace: React.FC<{
         {pendingResource.state.status === 'success' && orderedPending.length > 0 && <div className="focus-review-list">
           {orderedPending.map((item) => <article key={item.id} className="focus-review-row">
             <div className="focus-review-row-copy"><div className="focus-review-topic">{item.topic_title}</div><div className="focus-review-date">计划时间：{formatDate(item.scheduled_for)} · {item.is_due ? '已到期' : '尚未到期'}</div><p>{learnerReviewReason(item)}</p><small>{item.review_stage ? `第 ${item.review_stage + 1} 次间隔检查` : '首次延迟复习'} · {item.retention_eligible ? '用于检查延迟保持' : '后续学习任务'}</small>{historyResource.state.status === 'success' && (() => { const previous = historyResource.state.data.find((event) => event.topic_id === item.topic_id && !['review_scheduled'].includes(event.kind)); return <div className="focus-review-previous">上次学习：{previous ? `${previous.title} · ${previous.summary}` : '暂无历史作答摘要。'}</div>; })()}</div>
-            <button type="button" className={item.is_due ? 'focus-button' : 'focus-button-secondary'} disabled={!item.is_due || busy || Boolean(pendingAnswer && pendingAnswer.reviewId !== item.id)} onClick={() => void beginReview(item)}>{pendingAnswer && pendingAnswer.reviewId !== item.id ? '先恢复上次作答' : item.is_due ? '开始复习' : '尚未到期'}</button>
+            {item.question_unavailable ? <span className="focus-help">{item.message ?? '暂无符合条件的独立复习题。'}</span>
+              : <button type="button" className={item.is_due ? 'focus-button' : 'focus-button-secondary'} disabled={!item.is_due || busy || Boolean(pendingAnswer && pendingAnswer.reviewId !== item.id)} onClick={() => void beginReview(item)}>{pendingAnswer && pendingAnswer.reviewId !== item.id ? '先恢复上次作答' : item.is_due ? '开始复习' : '尚未到期'}</button>}
           </article>)}
         </div>}
       </section>

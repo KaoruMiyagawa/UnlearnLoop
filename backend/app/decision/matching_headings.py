@@ -25,7 +25,7 @@ from app.domain.reading_groups import (
     MATCHING_HEADINGS_PROTOCOL as PROTOCOL,
     MatchingHeadingsGroup,
 )
-from app.persistence.models import Attempt, DecisionEvent, DiagnosticCase, LearningSession, Question, ReadingGroupVersion, ReadingRuleVersion
+from app.persistence.models import Attempt, DecisionEvent, DiagnosticCase, LearningSession, Question, ReadingGroupVersion, ReadingRuleVersion, ReviewItem
 from app.persistence.repositories import LearningRepository
 
 
@@ -189,6 +189,153 @@ class MatchingHeadingsRules:
             and rules.source_group_id == source.source_group_id
             and rules.role == question.question_role
             and set(rules.targets) == set(targets)
+        )
+
+    def select_independent_task(self, session, case, role: QuestionRole, *, exclude_review_item_id: str | None = None):
+        """Select an explicitly reviewed transfer/review task for one supported cause."""
+        trigger = case.trigger_attempt
+        source_group = self.db.get(ReadingGroupVersion, trigger.group_version_id) if trigger.group_version_id else None
+        source = published_rules(self.db, source_group) if source_group else None
+        if (
+            not supported_protocol(trigger) or source is None
+            or (source.protocol, source.version) != attempt_protocol(trigger)
+            or trigger.question_snapshot_json.get("rule_version_id") != source_group.rule_version_id
+            or source.role != QuestionRole.INITIAL.value
+            or source_group.exam_variant != session.exam_variant
+        ):
+            return None
+        hypotheses = {h.error_code: h.status for h in case.hypotheses if h.error_code in source.targets}
+        supported = [code for code, status in hypotheses.items() if status == HypothesisStatus.SUPPORTED.value]
+        if len(supported) != 1 or any(
+            status != HypothesisStatus.LOWERED.value
+            for code, status in hypotheses.items() if code != supported[0]
+        ):
+            return None
+        target = supported[0]
+        attempts = self.repo.list_attempts_for_session(session.id)
+        if role == QuestionRole.TRANSFER_CHECK:
+            practices = [a for a in attempts if a.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
+            if not practices or practices[-1].is_correct is not True:
+                return None
+        used_question_ids = {attempt.question_id for attempt in attempts}
+        used_group_ids = {source_group.group_id}
+        for attempt in attempts:
+            prior_group = self.db.get(ReadingGroupVersion, attempt.group_version_id) if attempt.group_version_id else None
+            if prior_group is not None:
+                used_group_ids.add(prior_group.group_id)
+        used_passage_ids = set()
+        for attempt in attempts:
+            snapshot = attempt.group_snapshot_json or {}
+            passage_id = (snapshot.get("passage") or {}).get("id")
+            if passage_id:
+                used_passage_ids.add(passage_id)
+        historical_attempts = self.db.scalars(
+            select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
+            .where(LearningSession.learner_id == session.learner_id,
+                   LearningSession.topic_id == session.topic_id)
+        ).all()
+        used_question_ids.update(a.question_id for a in historical_attempts)
+        for prior_attempt in historical_attempts:
+            prior_group = self.db.get(ReadingGroupVersion, prior_attempt.group_version_id) if prior_attempt.group_version_id else None
+            if prior_group is not None:
+                used_group_ids.add(prior_group.group_id)
+            passage_id = (prior_attempt.group_snapshot_json or {}).get("passage", {}).get("id")
+            if passage_id:
+                used_passage_ids.add(passage_id)
+        assigned_group_ids = self.db.scalars(
+            select(LearningSession.current_group_version_id).where(
+                LearningSession.learner_id == session.learner_id,
+                LearningSession.topic_id == session.topic_id,
+                LearningSession.current_group_version_id.is_not(None),
+            )
+        ).all()
+        for version_id in assigned_group_ids:
+            assigned_group = self.db.get(ReadingGroupVersion, version_id)
+            if assigned_group is not None:
+                used_group_ids.add(assigned_group.group_id)
+                assigned_passage_id = assigned_group.display_json.get("passage", {}).get("id")
+                if assigned_passage_id:
+                    used_passage_ids.add(assigned_passage_id)
+        if role == QuestionRole.REVIEW and case:
+            state = self.repo.get_knowledge_state(session.learner_id, session.topic_id)
+            related = self.db.scalars(select(ReviewItem).where(
+                ReviewItem.learner_id == session.learner_id,
+                ReviewItem.topic_id == session.topic_id,
+                ReviewItem.knowledge_state_id == (state.id if state else None),
+            )).all()
+            for item in related:
+                if item.id == exclude_review_item_id:
+                    continue
+                if item.question_id:
+                    used_question_ids.add(item.question_id)
+                prior_group = self.db.get(ReadingGroupVersion, item.group_version_id) if item.group_version_id else None
+                if prior_group is not None:
+                    used_group_ids.add(prior_group.group_id)
+                    prior_passage_id = prior_group.display_json.get("passage", {}).get("id")
+                    if prior_passage_id:
+                        used_passage_ids.add(prior_passage_id)
+                if item.review_session_id:
+                    for prior_attempt in self.repo.list_attempts_for_session(item.review_session_id):
+                        prior_group = self.db.get(ReadingGroupVersion, prior_attempt.group_version_id) if prior_attempt.group_version_id else None
+                        if prior_group is not None:
+                            used_group_ids.add(prior_group.group_id)
+                        prior_passage_id = (prior_attempt.group_snapshot_json or {}).get("passage", {}).get("id")
+                        if prior_passage_id:
+                            used_passage_ids.add(prior_passage_id)
+
+        for question in self.repo.list_questions_for_topic(session.topic_id, role=role):
+            if question.id in used_question_ids or question.question_type != QuestionType.MATCHING_HEADINGS.value:
+                continue
+            group = self.db.get(ReadingGroupVersion, question.reading_group_version_id) if question.reading_group_version_id else None
+            rules = published_rules(self.db, group) if group else None
+            if (
+                group is None or rules is None
+                or source.task_versions.get(question.id) != group.id
+                or group.exam_variant != session.exam_variant
+                or group.question_type != QuestionType.MATCHING_HEADINGS.value
+                or rules.role != role.value
+                or (rules.protocol, rules.version) != (source.protocol, source.version)
+                or rules.source_group_id != source.source_group_id
+                or rules.targets != [target]
+            ):
+                continue
+            independence = group.provenance_json.get("independence_review", {})
+            basis_groups = set(independence.get("independent_from_group_ids", []))
+            passage_id = group.display_json.get("passage", {}).get("id")
+            if (
+                not independence.get("independence_id")
+                or not independence.get("independence_basis")
+                or not basis_groups.issuperset({source_group.group_id, *(self.db.get(ReadingGroupVersion, a.group_version_id).group_id
+                                                                           for a in attempts if a.group_version_id
+                                                                           and self.db.get(ReadingGroupVersion, a.group_version_id))})
+                or not passage_id or passage_id in used_passage_ids
+                or group.id in used_group_ids
+            ):
+                continue
+            return question, group, target, source
+        return None
+
+    def task_matches(self, session, case, question, group, role, target):
+        trigger = case.trigger_attempt
+        source_group = self.db.get(ReadingGroupVersion, trigger.group_version_id) if trigger.group_version_id else None
+        source = published_rules(self.db, source_group) if source_group else None
+        task_rules = published_rules(self.db, group) if group else None
+        if not supported_protocol(trigger) or source is None or task_rules is None or group is None:
+            return False
+        independence = group.provenance_json.get("independence_review", {})
+        return (
+            question.topic_id == session.topic_id
+            and question.question_type == QuestionType.MATCHING_HEADINGS.value
+            and question.question_role == role.value
+            and group.exam_variant == session.exam_variant
+            and group.id == source.task_versions.get(question.id)
+            and (source.protocol, source.version) == attempt_protocol(trigger)
+            and (task_rules.protocol, task_rules.version) == (source.protocol, source.version)
+            and task_rules.role == role.value and task_rules.targets == [target]
+            and task_rules.source_group_id == source.source_group_id
+            and bool(independence.get("independence_id"))
+            and bool(independence.get("independence_basis"))
+            and source_group.group_id in independence.get("independent_from_group_ids", [])
         )
 
     def _choose(self, session, source, role, targets, answered_ids):

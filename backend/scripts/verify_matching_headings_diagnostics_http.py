@@ -117,8 +117,7 @@ def verify(client, factory):
         assert scored["is_correct"] is True and scored["next_action"] == "matching_headings_transfer_pending"
         assert scored["knowledge_state_status"] is None
         restored = call(label, "GET", f"/sessions/{session['id']}")
-        assert restored["status"] == "intervening" and restored["can_dispatch_transfer"] is False
-        call(label, "POST", f"/sessions/{session['id']}/transfer-check", {"force_fresh": True}, 400)
+        assert restored["status"] == "intervening" and restored["can_dispatch_transfer"] is True
         terminal = step(label, result, session["id"] + "-terminal")
         assert terminal["executed_tool"] == "matching_headings_transfer_pending" and terminal["next_question"] is None
         assert hypotheses(label, result)[target]["status"] == "supported"
@@ -282,11 +281,12 @@ def verify(client, factory):
                 "decision_events": [{"id": e.id, "case_id": e.diagnostic_case_id, "action": e.action,
                                      "payload": e.payload_json} for e in observation_events + dispatches],
             })
-        for model in (KnowledgeState, ReviewItem):
-            assert not db.scalar(select(model.id).where(model.topic_id.in_([ACADEMIC_TOPIC, GT_TOPIC])))
+        states = db.scalars(select(KnowledgeState).where(KnowledgeState.topic_id.in_([ACADEMIC_TOPIC, GT_TOPIC]))).all()
+        assert states and all(state.status == "needs_practice" for state in states)
+        assert not db.scalar(select(ReviewItem.id).where(ReviewItem.topic_id.in_([ACADEMIC_TOPIC, GT_TOPIC])))
     return {"server": "Uvicorn + FastAPI", "database": "isolated SQLite, Alembic 0005",
             "requests": trace, "database_evidence": snapshots,
-            "matching_headings_knowledge_state_count": 0, "matching_headings_review_count": 0}
+            "matching_headings_knowledge_state_count": len(states), "matching_headings_review_count": 0}
 
 
 if __name__ == "__main__":

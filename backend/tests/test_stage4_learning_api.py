@@ -1120,21 +1120,22 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
     schema = openapi_resp.json()
     paths = schema["paths"]
 
-    # Review detail/dispatch and the learner-safe history timeline are public paths.
-    assert len(paths) == 28
+    # Review detail/dispatch, learner-safe history and evidence revalidation are public paths.
+    assert len(paths) == 29
+    assert "POST" in {method.upper() for method in paths["/api/v1/profile/evidence-revalidation"]}
 
-    # Review detail and dispatch add two public HTTP operations.
+    # Review detail/dispatch and evidence revalidation add three public operations.
     public_operations = [
         (method.upper(), path)
         for path, methods in paths.items()
         for method in methods
         if method.lower() in {"get", "post", "put", "patch", "delete"}
     ]
-    assert len(public_operations) == 31
+    assert len(public_operations) == 32
     stage4_public_operations = [
         op for op in public_operations if op[1] != "/api/v1/health"
     ]
-    assert len(stage4_public_operations) == 30
+    assert len(stage4_public_operations) == 31
 
     # Hidden alias GET /api/v1/dashboard/summary is functional (200) but excluded from OpenAPI schema
     assert "/api/v1/dashboard/summary" not in paths

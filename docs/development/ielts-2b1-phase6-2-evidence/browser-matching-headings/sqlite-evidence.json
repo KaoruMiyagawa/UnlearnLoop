@@ -1,0 +1,724 @@
+{
+  "sessions": [
+    {
+      "id": "sess_19574f4ec35c4d6d",
+      "topic_id": "ielts-mh-academic",
+      "status": "active",
+      "current_group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0"
+    },
+    {
+      "id": "sess_9b2ae86e39ae41c5",
+      "topic_id": "ielts-mh-academic",
+      "status": "completed",
+      "current_group_version_id": "rg_a839786a741a7984c1651d055865bd5b"
+    },
+    {
+      "id": "sess_39bb17e69e594195",
+      "topic_id": "ielts-mh-general-training",
+      "status": "completed",
+      "current_group_version_id": "rg_afd9c28fe6f638100fb1969921374eab"
+    },
+    {
+      "id": "sess_c0b737c97ee94a61",
+      "topic_id": "ielts-mh-academic",
+      "status": "completed",
+      "current_group_version_id": "rg_37d6193b362531593312cec8b3427c6c"
+    },
+    {
+      "id": "sess_b1d0e74339234df3",
+      "topic_id": "ielts-mh-general-training",
+      "status": "completed",
+      "current_group_version_id": "rg_4337de38df4fc0c003814babef66355e"
+    },
+    {
+      "id": "sess_28ccab57794443be",
+      "topic_id": "ielts-mh-academic",
+      "status": "intervening",
+      "current_group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f"
+    },
+    {
+      "id": "sess_928655f72b3e42ab",
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "status": "diagnosing",
+      "current_group_version_id": null
+    }
+  ],
+  "attempts": [
+    {
+      "id": "att_fdaf8716bb4044f6",
+      "session_id": "sess_19574f4ec35c4d6d",
+      "question_id": "ielts-mh-academic-initial",
+      "attempt_role": "initial",
+      "idempotency_key": "cf1db043-1e14-40b3-92cb-0186938dcffa",
+      "group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "i",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_40b127345869973e70009dc7cbe3196c",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_9e7c22d95b21423b",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "question_id": "ielts-mh-academic-initial",
+      "attempt_role": "initial",
+      "idempotency_key": "78b4d0f5-96fd-42cd-90d1-ba4b23f116b1",
+      "group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": true
+        },
+        "correct_count": 2,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_40b127345869973e70009dc7cbe3196c",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_a5db4f6dca5d4653",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "question_id": "ielts-mh-academic-diagnostic",
+      "attempt_role": "diagnostic_followup",
+      "idempotency_key": "d5ef763f-6141-4a4f-ab9f-2a047bc982a8",
+      "group_version_id": "rg_6c0914d12eaa70cba2fa5e50fb68582e",
+      "structured_answer_json": {
+        "probe-main": "probe-main-distractor",
+        "probe-keyword": "probe-keyword-heading"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "probe-main": false,
+          "probe-keyword": true
+        },
+        "correct_count": 1,
+        "total_count": 2,
+        "outcome": "partial",
+        "group_version_id": "rg_6c0914d12eaa70cba2fa5e50fb68582e",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_98d0d5d4c9dba330f2b7b06c6e7ebb9c",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_03f6f363548f443c",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "question_id": "ielts-mh-academic-main-practice",
+      "attempt_role": "targeted_practice",
+      "idempotency_key": "825c359d-67c8-4706-8512-34fd8b7c354f",
+      "group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f",
+      "structured_answer_json": {
+        "main-practice": "main-practice-heading"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "main-practice": true
+        },
+        "correct_count": 1,
+        "total_count": 1,
+        "outcome": "correct",
+        "group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_f75ead8ef56043bf07d5bf722cc8ac51",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_237d81cf045e406f",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "question_id": "ielts-mh-academic-main-transfer",
+      "attempt_role": "transfer_check",
+      "idempotency_key": "7d5cdc05-6e7b-4b5e-a944-9281ba954a59",
+      "group_version_id": "rg_a839786a741a7984c1651d055865bd5b",
+      "structured_answer_json": {
+        "item-1": "h1",
+        "item-2": "h3",
+        "item-3": "h5"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "item-1": true,
+          "item-2": true,
+          "item-3": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_a839786a741a7984c1651d055865bd5b",
+        "content_version": "2",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_65371105e2bcde411ce10e8e0e8a9add",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_8c011f1d602642d9",
+      "session_id": "sess_39bb17e69e594195",
+      "question_id": "ielts-mh-gt-initial",
+      "attempt_role": "initial",
+      "idempotency_key": "6412e697-8c74-4a58-9d2c-9f919c09c11f",
+      "group_version_id": "rg_1fc6f5413217c27af4d69a085b9db412",
+      "structured_answer_json": {
+        "paragraph-a": "i",
+        "paragraph-b": "v",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": false,
+          "paragraph-b": false,
+          "paragraph-c": false
+        },
+        "correct_count": 0,
+        "total_count": 3,
+        "outcome": "incorrect",
+        "group_version_id": "rg_1fc6f5413217c27af4d69a085b9db412",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_e01c66032c714fcf9ccfe385624a62f9",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_efaaff0a484a40e1",
+      "session_id": "sess_39bb17e69e594195",
+      "question_id": "ielts-mh-gt-diagnostic",
+      "attempt_role": "diagnostic_followup",
+      "idempotency_key": "c44b2100-b4ed-4055-a005-9069896aad6f",
+      "group_version_id": "rg_811ea35c63fec6ce15f805b917cf7025",
+      "structured_answer_json": {
+        "probe-main": "probe-main-distractor",
+        "probe-keyword": "probe-keyword-heading"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "probe-main": false,
+          "probe-keyword": true
+        },
+        "correct_count": 1,
+        "total_count": 2,
+        "outcome": "partial",
+        "group_version_id": "rg_811ea35c63fec6ce15f805b917cf7025",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_d24460771dd89f5c19e21dcb415871a4",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_2be3bd23b109442b",
+      "session_id": "sess_39bb17e69e594195",
+      "question_id": "ielts-mh-gt-main-practice",
+      "attempt_role": "targeted_practice",
+      "idempotency_key": "3d42de29-ffb0-416e-ba0a-31f4306dac00",
+      "group_version_id": "rg_da6833bb6ad055c589f5e101015a2fb2",
+      "structured_answer_json": {
+        "main-practice": "main-practice-heading"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "main-practice": true
+        },
+        "correct_count": 1,
+        "total_count": 1,
+        "outcome": "correct",
+        "group_version_id": "rg_da6833bb6ad055c589f5e101015a2fb2",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_8ed13f54568073e4076f34eba5c23753",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_c8cbbae625684e53",
+      "session_id": "sess_39bb17e69e594195",
+      "question_id": "ielts-mh-gt-main-transfer",
+      "attempt_role": "transfer_check",
+      "idempotency_key": "3afea068-a052-4af5-881a-bad42c08083e",
+      "group_version_id": "rg_afd9c28fe6f638100fb1969921374eab",
+      "structured_answer_json": {
+        "item-1": "h1",
+        "item-2": "h2",
+        "item-3": "h5"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "item-1": true,
+          "item-2": true,
+          "item-3": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_afd9c28fe6f638100fb1969921374eab",
+        "content_version": "2",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_15ca0b691bcbae4ece1234919ac9bbc9",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_ce3a434d97c6439a",
+      "session_id": "sess_c0b737c97ee94a61",
+      "question_id": "ielts-mh-academic-main-review",
+      "attempt_role": "review",
+      "idempotency_key": "88ac3765-7638-4da8-99b5-40d4b094146b",
+      "group_version_id": "rg_37d6193b362531593312cec8b3427c6c",
+      "structured_answer_json": {
+        "item-1": "h1",
+        "item-2": "h2",
+        "item-3": "h5"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "item-1": true,
+          "item-2": true,
+          "item-3": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_37d6193b362531593312cec8b3427c6c",
+        "content_version": "2",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_711daf7a90a96604ea3dff9ab4489e92",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_167449c282cb4e26",
+      "session_id": "sess_b1d0e74339234df3",
+      "question_id": "ielts-mh-gt-main-review",
+      "attempt_role": "review",
+      "idempotency_key": "6c7da4c0-b766-4ce6-97b6-c48608dc7cf4",
+      "group_version_id": "rg_4337de38df4fc0c003814babef66355e",
+      "structured_answer_json": {
+        "item-1": "h2",
+        "item-2": "h1",
+        "item-3": "h3"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "item-1": false,
+          "item-2": false,
+          "item-3": true
+        },
+        "correct_count": 1,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_4337de38df4fc0c003814babef66355e",
+        "content_version": "2",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_446ac862d13862a3a4f25687a273fd6a",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_588f6e91fa904ea6",
+      "session_id": "sess_28ccab57794443be",
+      "question_id": "ielts-mh-academic-initial",
+      "attempt_role": "initial",
+      "idempotency_key": "f44afcec-285b-4722-a98e-5108415e507a",
+      "group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": true
+        },
+        "correct_count": 2,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_1b9bd2b407c109c03094bc473e179ec0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_40b127345869973e70009dc7cbe3196c",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_eb3eaecdaea84eb4",
+      "session_id": "sess_28ccab57794443be",
+      "question_id": "ielts-mh-academic-diagnostic",
+      "attempt_role": "diagnostic_followup",
+      "idempotency_key": "50b523cc-44f8-4948-91aa-f5e23e22c881",
+      "group_version_id": "rg_6c0914d12eaa70cba2fa5e50fb68582e",
+      "structured_answer_json": {
+        "probe-main": "probe-main-distractor",
+        "probe-keyword": "probe-keyword-heading"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "probe-main": false,
+          "probe-keyword": true
+        },
+        "correct_count": 1,
+        "total_count": 2,
+        "outcome": "partial",
+        "group_version_id": "rg_6c0914d12eaa70cba2fa5e50fb68582e",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_98d0d5d4c9dba330f2b7b06c6e7ebb9c",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false
+    },
+    {
+      "id": "att_50bcb61fba454f8f",
+      "session_id": "sess_28ccab57794443be",
+      "question_id": "ielts-mh-academic-main-practice",
+      "attempt_role": "targeted_practice",
+      "idempotency_key": "6f0ab417-cb55-418f-a65d-6fc9bca9ac29",
+      "group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f",
+      "structured_answer_json": {
+        "main-practice": "main-practice-heading"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "main-practice": true
+        },
+        "correct_count": 1,
+        "total_count": 1,
+        "outcome": "correct",
+        "group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_f75ead8ef56043bf07d5bf722cc8ac51",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true
+    },
+    {
+      "id": "att_20a42a6f38c64749",
+      "session_id": "sess_928655f72b3e42ab",
+      "question_id": "ielts-tfng-acad-initial",
+      "attempt_role": "initial",
+      "idempotency_key": "713b4ec3-7575-4d6f-9462-d153ecba052b",
+      "group_version_id": null,
+      "structured_answer_json": null,
+      "item_evaluation_json": null,
+      "is_correct": false
+    }
+  ],
+  "diagnostic_cases": [
+    {
+      "id": "diag_5aa25fb3b4874184",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "trigger_attempt_id": "att_9e7c22d95b21423b",
+      "status": "resolved"
+    },
+    {
+      "id": "diag_fb39d76e9d4e4a06",
+      "session_id": "sess_39bb17e69e594195",
+      "trigger_attempt_id": "att_8c011f1d602642d9",
+      "status": "resolved"
+    },
+    {
+      "id": "diag_8cd7541ae1434614",
+      "session_id": "sess_28ccab57794443be",
+      "trigger_attempt_id": "att_588f6e91fa904ea6",
+      "status": "intervention_selected"
+    },
+    {
+      "id": "diag_00a0cb9ba95c4945",
+      "session_id": "sess_928655f72b3e42ab",
+      "trigger_attempt_id": "att_20a42a6f38c64749",
+      "status": "collecting_attempt"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evi_56e81c25b1c041f2",
+      "hypothesis_id": "hyp_4cae32aa25b9471e",
+      "attempt_id": "att_9e7c22d95b21423b",
+      "source_ref": "mh:evt_94eafd15f2b84112",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_8831ebeb6e074c56",
+      "hypothesis_id": "hyp_18416b8ed4244670",
+      "attempt_id": "att_9e7c22d95b21423b",
+      "source_ref": "mh:evt_94eafd15f2b84112",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_390d9dd7464e4441",
+      "hypothesis_id": "hyp_4cae32aa25b9471e",
+      "attempt_id": "att_a5db4f6dca5d4653",
+      "source_ref": "mh:evt_5a64a005810f467d",
+      "relation": "supports"
+    },
+    {
+      "id": "evi_58046544deae4018",
+      "hypothesis_id": "hyp_18416b8ed4244670",
+      "attempt_id": "att_a5db4f6dca5d4653",
+      "source_ref": "mh:evt_85098cbb028f4f9d",
+      "relation": "contradicts"
+    },
+    {
+      "id": "evi_0acca499c97642ec",
+      "hypothesis_id": "hyp_4cae32aa25b9471e",
+      "attempt_id": "att_237d81cf045e406f",
+      "source_ref": "attempt:att_237d81cf045e406f",
+      "relation": "contradicts"
+    },
+    {
+      "id": "evi_7e334fe0cd064328",
+      "hypothesis_id": "hyp_18416b8ed4244670",
+      "attempt_id": "att_237d81cf045e406f",
+      "source_ref": "attempt:att_237d81cf045e406f",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_88044a674adc48d9",
+      "hypothesis_id": "hyp_80817ba46c44498d",
+      "attempt_id": "att_8c011f1d602642d9",
+      "source_ref": "mh:evt_823b72ed2b29404d",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_6ca3d4b4d74e4b7d",
+      "hypothesis_id": "hyp_c25a5c4ba2644557",
+      "attempt_id": "att_8c011f1d602642d9",
+      "source_ref": "mh:evt_823b72ed2b29404d",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_8d831643bb294faa",
+      "hypothesis_id": "hyp_f0793a7a18f54278",
+      "attempt_id": "att_8c011f1d602642d9",
+      "source_ref": "mh:evt_8b83ca3410044252",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_c360d2b2ea13467c",
+      "hypothesis_id": "hyp_80817ba46c44498d",
+      "attempt_id": "att_8c011f1d602642d9",
+      "source_ref": "mh:evt_0d4abc8506dc4ad7",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_5adfda448f954d51",
+      "hypothesis_id": "hyp_c25a5c4ba2644557",
+      "attempt_id": "att_8c011f1d602642d9",
+      "source_ref": "mh:evt_0d4abc8506dc4ad7",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_a76550fda3064167",
+      "hypothesis_id": "hyp_80817ba46c44498d",
+      "attempt_id": "att_efaaff0a484a40e1",
+      "source_ref": "mh:evt_86f51197f56d4c9f",
+      "relation": "supports"
+    },
+    {
+      "id": "evi_a7221cde6bf14f29",
+      "hypothesis_id": "hyp_c25a5c4ba2644557",
+      "attempt_id": "att_efaaff0a484a40e1",
+      "source_ref": "mh:evt_129548662d694150",
+      "relation": "contradicts"
+    },
+    {
+      "id": "evi_a9846f67e1d84e30",
+      "hypothesis_id": "hyp_80817ba46c44498d",
+      "attempt_id": "att_c8cbbae625684e53",
+      "source_ref": "attempt:att_c8cbbae625684e53",
+      "relation": "contradicts"
+    },
+    {
+      "id": "evi_a1a2829904744d43",
+      "hypothesis_id": "hyp_c25a5c4ba2644557",
+      "attempt_id": "att_c8cbbae625684e53",
+      "source_ref": "attempt:att_c8cbbae625684e53",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_0492b20b38fc469c",
+      "hypothesis_id": "hyp_f0793a7a18f54278",
+      "attempt_id": "att_c8cbbae625684e53",
+      "source_ref": "attempt:att_c8cbbae625684e53",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_30a7dce72dfe42c3",
+      "hypothesis_id": "hyp_80817ba46c44498d",
+      "attempt_id": "att_167449c282cb4e26",
+      "source_ref": "review:rev_a04092762610420f:attempt:att_167449c282cb4e26",
+      "relation": "supports"
+    },
+    {
+      "id": "evi_6320b2cdaa44471a",
+      "hypothesis_id": "hyp_c25a5c4ba2644557",
+      "attempt_id": "att_167449c282cb4e26",
+      "source_ref": "review:rev_a04092762610420f:attempt:att_167449c282cb4e26",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_c7334d031c914ef6",
+      "hypothesis_id": "hyp_f0793a7a18f54278",
+      "attempt_id": "att_167449c282cb4e26",
+      "source_ref": "review:rev_a04092762610420f:attempt:att_167449c282cb4e26",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_9d77939299ae40ef",
+      "hypothesis_id": "hyp_c0b292e5ea83415b",
+      "attempt_id": "att_588f6e91fa904ea6",
+      "source_ref": "mh:evt_e427c451bacb4a47",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_11a2087abb2849df",
+      "hypothesis_id": "hyp_e1592db1811a4776",
+      "attempt_id": "att_588f6e91fa904ea6",
+      "source_ref": "mh:evt_e427c451bacb4a47",
+      "relation": "neutral"
+    },
+    {
+      "id": "evi_bd263f8f2c7d4c66",
+      "hypothesis_id": "hyp_c0b292e5ea83415b",
+      "attempt_id": "att_eb3eaecdaea84eb4",
+      "source_ref": "mh:evt_a9b5fcf27cb6449e",
+      "relation": "supports"
+    },
+    {
+      "id": "evi_9955ae509b9644e6",
+      "hypothesis_id": "hyp_e1592db1811a4776",
+      "attempt_id": "att_eb3eaecdaea84eb4",
+      "source_ref": "mh:evt_38829080bce54ad7",
+      "relation": "contradicts"
+    }
+  ],
+  "knowledge": [
+    {
+      "id": "kst_1916bc50a3284bb1",
+      "topic_id": "ielts-mh-academic",
+      "status": "needs_practice",
+      "last_transfer_attempt_id": "att_237d81cf045e406f"
+    },
+    {
+      "id": "kst_ccace706e38245ad",
+      "topic_id": "ielts-mh-general-training",
+      "status": "needs_practice",
+      "last_transfer_attempt_id": "att_c8cbbae625684e53"
+    },
+    {
+      "id": "kst_f8898910aaeb40b8",
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "status": "needs_diagnosis",
+      "last_transfer_attempt_id": null
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev_024045525b1a485b",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "review_session_id": "sess_c0b737c97ee94a61",
+      "question_id": "ielts-mh-academic-main-review",
+      "group_version_id": "rg_37d6193b362531593312cec8b3427c6c",
+      "trigger_attempt_id": "att_237d81cf045e406f",
+      "attempt_id": "att_ce3a434d97c6439a",
+      "status": "completed",
+      "retention_verified": true,
+      "review_outcome": "passed_delayed",
+      "scheduled_for": "2026-04-02 12:00:00"
+    },
+    {
+      "id": "rev_a04092762610420f",
+      "session_id": "sess_39bb17e69e594195",
+      "review_session_id": "sess_b1d0e74339234df3",
+      "question_id": "ielts-mh-gt-main-review",
+      "group_version_id": "rg_4337de38df4fc0c003814babef66355e",
+      "trigger_attempt_id": "att_c8cbbae625684e53",
+      "attempt_id": "att_167449c282cb4e26",
+      "status": "completed",
+      "retention_verified": false,
+      "review_outcome": "failed",
+      "scheduled_for": "2026-04-02 12:00:00"
+    },
+    {
+      "id": "rev_194b9f03ffb84522",
+      "session_id": "sess_9b2ae86e39ae41c5",
+      "review_session_id": null,
+      "question_id": null,
+      "group_version_id": null,
+      "trigger_attempt_id": "att_ce3a434d97c6439a",
+      "attempt_id": null,
+      "status": "pending",
+      "retention_verified": false,
+      "review_outcome": null,
+      "scheduled_for": "2026-04-05 12:00:00"
+    },
+    {
+      "id": "rev_d4f4b692c80b4f4c",
+      "session_id": "sess_39bb17e69e594195",
+      "review_session_id": null,
+      "question_id": null,
+      "group_version_id": null,
+      "trigger_attempt_id": "att_167449c282cb4e26",
+      "attempt_id": null,
+      "status": "pending",
+      "retention_verified": false,
+      "review_outcome": null,
+      "scheduled_for": "2026-04-03 12:00:00"
+    }
+  ]
+}

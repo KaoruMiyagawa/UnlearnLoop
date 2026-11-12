@@ -91,6 +91,7 @@ export function canRunDiagnosticStep(
   diagnosis: DiagnosticCase | null,
   attempts: AttemptSummary[] = [],
 ): boolean {
+  if (session?.latest_attempt_result?.next_action === 'matching_headings_transfer_pending') return false;
   const currentQuestionId = session?.current_question_id ?? session?.current_question?.id;
   if (currentQuestionId && !attempts.some((attempt) => attempt.question_id === currentQuestionId)) {
     return false;

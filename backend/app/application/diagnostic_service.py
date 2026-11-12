@@ -13,12 +13,14 @@ from app.api.v1.schemas import (
     ReadingEvidenceSource,
 )
 from app.application.exceptions import EntityNotFoundError, InvalidSessionOperationError
+from app.application.evidence_validity import evidence_reason, evidence_status
 from app.application.learning_service import LearningAppService
 from app.config import Settings
 from app.decision.agent_engine import DiagnosticAgentEngine
 from app.decision.matching_headings import attempt_protocol, supported_protocol
 from app.domain.enums import (
     DiagnosticCaseStatus,
+    EvidenceValidityStatus,
     EvidenceRelation,
     EvidenceSourceType,
     HypothesisStatus,
@@ -145,6 +147,8 @@ class DiagnosticAppService:
                 summary=ev.summary,
                 reliability_note=ev.reliability_note,
                 created_at=ev.created_at,
+                evidence_validity_status=EvidenceValidityStatus(evidence_status(self.db, "evidence_link", ev.id)),
+                evidence_validity_reason=evidence_reason(self.db, "evidence_link", ev.id),
             )
             for ev in links
         ]

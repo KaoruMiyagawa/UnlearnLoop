@@ -188,7 +188,15 @@ def test_upgrade_0004_preserves_historical_attempts(tmp_path):
                     conn.execute(text("UPDATE learning_sessions SET exam_variant='academic' WHERE id='session-tfng'"))
                 conn.execute(text("INSERT INTO attempts (id,session_id,question_id,question_version,question_snapshot_json,attempt_role,submitted_answer,is_correct,evaluation_status,submitted_at) VALUES (:id,:session,:question,1,'{}','initial','original',0,'evaluated',CURRENT_TIMESTAMP)"),
                     {"id": "attempt-" + suffix, "session": "session-" + suffix, "question": "question-" + suffix})
-        upgrade_database(engine=engine, database_url=url)
+        upgrade_database(engine=engine, database_url=url, revision="0005_reading_groups")
+        with create_session_factory(engine)() as db:
+            for suffix in ("python", "tfng"):
+                attempt = db.get(Attempt, "attempt-" + suffix)
+                assert attempt.submitted_answer == "original"
+                assert attempt.evaluation_status == "evaluated"
+                assert attempt.is_correct is False
+                assert db.get(LearningSession, "session-" + suffix).current_group_version_id is None
+        upgrade_database(engine=engine, database_url=url, revision="0006_matching_headings_review_provenance")
         with create_session_factory(engine)() as db:
             for suffix in ("python", "tfng"):
                 assert db.get(Attempt, "attempt-" + suffix).submitted_answer == "original"

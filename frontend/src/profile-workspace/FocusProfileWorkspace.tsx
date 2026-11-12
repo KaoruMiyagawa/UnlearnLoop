@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
-import { listKnowledgeStates, listLearningHistory } from '../api/profile';
+import React, { useCallback, useMemo, useState } from 'react';
+import { listKnowledgeStates, listLearningHistory, startEvidenceRevalidation } from '../api/profile';
 import { listReviews } from '../api/reviews';
 import type { KnowledgeState, LearningHistoryEvent, ReviewItem } from '../api/types';
+import { evidenceValidityLabel, learnerEvidenceValidityReason } from '../evidenceValidity';
 import { useApiResource } from '../learning-workspace/useApiResource';
 import type { WorkspaceId } from '../app-shell/navigation';
 
@@ -40,6 +41,8 @@ function HistoryNotice({ state, retry }: { state: { status: string; error?: unkn
 export const FocusProfileWorkspace: React.FC<{
   onNavigateWorkspace: (workspace: WorkspaceId) => void;
 }> = ({ onNavigateWorkspace }) => {
+  const [revalidationBusy, setRevalidationBusy] = useState<string | null>(null);
+  const [revalidationNotice, setRevalidationNotice] = useState<string | null>(null);
   const loadStates = useCallback((signal: AbortSignal) => listKnowledgeStates(LEARNER_ID, signal), []);
   const loadHistory = useCallback((signal: AbortSignal) => listLearningHistory(LEARNER_ID, 100, signal), []);
   const loadPending = useCallback((signal: AbortSignal) => listReviews({ learner_id: LEARNER_ID, status: 'pending' }, signal), []);
@@ -65,6 +68,33 @@ export const FocusProfileWorkspace: React.FC<{
   }, [reviews.state]);
 
   const allEvents = history.state.status === 'success' ? history.state.data : [];
+  const beginRevalidation = async (item: KnowledgeState) => {
+    if (!item.exam_variant || revalidationBusy) return;
+    setRevalidationBusy(item.topic_id);
+    setRevalidationNotice(null);
+    try {
+      const result = await startEvidenceRevalidation({
+        topic_id: item.topic_id,
+        learner_id: item.learner_id,
+        exam_variant: item.exam_variant,
+        idempotency_key: crypto.randomUUID(),
+      });
+      setRevalidationNotice(result.message);
+      if (result.available && result.session) {
+        // The learning workspace restores only the server-issued active session ID.
+        // Persist this returned ID before navigation so revalidation opens the
+        // corrected assigned question instead of an empty topic picker.
+        window.sessionStorage.setItem('unlearnloop.real.active-session.v1', result.session.id);
+        onNavigateWorkspace('learning');
+      }
+    } catch (error) {
+      setRevalidationNotice(error instanceof Error ? error.message : '重新验证请求失败；原学习记录已保留。');
+    } finally {
+      setRevalidationBusy(null);
+      void states.retry();
+      void history.retry();
+    }
+  };
   return <div className="focus-page focus-profile-page">
     <div className="focus-page-content">
       <header className="focus-page-header">
@@ -72,6 +102,7 @@ export const FocusProfileWorkspace: React.FC<{
         <h1 className="focus-page-title">看见哪些理解经过了验证，也看见还缺什么证据。</h1>
         <p className="focus-page-subtitle">当前迁移通过与长期保持是不同证据。一次延迟复习通过，也不能证明永久掌握。</p>
       </header>
+      {revalidationNotice && <div className="focus-notice neutral" role="status">{revalidationNotice}</div>}
 
       <section className="focus-page-section" aria-labelledby="knowledge-record-title">
         <div className="focus-review-section-heading"><div><h2 id="knowledge-record-title">知识点进展</h2><p>状态、保持记录和复习安排来自服务端。</p></div></div>
@@ -90,6 +121,13 @@ export const FocusProfileWorkspace: React.FC<{
                 <div><dt>下次复习</dt><dd>{nextReview ? `${formatDate(nextReview.scheduled_for)} · ${nextReview.is_due ? '已到期' : '尚未到期'}` : '当前没有待办计划'}</dd></div>
                 <div><dt>长期保持</dt><dd>尚未证明长期保持；复习记录仅代表已获得的延迟证据。</dd></div>
               </dl>
+              {item.revalidation_available && <div className="focus-notice warning">
+                <strong>历史验证证据需要重新核对</strong>
+                <p>{learnerEvidenceValidityReason(item.evidence_validity_status ?? 'review_required', item.evidence_validity_reason)}</p>
+                <button className="focus-button" disabled={!item.exam_variant || revalidationBusy !== null} onClick={() => void beginRevalidation(item)}>
+                  {revalidationBusy === item.topic_id ? '正在创建新学习会话…' : '开始重新验证'}
+                </button>
+              </div>}
               {item.unresolved_error_reasons && item.unresolved_error_reasons.length > 0
                 ? <details className="focus-disclosure"><summary>仍待验证的可能原因（{item.unresolved_error_reasons.length}）</summary><div className="focus-disclosure-content">{item.unresolved_error_reasons.map((reason, index) => <div className="focus-reason" key={`${reason.title}-${index}`}><strong>{reason.title}</strong><p>{reason.summary}</p><small>当前判断：{reason.status} · 仍需结合新证据确认</small></div>)}</div></details>
                 : <p className="focus-help">当前没有由服务端标记为待验证的错误原因。</p>}
@@ -105,7 +143,7 @@ export const FocusProfileWorkspace: React.FC<{
         {history.state.status === 'success' && allEvents.length > 0 && <ol className="focus-timeline">
           {allEvents.map((event) => <li className="focus-timeline-item" key={event.id}>
             <span className="focus-timeline-dot" aria-hidden="true" />
-            <div className="focus-timeline-main"><div className="focus-timeline-heading"><strong>{event.title}</strong><time dateTime={event.occurred_at}>{formatDate(event.occurred_at)}</time></div><div className="focus-timeline-topic">{event.topic_title}</div><p>{event.summary}</p><details className="focus-disclosure"><summary>查看证据摘要</summary><div className="focus-disclosure-content">{event.evidence_summary}</div></details></div>
+            <div className="focus-timeline-main"><div className="focus-timeline-heading"><strong>{event.title}</strong><time dateTime={event.occurred_at}>{formatDate(event.occurred_at)}</time></div><div className="focus-timeline-topic">{event.topic_title}</div><p>{event.summary}</p>{event.evidence_validity_status && event.evidence_validity_status !== 'eligible' && <div className="focus-notice warning">证据状态：{evidenceValidityLabel(event.evidence_validity_status)}。{learnerEvidenceValidityReason(event.evidence_validity_status, event.evidence_validity_reason)}</div>}<details className="focus-disclosure"><summary>查看证据摘要</summary><div className="focus-disclosure-content">{event.evidence_summary}</div></details></div>
           </li>)}
         </ol>}
       </section>

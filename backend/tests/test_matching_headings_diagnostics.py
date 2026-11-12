@@ -22,7 +22,7 @@ def diagnostic_client(ielts_client, session_factory):
 
 def test_error_dna_and_targeted_practice_protocol(diagnostic_client, session_factory):
     evidence = verify(diagnostic_client, session_factory)
-    assert evidence["matching_headings_knowledge_state_count"] == 0
+    assert evidence["matching_headings_knowledge_state_count"] == 2
     assert evidence["matching_headings_review_count"] == 0
 
 

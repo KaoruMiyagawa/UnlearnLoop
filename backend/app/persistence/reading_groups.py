@@ -24,6 +24,18 @@ def import_matching_headings(session: Session, *, display: dict[str, Any],
     if not all(isinstance(provenance.get(k), str) and provenance[k].strip()
                for k in ("source", "license")):
         raise ValueError("Content source and license are required")
+    if private_rules.get("diagnostics", {}).get("role") in {"transfer_check", "review"}:
+        independence = provenance.get("independence_review")
+        if (
+            not isinstance(independence, dict)
+            or not isinstance(independence.get("independence_id"), str)
+            or not independence["independence_id"].strip()
+            or not isinstance(independence.get("independent_from_group_ids"), list)
+            or not independence["independent_from_group_ids"]
+            or not isinstance(independence.get("independence_basis"), str)
+            or not independence["independence_basis"].strip()
+        ):
+            raise ValueError("Transfer and review content requires an auditable independence record")
     group = MatchingHeadingsGroup.model_validate(display)
     key = HeadingAnswerKey.model_validate(private_rules)
     items, options = {i.id for i in group.items}, {o.id for o in group.options}

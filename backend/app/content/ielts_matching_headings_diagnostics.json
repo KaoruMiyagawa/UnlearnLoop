@@ -317,6 +317,460 @@
             }
           }
         }
+      },
+      {
+        "id": "ielts-mh-academic-main-transfer",
+        "question_role": "transfer_check",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 3,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-academic-main-transfer-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-street-heat",
+                "ielts-mh-academic-diagnostic-group",
+                "ielts-mh-academic-main-practice-group",
+                "ielts-mh-academic-keyword-practice-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-academic-main-transfer-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-main-transfer-group-passage",
+              "content_version": "2",
+              "title": "River Paths and Summer Cooling",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "A municipal research team compared three riverside paths over two summers. Shaded sections stayed cooler at midday, but the main finding was that connected paths offered residents a continuous route to cooler districts. A single shaded bench helped locally; it did not provide the same city-wide access."
+                },
+                {
+                  "id": "para-2",
+                  "text": "The project began with inexpensive temperature sensors attached to lamp posts. Some readings were inaccurate after rain, so researchers checked them against handheld instruments. Replacing every sensor was considered, but the comparison showed that a small calibration adjustment was sufficient."
+                },
+                {
+                  "id": "para-3",
+                  "text": "Residents used the paths more often when signs linked them to bus stops and public buildings. The team therefore recommended treating the routes as part of a transport network, rather than as isolated landscaping improvements."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "A network that makes cooler routes accessible"
+              },
+              {
+                "id": "h2",
+                "text": "A bench that attracted visitors"
+              },
+              {
+                "id": "h3",
+                "text": "Checking and calibrating uncertain sensor readings"
+              },
+              {
+                "id": "h4",
+                "text": "Why researchers replaced every sensor"
+              },
+              {
+                "id": "h5",
+                "text": "Connecting riverside paths with public transport"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h3",
+              "item-3": "h5"
+            },
+            "explanations": {
+              "item-1": "The connected routes provide access to cooler districts, whereas a bench helps only locally.",
+              "item-2": "Researchers compared inaccurate post-rain readings with handheld instruments and used a calibration adjustment.",
+              "item-3": "The recommendation treats routes linked to bus stops and buildings as a transport network."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "transfer_check",
+              "targets": [
+                "main_idea_vs_detail"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-academic-main-review",
+        "question_role": "review",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 4,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-academic-main-review-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-street-heat",
+                "ielts-mh-academic-diagnostic-group",
+                "ielts-mh-academic-main-practice-group",
+                "ielts-mh-academic-keyword-practice-group",
+                "ielts-mh-academic-main-transfer-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-academic-main-review-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-main-review-group-passage",
+              "content_version": "2",
+              "title": "Repair Cafés and Shared Skills",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "A neighbourhood repair café first set out to reduce the number of small appliances discarded each year. Its organisers soon found that the larger benefit was social: residents with different skills began solving problems together and sharing techniques beyond the monthly event."
+                },
+                {
+                  "id": "para-2",
+                  "text": "At one session, a volunteer replaced a plug on a lamp while another participant recorded the steps. The written guide was useful, but organisers said the lasting change came from people becoming confident enough to attempt simple repairs at home."
+                },
+                {
+                  "id": "para-3",
+                  "text": "The café now lends basic tools between meetings. This has made the service more convenient, although the organisers still see the exchange of knowledge as its central purpose. They plan to invite more residents to demonstrate repairs next season."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "A community built around practical cooperation"
+              },
+              {
+                "id": "h2",
+                "text": "Gaining confidence to make repairs at home"
+              },
+              {
+                "id": "h3",
+                "text": "The storage of borrowed equipment"
+              },
+              {
+                "id": "h4",
+                "text": "Why monthly events are inconvenient"
+              },
+              {
+                "id": "h5",
+                "text": "Extending shared repair knowledge beyond meetings"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h2",
+              "item-3": "h5"
+            },
+            "explanations": {
+              "item-1": "Residents with different skills solve problems together and share techniques beyond the event.",
+              "item-2": "The plug repair is an example; organisers emphasise confidence to attempt repairs at home.",
+              "item-3": "Tools are lent between meetings while the organisers plan to expand demonstrations and knowledge sharing."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "review",
+              "targets": [
+                "main_idea_vs_detail"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-academic-keyword-transfer",
+        "question_role": "transfer_check",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 3,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-academic-keyword-transfer-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-street-heat",
+                "ielts-mh-academic-diagnostic-group",
+                "ielts-mh-academic-main-practice-group",
+                "ielts-mh-academic-keyword-practice-group",
+                "ielts-mh-academic-main-transfer-group",
+                "ielts-mh-academic-main-review-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-academic-keyword-transfer-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-keyword-transfer-group-passage",
+              "content_version": "2",
+              "title": "Seeds That Wait for Rain",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "A seed bank in the northern plateau stores local grass varieties in dry, cool rooms. The collection matters because short-lived plants can disappear after several dry seasons, while preserved samples allow researchers to compare how populations respond when rain returns."
+                },
+                {
+                  "id": "para-2",
+                  "text": "Staff label each envelope with a location code. The code helps them find a sample quickly, but the research question concerns how rainfall timing affects germination. In trials, seeds from two valleys responded differently even when the total amount of water was similar."
+                },
+                {
+                  "id": "para-3",
+                  "text": "The team plans to return selected plants to small test plots. Rather than choosing the most productive variety, it will compare survival across several weather patterns. The aim is to understand resilience, not to identify a single crop for immediate commercial use."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "Why a collection helps study plant responses"
+              },
+              {
+                "id": "h2",
+                "text": "A faster method for printing labels"
+              },
+              {
+                "id": "h3",
+                "text": "The commercial value of one grass variety"
+              },
+              {
+                "id": "h4",
+                "text": "Differences in rainfall response"
+              },
+              {
+                "id": "h5",
+                "text": "Testing plant survival across different weather patterns"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h4",
+              "item-3": "h5"
+            },
+            "explanations": {
+              "item-1": "Stored samples let researchers compare plant populations after rain returns.",
+              "item-2": "Seeds from two valleys germinated differently despite similar total water, pointing to rainfall timing.",
+              "item-3": "Test plots compare survival across weather patterns to investigate resilience."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "transfer_check",
+              "targets": [
+                "surface_keyword_matching"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-academic-keyword-review",
+        "question_role": "review",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 4,
+        "reading_group": {
+          "exam_variant": "academic",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-academic-keyword-review-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-street-heat",
+                "ielts-mh-academic-diagnostic-group",
+                "ielts-mh-academic-main-practice-group",
+                "ielts-mh-academic-keyword-practice-group",
+                "ielts-mh-academic-main-transfer-group",
+                "ielts-mh-academic-main-review-group",
+                "ielts-mh-academic-keyword-transfer-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-academic-keyword-review-group",
+            "section_id": "academic-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-academic-keyword-review-group-passage",
+              "content_version": "2",
+              "title": "A Library of Household Tools",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "A district library has introduced a lending shelf for drills, sewing machines and other household tools. The scheme was designed to help residents complete occasional jobs without buying equipment they would rarely use. Its success depends on convenient access, not on increasing the number of books."
+                },
+                {
+                  "id": "para-2",
+                  "text": "Each tool has a coloured tag showing its return date. The tags have reduced late returns, but they are not the main reason people use the service. Borrowers say that being able to reserve a tool online is more important than the colour system."
+                },
+                {
+                  "id": "para-3",
+                  "text": "The library is now asking members which additional items would be useful. Staff will compare requests with repair costs and storage space before expanding the collection. A popular suggestion will not automatically be added if it cannot be maintained safely."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "A service that avoids unnecessary purchases"
+              },
+              {
+                "id": "h2",
+                "text": "How coloured tags are manufactured"
+              },
+              {
+                "id": "h3",
+                "text": "Why convenient online reservations matter to borrowers"
+              },
+              {
+                "id": "h4",
+                "text": "Choosing additions within practical limits"
+              },
+              {
+                "id": "h5",
+                "text": "The history of online reservations"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h3",
+              "item-3": "h4"
+            },
+            "explanations": {
+              "item-1": "The scheme lets residents borrow tools for occasional jobs instead of buying rarely used equipment.",
+              "item-2": "Borrowers value online reservations more than the coloured return tags.",
+              "item-3": "Staff compare requests with maintenance cost, safety and storage before expanding."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-street-heat",
+              "role": "review",
+              "targets": [
+                "surface_keyword_matching"
+              ]
+            }
+          }
+        }
       }
     ],
     "ielts-mh-general-training": [
@@ -570,6 +1024,460 @@
               "version": "1",
               "source_group_id": "mh-tool-library",
               "role": "targeted_practice",
+              "targets": [
+                "surface_keyword_matching"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-gt-main-transfer",
+        "question_role": "transfer_check",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 3,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-gt-main-transfer-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-tool-library",
+                "ielts-mh-gt-diagnostic-group",
+                "ielts-mh-gt-main-practice-group",
+                "ielts-mh-gt-keyword-practice-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-gt-main-transfer-group",
+            "section_id": "general_training-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-main-transfer-group-passage",
+              "content_version": "2",
+              "title": "A Better Handover at Brookside Clinic",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "Brookside Clinic changed its reception handover after patients sometimes repeated the same information to different staff. The new routine gives the incoming team a short shared overview, helping them maintain continuity when the desk is busy."
+                },
+                {
+                  "id": "para-2",
+                  "text": "The overview includes a list of appointments starting within the next hour. Staff also note which printer has run out of paper, but this practical detail is kept separate from the patient update so that urgent information is easy to find."
+                },
+                {
+                  "id": "para-3",
+                  "text": "After a month, the clinic found that fewer callers had to explain their situation again. It decided to keep the handover and review it each quarter, focusing on whether people receive consistent help rather than on how quickly staff complete the checklist."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "A routine that improves continuity for visitors"
+              },
+              {
+                "id": "h2",
+                "text": "Keeping urgent patient updates separate from equipment details"
+              },
+              {
+                "id": "h3",
+                "text": "Why the clinic changed its opening hours"
+              },
+              {
+                "id": "h4",
+                "text": "Keeping urgent information distinct"
+              },
+              {
+                "id": "h5",
+                "text": "Measuring service consistency"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h2",
+              "item-3": "h5"
+            },
+            "explanations": {
+              "item-1": "The shared handover overview is intended to reduce repeated explanations and maintain continuity.",
+              "item-2": "Patient updates are kept distinct from a printer detail so urgent information is easy to find.",
+              "item-3": "The clinic reviews whether callers receive consistent help rather than checklist speed."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "transfer_check",
+              "targets": [
+                "main_idea_vs_detail"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-gt-main-review",
+        "question_role": "review",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 4,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-gt-main-review-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-tool-library",
+                "ielts-mh-gt-diagnostic-group",
+                "ielts-mh-gt-main-practice-group",
+                "ielts-mh-gt-keyword-practice-group",
+                "ielts-mh-gt-main-transfer-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-gt-main-review-group",
+            "section_id": "general_training-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-main-review-group-passage",
+              "content_version": "2",
+              "title": "Saturday Skills Exchange",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "The town hall started a Saturday skills exchange to help neighbours learn practical tasks from one another. The organisers hoped it would create stronger local connections, not simply provide a timetable of demonstrations. People who attended one session often returned to teach something themselves."
+                },
+                {
+                  "id": "para-2",
+                  "text": "A retired tailor showed visitors how to mend a torn seam. The hall provided needles and thread, but the organisers believe the informal conversation mattered just as much as the materials. Participants later arranged to practise together in a nearby café."
+                },
+                {
+                  "id": "para-3",
+                  "text": "The next programme will include bicycle checks and basic food preservation. Organisers will choose sessions that volunteers can safely lead and that residents have requested, rather than selecting topics only because they are easy to advertise."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "Learning together strengthens neighbourhood ties"
+              },
+              {
+                "id": "h2",
+                "text": "How a shared repair session encouraged new connections"
+              },
+              {
+                "id": "h3",
+                "text": "Choosing safe and requested sessions"
+              },
+              {
+                "id": "h4",
+                "text": "Why the hall is moving to weekdays"
+              },
+              {
+                "id": "h5",
+                "text": "The cost of advertising local events"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h2",
+              "item-3": "h3"
+            },
+            "explanations": {
+              "item-1": "Organisers seek stronger connections and attendees return to teach each other.",
+              "item-2": "Participants continued practising together after the tailoring demonstration and conversation.",
+              "item-3": "Organisers select requested sessions that volunteers can safely lead."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "review",
+              "targets": [
+                "main_idea_vs_detail"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-gt-keyword-transfer",
+        "question_role": "transfer_check",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 3,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-gt-keyword-transfer-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-tool-library",
+                "ielts-mh-gt-diagnostic-group",
+                "ielts-mh-gt-main-practice-group",
+                "ielts-mh-gt-keyword-practice-group",
+                "ielts-mh-gt-main-transfer-group",
+                "ielts-mh-gt-main-review-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-gt-keyword-transfer-group",
+            "section_id": "general_training-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-keyword-transfer-group-passage",
+              "content_version": "2",
+              "title": "Collecting Parcels at Northgate",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "Northgate Post Office introduced a collection shelf for parcels that customers cannot receive at home. The service is intended to make collection more flexible for people who work irregular hours, while keeping items secure until they arrive."
+                },
+                {
+                  "id": "para-2",
+                  "text": "A green sticker indicates that a parcel has been scanned into the building. Customers should not mistake it for a sign that the item is ready: staff must first check the name and move the parcel to the numbered collection area."
+                },
+                {
+                  "id": "para-3",
+                  "text": "The office is testing a later closing time on Thursdays. Early feedback suggests that the extra hour helps shift workers, although the manager will compare use across several weeks before deciding whether to keep the change."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "Flexible collection for people away from home"
+              },
+              {
+                "id": "h2",
+                "text": "The meaning of a green sticker"
+              },
+              {
+                "id": "h3",
+                "text": "Steps required before parcels can be collected"
+              },
+              {
+                "id": "h4",
+                "text": "A trial of longer Thursday hours"
+              },
+              {
+                "id": "h5",
+                "text": "How numbered areas are painted"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h3",
+              "item-3": "h4"
+            },
+            "explanations": {
+              "item-1": "The shelf provides flexible collection for people with irregular work hours while keeping parcels secure.",
+              "item-2": "A scan sticker alone is insufficient: staff check the name and move the parcel to the collection area.",
+              "item-3": "The later Thursday closing is a trial assessed over several weeks."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "transfer_check",
+              "targets": [
+                "surface_keyword_matching"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "ielts-mh-gt-keyword-review",
+        "question_role": "review",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "standard_answer": "",
+        "answer_explanation": "",
+        "version": 1,
+        "difficulty": 4,
+        "reading_group": {
+          "exam_variant": "general_training",
+          "provenance": {
+            "source": "Original VerbaTrail IELTS-2B.1 Phase 4 content",
+            "license": "Original authored content; no third-party source material used",
+            "author": "VerbaTrail content authoring",
+            "review_status": "Internally corrected headings and answer alignment in Phase 6; independent editorial review pending",
+            "independence_review": {
+              "independence_id": "ielts-mh-gt-keyword-review-group-independence-v1",
+              "independent_from_group_ids": [
+                "mh-tool-library",
+                "ielts-mh-gt-diagnostic-group",
+                "ielts-mh-gt-main-practice-group",
+                "ielts-mh-gt-keyword-practice-group",
+                "ielts-mh-gt-main-transfer-group",
+                "ielts-mh-gt-main-review-group",
+                "ielts-mh-gt-keyword-transfer-group"
+              ],
+              "independence_basis": "New passage topic, setting, paragraph claims and heading wording; not a paraphrase of the listed source groups."
+            }
+          },
+          "display": {
+            "id": "ielts-mh-gt-keyword-review-group",
+            "section_id": "general_training-reading",
+            "display_schema_version": "1",
+            "allow_reuse": false,
+            "passage": {
+              "id": "ielts-mh-gt-keyword-review-group-passage",
+              "content_version": "2",
+              "title": "Secure Bicycle Lockers at Work",
+              "paragraphs": [
+                {
+                  "id": "para-1",
+                  "text": "A group of employees asked their workplace to provide secure bicycle lockers. The company agreed because it wanted to make cycling a practical commuting option, especially for staff who travel from outside the immediate area."
+                },
+                {
+                  "id": "para-2",
+                  "text": "Each locker has a small number plate that helps facilities staff record inspections. The plates are not electronic access devices; employees open the lockers with their own registered key cards."
+                },
+                {
+                  "id": "para-3",
+                  "text": "The company will review the scheme after six months. It will consider how often lockers are used and whether they remain secure, rather than judging the project by the number of signs placed around the car park."
+                }
+              ]
+            },
+            "options": [
+              {
+                "id": "h1",
+                "text": "Making cycling a workable commute"
+              },
+              {
+                "id": "h2",
+                "text": "How locker inspections and access are managed"
+              },
+              {
+                "id": "h3",
+                "text": "How locker use will be reviewed"
+              },
+              {
+                "id": "h4",
+                "text": "Why staff need electronic keys"
+              },
+              {
+                "id": "h5",
+                "text": "Adding signs around the car park"
+              }
+            ],
+            "items": [
+              {
+                "id": "item-1",
+                "paragraph_id": "para-1"
+              },
+              {
+                "id": "item-2",
+                "paragraph_id": "para-2"
+              },
+              {
+                "id": "item-3",
+                "paragraph_id": "para-3"
+              }
+            ]
+          },
+          "private_rules": {
+            "rules_version": "2",
+            "answers": {
+              "item-1": "h1",
+              "item-2": "h2",
+              "item-3": "h3"
+            },
+            "explanations": {
+              "item-1": "The lockers aim to make cycling a practical commute, including for people travelling further.",
+              "item-2": "Number plates support inspection records, while registered key cards provide access.",
+              "item-3": "The review considers usage and security rather than counting car park signs."
+            },
+            "diagnostics": {
+              "protocol": "matching-headings",
+              "version": "1",
+              "source_group_id": "mh-tool-library",
+              "role": "review",
               "targets": [
                 "surface_keyword_matching"
               ]

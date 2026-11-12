@@ -15,11 +15,13 @@ export function questionRoleLabel(role: string): string {
 export function questionTypeLabel(type: string): string {
   const labels: Record<string, string> = {
     short_text: '简答题', code_trace: '代码推演', code_writing: '代码编写', multiple_choice: '选择题',
+    matching_headings: 'Matching Headings · 段落标题匹配',
   };
   return labels[type] ?? '练习题';
 }
 
 const diagnosticTranslations = new Map([
+  ['No reviewed independent transfer group matches the supported diagnosis; verification remains pending.', '暂无符合当前诊断目标的独立迁移文章，本次迁移仍未验证。'],
   ['Deterministic rule evaluation; not proof of a unique misconception or long-term retention.', '按题目规则评判，仅反映本次作答。错误原因仍需验证，长期保持需另行复习。'],
   ['Deterministic local rubric rule check (heuristic, non-conclusive)', '按本地评分规则检查，结果仅供判断。'],
   ['Agent structured evidence analysis (heuristic confidence, not statistical probability)', '模型按证据分析，支持程度为定性判断。'],
@@ -80,9 +82,11 @@ export function evidenceTimeline(sessionId: string, attempts: AttemptSummary[], 
     id: attempt.id,
     title: questionRoleLabel(attempt.question_role),
     time: attempt.submitted_at,
-    result: attempt.is_correct === true ? '本题通过' : attempt.is_correct === false ? '本题未通过' : '尚待评价',
+    result: attempt.group_evaluation?.outcome === 'partial'
+      ? `部分正确 · ${attempt.group_evaluation.correct_count}/${attempt.group_evaluation.total_count}`
+      : attempt.is_correct === true ? '本题通过' : attempt.is_correct === false ? '本题未通过' : '尚待评价',
     summary: attempt.evaluation_summary,
-    answer: attempt.submitted_answer,
+    answer: attempt.structured_answer ? Object.entries(attempt.structured_answer).map(([item, heading]) => `${item} → ${heading}`).join(' · ') : attempt.submitted_answer,
     questionId: attempt.question_id,
   }));
   for (const item of reviews) {

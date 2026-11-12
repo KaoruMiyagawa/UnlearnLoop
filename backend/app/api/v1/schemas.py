@@ -9,6 +9,7 @@ from app.domain.enums import (
     DiagnosticCaseStatus,
     EvidenceRelation,
     EvidenceSourceType,
+    EvidenceValidityStatus,
     HypothesisStatus,
     KnowledgeMasteryStatus,
     QuestionRole,
@@ -69,6 +70,7 @@ class TopicSummaryResponse(BaseModel):
     summary: str
     difficulty_level: int
     prerequisite_ids: list[str] = Field(default_factory=list)
+    initial_question_types: list[QuestionType] = Field(default_factory=list)
 
 
 class TopicDetailResponse(BaseModel):
@@ -183,6 +185,7 @@ class SessionDetailResponse(BaseModel):
     active_diagnostic_case_id: str | None = None
     latest_attempt_result: "AttemptResultResponse | None" = None
     can_dispatch_transfer: bool = False
+    transfer_unavailable_reason: str | None = None
     attempts_count: int = 0
     started_at: datetime
     updated_at: datetime
@@ -243,6 +246,8 @@ class AttemptSummaryResponse(BaseModel):
     is_correct: bool | None = None
     evaluation_status: str
     evaluation_summary: str | None = None
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
     submitted_at: datetime
 
 
@@ -263,6 +268,8 @@ class AttemptDetailResponse(BaseModel):
     idempotency_key: str | None = None
     diagnostic_case_id: str | None = None
     evaluation_source: str | None = None
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
     submitted_at: datetime
 
 
@@ -283,6 +290,8 @@ class AttemptResultResponse(BaseModel):
     evaluation_source: str = "rule_check"
     mastery_note: str | None = None
     group_evaluation: ReadingGroupEvaluation | None = None
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
 
 
 SessionDetailResponse.model_rebuild()
@@ -336,6 +345,8 @@ class EvidenceLinkResponse(BaseModel):
     summary: str
     reliability_note: str | None = None
     created_at: datetime
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
 
 
 class DiagnosticCaseResponse(BaseModel):
@@ -418,6 +429,7 @@ class TransferCheckDispatchResponse(BaseModel):
     session_status: SessionStatus
     degraded: bool = False
     message: str
+    next_action: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -444,6 +456,10 @@ class ReviewItemResponse(BaseModel):
     current_question: SanitizedQuestionResponse | None = None
     review_question: SanitizedQuestionResponse | None = None
     attempt_id: str | None = None
+    trigger_attempt_id: str | None = None
+    group_version_id: str | None = None
+    group_evaluation: ReadingGroupEvaluation | None = None
+    question_unavailable: bool = False
     is_correct: bool | None = None
     submitted_at: datetime | None = None
     evaluation_summary: str | None = None
@@ -454,6 +470,8 @@ class ReviewItemResponse(BaseModel):
     knowledge_state_id: str | None = None
     message: str | None = None
     is_due: bool = False
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
 
 
 class CompleteReviewRequest(BaseModel):
@@ -491,6 +509,10 @@ class KnowledgeStateResponse(BaseModel):
     last_reviewed_at: datetime | None = None
     last_retention_verified_at: datetime | None = None
     unresolved_error_reasons: list[UnresolvedErrorReasonResponse] = Field(default_factory=list)
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
+    revalidation_available: bool = False
+    exam_variant: Literal["academic", "general_training"] | None = None
 
 
 class ExamCatalogEntryResponse(BaseModel):
@@ -565,6 +587,22 @@ class LearningHistoryEventResponse(BaseModel):
     session_id: str | None = None
     attempt_id: str | None = None
     review_id: str | None = None
+    evidence_validity_status: EvidenceValidityStatus = EvidenceValidityStatus.ELIGIBLE
+    evidence_validity_reason: str | None = None
+
+
+class EvidenceRevalidationRequest(BaseModel):
+    topic_id: str = Field(min_length=1, max_length=64)
+    learner_id: str = Field(min_length=1, max_length=64)
+    exam_variant: Literal["academic", "general_training"]
+    idempotency_key: str = Field(min_length=1, max_length=128)
+
+
+class EvidenceRevalidationResponse(BaseModel):
+    available: bool
+    message: str
+    session: SessionDetailResponse | None = None
+    idempotency_key: str
 
 
 class DashboardSummaryResponse(BaseModel):

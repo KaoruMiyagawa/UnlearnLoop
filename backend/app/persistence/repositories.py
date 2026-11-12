@@ -16,6 +16,7 @@ from app.domain.enums import (
     KnowledgeMasteryStatus,
     ModelCallStatus,
     QuestionRole,
+    QuestionType,
     ReviewStatus,
     SessionStatus,
     UncertaintyLevel,
@@ -42,6 +43,7 @@ from app.persistence.models import (
     ModelCall,
     Question,
     ReadingGroupVersion,
+    ReadingRuleVersion,
     ReviewItem,
     utc_now,
 )
@@ -372,7 +374,26 @@ class LearningRepository:
     ) -> None:
         attempts = self.list_attempts_for_session(learning_session.id)
         if learning_session.current_group_version_id or any(attempt.group_version_id for attempt in attempts):
-            raise DomainRuleViolationError("Matching Headings independent transfer is not available yet.")
+            from app.decision.matching_headings import MatchingHeadingsRules, supported_protocol
+
+            case = self.latest_diagnostic_case(learning_session.id)
+            trigger = case.trigger_attempt if case else None
+            if (
+                case is None or trigger is None or not supported_protocol(trigger)
+                or learning_session.status not in {SessionStatus.INTERVENING.value, SessionStatus.TRANSFER_CHECKING.value}
+            ):
+                raise DomainRuleViolationError("Matching Headings transfer is not authorized by its diagnostic protocol.")
+            if learning_session.status == SessionStatus.TRANSFER_CHECKING.value:
+                assigned = self.get_question_by_id(learning_session.current_question_id) if learning_session.current_question_id else None
+                if assigned and assigned.question_role == QuestionRole.TRANSFER_CHECK.value:
+                    return
+            practices = [a for a in attempts if a.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
+            if not practices or practices[-1].is_correct is not True or practices[-1].evaluation_status != AttemptEvaluationStatus.EVALUATED.value:
+                raise DomainRuleViolationError("A successful targeted practice is required before Matching Headings transfer.")
+            if MatchingHeadingsRules(self).select_independent_task(learning_session, case, QuestionRole.TRANSFER_CHECK) is None:
+                # Allow the endpoint to return a truthful transfer_unavailable result.
+                return
+            return
         case = self.latest_diagnostic_case(learning_session.id)
         practices = [attempt for attempt in attempts if attempt.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
         validate_transfer_entry(
@@ -731,6 +752,7 @@ class LearningRepository:
 
         transfer_attempt: Attempt | None = None
         is_retried_transfer = False
+        matching_group_transfer = False
         if transfer_attempt_id is not None:
             transfer_attempt = self.session.get(Attempt, transfer_attempt_id)
             if transfer_attempt is None:
@@ -739,6 +761,59 @@ class LearningRepository:
                 )
             if transfer_attempt.session_id != session_id or transfer_attempt.session.learner_id != learner_id:
                 raise DomainRuleViolationError("Transfer evidence must belong to this learner and session.")
+            matching_group_transfer = bool(
+                transfer_attempt.group_version_id
+                and transfer_attempt.question_snapshot_json.get("question_type") == QuestionType.MATCHING_HEADINGS.value
+            )
+            if matching_group_transfer:
+                from app.domain.reading_groups import HeadingAnswerKey
+
+                if target_enum == KnowledgeMasteryStatus.STABLE:
+                    raise DomainRuleViolationError("Matching Headings transfer evidence cannot establish stable mastery.")
+                group = self.session.get(ReadingGroupVersion, transfer_attempt.group_version_id)
+                question = self.session.get(Question, transfer_attempt.question_id)
+                case = self.latest_diagnostic_case(session_id)
+                dispatch = next((event for event in reversed(case.decision_events)
+                                 if event.action == "dispatch_matching_headings_transfer"), None) if case else None
+                payload = dispatch.payload_json if dispatch else {}
+                group_rule = self.session.get(ReadingRuleVersion, group.rule_version_id) if group else None
+                key = HeadingAnswerKey.model_validate(group_rule.private_rules_json) if group_rule else None
+                source_group = self.session.get(ReadingGroupVersion, case.trigger_attempt.group_version_id) if case and case.trigger_attempt.group_version_id else None
+                source_rule = self.session.get(ReadingRuleVersion, source_group.rule_version_id) if source_group else None
+                source_key = HeadingAnswerKey.model_validate(source_rule.private_rules_json) if source_rule else None
+                if (
+                    group is None or question is None
+                    or transfer_attempt.attempt_role != QuestionRole.TRANSFER_CHECK.value
+                    or transfer_attempt.evaluation_status != AttemptEvaluationStatus.EVALUATED.value
+                    or transfer_attempt.is_correct is not True
+                    or question.question_role != QuestionRole.TRANSFER_CHECK.value
+                    or transfer_attempt.question_snapshot_json.get("rule_version_id") != group.rule_version_id
+                    or key is None or key.diagnostics is None
+                    or key.diagnostics.role != QuestionRole.TRANSFER_CHECK.value
+                    or key.diagnostics.targets != [payload.get("target_error_code")]
+                    or source_key is None or source_key.diagnostics is None
+                    or source_key.diagnostics.task_versions.get(question.id) != group.id
+                    or payload.get("selected_question_id") != question.id
+                    or payload.get("group_version_id") != group.id
+                    or not transfer_attempt.item_evaluation_json
+                    or transfer_attempt.item_evaluation_json.get("outcome") != "correct"
+                    or transfer_attempt.item_evaluation_json.get("correct_count") != transfer_attempt.item_evaluation_json.get("total_count")
+                ):
+                    raise DomainRuleViolationError("Matching Headings transfer verification requires a successful protocol-authorized group Attempt.")
+                independence = group.provenance_json.get("independence_review", {})
+                required_group_ids = set()
+                for prior in self.list_attempts_for_session(session_id):
+                    if prior.id == transfer_attempt.id:
+                        continue
+                    prior_group = self.session.get(ReadingGroupVersion, prior.group_version_id) if prior.group_version_id else None
+                    if prior_group is not None:
+                        required_group_ids.add(prior_group.group_id)
+                if (
+                    not independence.get("independence_id")
+                    or not independence.get("independence_basis")
+                    or not required_group_ids.issubset(set(independence.get("independent_from_group_ids", [])))
+                ):
+                    raise DomainRuleViolationError("Matching Headings transfer content lacks the audited independence chain.")
             # Check if this learner previously attempted the same transfer question and failed
             prior_failed_attempt_id = self.session.scalar(
                 select(Attempt.id)
@@ -752,7 +827,7 @@ class LearningRepository:
             )
             if prior_failed_attempt_id is not None:
                 is_retried_transfer = True
-            if target_enum in (KnowledgeMasteryStatus.STABLE, KnowledgeMasteryStatus.TRANSFER_VERIFIED):
+            if target_enum in (KnowledgeMasteryStatus.STABLE, KnowledgeMasteryStatus.TRANSFER_VERIFIED) and not matching_group_transfer:
                 key = transfer_context_key(transfer_attempt.question.prompt_text, transfer_attempt.question.context_snippet)
                 other_attempts = list(self.session.scalars(
                     select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
@@ -766,7 +841,7 @@ class LearningRepository:
                     for prior in other_attempts
                 ):
                     is_retried_transfer = True
-                if transfer_attempt.question.topic.domain_code in {"ielts_academic", "ielts_general_training"}:
+                if transfer_attempt.question.topic.domain_code in {"ielts_academic", "ielts_general_training"} and not matching_group_transfer:
                     material_key = self._attempt_material_fingerprint(transfer_attempt)
                     prior_materials = {self._attempt_material_fingerprint(prior) for prior in other_attempts}
                     prior_materials.update(self._assigned_reading_materials(learner_id, topic_id, exclude_session_id=session_id))
@@ -774,7 +849,7 @@ class LearningRepository:
                                           if q.question_role in {QuestionRole.INITIAL.value, QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value}}
                     if material_key is None or None in prior_materials or None in training_materials or material_key in prior_materials or material_key in training_materials:
                         is_retried_transfer = True
-                if any(
+                if not matching_group_transfer and any(
                     question.question_role != QuestionRole.TRANSFER_CHECK.value
                     and transfer_context_key(question.prompt_text, question.context_snippet) == key
                     for question in self.list_questions_for_topic(topic_id)
@@ -863,6 +938,8 @@ class LearningRepository:
         learner_id: str = "local_default_learner",
         session_id: str | None = None,
         hypothesis_id: str | None = None,
+        trigger_attempt_id: str | None = None,
+        group_version_id: str | None = None,
         schedule_key: str | None = None,
         review_stage: int = 0,
     ) -> ReviewItem:
@@ -880,6 +957,8 @@ class LearningRepository:
             topic_id=topic_id,
             session_id=session_id,
             hypothesis_id=hypothesis_id,
+            trigger_attempt_id=trigger_attempt_id,
+            group_version_id=group_version_id,
             trigger_reason=trigger_reason.strip(),
             status=ReviewStatus.PENDING.value,
             scheduled_for=scheduled_for or utc_now(),
