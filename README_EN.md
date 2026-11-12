@@ -1,45 +1,85 @@
-# UnlearnLoop
+# VerbaTrail
 
-**Start with mistakes. Verify understanding in a new context.**
+**VerbaTrail — Learn a language. Make it yours.**
 
-[中文](README.md) · [Quick start](docs/development/QUICKSTART.md) · [Architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md)
+An adaptive language learning system designed to help learners build understanding, communication skills, and lasting proficiency through personalized practice and evidence-based feedback.
 
-![Stage](https://img.shields.io/badge/stage-early%20development-blue) ![Backend](https://img.shields.io/badge/backend-FastAPI-009688) ![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-3178c6)
+**First milestone: IELTS Overall Band 8.0.** This is a learning goal, not a statement of current ability, a score prediction, or a guarantee. The long-term vision is to help people truly learn a language, beyond getting more test questions right.
 
-UnlearnLoop explores evidence-driven learning: retain competing explanations for an error, gather evidence through follow-up and practice, and check understanding in a new context. Hypotheses and heuristic weights are provisional, not certain diagnoses.
+[简体中文](README.md) · [Current development branch](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows quick start](docs/development/QUICKSTART.md) · [Current architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [Product direction](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [Roadmap](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
 
-## Current status: distinguish the branches
+> **Current status:** Limited IELTS Academic and General Training reading flows, Matching Headings, feedback, targeted practice, independent transfer, and a first delayed-review cycle are implemented. The IELTS-2B.1 Phase 6 comprehensive acceptance result is **FAIL**: legacy transfer/review scoring evidence has no validity marker or learning-state recalculation path. New content versions were corrected and affected legacy versions are blocked from creating further verification evidence, but existing records still need a trust review. Phase 4–6 work on the current development branch remains local and uncommitted; this branch has not been merged into `main`. This is not a production release.
 
-| Scope | Actual state |
-| --- | --- |
-| **This `main` branch** | Stage 4 backend APIs, domain rules and persistence cover sessions, attempts, diagnosis, interventions, transfer and profile. The frontend is a placeholder with a health check, not a connected end-to-end learning UI. A confirmed database dependency defect is described below. |
-| **[IELTS development branch](https://github.com/KaoruMiyagawa/UnlearnLoop/tree/feat/ielts-pivot)** | Academic and General Training reading and the learning interface passed the specified isolated IELTS-1 acceptance; they are **not merged into main**. See its [acceptance report](https://github.com/KaoruMiyagawa/UnlearnLoop/blob/feat/ielts-pivot/docs/development/IELTS_1_FINAL_BROWSER_ACCEPTANCE.md). |
-| **Model and deployment** | Acceptance used an offline FakeModelProvider; real AI personalization and production release have not been validated. |
+## Product vision
 
-<p align="center"><img src="https://raw.githubusercontent.com/KaoruMiyagawa/UnlearnLoop/feat/ielts-pivot/docs/development/ielts-1-browser-evidence/14-gt-reading-mobile.png" alt="Actual browser screenshot from the unmerged IELTS development branch" width="390"></p>
-<p align="center"><sub>Actual browser capture from the IELTS branch, not the current main interface</sub></p>
+VerbaTrail aims to adapt practice to a learner’s goals, evidence about their current abilities, and available time. It will combine useful input, practice, communication, feedback, and review. IELTS Overall Band 8.0 is the first concrete target scenario; the broader goal is language understanding, communication, and use across contexts.
 
-## Learning loop
+The product relationship is planned as follows. Except for the implemented Reading and learning flows listed below, a unified learner model, personalized planner, and cross-skill Agent strategy remain planned capabilities.
 
 ```mermaid
 flowchart LR
-    A[Answer] --> B[Evaluation and diagnosis]
-    B --> C[Competing hypotheses and evidence]
-    C --> D[Follow-up]
-    D --> E[Targeted practice]
-    E --> F[Independent transfer task]
-    F --> G[Knowledge state and review]
+    L[Language learning system] --> P[Learner profile and ability evidence]
+    P --> A[Adaptive learning Agent]
+    A --> I[Input: reading · listening · vocabulary · grammar]
+    A --> O[Output: speaking · writing · communication]
+    I --> F[Feedback and error diagnosis]
+    O --> F
+    F -. Error DNA: candidate explanations and evidence .-> T[Transfer to new contexts and long-term review]
+    T --> N[Personalized learning plan]
+    N --> A
 ```
 
-This is the intended flow, subject to server state, available tasks and branch implementation. A transfer pass does not prove long-term retention. The main-branch UI does not yet connect the complete flow.
+**Error DNA is one feedback and diagnosis capability, not the whole product.** It organizes observed answer patterns, candidate explanations, and evidence that may verify them. Rule-based flows and FakeModelProvider do not establish real AI semantic diagnosis. A single answer, transfer pass, or review pass cannot by itself prove lasting mastery.
 
-## Architecture and local setup
+## Capability status
 
-React, TypeScript and Vite provide the placeholder frontend; FastAPI coordinates domain and application services, with SQLite, SQLAlchemy and Alembic for persistence and a model provider abstraction. See [current architecture](docs/architecture/CURRENT_ARCHITECTURE.md).
+| Capability | Status and limits |
+| --- | --- |
+| IELTS Reading | **Implemented in a limited scope:** original Academic and General Training materials, TFNG flows, and Matching Headings group answers with item-level evaluation. This is not full Reading question-type coverage. |
+| Feedback and Error DNA | **Partially implemented:** candidate hypotheses, evidence, discriminating follow-up, and targeted practice for specific Reading paths. These are supported by server-side rules; they are not validated real-model teaching or a language-wide learner profile. |
+| Transfer and review | **First cycle implemented with a quality blocker:** Matching Headings independent transfer and first delayed review have server records. Phase 6 found incorrect answer evidence in legacy content versions; validity labeling and state recalculation for historical evidence remain unfinished. See the final acceptance report (local report not yet committed). |
+| Learning history and profile | **Basic capability implemented:** displays existing server-side sessions, knowledge states, transfer and review records. The legacy evidence issue means not every old state can be treated as accurate. |
+| Dual-theme interface | **Implemented:** one React app supports Premium Academic and Noir & Champagne. |
+| Listening, Writing, Speaking | **Planned:** complete learning flows have not been delivered. |
+| Vocabulary, Grammar, comprehension and expression practice | **Planned:** there is no unified cross-skill ability model or complete training system yet. |
+| Learner model, personalized plan, adaptive Agent | **Planned:** a complete initial ability assessment and cross-skill plan do not exist yet. |
+| IELTS mock tests, UKVI, Life Skills, other languages | **Not implemented:** future directions; the current product covers only limited English IELTS Reading scenarios. |
+| Real-model teaching quality, official scoring, band prediction | **Unvalidated / not implemented:** no claim of real AI personalization, official scores, or an IELTS 8.0 outcome. |
 
-**Known main-branch defect:** `get_session_factory` in `backend/app/api/v1/dependencies.py` refers to `create_db_engine` without importing it. Direct invocation raises `NameError`, so database APIs using that dependency cannot be considered operational. A fix requires separate review and integration; this homepage update changes documentation only.
+### Themes and product captures
 
-Requirements: Python 3.11+, Node.js and npm. On Windows PowerShell:
+These are genuine browser captures from an earlier isolated IELTS-1 acceptance run. They show the home and Reading interface at that time; they do not imply that IELTS-2B.1 Phase 6 passed or that all current capabilities are complete.
+
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/home-premium.png" alt="Premium Academic home" width="100%"><br><sub>Premium Academic · Home</sub></td>
+    <td><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/home-noir.png" alt="Noir & Champagne home" width="100%"><br><sub>Noir &amp; Champagne · Home</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="https://raw.githubusercontent.com/KaoruMiyagawa/VerbaTrail/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/academic-reading-premium.png" alt="Academic Reading workspace" width="100%"><br><sub>Academic Reading · earlier isolated browser acceptance</sub></td>
+  </tr>
+</table>
+
+IELTS-2B.1 Phase 6 captures and acceptance limits (local report not yet committed) · [Earlier browser evidence index](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [Dual-theme visual review](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+
+## Architecture
+
+```mermaid
+flowchart LR
+    UI[React / TypeScript / Vite] -->|REST API| API[FastAPI]
+    API --> APP[Application services and domain rules]
+    APP --> DATA[SQLite / SQLAlchemy]
+    APP --> MIG[Alembic migrations]
+    APP --> LEARN[Sessions · answers · evaluation]
+    APP --> AGENT[Rule-based diagnosis and learning-state orchestration]
+    AGENT --> PROVIDER[FakeModelProvider / model adapter interface]
+```
+
+The current backend manages learning sessions, version-pinned reading groups, structured answers, evaluation snapshots, specific diagnostic flows, transfer, and review states. React renders server-provided state through an API client. SQLite is the default local store. A unified learner model, cross-skill planning, and a validated live-model Agent are not implemented. See the [current architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) and [target architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/ARCHITECTURE.md).
+
+## Run locally on Windows
+
+Requirements: Python 3.11+, Node.js, npm, and Git. From the repository root:
 
 ```powershell
 python -m venv .venv
@@ -49,32 +89,49 @@ npm ci
 cd ..
 ```
 
-In a backend terminal:
+Start the backend in a PowerShell window (`DATABASE_URL` is relative to `backend/`):
 
 ```powershell
-$env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
+$env:DATABASE_URL = 'sqlite:///./verbatrail-local.db'
+$env:APP_NAME = 'VerbaTrail'
 $env:MODEL_PROVIDER = 'fake'
 $env:ALLOW_REMOTE_MODEL_CALLS = 'false'
 cd backend
 ..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
 ```
 
-In another terminal, run `cd frontend` and `npm run dev`, then visit `http://127.0.0.1:15173`. API docs: `http://127.0.0.1:18000/docs`. Development startup migrates the configured database and seeds content; use a new file and back up existing data. See the [quick start](docs/development/QUICKSTART.md). This is a trusted local MVP; `learner_id` is not authentication.
+Start the frontend in a second window:
 
-## Tests and layout
+```powershell
+cd frontend
+npm run dev
+```
+
+Open `http://127.0.0.1:15173`; API documentation is at `http://127.0.0.1:18000/docs`. Startup migrates the configured database. Back up and verify recoverability before using an existing database. See the [quick-start guide](docs/development/QUICKSTART.md) for details. This is a local development setup, not a production or multi-user security configuration.
+
+## Tests and project maturity
+
+Common checks:
 
 ```powershell
 cd backend
 ..\.venv\Scripts\python -m pytest
 cd ../frontend
+node --test tests/*.test.mjs
 npm run typecheck
 npm run build
 ```
 
-`backend/` holds the API, services, persistence and tests; `frontend/` holds the placeholder interface and health client; `docs/` contains product, architecture, design and roadmap documents. The IELTS branch's 80 backend tests, 40 frontend tests and browser acceptance describe that branch, not features already on main.
+The IELTS-2B.1 Phase 6 regression run recorded **159 backend tests passed** and **47 frontend tests passed**; TypeScript checks, production build, a single Alembic head, isolated HTTP flows, and Chrome browser scripts also passed. **Passing engineering checks do not change the comprehensive acceptance result of FAIL:** historical transfer/review evidence still lacks a trust marker and recalculation path. Tests use rules and FakeModelProvider; they do not validate real-model quality, external expert review, production security, or complete IELTS coverage.
 
-## Roadmap and contributing
+The current trust boundary is local, single-user development: `learner_id` is a filter, not authentication. The project does not provide production-grade account authentication or tenant isolation. No open-source license is declared; redistribution rights should not be assumed.
 
-Review integration of the learning interface and IELTS branch; address backup and restore, data export/deletion, dependency risks and authorization before broader use. Future work includes more content and skills, accessibility, quality automation and real-model evaluation with clear consent, budget and privacy boundaries. See the [roadmap](docs/development/ROADMAP.md).
+## Product and development documents
 
-Issues and contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). **No open-source license is currently declared.** Do not assume permission to reuse or redistribute; the maintainer must choose a license.
+- [Product direction](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md): learner-centered language-learning vision and capability plan.
+- [Product requirements](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/PRD.md): current scope, capability status, and product boundaries.
+- [Current architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [Target architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/ARCHITECTURE.md)
+- [Development roadmap](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md) · [Windows quick start](docs/development/QUICKSTART.md)
+- IELTS-2B.1 Phase 6 final acceptance (local report not yet committed): current FAIL reason, fixes, evidence, and outstanding work.
+
+The roadmap starts with trust labels and recalculation for historical evidence, then builds a language ability model, initial assessment, and personalized planning. It next expands across skills, long-term memory and transfer, before evaluating additional languages and more capable teaching systems.
