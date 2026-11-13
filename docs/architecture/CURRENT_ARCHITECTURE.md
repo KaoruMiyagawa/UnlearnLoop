@@ -25,7 +25,7 @@ flowchart LR
 
 ## 当前 IELTS 实现范围
 
-产品导航呈现 Learn / Discover / Adapt。Learn 首页 `/` 提供 Listening、Speaking、Reading、Writing 四个入口。Reading 使用既有 `/learning` 工作区，`/learn/reading` 可直接访问同一工作区。三个规划页分别位于 `/learn/listening`、`/learn/speaking`、`/learn/writing`。Discover 和 Adapt 显示规划状态。诊断、迁移、复习与学习档案保留原路由。
+产品导航呈现 Learn / Discover / Adapt。Learn 首页 `/` 提供 Listening、Speaking、Reading、Writing 四个入口。Reading 使用既有 `/learning` 工作区，`/learn/reading` 可直接访问同一工作区。Listening 位于 `/learn/listening`，含一套约 64 秒原创合成音频、5 道客观题、服务端规则评分、提交后解释及音频时间锚点；Listening Attempt 存入既有共享 LearningSession/Attempt 历史。Speaking 与 Writing 仍为规划页。Discover 和 Adapt 显示规划状态。诊断、迁移、复习与学习档案保留原路由。
 
 `frontend/src/learn/skills.ts` 定义类型化技能目录和能力状态。`implemented` 表示已有学习流程，`planned` 表示可浏览规划，`unavailable` 表示无可用入口。目录由前端静态维护。考试目标、题目派发、作答、诊断、复习和学习历史继续以共享 API 为准。
 
@@ -33,7 +33,7 @@ Academic 与 General Training 有有限的 Reading 流程，包括 TFNG 及 Matc
 
 **IELTS-2B.1 Phase 6.2 最终工程验收为 PASS WITH LIMITATIONS。** 旧版证据有效性标记、派生状态协调与用户重新验证已在隔离 SQLite 复验。正式库的协调和生产发布评估仍有待执行。原 Phase 6 FAIL 作为历史记录保留。[最终复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
-完整 IELTS Reading 题型覆盖、Listening、Writing、Speaking、完整词汇/语法课程、模考、统一能力评估、个性化学习计划、多语言教学均未实现。目标架构中的 Learner Model 和跨技能 Adaptive Agent 也还未完整落地。
+完整 IELTS Reading 题型覆盖、完整 IELTS Listening 考试、Writing、Speaking、完整词汇/语法课程、模考、统一能力评估、个性化学习计划、多语言教学均未实现。Listening 仅交付有限原创试用练习，不提供官方 Band 分数；一次练习结果不代表长期能力，也不会产生迁移或保持证据。目标架构中的 Learner Model 和跨技能 Adaptive Agent 也还未完整落地。
 
 ## 证据与数据流
 

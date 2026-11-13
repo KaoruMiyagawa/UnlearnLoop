@@ -8,7 +8,7 @@
 
 [English](README_EN.md) · [Learn / IELTS 开发基线](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
 
-> **当前状态：** VerbaTrail 的顶层产品结构为 Learn / Discover / Adapt。Learn 提供 Listening / Speaking / Reading / Writing 四项技能。Reading 接入现有 Academic / General Training 练习，其他三项提供规划页。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**；原 Phase 6 **FAIL** 保留为历史记录。
+> **当前状态：** VerbaTrail 的顶层产品结构为 Learn / Discover / Adapt。Learn 提供 Listening / Speaking / Reading / Writing 四项技能。Reading 保留现有 Academic / General Training 流程；Listening 已有一套有限原创合成音频练习；Speaking 和 Writing 仍为规划页。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**；原 Phase 6 **FAIL** 保留为历史记录。
 
 ## 产品愿景
 
@@ -36,14 +36,15 @@ flowchart LR
 | 能力 | 状态与边界 |
 | --- | --- |
 | IELTS Reading | **有限范围已实现：** Academic 与 General Training 的原创阅读内容、TFNG 流程及 Matching Headings 题组作答和逐项评价。不是完整 Reading 题型覆盖。 |
+| IELTS Listening | **首个有限闭环已实现：** 一段约 64 秒原创脚本离线合成音频、5 道选择题、服务端规则评分、逐题解释和音频片段锚点；Attempt 复用共享学习历史。不提供官方 Band 分数、完整考试或长期能力/迁移/保持结论。 |
 | 反馈与 Error DNA | **部分实现：** 已有特定 Reading 路径的候选假设、证据、区分性追问和定向训练。状态由服务端规则流程支持；不代表真实模型教学效果或全语言学习者画像。 |
 | 迁移与复习 | Matching Headings 独立迁移和首轮延迟复习有服务端记录。历史证据标记与状态协调已通过隔离复验。 |
 | 学习历史与档案 | 展示服务端会话、知识状态、迁移与复习记录，以及历史证据有效性和重新验证入口。 |
 | 双主题界面 | **已实现：** 一套 React 应用支持 Premium Academic 与 Noir & Champagne。 |
-| Listening、Speaking、Writing | 本轮提供规划页，音频、录音转写和写作评价尚未实现。 |
+| Speaking、Writing | **规划中：** 口语录音/转写与表达评价、写作草稿及反馈尚未实现。 |
 | Vocabulary、Grammar、理解与表达训练 | **规划中：** 尚无统一跨技能能力模型和完整训练体系。 |
 | 学习者模型、个性化计划与自适应 Agent | **规划中：** 目前没有完整的初始能力评估或跨技能学习计划。 |
-| IELTS 模考、UKVI、Life Skills、其他语言 | **尚未实现：** 属于后续方向；当前产品只实现部分英语 IELTS 阅读场景。 |
+| IELTS 模考、UKVI、Life Skills、其他语言 | **尚未实现：** 属于后续方向；当前产品只实现有限英语 IELTS Reading 与一套原创 Listening 练习。 |
 | 真实模型教学质量、官方评分、Band 预测 | **未验证 / 未实现：** 不承诺真实 AI 个性化效果、官方分数或 IELTS 8.0 结果。 |
 
 ### 主题与实际界面
@@ -60,7 +61,7 @@ flowchart LR
   </tr>
 </table>
 
-[Learn V1.1 截图](docs/development/learn-v1.1-browser-evidence/README.md) · [IELTS-2B.1 Phase 6.2 最终复验](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · 原 Phase 6 FAIL 报告见 `docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md` · [早期浏览器证据索引](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+[Learn V1.1 截图](docs/development/learn-v1.1-browser-evidence/README.md) · [Listening V1.2 截图与验收](docs/development/listening-v1.2-browser-evidence/README.md) · [IELTS-2B.1 Phase 6.2 最终复验](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · 原 Phase 6 FAIL 报告见 `docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md` · [早期浏览器证据索引](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
 
 ## 技术架构
 

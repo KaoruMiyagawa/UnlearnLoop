@@ -711,6 +711,25 @@ a.learn-skill-card:hover { border-color: var(--vt-gold); background: var(--focus
 .focus-product-nav + .focus-nav-links { border-left: 1px solid var(--focus-line); padding-left: clamp(8px, 1.5vw, 20px); }
 .focus-review-row, .focus-timeline-item, .focus-profile-facts > div { border-color: var(--focus-line); }
 .focus-review-row p, .focus-review-previous, .focus-profile-facts dd { color: var(--focus-secondary); }
+.listening-page { width: min(100%, 1050px); margin-inline: auto; }
+.listening-intro, .listening-audio, .listening-question, .listening-score { padding: clamp(18px, 3vw, 28px); color: var(--focus-ink); }
+.listening-audio { display: grid; gap: 12px; margin-bottom: 18px; }
+.listening-audio h2, .listening-history h2 { margin: 0 0 6px; color: var(--focus-ink); }
+.listening-audio p, .listening-intro p, .listening-history p, .listening-history li, .listening-submit p, .listening-result p { color: var(--focus-secondary); }
+.listening-audio audio { display: block; width: 100%; min-height: 44px; }
+.listening-audio-note { margin: 0; font-size: 12px; }
+.listening-questions { display: grid; gap: 14px; }
+.listening-question { min-width: 0; margin: 0; }
+.listening-question legend { padding: 0 4px; color: var(--focus-ink); font-weight: 700; }
+.listening-option { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 8px; border-bottom: 1px solid var(--focus-line); color: var(--focus-ink); cursor: pointer; }
+.listening-option input { width: 20px; height: 20px; accent-color: var(--focus-blue); flex: 0 0 auto; }
+.listening-result { margin-top: 14px; padding: 14px; border-left: 3px solid var(--vt-gold); background: color-mix(in srgb, var(--focus-surface) 84%, var(--vt-gold)); color: var(--focus-ink); }
+.listening-result p { margin: 6px 0 12px; }
+.listening-submit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-block: 18px; }
+.listening-submit .wb-btn, .listening-intro .wb-btn, .listening-score .wb-btn { min-height: 48px; }
+.listening-history { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--focus-line); overflow-wrap: anywhere; }
+.listening-history ul { padding-left: 22px; color: var(--focus-secondary); }
+@media (max-width: 600px) { .listening-submit { align-items: stretch; } .listening-submit .wb-btn { width: 100%; } }
 @media (max-width: 900px) { .verbatrail-reading-layout { grid-template-columns: 1fr; } .focus-question-card { position: static; max-height: none; } .focus-learning-materials { max-height: 55vh; } }
 @media (max-width: 1000px) {
   .focus-top-nav-inner { flex-wrap: wrap; padding-block: 8px; gap: 4px 12px; }

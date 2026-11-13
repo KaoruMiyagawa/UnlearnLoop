@@ -8,7 +8,7 @@ An adaptive language learning system designed to help learners build understandi
 
 [简体中文](README.md) · [Learn / IELTS development baseline](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows quick start](docs/development/QUICKSTART.md) · [Current architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [Product direction](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [Roadmap](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
 
-> **Current status:** VerbaTrail has three product areas: Learn / Discover / Adapt. Learn has Listening, Speaking, Reading, and Writing sections. Reading opens the existing Academic and General Training flows. Listening, Speaking, and Writing have planned pages. The IELTS-2B.1 Phase 6.2 engineering result is **PASS WITH LIMITATIONS**. The original Phase 6 **FAIL** remains in the historical report.
+> **Current status:** VerbaTrail has three product areas: Learn / Discover / Adapt. Learn has Listening, Speaking, Reading, and Writing sections. Reading retains the existing Academic and General Training flows. Listening now has one limited original synthetic-audio exercise; Speaking and Writing remain planned. The IELTS-2B.1 Phase 6.2 engineering result is **PASS WITH LIMITATIONS**. The original Phase 6 **FAIL** remains in the historical report.
 
 ## Product vision
 
@@ -36,14 +36,15 @@ flowchart LR
 | Capability | Status and limits |
 | --- | --- |
 | IELTS Reading | **Implemented in a limited scope:** original Academic and General Training materials, TFNG flows, and Matching Headings group answers with item-level evaluation. This is not full Reading question-type coverage. |
+| IELTS Listening | **First limited loop implemented:** one approximately 64-second original script with offline-synthesized audio, five multiple-choice questions, server-side rule scoring, explanations, and audio time anchors. Attempts reuse shared learning history. No official Band score, full exam, or long-term ability/transfer/retention claim. |
 | Feedback and Error DNA | **Partially implemented:** candidate hypotheses, evidence, discriminating follow-up, and targeted practice for specific Reading paths. These are supported by server-side rules; they are not validated real-model teaching or a language-wide learner profile. |
 | Transfer and review | Matching Headings independent transfer and first delayed review use server records. Historical evidence labeling and state reconciliation passed isolated retesting. |
 | Learning history and profile | Displays server-side sessions, knowledge states, transfer, review, historical evidence validity, and revalidation when available. |
 | Dual-theme interface | **Implemented:** one React app supports Premium Academic and Noir & Champagne. |
-| Listening, Speaking, Writing | Planned pages only. Audio practice, recording/transcription, writing tasks, and evaluations remain unimplemented. |
+| Speaking and Writing | **Planned:** speaking recording/transcription and feedback, and writing drafts and feedback, remain unimplemented. |
 | Vocabulary, Grammar, comprehension and expression practice | **Planned:** there is no unified cross-skill ability model or complete training system yet. |
 | Learner model, personalized plan, adaptive Agent | **Planned:** a complete initial ability assessment and cross-skill plan do not exist yet. |
-| IELTS mock tests, UKVI, Life Skills, other languages | **Not implemented:** future directions; the current product covers only limited English IELTS Reading scenarios. |
+| IELTS mock tests, UKVI, Life Skills, other languages | **Not implemented:** future directions; the current product covers limited English IELTS Reading and one original Listening exercise. |
 | Real-model teaching quality, official scoring, band prediction | **Unvalidated / not implemented:** no claim of real AI personalization, official scores, or an IELTS 8.0 outcome. |
 
 ### Themes and product captures
@@ -60,7 +61,7 @@ These are genuine browser captures from an earlier isolated IELTS-1 acceptance r
   </tr>
 </table>
 
-[Learn V1.1 browser captures](docs/development/learn-v1.1-browser-evidence/README.md) · [IELTS-2B.1 Phase 6.2 retest](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · Original Phase 6 FAIL report at `docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md` · [Earlier browser evidence index](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [Dual-theme visual review](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+[Learn V1.1 browser captures](docs/development/learn-v1.1-browser-evidence/README.md) · [Listening V1.2 captures and acceptance](docs/development/listening-v1.2-browser-evidence/README.md) · [IELTS-2B.1 Phase 6.2 retest](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · Original Phase 6 FAIL report at `docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md` · [Earlier browser evidence index](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [Dual-theme visual review](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
 
 ## Architecture
 

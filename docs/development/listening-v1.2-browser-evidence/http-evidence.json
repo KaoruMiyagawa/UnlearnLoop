@@ -1,0 +1,13 @@
+{
+  "lesson_status": 200,
+  "start_status": 201,
+  "submit_status": 200,
+  "retry_status": 200,
+  "content_version": "listening-study-group-v1",
+  "evaluation_rule_version": "listening-exact-choice-v1",
+  "evaluation_source": "rule_check",
+  "score": 3,
+  "session_id": "sess_db63c3e50e644718",
+  "assessment_note": "\u672c\u6b21\u7ec3\u4e60\u7ed3\u679c\uff0c\u4ec5\u4ee3\u8868\u8fd9\u6b21\u539f\u521b\u542c\u529b\u4efb\u52a1\u8868\u73b0\uff1b\u4e0d\u6784\u6210 IELTS Band \u5206\u6570\u6216\u957f\u671f\u80fd\u529b\u8bc4\u4f30\u3002",
+  "history_status": 200
+}

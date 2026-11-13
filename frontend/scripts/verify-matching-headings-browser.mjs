@@ -286,7 +286,7 @@ const verifyLearn = async () => {
     skill: card.querySelector('h2').textContent, route: card.getAttribute('href'), status: card.querySelector('.focus-state-tag').textContent.trim()
   }))`);
   assert.deepEqual(cards, [
-    { skill: 'Listening', route: '/learn/listening', status: '规划中' },
+    { skill: 'Listening', route: '/learn/listening', status: '可练习' },
     { skill: 'Speaking', route: '/learn/speaking', status: '规划中' },
     { skill: 'Reading', route: '/learning', status: '可练习' },
     { skill: 'Writing', route: '/learn/writing', status: '规划中' },
@@ -333,8 +333,9 @@ const verifyLearn = async () => {
   await layout(390, 844);
   await touch('.learn-skill-card[href="/learn/listening"]');
   await text('Listening · 听力');
-  await text('音频片段与题目关联');
-  assert.equal(await evaluate("document.querySelector('main').querySelectorAll('audio, video, button, input').length"), 0);
+  await text('约 64 秒');
+  assert.equal(await evaluate("document.querySelector('main').querySelectorAll('audio').length"), 0);
+  assert.equal(await evaluate("document.querySelector('main').querySelectorAll('button').length"), 2);
   await capture('learn-listening-mobile', 'body', 390, 844);
   await touch('.learn-back-link');
   await text('IELTS 学习中心');

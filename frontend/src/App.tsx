@@ -29,6 +29,7 @@ import { ProfileWorkspacePlaceholder } from './profile-workspace/ProfileWorkspac
 import { ReviewWorkspacePlaceholder } from './review-workspace/ReviewWorkspacePlaceholder';
 import { LearnHome, PlannedSkillPage } from './learn/LearnHome';
 import { plannedSkills } from './learn/skills';
+import { ListeningWorkspace } from './learn/ListeningWorkspace';
 
 export const App: React.FC = () => {
   const [dataMode, setDataMode] = useState<'demo' | 'real'>('real');
@@ -187,6 +188,8 @@ export const App: React.FC = () => {
     >
       {plannedSkill ? (
         <PlannedSkillPage skill={plannedSkill} onNavigate={navigateWorkspace} />
+      ) : dataMode === 'real' && activeWorkspace === 'listening' ? (
+        <ListeningWorkspace onNavigate={navigateWorkspace} />
       ) : dataMode === 'real' ? activeWorkspace === 'review' ? (
         <FocusReviewWorkspace onNavigateWorkspace={navigateWorkspace} />
       ) : activeWorkspace === 'profile' ? (

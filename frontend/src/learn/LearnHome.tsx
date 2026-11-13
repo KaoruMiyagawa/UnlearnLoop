@@ -27,7 +27,7 @@ function SkillCard({ skill, onNavigate }: { skill: SkillDefinition; onNavigate: 
     return <article className="focus-card focus-card-quiet learn-skill-card">{content}</article>;
   }
 
-  const action = skill.availability === 'implemented' ? '进入阅读' : '查看计划';
+  const action = skill.availability === 'implemented' ? `进入${skill.localizedLabel}` : '查看计划';
   return <a
     className={`focus-card focus-card-quiet learn-skill-card ${skill.availability}`}
     href={skillEntryRoute(skill)}

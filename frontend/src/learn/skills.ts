@@ -20,7 +20,7 @@ export type PlannedSkill = SkillDetails & {
 };
 
 export type SkillDefinition = PlannedSkill | (SkillDetails & (
-  | { availability: 'implemented'; workspace: 'learning'; availableCapabilities: readonly string[] }
+  | { availability: 'implemented'; workspace: 'learning' | PlannedSkillWorkspace; availableCapabilities: readonly string[] }
   | { availability: 'unavailable'; availableCapabilities: readonly [] }
 ));
 
@@ -32,11 +32,10 @@ export const SKILLS = {
     label: 'Listening',
     localizedLabel: '听力',
     description: '练习捕捉关键信息，理解语境与细节。',
-    availability: 'planned',
+    availability: 'implemented',
     workspace: 'listening',
     examVariants,
-    availableCapabilities: [],
-    plannedCapabilities: ['IELTS 听力训练', '精听与理解练习', '音频片段与题目关联', '错误反馈与复习'],
+    availableCapabilities: ['原创音频播放', '听力选择题', '服务端评分与逐题解释', '音频时间锚点', '共享学习历史'],
   },
   speaking: {
     id: 'speaking',
