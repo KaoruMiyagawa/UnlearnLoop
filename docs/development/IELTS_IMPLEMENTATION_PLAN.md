@@ -1,6 +1,6 @@
 # VerbaTrail IELTS 实施路线
 
-> **规划状态说明（2026-11-12）：** 本文保留 IELTS 专项阶段拆分的历史记录，不再代表整个 VerbaTrail 的当前最高优先级。当前产品定位和跨技能路线以 [`ROADMAP.md`](ROADMAP.md) 及 [`docs/product/IELTS_PRODUCT_DIRECTION.md`](../product/IELTS_PRODUCT_DIRECTION.md) 为准。IELTS Reading 的题型扩展仍是其中一项后续工作；当前首先处理 IELTS-2B.1 Phase 6 历史证据可信度与状态重算阻断。下方各阶段原文保留，不作为已完成能力声明。
+> **规划状态说明（2026-11-13）** 本文保留 IELTS 专项阶段拆分的历史记录。当前优先开发 Learn 四项技能入口，Reading 题型扩展为后续工作。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**，原 Phase 6 FAIL 保留于历史报告。[研发路线图](ROADMAP.md) · [产品方向](../product/IELTS_PRODUCT_DIRECTION.md) · [Phase 6.2 复验](IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 本计划将产品目录状态与开发完成状态分开。阶段按依赖排序；不承诺未完成内容或日历日期。每阶段都要求保留可运行成果，并延续 Python 回归。
 

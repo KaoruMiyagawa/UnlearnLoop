@@ -1,6 +1,6 @@
 # VerbaTrail 当前架构与能力边界
 
-更新日期：2026-11-12。本文描述当前 VerbaTrail 的代码结构及已知边界；目标产品关系见[产品方向](../product/IELTS_PRODUCT_DIRECTION.md)，长期技术目标见[目标架构](ARCHITECTURE.md)。
+更新日期：2026-11-13。本文描述当前 VerbaTrail 的代码结构及已知边界。[产品方向](../product/IELTS_PRODUCT_DIRECTION.md) · [目标架构](ARCHITECTURE.md)
 
 ## 当前运行架构
 
@@ -8,7 +8,7 @@
 - **HTTP/API：** FastAPI 提供版本化 `/api/v1` 接口。API schemas 对学生可见数据建模，题组展示内容与私有答案键/评分规则分离。
 - **应用服务：** 应用层编排考试配置、内容/题目选择、学习会话、提交、诊断、专项训练、Matching Headings 迁移与复习。
 - **领域与评价：** 领域规则验证学习状态转换、Matching Headings 题组及逐项评价。规则协议和 FakeModelProvider 支持流程执行与测试，不构成真实模型个性化质量证据。
-- **持久化：** SQLAlchemy 仓储保存内容版本、Question、LearningSession、Attempt、诊断假设/证据、KnowledgeState 和 ReviewItem；Alembic 当前单一 head 为 `0006_matching_headings_review_provenance`。测试和浏览器流程使用隔离 SQLite。
+- **持久化** SQLAlchemy 仓储保存内容版本、Question、LearningSession、Attempt、诊断假设、KnowledgeState、ReviewItem 与证据有效性事件。Alembic 当前单一 head 为 `0007_evidence_validity_events`。测试和浏览器流程使用隔离 SQLite。
 
 ```mermaid
 flowchart LR
@@ -20,14 +20,18 @@ flowchart LR
     AGENT --> PROVIDER[FakeModelProvider / Provider 接口]
     APP --> REPO[SQLAlchemy 仓储]
     REPO --> DB[(SQLite)]
-    DB --> MIG[Alembic 0001–0006]
+    DB --> MIG[Alembic 0001–0007]
 ```
 
 ## 当前 IELTS 实现范围
 
+产品导航呈现 Learn / Discover / Adapt。Learn 首页 `/` 提供 Listening、Speaking、Reading、Writing 四个入口。Reading 使用既有 `/learning` 工作区，`/learn/reading` 可直接访问同一工作区。三个规划页分别位于 `/learn/listening`、`/learn/speaking`、`/learn/writing`。Discover 和 Adapt 显示规划状态。诊断、迁移、复习与学习档案保留原路由。
+
+`frontend/src/learn/skills.ts` 定义类型化技能目录和能力状态。`implemented` 表示已有学习流程，`planned` 表示可浏览规划，`unavailable` 表示无可用入口。目录由前端静态维护。考试目标、题目派发、作答、诊断、复习和学习历史继续以共享 API 为准。
+
 Academic 与 General Training 有有限的 Reading 流程，包括 TFNG 及 Matching Headings 结构化题组；Matching Headings 已接入固定内容版本、逐项评分、错误假设、追问、针对性训练、独立迁移和首轮延迟复习。历史、Review 和 Profile 消费服务端记录。
 
-**IELTS-2B.1 Phase 6 综合验收为 FAIL。** Phase 4 早期部分 Matching Headings 迁移/复习答案依据有误。新的内容版本已更正，受影响的旧版本不能继续产生新的迁移/保持验证；但历史 Attempt 与派生 KnowledgeState / ReviewItem 尚没有可信度标签、重算流程及用户恢复路径。因此不能认为所有旧学习状态准确。详情见[最终验收报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)。
+**IELTS-2B.1 Phase 6.2 最终工程验收为 PASS WITH LIMITATIONS。** 旧版证据有效性标记、派生状态协调与用户重新验证已在隔离 SQLite 复验。正式库的协调和生产发布评估仍有待执行。原 Phase 6 FAIL 作为历史记录保留。[最终复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 完整 IELTS Reading 题型覆盖、Listening、Writing、Speaking、完整词汇/语法课程、模考、统一能力评估、个性化学习计划、多语言教学均未实现。目标架构中的 Learner Model 和跨技能 Adaptive Agent 也还未完整落地。
 
@@ -37,7 +41,7 @@ Matching Headings 当前典型流程：
 
 `版本化题组 → 服务端派发并固定版本 → 结构化 Attempt 与逐项评分快照 → 候选诊断假设及证据 → 合法追问/专项训练 → 独立迁移 → ReviewItem / 延迟作答`
 
-前端显示服务端返回的题型、评分及下一步状态，不应据本地分数推断掌握状态。规则诊断的来源应明确，候选假设不等于确认原因。训练、迁移和延迟保持是不同证据层级。当前流程主要覆盖首轮迁移/复习；旧版证据有效性仍待修复，更多独立复习周期也未完成。
+前端显示服务端返回的题型、评分及下一步状态。规则诊断保留候选原因和证据来源。训练、迁移和延迟保持是不同证据层级。当前验收主要覆盖首轮迁移和复习，更多独立复习周期仍待验证。
 
 ## 安全与信任边界
 

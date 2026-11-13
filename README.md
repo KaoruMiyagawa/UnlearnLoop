@@ -6,15 +6,15 @@
 
 **首个目标场景：IELTS Overall Band 8.0。** 这是学习目标，不是当前水平、分数预测或结果保证。长期愿景是帮助学习者真正掌握一门语言，而不只提高考试答题正确率。
 
-[English](README_EN.md) · [当前开发分支](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](docs/development/ROADMAP.md)
+[English](README_EN.md) · [Reading 开发基线](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](docs/development/ROADMAP.md)
 
-> **当前状态：** IELTS Academic / General Training 的部分阅读学习、Matching Headings、错误反馈、针对性训练、独立迁移和首轮延迟复习已有实现。IELTS-2B.1 Phase 6 综合验收为 **FAIL**：已知旧版迁移/复习评分证据缺少有效性标记和学习状态重算机制。新内容版本已修正并阻止相关旧版本继续产生新验证，但历史记录的可信度处理尚未完成。当前开发分支的 Phase 4–6 修改仍在本地，未提交；该分支也未合并到 `main`。这不是生产发布。
+> **当前状态** Learn V1.1 提供 Listening / Speaking / Reading / Writing 四项入口。Reading 接入 Academic / General Training 的现有练习，其他三项提供规划页。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**。原 Phase 6 **FAIL** 保留为历史记录。 [Phase 6.2 复验](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 ## 产品愿景
 
 VerbaTrail 围绕学习者的目标、当前能力证据和可用时间，逐步安排适合的输入、练习、表达、反馈与复习。IELTS Overall 8.0 是首个明确目标场景；产品长期关注的是语言理解、交流和跨情境运用能力。
 
-目标产品关系如下。除下文标明已实现的 Reading 与学习流程外，统一学习者模型、个性化规划和跨技能 Agent 决策仍是规划能力。
+产品包含 **Learn / Discover / Adapt**。Learn 提供听、说、读、写四项技能，Discover 规划合法外部学习资源，Adapt 规划个性化学习决策。学习者目标、词汇、语法、Error DNA、迁移、复习、学习历史与能力评估属于跨技能共享能力。
 
 ```mermaid
 flowchart LR
@@ -37,8 +37,8 @@ flowchart LR
 | --- | --- |
 | IELTS Reading | **有限范围已实现：** Academic 与 General Training 的原创阅读内容、TFNG 流程及 Matching Headings 题组作答和逐项评价。不是完整 Reading 题型覆盖。 |
 | 反馈与 Error DNA | **部分实现：** 已有特定 Reading 路径的候选假设、证据、区分性追问和定向训练。状态由服务端规则流程支持；不代表真实模型教学效果或全语言学习者画像。 |
-| 迁移与复习 | **首轮流程已实现，但有质量阻断：** Matching Headings 独立迁移和首轮延迟复习有服务端记录。Phase 6 发现旧版题组答案依据有误，历史证据有效性标记与状态重算尚未完成，详见[最终验收报告](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)。 |
-| 学习历史与档案 | **基础能力已实现：** 展示现有服务端会话、知识状态、迁移与复习记录；受上述历史证据问题影响，不能据此确认所有旧状态准确。 |
+| 迁移与复习 | Matching Headings 独立迁移和首轮延迟复习有服务端记录。历史证据标记与状态协调已通过隔离复验。 |
+| 学习历史与档案 | 展示服务端会话、知识状态、迁移与复习记录，以及历史证据有效性与重新验证入口。 |
 | 双主题界面 | **已实现：** 一套 React 应用支持 Premium Academic 与 Noir & Champagne。 |
 | Listening、Writing、Speaking | **规划中：** 尚未交付完整学习流程。 |
 | Vocabulary、Grammar、理解与表达训练 | **规划中：** 尚无统一跨技能能力模型和完整训练体系。 |
@@ -48,7 +48,7 @@ flowchart LR
 
 ### 主题与实际界面
 
-以下是项目浏览器验收中的真实截图，来自早期 IELTS-1 隔离验收，展示当时的首页和阅读界面，并不代表 IELTS-2B.1 Phase 6 通过，也不覆盖当前全部能力状态。
+下图保留早期 IELTS-1 隔离验收的首页和阅读界面。当前界面见 [Learn V1.1 浏览器截图](docs/development/learn-v1.1-browser-evidence/README.md)。
 
 <table>
   <tr>
@@ -60,7 +60,7 @@ flowchart LR
   </tr>
 </table>
 
-[IELTS-2B.1 Phase 6 当前截图与验收边界](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md) · [早期浏览器证据索引](docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+[IELTS-2B.1 Phase 6.2 最终复验](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [早期浏览器证据索引](docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
 
 ## 技术架构
 
@@ -122,7 +122,7 @@ npm run typecheck
 npm run build
 ```
 
-IELTS-2B.1 Phase 6 本轮完整回归记录为后端 **159 passed**、前端 **47 passed**，TypeScript 检查、Production build、Alembic 单一 head、隔离 HTTP 与 Chrome 浏览器脚本均通过。**工程门禁通过不改变综合验收 FAIL 结论：旧版迁移/复习证据尚无可信度标记及重算机制。**测试使用规则和 FakeModelProvider；没有证明真实模型质量、外部专家审校、生产安全或完整 IELTS 覆盖。
+IELTS-2B.1 Phase 6.2 的工程复验记录为后端 **166 项通过**、前端 **48 项通过**，TypeScript、生产构建、Alembic 单一 head、隔离 HTTP 和 Chrome 浏览器回归均通过。实际部署数据库协调、外部专家审校和生产发布评估仍待完成。 [Phase 6.2 验收范围与限制](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md)
 
 当前身份边界为本地单用户开发：`learner_id` 是筛选字段，不是认证。项目没有生产级账号认证或多租户隔离。项目也未声明开源许可证，请勿据此假定再分发权利。
 
@@ -132,6 +132,6 @@ IELTS-2B.1 Phase 6 本轮完整回归记录为后端 **159 passed**、前端 **4
 - [产品需求概要](docs/product/PRD.md)：当前范围、能力状态与产品边界。
 - [当前架构](docs/architecture/CURRENT_ARCHITECTURE.md) · [目标架构](docs/architecture/ARCHITECTURE.md)
 - [研发路线图](docs/development/ROADMAP.md) · [Windows 快速启动](docs/development/QUICKSTART.md)
-- [IELTS-2B.1 Phase 6 最终验收](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)：当前 FAIL 原因、修复、证据及未完成项。
+- [IELTS-2B.1 Phase 6.2 最终复验](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [历史 Phase 6 FAIL 报告](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 路线图从可信历史证据与状态重算开始，再逐步建立语言能力模型、初始评估和个性化学习规划；随后扩展其他技能、长期记忆与迁移，最后评估更多语言及智能教学能力。

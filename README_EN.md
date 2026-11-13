@@ -6,15 +6,15 @@ An adaptive language learning system designed to help learners build understandi
 
 **First milestone: IELTS Overall Band 8.0.** This is a learning goal, not a statement of current ability, a score prediction, or a guarantee. The long-term vision is to help people truly learn a language, beyond getting more test questions right.
 
-[简体中文](README.md) · [Current development branch](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows quick start](docs/development/QUICKSTART.md) · [Current architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Product direction](docs/product/IELTS_PRODUCT_DIRECTION.md) · [Roadmap](docs/development/ROADMAP.md)
+[简体中文](README.md) · [Reading development baseline](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows quick start](docs/development/QUICKSTART.md) · [Current architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Product direction](docs/product/IELTS_PRODUCT_DIRECTION.md) · [Roadmap](docs/development/ROADMAP.md)
 
-> **Current status:** Limited IELTS Academic and General Training reading flows, Matching Headings, feedback, targeted practice, independent transfer, and a first delayed-review cycle are implemented. The IELTS-2B.1 Phase 6 comprehensive acceptance result is **FAIL**: legacy transfer/review scoring evidence has no validity marker or learning-state recalculation path. New content versions were corrected and affected legacy versions are blocked from creating further verification evidence, but existing records still need a trust review. Phase 4–6 work on the current development branch remains local and uncommitted; this branch has not been merged into `main`. This is not a production release.
+> **Current status** Learn V1.1 has four sections: Listening, Speaking, Reading, and Writing. Reading opens the existing Academic and General Training practice flows. The other three sections describe planned work. The final IELTS-2B.1 engineering result is **PASS WITH LIMITATIONS**. The original Phase 6 **FAIL** remains in the historical report. [Phase 6.2 retest](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [Original Phase 6 report](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 ## Product vision
 
 VerbaTrail aims to adapt practice to a learner’s goals, evidence about their current abilities, and available time. It will combine useful input, practice, communication, feedback, and review. IELTS Overall Band 8.0 is the first concrete target scenario; the broader goal is language understanding, communication, and use across contexts.
 
-The product relationship is planned as follows. Except for the implemented Reading and learning flows listed below, a unified learner model, personalized planner, and cross-skill Agent strategy remain planned capabilities.
+VerbaTrail has three product areas: **Learn / Discover / Adapt**. Learn covers the four IELTS skills. Discover will provide external resources with clear usage rights, and Adapt will personalize learning plans and decisions. Learner goals, vocabulary, grammar, Error DNA, transfer, review, learning history, and assessment are shared across skills.
 
 ```mermaid
 flowchart LR
@@ -37,8 +37,8 @@ flowchart LR
 | --- | --- |
 | IELTS Reading | **Implemented in a limited scope:** original Academic and General Training materials, TFNG flows, and Matching Headings group answers with item-level evaluation. This is not full Reading question-type coverage. |
 | Feedback and Error DNA | **Partially implemented:** candidate hypotheses, evidence, discriminating follow-up, and targeted practice for specific Reading paths. These are supported by server-side rules; they are not validated real-model teaching or a language-wide learner profile. |
-| Transfer and review | **First cycle implemented with a quality blocker:** Matching Headings independent transfer and first delayed review have server records. Phase 6 found incorrect answer evidence in legacy content versions; validity labeling and state recalculation for historical evidence remain unfinished. See the [final acceptance report](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md). |
-| Learning history and profile | **Basic capability implemented:** displays existing server-side sessions, knowledge states, transfer and review records. The legacy evidence issue means not every old state can be treated as accurate. |
+| Transfer and review | Matching Headings independent transfer and first delayed review use server records. Historical evidence labeling and state reconciliation passed isolated retesting. |
+| Learning history and profile | Displays server-side sessions, knowledge states, transfer, review, historical evidence validity, and revalidation when available. |
 | Dual-theme interface | **Implemented:** one React app supports Premium Academic and Noir & Champagne. |
 | Listening, Writing, Speaking | **Planned:** complete learning flows have not been delivered. |
 | Vocabulary, Grammar, comprehension and expression practice | **Planned:** there is no unified cross-skill ability model or complete training system yet. |
@@ -48,7 +48,7 @@ flowchart LR
 
 ### Themes and product captures
 
-These are genuine browser captures from an earlier isolated IELTS-1 acceptance run. They show the home and Reading interface at that time; they do not imply that IELTS-2B.1 Phase 6 passed or that all current capabilities are complete.
+These browser captures show the home and Reading interface from the earlier isolated IELTS-1 acceptance run. [Current Learn V1.1 captures](docs/development/learn-v1.1-browser-evidence/README.md)
 
 <table>
   <tr>
@@ -60,7 +60,7 @@ These are genuine browser captures from an earlier isolated IELTS-1 acceptance r
   </tr>
 </table>
 
-[IELTS-2B.1 Phase 6 captures and acceptance limits](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md) · [Earlier browser evidence index](docs/development/consolidation-browser-evidence/README.md) · [Dual-theme visual review](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+[IELTS-2B.1 Phase 6.2 retest](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [Earlier browser evidence index](docs/development/consolidation-browser-evidence/README.md) · [Dual-theme visual review](docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
 
 ## Architecture
 
@@ -122,7 +122,7 @@ npm run typecheck
 npm run build
 ```
 
-The IELTS-2B.1 Phase 6 regression run recorded **159 backend tests passed** and **47 frontend tests passed**; TypeScript checks, production build, a single Alembic head, isolated HTTP flows, and Chrome browser scripts also passed. **Passing engineering checks do not change the comprehensive acceptance result of FAIL:** historical transfer/review evidence still lacks a trust marker and recalculation path. Tests use rules and FakeModelProvider; they do not validate real-model quality, external expert review, production security, or complete IELTS coverage.
+The IELTS-2B.1 Phase 6.2 retest passed **166 backend tests** and **48 frontend tests**. TypeScript checks, the production build, a single Alembic head, isolated HTTP flows, and Chrome regression checks also passed. Deployment database reconciliation, independent editorial review, and production release assessment remain pending. [Phase 6.2 scope and limitations](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md)
 
 The current trust boundary is local, single-user development: `learner_id` is a filter, not authentication. The project does not provide production-grade account authentication or tenant isolation. No open-source license is declared; redistribution rights should not be assumed.
 
@@ -132,6 +132,6 @@ The current trust boundary is local, single-user development: `learner_id` is a 
 - [Product requirements](docs/product/PRD.md): current scope, capability status, and product boundaries.
 - [Current architecture](docs/architecture/CURRENT_ARCHITECTURE.md) · [Target architecture](docs/architecture/ARCHITECTURE.md)
 - [Development roadmap](docs/development/ROADMAP.md) · [Windows quick start](docs/development/QUICKSTART.md)
-- [IELTS-2B.1 Phase 6 final acceptance](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md): current FAIL reason, fixes, evidence, and outstanding work.
+- [IELTS-2B.1 Phase 6.2 retest](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [Historical Phase 6 FAIL report](docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 The roadmap starts with trust labels and recalculation for historical evidence, then builds a language ability model, initial assessment, and personalized planning. It next expands across skills, long-term memory and transfer, before evaluating additional languages and more capable teaching systems.

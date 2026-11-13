@@ -1,6 +1,6 @@
 # VerbaTrail 产品方向
 
-更新日期：2026-11-12。文件名因早期 IELTS 项目沿用；本文件现描述 VerbaTrail 的整体产品方向。历史 IELTS 规划和验收记录保留原样，见 `docs/archive/`、`docs/ielts-0-baseline/` 与阶段验收文档。
+更新日期：2026-11-13。文件名沿用早期 IELTS 项目。本文件描述 VerbaTrail 的整体产品方向。
 
 ## 愿景与首个目标场景
 
@@ -8,9 +8,15 @@ VerbaTrail 是以学习者为中心、由自适应学习 Agent 驱动的语言�
 
 首个明确目标场景是 **IELTS Overall Band 8.0**。这是学习者可设定的备考目标，不代表当前水平，不是分数预测，也不是成绩保证。长期愿景超越考试题目：帮助学习者真正掌握一门语言。
 
-当前产品范围仍然有限：只实现部分英语 IELTS Reading 工作流和配套的诊断、训练、迁移、首轮复习能力。完整四科、统一语言能力评估、跨技能个性化计划、真实模型教学质量均未完成或未验证。
+Learn V1.1 提供四项技能入口。当前可练习的范围包括部分 IELTS Reading 工作流及配套的诊断、训练、迁移和首轮复习。统一语言能力评估、跨技能个性化计划和真实模型教学质量仍待建设或验证。
 
 ## 产品关系
+
+- **Learn（学习）** 提供 Listening（听力）、Speaking（口语）、Reading（阅读）、Writing（写作）四个一级板块。Reading 接入现有练习，其他三项提供规划详情页。
+- **Discover（发现）** 将为学习活动提供有明确来源和许可的外部资源，当前为规划中。
+- **Adapt（自适应）** 将利用学习者目标、能力证据和学习历史做个性化规划与决策，当前为规划中。
+
+词汇、语法、Error DNA、迁移、复习、学习历史与能力评估是跨技能共享能力。学习者目标、能力证据与学习历史由共享服务管理。
 
 ```mermaid
 flowchart LR
@@ -40,7 +46,7 @@ flowchart LR
 | Language Output | 写作、口语和真实交流表达 | 未实现完整学习流程 |
 | Adaptive Agent | 基于状态与证据选择下一项合适活动，并能解释依据和不确定性 | 已有受约束的后端诊断/派题流程；未有经过验证的跨技能自适应教学 Agent |
 | Error DNA | 整理错误观察、候选原因、支持/反证与后续验证 | 已在部分 TFNG 与 Matching Headings 流程中实现；质量边界见 Phase 6 验收 |
-| Memory & Review | 复习排程、到期任务、延迟证据与长期记忆追踪 | ReviewItem 与首轮延迟复习路径已有实现；历史旧版证据尚需可信度处理，多轮保持未建立 |
+| Memory & Review | 复习排程、到期任务、延迟证据与长期记忆追踪 | ReviewItem 与首轮延迟复习路径已有实现，历史证据有效性协调已在隔离库复验，多轮保持待验证 |
 | Transfer | 在新材料、新语境中检查能力能否迁移 | 部分 Reading 路径已有独立迁移；不等于稳定掌握 |
 | Progress & Goals | 显示目标、真实进展、证据来源和未知能力 | 已有考试目标与档案基础；没有校准 Band 估分或完整四科能力追踪 |
 
@@ -58,14 +64,13 @@ flowchart LR
 
 - Academic 与 General Training 是当前可用考试模式，但阅读内容规模有限。
 - TFNG 与 Matching Headings 有部分服务端流程；Matching Headings 有原创题组、结构化作答、逐项评价、诊断、训练、独立迁移和首轮延迟复习实现。
-- **IELTS-2B.1 Phase 6 综合验收为 FAIL。** Phase 4 早期版本的部分迁移/复习标题答案与文章不匹配。新版本已更正，并阻止受影响旧版本继续创建新的迁移/保持证据；但已有旧记录还没有有效性标记和知识状态重算流程。见 [`IELTS_2B1_FINAL_ACCEPTANCE.md`](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)。
-- 旧版历史记录仍可读；在有效性重算完成前，不能把旧状态当作已确认的真实能力。
-- Listening、Writing、Speaking、完整 Reading 题型、Vocabulary、Grammar、Mock Tests、UKVI、Life Skills 和多语言教学尚未实现。
+- **IELTS-2B.1 Phase 6.2 最终工程验收为 PASS WITH LIMITATIONS。** 证据有效性登记、状态协调及重新验证已通过隔离复验，正式库尚未执行协调，独立内容审校和生产发布评估仍待完成。原 Phase 6 FAIL 记录继续保留。[Phase 6.2 复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)
+- Listening、Speaking、Writing 当前提供规划页。完整 Reading 题型、词汇语法课程、模考、UKVI、Life Skills 和多语言教学尚未实现。
 - FakeModelProvider 与规则诊断只支持隔离开发和流程验证，不能证明真实模型或产品级个性化有效。
 
 ## 规划原则
 
-- 先解决证据可信度和状态重算，再扩展学习能力。
+- 扩展学习能力时继续沿用可追溯的证据有效性处理和状态重算机制。
 - 内容包有独立 ID、版本、来源/授权和答案依据；新内容需单独审校。
 - 扩展其他语言时，将通用学习模型与 IELTS 考试规范分层；当前不宣称已支持其他语言。
 - UKVI 与 Life Skills 必须采用适合各自考试目标的独立目录与流程，不把 Life Skills Band 化，也不虚构与基础 IELTS 不同的题型。

@@ -13,6 +13,8 @@ const traffic = new Map();
 const checks = {};
 const shots = [];
 const browserErrors = [];
+const learnConsoleErrors = [];
+let checkingLearn = false;
 let sequence = 0;
 let heldResponse;
 let heldRestore;
@@ -36,6 +38,12 @@ socket.onmessage = ({ data }) => {
   }
   const p = message.params;
   if (message.method === 'Runtime.exceptionThrown') browserErrors.push(p.exceptionDetails.text);
+  if (message.method === 'Runtime.consoleAPICalled' && p.type === 'error') {
+    browserErrors.push(p.args.map(arg => arg.description ?? arg.value).join(' '));
+  }
+  if (checkingLearn && message.method === 'Log.entryAdded' && p.entry.level === 'error') {
+    learnConsoleErrors.push({ message: p.entry.text, url: p.entry.url });
+  }
   if (message.method === 'Fetch.requestPaused') {
     if (restoreTarget && p.request.method === 'GET' && p.request.url.endsWith(restoreTarget)) {
       heldRestore = p.requestId;
@@ -151,7 +159,7 @@ const start = async (variant, matching = true) => {
     return true;
   })()`), 'exam choice');
   await wait(() => evaluate(`[...document.querySelectorAll('.exam-choice')].some(b => b.getAttribute('aria-pressed') === 'true' && b.textContent.includes(${js(variant === 'academic' ? 'Academic' : 'General Training')}))`), 'saved exam');
-  await press('学习', '.focus-nav-links');
+  await openReading();
   await wait(() => evaluate(`Boolean(document.querySelector('.wb-topic-option, .focus-session-meta'))`), 'reading catalog or restored session');
   if (await evaluate("Boolean(document.querySelector('.focus-session-meta'))")) await press('选择其他阅读任务');
   await wait(() => evaluate(`(() => {
@@ -244,6 +252,111 @@ const key = async (name, code) => {
   await send('Input.dispatchKeyEvent', { ...params, type: 'rawKeyDown' });
   await send('Input.dispatchKeyEvent', { ...params, type: 'keyUp' });
 };
+const openReading = async () => {
+  await wait(() => evaluate(`(() => {
+    const link = document.querySelector('.learn-skill-card[href="/learning"]');
+    if (!link) return false;
+    link.click();
+    return true;
+  })()`), 'Learn → Reading');
+  await wait(() => evaluate("location.pathname === '/learning' && Boolean(document.querySelector('.focus-reading-page'))"), 'real Reading workspace');
+};
+const touch = async selector => {
+  const point = await evaluate(`(() => {
+    const target = document.querySelector(${js(selector)});
+    target.scrollIntoView({block: 'center', behavior: 'instant'});
+    const {left, top, width, height} = target.getBoundingClientRect();
+    return {x: left + width / 2, y: top + height / 2};
+  })()`);
+  await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+  await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+};
+const verifyLearn = async () => {
+  checkingLearn = true;
+  await navigate('/');
+  await text('IELTS 学习中心');
+  await text('未评估');
+  const nav = await evaluate(`(() => {
+    const nav = document.querySelector('.focus-product-nav');
+    return {actions: [...nav.querySelectorAll('a,button')].map(item => item.textContent.trim()),
+      planned: [...nav.querySelectorAll('.focus-product-planned')].map(item => item.textContent.trim())};
+  })()`);
+  assert.deepEqual(nav, { actions: ['Learn'], planned: ['Discover规划中', 'Adapt规划中'] });
+  const cards = await evaluate(`[...document.querySelectorAll('a.learn-skill-card')].map(card => ({
+    skill: card.querySelector('h2').textContent, route: card.getAttribute('href'), status: card.querySelector('.focus-state-tag').textContent.trim()
+  }))`);
+  assert.deepEqual(cards, [
+    { skill: 'Listening', route: '/learn/listening', status: '规划中' },
+    { skill: 'Speaking', route: '/learn/speaking', status: '规划中' },
+    { skill: 'Reading', route: '/learning', status: '可练习' },
+    { skill: 'Writing', route: '/learn/writing', status: '规划中' },
+  ]);
+  for (const name of ['premium', 'noir']) {
+    await theme(name);
+    for (const [width, height, size] of [[1440, 1000, 'desktop'], [390, 844, 'mobile']]) {
+      await layout(width, height);
+      const geometry = await evaluate(`(() => ({
+        columns: getComputedStyle(document.querySelector('.learn-skill-grid')).gridTemplateColumns.split(' ').length,
+        targets: [...document.querySelectorAll('.focus-top-nav button, .learn-skill-card, .exam-choice')].map(element => {
+          const {width, height, left, right} = element.getBoundingClientRect();
+          return {width, height, left, right};
+        }),
+        lastCardBottom: document.querySelector('.learn-skill-card:last-child').getBoundingClientRect().bottom
+      }))()`);
+      assert.equal(geometry.columns, width === 390 ? 1 : 2);
+      assert.ok(geometry.lastCardBottom <= height, 'All four skills are visible in the first viewport');
+      if (width === 390) assert.ok(geometry.targets.every(target =>
+        target.width >= 44 && target.height >= 44 && target.left >= 0 && target.right <= width), js(geometry));
+      await capture(`learn-${name}-${size}`, 'body', width, height);
+    }
+  }
+  await theme('premium');
+  await layout(1440, 1000);
+  await evaluate("document.querySelector('.focus-mode-switch button:last-child').focus()");
+  for (const { skill } of cards) {
+    await key('Tab', 9);
+    assert.ok(await evaluate(`(() => {
+      const active = document.activeElement;
+      return active.matches('.learn-skill-card:focus-visible') && active.querySelector('h2').textContent === ${js(skill)} &&
+        getComputedStyle(active).outlineStyle === 'solid' && parseInt(getComputedStyle(active).outlineWidth, 10) >= 3;
+    })()`), `Visible keyboard focus on ${skill}`);
+  }
+  await capture('learn-keyboard-focus', 'body');
+  await key('Enter', 13);
+  await text('Writing · 写作');
+  assert.equal(await evaluate("document.activeElement.tagName"), 'H1');
+  assert.equal(await evaluate("location.pathname"), '/learn/writing');
+  await text('结构、语言与任务完成度反馈');
+  await capture('learn-writing-desktop', 'body');
+  await evaluate('history.back()');
+  await text('IELTS 学习中心');
+  await layout(390, 844);
+  await touch('.learn-skill-card[href="/learn/listening"]');
+  await text('Listening · 听力');
+  await text('音频片段与题目关联');
+  assert.equal(await evaluate("document.querySelector('main').querySelectorAll('audio, video, button, input').length"), 0);
+  await capture('learn-listening-mobile', 'body', 390, 844);
+  await touch('.learn-back-link');
+  await text('IELTS 学习中心');
+  await touch('.learn-skill-card[href="/learn/speaking"]');
+  await text('Speaking · 口语');
+  await send('Page.reload');
+  await text('录音与转写');
+  await text('表达反馈与 AI 口语评价');
+  assert.equal(await evaluate("document.querySelector('main').querySelectorAll('audio, video, button, input').length"), 0);
+  await theme('noir');
+  await capture('learn-speaking-mobile', 'body', 390, 844);
+  await touch('.learn-back-link');
+  await text('IELTS 学习中心');
+  await touch('.learn-skill-card[href="/learning"]');
+  await text('请先在 Learn 保存考试类型。');
+  assert.equal(await evaluate("location.pathname"), '/learning');
+  await navigate('/learn/reading');
+  await text('选择阅读任务');
+  assert.deepEqual(learnConsoleErrors, []);
+  checkingLearn = false;
+  return { nav, cards, keyboard: true, touch: true, consoleErrors: learnConsoleErrors };
+};
 const fillByKeyboard = async selections => {
   for (const [item, choice] of Object.entries(selections)) {
     const control = `[data-item-id="${item}"] select`;
@@ -263,6 +376,9 @@ try {
   await send('Page.enable');
   await send('Runtime.enable');
   await send('Network.enable');
+  await send('Log.enable');
+  await layout(1440, 1000);
+  checks.learn = await verifyLearn();
   await layout(1440, 1000);
   const a = await start('academic');
   await theme('premium');
@@ -294,6 +410,11 @@ try {
   await delay(100);
   await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await wait(() => evaluate("location.hash.includes('paragraph-')"), 'touch passage link');
+  await wait(() => evaluate(`(() => {
+    const paragraph = document.getElementById(location.hash.slice(1));
+    const nav = document.querySelector('.focus-top-nav');
+    return paragraph.getBoundingClientRect().top >= nav.getBoundingClientRect().bottom;
+  })()`), 'paragraph is visible below the sticky mobile navigation');
   await fillByKeyboard(privateFixtures.get((await assigned()).id));
   await capture('L-mobile-answer', '.mh-answer', 390, 844);
   await offline(true);

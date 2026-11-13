@@ -115,7 +115,7 @@
 
 @media (max-width: 760px) {
   .error-dna-grid, .error-dna-priority { grid-template-columns: minmax(0, 1fr); }
-  .error-dna { scroll-margin-top: 126px; }
+  .error-dna { scroll-margin-top: var(--focus-mobile-anchor-offset, 126px); }
 }
 @media (max-width: 490px) {
   .error-dna-priority { gap: 8px; margin-top: 12px; }
