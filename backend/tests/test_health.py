@@ -17,7 +17,7 @@ def test_health_endpoint_returns_expected_contract(client: TestClient) -> None:
     data = response.json()
 
     assert data["status"] == "ok"
-    assert data["service"] == "UnlearnLoop"
+    assert data["service"] == "VerbaTrail"
     assert data["version"] == "0.1.0"
     assert data["environment"] == "testing"
     assert data["stage"] == "stage-1-foundation"

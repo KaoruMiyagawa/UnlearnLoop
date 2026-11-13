@@ -1,0 +1,720 @@
+{
+  "pack_id": "verbatrail-tfng-diagnostic-v1",
+  "domain_code": "ielts_academic",
+  "topics": [
+    {
+      "id": "ielts-tfng-acad-reading-english",
+      "slug": "ielts-tfng-acad-reading-english",
+      "domain_code": "ielts_academic",
+      "title": "TFNG · evidence and logic",
+      "summary": "原创微型任务，分别检验原文定位与未提及/否定逻辑。",
+      "difficulty_level": 2,
+      "common_error_patterns": [
+        {
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "description": "候选原因，需独立证据验证。"
+        },
+        {
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "description": "候选原因，需独立证据验证。"
+        }
+      ],
+      "materials": [
+        {
+          "id": "ielts-tfng-acad-material-initial",
+          "title": "initial",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "The town library opens at nine on weekdays. Members may borrow six books.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-locate",
+          "title": "locate",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "[1] The museum opens at ten. [2] Backpacks must be left in lockers. [3] Tickets are sold online.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-logic",
+          "title": "logic",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "Relevant evidence: The research team measured water temperature in July. No other measurement dates are described.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-practice-logic",
+          "title": "practice-logic",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "The ferry runs every Monday. Tuesday services are not discussed.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-practice-location",
+          "title": "practice-location",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "[1] Classes begin at eight. [2] Registration closes on Friday. [3] Bring a pencil.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-transfer-logic",
+          "title": "transfer-logic",
+          "summary": "Original independent verification passage",
+          "content_body": "A survey recorded bicycle use in April. It says nothing about May.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-transfer-location",
+          "title": "transfer-location",
+          "summary": "Original independent verification passage",
+          "content_body": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-review-logic",
+          "title": "review-logic",
+          "summary": "Original independent verification passage",
+          "content_body": "A study reported that seals were observed in winter. It did not mention spring observations.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-material-review-location",
+          "title": "review-location",
+          "summary": "Original independent verification passage",
+          "content_body": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.",
+          "content_format": "markdown",
+          "version": 1
+        }
+      ],
+      "questions": [
+        {
+          "id": "ielts-tfng-acad-initial",
+          "material_id": "ielts-tfng-acad-material-initial",
+          "question_role": "initial",
+          "question_type": "multiple_choice",
+          "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "TRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "Only weekday opening is specified; Sunday opening is not stated.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "初始错误仅触发竞争假设",
+            "evidence_scope": "Only weekday opening is specified; Sunday opening is not stated.",
+            "candidate_error_mappings": [
+              {
+                "answer": "FALSE",
+                "error_code": "true_false_not_given",
+                "evidence_summary": "该选择与候选原因相容，但单题无法区分原因。"
+              },
+              {
+                "answer": "FALSE",
+                "error_code": "passage_location",
+                "evidence_summary": "该选择与候选原因相容，但单题无法区分原因。"
+              }
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-locate",
+          "material_id": "ielts-tfng-acad-material-locate",
+          "question_role": "diagnostic_followup",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence gives the rule about bags?",
+          "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 names backpacks and lockers.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "隔离定位能力：无需 TFNG 推断，只找相关句",
+            "evidence_scope": "Sentence 2 names backpacks and lockers.",
+            "target_error_codes": [
+              "passage_location"
+            ],
+            "discriminating_rationale": "先用新短文定位任务检验定位能力，避免把 TFNG 逻辑错误与定位错误混在一起。",
+            "diagnostic_evidence_mappings": [
+              {
+                "answer": "B",
+                "error_code": "passage_location",
+                "relation": "contradicts",
+                "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。"
+              },
+              {
+                "answer": "A",
+                "error_code": "passage_location",
+                "relation": "supports",
+                "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+              },
+              {
+                "answer": "C",
+                "error_code": "passage_location",
+                "relation": "supports",
+                "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+              }
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-logic",
+          "material_id": "ielts-tfng-acad-material-logic",
+          "question_role": "diagnostic_followup",
+          "question_type": "multiple_choice",
+          "prompt_text": "Statement: The team measured water temperature in December. Use only the supplied evidence.",
+          "context_snippet": "TRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "July measurement does not establish or deny December measurement.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "直接提供证据范围，减少定位负担，单独检验未提及与否定逻辑",
+            "evidence_scope": "July measurement does not establish or deny December measurement.",
+            "target_error_codes": [
+              "true_false_not_given"
+            ],
+            "discriminating_rationale": "直接给出相关证据，检验未提及与明确否定的逻辑区别；与前一道定位题合并判断。",
+            "diagnostic_evidence_mappings": [
+              {
+                "answer": "NOT GIVEN",
+                "error_code": "true_false_not_given",
+                "relation": "contradicts",
+                "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。"
+              },
+              {
+                "answer": "FALSE",
+                "error_code": "true_false_not_given",
+                "relation": "supports",
+                "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+              }
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-practice-logic",
+          "material_id": "ielts-tfng-acad-material-practice-logic",
+          "question_role": "targeted_practice",
+          "question_type": "multiple_choice",
+          "prompt_text": "The ferry does not run on Tuesday. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "TRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "Monday operation neither establishes nor denies Tuesday operation.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "练习识别没有提供的信息",
+            "evidence_scope": "Monday operation neither establishes nor denies Tuesday operation.",
+            "target_error_codes": [
+              "true_false_not_given"
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-practice-location",
+          "material_id": "ielts-tfng-acad-material-practice-location",
+          "question_role": "targeted_practice",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence gives the registration deadline?",
+          "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 specifies the registration deadline.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "练习按问题对象定位证据句",
+            "evidence_scope": "Sentence 2 specifies the registration deadline.",
+            "target_error_codes": [
+              "passage_location"
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-transfer-logic",
+          "material_id": "ielts-tfng-acad-material-transfer-logic",
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "Bicycle use decreased in May. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "A survey recorded bicycle use in April. It says nothing about May.\n\nTRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "The survey provides no May comparison.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "true_false_not_given"
+            ],
+            "evidence_scope": "The survey provides no May comparison.",
+            "purpose": "独立迁移验证"
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-transfer-location",
+          "material_id": "ielts-tfng-acad-material-transfer-location",
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence describes the preparation of samples?",
+          "context_snippet": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 describes drying the samples.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "passage_location"
+            ],
+            "evidence_scope": "Sentence 2 describes drying the samples.",
+            "purpose": "独立迁移验证"
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-review-logic",
+          "material_id": "ielts-tfng-acad-material-review-logic",
+          "question_role": "review",
+          "question_type": "multiple_choice",
+          "prompt_text": "Seals were absent in spring. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "A study reported that seals were observed in winter. It did not mention spring observations.\n\nTRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "Spring observations are not described.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "true_false_not_given"
+            ],
+            "evidence_scope": "Spring observations are not described.",
+            "purpose": "独立延迟复习"
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-acad-review-location",
+          "material_id": "ielts-tfng-acad-material-review-location",
+          "question_role": "review",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence tells when responses were entered?",
+          "context_snippet": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 states the entry day.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "passage_location"
+            ],
+            "evidence_scope": "Sentence 2 states the entry day.",
+            "purpose": "独立延迟复习"
+          },
+          "difficulty": 1,
+          "version": 1
+        }
+      ]
+    },
+    {
+      "id": "ielts-tfng-gt-reading-english",
+      "slug": "ielts-tfng-gt-reading-english",
+      "domain_code": "ielts_general_training",
+      "title": "TFNG · evidence and logic",
+      "summary": "原创微型任务，分别检验原文定位与未提及/否定逻辑。",
+      "difficulty_level": 2,
+      "common_error_patterns": [
+        {
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "description": "候选原因，需独立证据验证。"
+        },
+        {
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "description": "候选原因，需独立证据验证。"
+        }
+      ],
+      "materials": [
+        {
+          "id": "ielts-tfng-gt-material-initial",
+          "title": "initial",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "The town library opens at nine on weekdays. Members may borrow six books.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-locate",
+          "title": "locate",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "[1] The museum opens at ten. [2] Backpacks must be left in lockers. [3] Tickets are sold online.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-logic",
+          "title": "logic",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "Relevant evidence: The research team measured water temperature in July. No other measurement dates are described.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-practice-logic",
+          "title": "practice-logic",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "The ferry runs every Monday. Tuesday services are not discussed.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-practice-location",
+          "title": "practice-location",
+          "summary": "Original diagnostic micro-passage",
+          "content_body": "[1] Classes begin at eight. [2] Registration closes on Friday. [3] Bring a pencil.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-transfer-logic",
+          "title": "transfer-logic",
+          "summary": "Original independent verification passage",
+          "content_body": "The community pool offers lessons on Saturdays. Its notice does not discuss Sunday lessons.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-transfer-location",
+          "title": "transfer-location",
+          "summary": "Original independent verification passage",
+          "content_body": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-review-logic",
+          "title": "review-logic",
+          "summary": "Original independent verification passage",
+          "content_body": "The market sells flowers on Fridays. The notice gives no information about flowers on Mondays.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-material-review-location",
+          "title": "review-location",
+          "summary": "Original independent verification passage",
+          "content_body": "[1] The event begins at noon. [2] Guests collect badges at the front desk. [3] Lunch is served upstairs.",
+          "content_format": "markdown",
+          "version": 1
+        }
+      ],
+      "questions": [
+        {
+          "id": "ielts-tfng-gt-initial",
+          "material_id": "ielts-tfng-gt-material-initial",
+          "question_role": "initial",
+          "question_type": "multiple_choice",
+          "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "TRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "Only weekday opening is specified; Sunday opening is not stated.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "初始错误仅触发竞争假设",
+            "evidence_scope": "Only weekday opening is specified; Sunday opening is not stated.",
+            "candidate_error_mappings": [
+              {
+                "answer": "FALSE",
+                "error_code": "true_false_not_given",
+                "evidence_summary": "该选择与候选原因相容，但单题无法区分原因。"
+              },
+              {
+                "answer": "FALSE",
+                "error_code": "passage_location",
+                "evidence_summary": "该选择与候选原因相容，但单题无法区分原因。"
+              }
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-locate",
+          "material_id": "ielts-tfng-gt-material-locate",
+          "question_role": "diagnostic_followup",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence gives the rule about bags?",
+          "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 names backpacks and lockers.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "隔离定位能力：无需 TFNG 推断，只找相关句",
+            "evidence_scope": "Sentence 2 names backpacks and lockers.",
+            "target_error_codes": [
+              "passage_location"
+            ],
+            "discriminating_rationale": "先用新短文定位任务检验定位能力，避免把 TFNG 逻辑错误与定位错误混在一起。",
+            "diagnostic_evidence_mappings": [
+              {
+                "answer": "B",
+                "error_code": "passage_location",
+                "relation": "contradicts",
+                "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。"
+              },
+              {
+                "answer": "A",
+                "error_code": "passage_location",
+                "relation": "supports",
+                "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+              },
+              {
+                "answer": "C",
+                "error_code": "passage_location",
+                "relation": "supports",
+                "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+              }
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-logic",
+          "material_id": "ielts-tfng-gt-material-logic",
+          "question_role": "diagnostic_followup",
+          "question_type": "multiple_choice",
+          "prompt_text": "Statement: The team measured water temperature in December. Use only the supplied evidence.",
+          "context_snippet": "TRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "July measurement does not establish or deny December measurement.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "直接提供证据范围，减少定位负担，单独检验未提及与否定逻辑",
+            "evidence_scope": "July measurement does not establish or deny December measurement.",
+            "target_error_codes": [
+              "true_false_not_given"
+            ],
+            "discriminating_rationale": "直接给出相关证据，检验未提及与明确否定的逻辑区别；与前一道定位题合并判断。",
+            "diagnostic_evidence_mappings": [
+              {
+                "answer": "NOT GIVEN",
+                "error_code": "true_false_not_given",
+                "relation": "contradicts",
+                "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。"
+              },
+              {
+                "answer": "FALSE",
+                "error_code": "true_false_not_given",
+                "relation": "supports",
+                "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+              }
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-practice-logic",
+          "material_id": "ielts-tfng-gt-material-practice-logic",
+          "question_role": "targeted_practice",
+          "question_type": "multiple_choice",
+          "prompt_text": "The ferry does not run on Tuesday. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "TRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "Monday operation neither establishes nor denies Tuesday operation.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "练习识别没有提供的信息",
+            "evidence_scope": "Monday operation neither establishes nor denies Tuesday operation.",
+            "target_error_codes": [
+              "true_false_not_given"
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-practice-location",
+          "material_id": "ielts-tfng-gt-material-practice-location",
+          "question_role": "targeted_practice",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence gives the registration deadline?",
+          "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 specifies the registration deadline.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_version": "reading-error-dna-v1",
+            "diagnostic_protocol": "tfng-v1",
+            "purpose": "练习按问题对象定位证据句",
+            "evidence_scope": "Sentence 2 specifies the registration deadline.",
+            "target_error_codes": [
+              "passage_location"
+            ]
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-transfer-logic",
+          "material_id": "ielts-tfng-gt-material-transfer-logic",
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "The pool offers no lessons on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "The community pool offers lessons on Saturdays. Its notice does not discuss Sunday lessons.\n\nTRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "Sunday lessons are not mentioned.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "true_false_not_given"
+            ],
+            "evidence_scope": "Sunday lessons are not mentioned.",
+            "purpose": "独立迁移验证"
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-transfer-location",
+          "material_id": "ielts-tfng-gt-material-transfer-location",
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence explains what to bring?",
+          "context_snippet": "[1] The clinic opens at eight. [2] Bring your appointment letter to reception. [3] The car park closes at six.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 asks for the appointment letter.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "passage_location"
+            ],
+            "evidence_scope": "Sentence 2 asks for the appointment letter.",
+            "purpose": "独立迁移验证"
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-review-logic",
+          "material_id": "ielts-tfng-gt-material-review-logic",
+          "question_role": "review",
+          "question_type": "multiple_choice",
+          "prompt_text": "The market never sells flowers on Mondays. Choose TRUE, FALSE or NOT GIVEN.",
+          "context_snippet": "The market sells flowers on Fridays. The notice gives no information about flowers on Mondays.\n\nTRUE / FALSE / NOT GIVEN",
+          "standard_answer": "NOT GIVEN",
+          "answer_explanation": "The notice does not describe Monday flower sales.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "NOT GIVEN"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "true_false_not_given"
+            ],
+            "evidence_scope": "The notice does not describe Monday flower sales.",
+            "purpose": "独立延迟复习"
+          },
+          "difficulty": 1,
+          "version": 1
+        },
+        {
+          "id": "ielts-tfng-gt-review-location",
+          "material_id": "ielts-tfng-gt-material-review-location",
+          "question_role": "review",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence tells guests where to collect badges?",
+          "context_snippet": "[1] The event begins at noon. [2] Guests collect badges at the front desk. [3] Lunch is served upstairs.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "standard_answer": "B",
+          "answer_explanation": "Sentence 2 identifies the front desk.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "diagnostic_protocol": "tfng-v1",
+            "diagnostic_version": "reading-error-dna-v1",
+            "target_error_codes": [
+              "passage_location"
+            ],
+            "evidence_scope": "Sentence 2 identifies the front desk.",
+            "purpose": "独立延迟复习"
+          },
+          "difficulty": 1,
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

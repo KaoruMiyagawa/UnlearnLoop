@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UnlearnLoop — 从错误中学习，验证真实理解</title>
+    <script>
+      try { document.documentElement.dataset.theme = localStorage.getItem('verbatrail.design.theme') === 'noir' ? 'noir' : 'premium'; }
+      catch (_) { document.documentElement.dataset.theme = 'premium'; }
+    </script>
+    <title>VerbaTrail — 从错误中学习，验证真实理解</title>
   </head>
   <body class="bg-surface-page text-text-primary antialiased">
     <div id="root"></div>

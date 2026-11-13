@@ -1,0 +1,27 @@
+{
+  "environment": {
+    "browser": "Headless Chrome via Chrome DevTools Protocol",
+    "frontend": "http://127.0.0.1:19242",
+    "backend": "http://127.0.0.1:19241",
+    "database": "D:/Temp/verbatrail-consolidation-smoke-20261110.sqlite",
+    "modelProvider": "fake",
+    "remoteModelCalls": false
+  },
+  "desktop": {
+    "homePremium": "PASS: route /, theme premium, VerbaTrail title and branding visible",
+    "homeNoir": "PASS: route unchanged, data-theme noir and localStorage key persisted",
+    "academicSession": "PASS: previously active Academic reading session restored with question and passage",
+    "themeOnReading": "PASS: theme toggled while reading session and question remained visible",
+    "generalTraining": "PASS: IELTS General Training selected; separate General Training Reading task created with Library Notice passage and task-specific question"
+  },
+  "mobile390": {
+    "homePremium": { "viewport": 390, "documentWidth": 390, "horizontalOverflow": false },
+    "homeNoir": { "viewport": 390, "documentWidth": 390, "horizontalOverflow": false },
+    "readingPremium": { "viewport": 390, "documentWidth": 390, "horizontalOverflow": false, "passageVisible": true },
+    "readingNoir": { "viewport": 390, "documentWidth": 390, "horizontalOverflow": false, "passageVisible": true }
+  },
+  "limitations": [
+    "The browser smoke opened and inspected both reading sessions; it did not submit an answer or run an end-to-end diagnosis in this pass.",
+    "MODEL_PROVIDER=fake was used. This validates the application workflow only and is not evidence of real AI personalized diagnosis."
+  ]
+}

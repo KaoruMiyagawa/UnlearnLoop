@@ -1,0 +1,1099 @@
+[
+  {
+    "method": "put",
+    "url": "/api/v1/profile/exam-preparation",
+    "request": {
+      "exam_variant": "academic"
+    },
+    "status": 200,
+    "response": {
+      "learner_id": "default_learner",
+      "selection_persisted": true,
+      "exam_variant": "academic",
+      "selection_status": "available",
+      "goal_type": "band",
+      "target_overall_band": 8.0,
+      "target_skill_bands": {
+        "listening": 8.0,
+        "reading": 8.0,
+        "writing": 8.0,
+        "speaking": 8.0
+      },
+      "target_outcome": null,
+      "exam_date": null,
+      "actual_level_status": "not_assessed",
+      "current_skill_bands": {
+        "listening": null,
+        "reading": null,
+        "writing": null,
+        "speaking": null
+      },
+      "spec_version": "ielts-spec-catalog-2026-03"
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions",
+    "request": {
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "exam_variant": "academic"
+    },
+    "status": 201,
+    "response": {
+      "id": "sess_406487bd97fb4025",
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "learner_id": "default_learner",
+      "exam_variant": "academic",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "active",
+      "knowledge_state_status": null,
+      "topic_mastered": false,
+      "current_question_id": "ielts-tfng-acad-initial",
+      "current_question": {
+        "id": "ielts-tfng-acad-initial",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-initial",
+        "parent_question_id": null,
+        "question_role": "initial",
+        "question_type": "multiple_choice",
+        "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "active_diagnostic_case_id": null,
+      "latest_attempt_result": null,
+      "can_dispatch_transfer": false,
+      "attempts_count": 0,
+      "started_at": "2026-11-11T02:52:05.204832Z",
+      "updated_at": "2026-11-11T02:52:05.204835Z",
+      "completed_at": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-initial",
+      "submitted_answer": "FALSE",
+      "idempotency_key": "sess_406487bd97fb4025-initial"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_a86edbc542c04c4a",
+      "session_id": "sess_406487bd97fb4025",
+      "question_id": "ielts-tfng-acad-initial",
+      "question_role": "initial",
+      "is_correct": false,
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "next_action": "diagnose",
+      "next_question": {
+        "id": "ielts-tfng-acad-initial",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-initial",
+        "parent_question_id": null,
+        "question_role": "initial",
+        "question_type": "multiple_choice",
+        "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "knowledge_state_status": "needs_diagnosis",
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/hypotheses",
+    "request": null,
+    "status": 200,
+    "response": []
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/step",
+    "request": {
+      "idempotency_key": "sess_406487bd97fb4025-step0"
+    },
+    "status": 200,
+    "response": {
+      "session_id": "sess_406487bd97fb4025",
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "case_status": "question_selected",
+      "executed_tool": "select_diagnostic_followup",
+      "decision_reason": "TFNG v1 规则：先用新短文定位任务检验定位能力，避免把 TFNG 逻辑错误与定位错误混在一起。",
+      "selected_intervention": "ask_followup",
+      "selected_question_id": "ielts-tfng-acad-locate",
+      "next_question": {
+        "id": "ielts-tfng-acad-locate",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-locate",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence gives the rule about bags?",
+        "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "explanation_text": null,
+      "uncertainty_level": "insufficient_evidence",
+      "uncertainty_note": "微任务证据有限，原因尚未确认。",
+      "confidence_is_heuristic": true,
+      "followup_turns_used": 1,
+      "max_followup_turns": 2,
+      "tokens_used_in_case": 0,
+      "session_token_budget": 4096,
+      "model_provider_name": "rules:tfng-v1",
+      "is_mock_provider": false,
+      "execution_mode": "rules",
+      "degraded_mode": false,
+      "degradation_reason": null,
+      "knowledge_state_status": "needs_diagnosis",
+      "hypotheses": [
+        {
+          "id": "hyp_82ebee8c562d4bf2",
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "candidate",
+          "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+          "evidence_count": 1,
+          "evidence_links": [
+            {
+              "id": "evi_0e64a71503844300",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            }
+          ]
+        },
+        {
+          "id": "hyp_9e928dccbacd4145",
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "candidate",
+          "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+          "evidence_count": 1,
+          "evidence_links": [
+            {
+              "id": "evi_750509e00e0a448e",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-locate",
+      "submitted_answer": "A",
+      "idempotency_key": "sess_406487bd97fb4025-locate"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_1cc5fa2b57244a1c",
+      "session_id": "sess_406487bd97fb4025",
+      "question_id": "ielts-tfng-acad-locate",
+      "question_role": "diagnostic_followup",
+      "is_correct": false,
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "next_action": "diagnose_step",
+      "next_question": {
+        "id": "ielts-tfng-acad-locate",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-locate",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence gives the rule about bags?",
+        "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/step",
+    "request": {
+      "idempotency_key": "sess_406487bd97fb4025-step1"
+    },
+    "status": 200,
+    "response": {
+      "session_id": "sess_406487bd97fb4025",
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "case_status": "question_selected",
+      "executed_tool": "select_diagnostic_followup",
+      "decision_reason": "TFNG v1 规则：直接给出相关证据，检验未提及与明确否定的逻辑区别；与前一道定位题合并判断。",
+      "selected_intervention": "ask_followup",
+      "selected_question_id": "ielts-tfng-acad-logic",
+      "next_question": {
+        "id": "ielts-tfng-acad-logic",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-logic",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Statement: The team measured water temperature in December. Use only the supplied evidence.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "explanation_text": null,
+      "uncertainty_level": "insufficient_evidence",
+      "uncertainty_note": "微任务证据有限，原因尚未确认。",
+      "confidence_is_heuristic": true,
+      "followup_turns_used": 2,
+      "max_followup_turns": 2,
+      "tokens_used_in_case": 0,
+      "session_token_budget": 4096,
+      "model_provider_name": "rules:tfng-v1",
+      "is_mock_provider": false,
+      "execution_mode": "rules",
+      "degraded_mode": false,
+      "degradation_reason": null,
+      "knowledge_state_status": "needs_diagnosis",
+      "hypotheses": [
+        {
+          "id": "hyp_82ebee8c562d4bf2",
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "candidate",
+          "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+          "evidence_count": 1,
+          "evidence_links": [
+            {
+              "id": "evi_0e64a71503844300",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            }
+          ]
+        },
+        {
+          "id": "hyp_9e928dccbacd4145",
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "supported",
+          "missing_evidence_desc": "需要独立任务和更多证据验证。",
+          "evidence_count": 2,
+          "evidence_links": [
+            {
+              "id": "evi_750509e00e0a448e",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            },
+            {
+              "id": "evi_7d37b0c00dff4b5a",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-locate:v1:att_1cc5fa2b57244a1c",
+              "relation": "supports",
+              "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-logic",
+      "submitted_answer": "NOT GIVEN",
+      "idempotency_key": "sess_406487bd97fb4025-logic"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_5e463c70ab974f64",
+      "session_id": "sess_406487bd97fb4025",
+      "question_id": "ielts-tfng-acad-logic",
+      "question_role": "diagnostic_followup",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "diagnose_step",
+      "next_question": {
+        "id": "ielts-tfng-acad-logic",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-logic",
+        "parent_question_id": null,
+        "question_role": "diagnostic_followup",
+        "question_type": "multiple_choice",
+        "prompt_text": "Statement: The team measured water temperature in December. Use only the supplied evidence.",
+        "context_snippet": "TRUE / FALSE / NOT GIVEN",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/hypotheses",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "hyp_82ebee8c562d4bf2",
+        "diagnostic_case_id": "diag_62b8a8523f0849ba",
+        "error_code": "true_false_not_given",
+        "name": "未提及与否定的逻辑混淆",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "candidate",
+        "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+        "created_at": "2026-11-11T02:52:05.266998",
+        "updated_at": "2026-11-11T02:52:05.266999"
+      },
+      {
+        "id": "hyp_9e928dccbacd4145",
+        "diagnostic_case_id": "diag_62b8a8523f0849ba",
+        "error_code": "passage_location",
+        "name": "相关原文定位困难",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "supported",
+        "missing_evidence_desc": "需要独立任务和更多证据验证。",
+        "created_at": "2026-11-11T02:52:05.267518",
+        "updated_at": "2026-11-11T02:52:05.300658"
+      }
+    ]
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/evidence",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "evi_0e64a71503844300",
+        "hypothesis_id": "hyp_82ebee8c562d4bf2",
+        "attempt_id": "att_a86edbc542c04c4a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:05.268783"
+      },
+      {
+        "id": "evi_750509e00e0a448e",
+        "hypothesis_id": "hyp_9e928dccbacd4145",
+        "attempt_id": "att_a86edbc542c04c4a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:05.269492"
+      },
+      {
+        "id": "evi_7d37b0c00dff4b5a",
+        "hypothesis_id": "hyp_9e928dccbacd4145",
+        "attempt_id": "att_1cc5fa2b57244a1c",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-locate:v1:att_1cc5fa2b57244a1c",
+        "relation": "supports",
+        "summary": "本次独立微任务表现与该候选原因相容；尚未确认。",
+        "reliability_note": "版本化追问规则；证据仍需独立验证。",
+        "created_at": "2026-11-11T02:52:05.298953"
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/step",
+    "request": {
+      "idempotency_key": "sess_406487bd97fb4025-practice-step"
+    },
+    "status": 200,
+    "response": {
+      "session_id": "sess_406487bd97fb4025",
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "case_status": "intervention_selected",
+      "executed_tool": "assign_targeted_practice",
+      "decision_reason": "TFNG v1：passage_location 获得支持，另一原因被削弱；选择对应训练，仍不确认能力缺陷。",
+      "selected_intervention": "targeted_practice",
+      "selected_question_id": "ielts-tfng-acad-practice-location",
+      "next_question": {
+        "id": "ielts-tfng-acad-practice-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-practice-location",
+        "parent_question_id": null,
+        "question_role": "targeted_practice",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence gives the registration deadline?",
+        "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "explanation_text": null,
+      "uncertainty_level": "insufficient_evidence",
+      "uncertainty_note": "尚需独立验证；本阶段不评定长期掌握。",
+      "confidence_is_heuristic": true,
+      "followup_turns_used": 2,
+      "max_followup_turns": 2,
+      "tokens_used_in_case": 0,
+      "session_token_budget": 4096,
+      "model_provider_name": "rules:tfng-v1",
+      "is_mock_provider": false,
+      "execution_mode": "rules",
+      "degraded_mode": false,
+      "degradation_reason": null,
+      "knowledge_state_status": "needs_diagnosis",
+      "hypotheses": [
+        {
+          "id": "hyp_82ebee8c562d4bf2",
+          "error_code": "true_false_not_given",
+          "name": "未提及与否定的逻辑混淆",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "lowered",
+          "missing_evidence_desc": "需要独立任务和更多证据验证。",
+          "evidence_count": 2,
+          "evidence_links": [
+            {
+              "id": "evi_0e64a71503844300",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            },
+            {
+              "id": "evi_94b547d550cd4280",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-logic:v1:att_5e463c70ab974f64",
+              "relation": "contradicts",
+              "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。"
+            }
+          ]
+        },
+        {
+          "id": "hyp_9e928dccbacd4145",
+          "error_code": "passage_location",
+          "name": "相关原文定位困难",
+          "heuristic_confidence": 0.35,
+          "confidence_is_heuristic": true,
+          "status": "supported",
+          "missing_evidence_desc": "需要独立任务和更多证据验证。",
+          "evidence_count": 2,
+          "evidence_links": [
+            {
+              "id": "evi_750509e00e0a448e",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+              "relation": "supports",
+              "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+            },
+            {
+              "id": "evi_7d37b0c00dff4b5a",
+              "source_type": "rule_check",
+              "source_ref": "reading-error-dna-v1:ielts-tfng-acad-locate:v1:att_1cc5fa2b57244a1c",
+              "relation": "supports",
+              "summary": "本次独立微任务表现与该候选原因相容；尚未确认。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/hypotheses",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "hyp_82ebee8c562d4bf2",
+        "diagnostic_case_id": "diag_62b8a8523f0849ba",
+        "error_code": "true_false_not_given",
+        "name": "未提及与否定的逻辑混淆",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "lowered",
+        "missing_evidence_desc": "需要独立任务和更多证据验证。",
+        "created_at": "2026-11-11T02:52:05.266998",
+        "updated_at": "2026-11-11T02:52:05.354700"
+      },
+      {
+        "id": "hyp_9e928dccbacd4145",
+        "diagnostic_case_id": "diag_62b8a8523f0849ba",
+        "error_code": "passage_location",
+        "name": "相关原文定位困难",
+        "description": "候选原因，需独立证据验证。",
+        "confidence": 0.35,
+        "status": "supported",
+        "missing_evidence_desc": "需要独立任务和更多证据验证。",
+        "created_at": "2026-11-11T02:52:05.267518",
+        "updated_at": "2026-11-11T02:52:05.300658"
+      }
+    ]
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/diagnoses/diag_62b8a8523f0849ba/evidence",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "evi_0e64a71503844300",
+        "hypothesis_id": "hyp_82ebee8c562d4bf2",
+        "attempt_id": "att_a86edbc542c04c4a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:05.268783"
+      },
+      {
+        "id": "evi_750509e00e0a448e",
+        "hypothesis_id": "hyp_9e928dccbacd4145",
+        "attempt_id": "att_a86edbc542c04c4a",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_a86edbc542c04c4a",
+        "relation": "supports",
+        "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。",
+        "reliability_note": "原题客观选项匹配；不是统计概率或确定诊断。",
+        "created_at": "2026-11-11T02:52:05.269492"
+      },
+      {
+        "id": "evi_7d37b0c00dff4b5a",
+        "hypothesis_id": "hyp_9e928dccbacd4145",
+        "attempt_id": "att_1cc5fa2b57244a1c",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-locate:v1:att_1cc5fa2b57244a1c",
+        "relation": "supports",
+        "summary": "本次独立微任务表现与该候选原因相容；尚未确认。",
+        "reliability_note": "版本化追问规则；证据仍需独立验证。",
+        "created_at": "2026-11-11T02:52:05.298953"
+      },
+      {
+        "id": "evi_94b547d550cd4280",
+        "hypothesis_id": "hyp_82ebee8c562d4bf2",
+        "attempt_id": "att_5e463c70ab974f64",
+        "source_type": "rule_check",
+        "source_ref": "reading-error-dna-v1:ielts-tfng-acad-logic:v1:att_5e463c70ab974f64",
+        "relation": "contradicts",
+        "summary": "本次独立微任务表现与该候选原因不一致；单题不能排除。",
+        "reliability_note": "版本化追问规则；证据仍需独立验证。",
+        "created_at": "2026-11-11T02:52:05.353298"
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-practice-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_406487bd97fb4025-practice"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_5ca7125fbd284621",
+      "session_id": "sess_406487bd97fb4025",
+      "question_id": "ielts-tfng-acad-practice-location",
+      "question_role": "targeted_practice",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "transfer_check",
+      "next_question": {
+        "id": "ielts-tfng-acad-transfer-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence describes the preparation of samples?",
+        "context_snippet": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "knowledge_state_status": "insufficient_evidence",
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-transfer-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_406487bd97fb4025-transfer"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_b4d6aecc8ce74bcc",
+      "session_id": "sess_406487bd97fb4025",
+      "question_id": "ielts-tfng-acad-transfer-location",
+      "question_role": "transfer_check",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "transfer_verified",
+      "next_question": {
+        "id": "ielts-tfng-acad-transfer-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence describes the preparation of samples?",
+        "context_snippet": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "knowledge_state_status": "transfer_verified",
+      "evaluation_source": "rule_check",
+      "mastery_note": "本次独立迁移验证通过；长期保持尚未验证。"
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-transfer-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_406487bd97fb4025-transfer"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_b4d6aecc8ce74bcc",
+      "session_id": "sess_406487bd97fb4025",
+      "question_id": "ielts-tfng-acad-transfer-location",
+      "question_role": "transfer_check",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "transfer_verified",
+      "next_question": {
+        "id": "ielts-tfng-acad-transfer-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence describes the preparation of samples?",
+        "context_snippet": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "knowledge_state_status": "transfer_verified",
+      "evaluation_source": "rule_check",
+      "mastery_note": "本次独立迁移验证通过；长期保持尚未验证。"
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/sessions/sess_406487bd97fb4025",
+    "request": null,
+    "status": 200,
+    "response": {
+      "id": "sess_406487bd97fb4025",
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "learner_id": "default_learner",
+      "exam_variant": "academic",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "transfer_checking",
+      "knowledge_state_status": "transfer_verified",
+      "topic_mastered": false,
+      "current_question_id": "ielts-tfng-acad-transfer-location",
+      "current_question": {
+        "id": "ielts-tfng-acad-transfer-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-transfer-location",
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence describes the preparation of samples?",
+        "context_snippet": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "active_diagnostic_case_id": "diag_62b8a8523f0849ba",
+      "latest_attempt_result": {
+        "attempt_id": "att_b4d6aecc8ce74bcc",
+        "session_id": "sess_406487bd97fb4025",
+        "question_id": "ielts-tfng-acad-transfer-location",
+        "question_role": "transfer_check",
+        "is_correct": true,
+        "evaluation_summary": "答案与本题设定的阅读证据相符。",
+        "feedback_text": "回答正确！",
+        "next_action": "transfer_verified",
+        "next_question": {
+          "id": "ielts-tfng-acad-transfer-location",
+          "topic_id": "ielts-tfng-acad-reading-english",
+          "material_id": "ielts-tfng-acad-material-transfer-location",
+          "parent_question_id": null,
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which sentence describes the preparation of samples?",
+          "context_snippet": "[1] Researchers sampled soil in June. [2] Samples were dried overnight. [3] Results were archived in August.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+          "difficulty": 1,
+          "version": 1
+        },
+        "diagnostic_case_id": "diag_62b8a8523f0849ba",
+        "knowledge_state_status": "transfer_verified",
+        "evaluation_source": "rule_check",
+        "mastery_note": "本次独立迁移验证通过；长期保持尚未验证。"
+      },
+      "can_dispatch_transfer": true,
+      "attempts_count": 5,
+      "started_at": "2026-11-11T02:52:05.204832",
+      "updated_at": "2026-11-11T02:52:05.384736",
+      "completed_at": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/reviews",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "rev_83c03b35f24540ec",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "topic_title": "TFNG · evidence and logic",
+        "session_id": "sess_406487bd97fb4025",
+        "learner_id": "default_learner",
+        "trigger_reason": "Independent transfer passed; schedule the first delayed retention check.",
+        "scheduled_for": "2026-11-12T00:00:00Z",
+        "status": "pending",
+        "created_at": "2026-11-11T02:52:05.403014Z",
+        "completed_at": null,
+        "review_stage": 0,
+        "review_session_id": null,
+        "question_id": null,
+        "current_question": null,
+        "review_question": null,
+        "attempt_id": null,
+        "is_correct": null,
+        "submitted_at": null,
+        "evaluation_summary": null,
+        "review_outcome": null,
+        "retention_verified": false,
+        "retention_eligible": true,
+        "decision_event_id": "evt_3dfb8966012b4234",
+        "knowledge_state_id": "kst_8d1fbfbe53934e5e",
+        "message": null,
+        "is_due": false
+      }
+    ]
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/reviews/rev_83c03b35f24540ec/start",
+    "request": null,
+    "status": 400,
+    "response": {
+      "code": "DOMAIN_RULE_VIOLATION",
+      "message": "This review task is not due yet.",
+      "request_id": "req_f7579fa95ac1"
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/reviews/rev_83c03b35f24540ec/complete",
+    "request": {},
+    "status": 400,
+    "response": {
+      "code": "DOMAIN_RULE_VIOLATION",
+      "message": "A review cannot be completed by acknowledgment alone. Start the due task and submit its assigned answer.",
+      "request_id": "req_89262ed97030"
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/reviews/rev_83c03b35f24540ec/start",
+    "request": null,
+    "status": 200,
+    "response": {
+      "id": "rev_83c03b35f24540ec",
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "session_id": "sess_406487bd97fb4025",
+      "learner_id": "default_learner",
+      "trigger_reason": "Independent transfer passed; schedule the first delayed retention check.",
+      "scheduled_for": "2026-11-12T00:00:00Z",
+      "status": "pending",
+      "created_at": "2026-11-11T02:52:05.403014Z",
+      "completed_at": null,
+      "review_stage": 0,
+      "review_session_id": "sess_ed1ff1e82e834baa",
+      "question_id": "ielts-tfng-acad-review-location",
+      "current_question": {
+        "id": "ielts-tfng-acad-review-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells when responses were entered?",
+        "context_snippet": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "review_question": {
+        "id": "ielts-tfng-acad-review-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells when responses were entered?",
+        "context_snippet": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "attempt_id": null,
+      "is_correct": null,
+      "submitted_at": null,
+      "evaluation_summary": null,
+      "review_outcome": null,
+      "retention_verified": false,
+      "retention_eligible": true,
+      "decision_event_id": "evt_3dfb8966012b4234",
+      "knowledge_state_id": "kst_8d1fbfbe53934e5e",
+      "message": "已派发服务端复习题；延迟保持需以提交作答后的评价为准。",
+      "is_due": true
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_ed1ff1e82e834baa/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-review-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_406487bd97fb4025-review"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_444bdd4b25014d96",
+      "session_id": "sess_ed1ff1e82e834baa",
+      "question_id": "ielts-tfng-acad-review-location",
+      "question_role": "review",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "delayed_retention_verified",
+      "next_question": {
+        "id": "ielts-tfng-acad-review-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells when responses were entered?",
+        "context_snippet": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": null,
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "post",
+    "url": "/api/v1/sessions/sess_ed1ff1e82e834baa/attempts",
+    "request": {
+      "question_id": "ielts-tfng-acad-review-location",
+      "submitted_answer": "B",
+      "idempotency_key": "sess_406487bd97fb4025-review"
+    },
+    "status": 201,
+    "response": {
+      "attempt_id": "att_444bdd4b25014d96",
+      "session_id": "sess_ed1ff1e82e834baa",
+      "question_id": "ielts-tfng-acad-review-location",
+      "question_role": "review",
+      "is_correct": true,
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "feedback_text": "回答正确！",
+      "next_action": "delayed_retention_verified",
+      "next_question": {
+        "id": "ielts-tfng-acad-review-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells when responses were entered?",
+        "context_snippet": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "diagnostic_case_id": null,
+      "knowledge_state_status": null,
+      "evaluation_source": "rule_check",
+      "mastery_note": null
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/reviews/rev_83c03b35f24540ec",
+    "request": null,
+    "status": 200,
+    "response": {
+      "id": "rev_83c03b35f24540ec",
+      "topic_id": "ielts-tfng-acad-reading-english",
+      "topic_title": "TFNG · evidence and logic",
+      "session_id": "sess_406487bd97fb4025",
+      "learner_id": "default_learner",
+      "trigger_reason": "Independent transfer passed; schedule the first delayed retention check.",
+      "scheduled_for": "2026-11-12T00:00:00Z",
+      "status": "completed",
+      "created_at": "2026-11-11T02:52:05.403014Z",
+      "completed_at": "2026-11-13T00:00:00Z",
+      "review_stage": 0,
+      "review_session_id": "sess_ed1ff1e82e834baa",
+      "question_id": "ielts-tfng-acad-review-location",
+      "current_question": null,
+      "review_question": {
+        "id": "ielts-tfng-acad-review-location",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "material_id": "ielts-tfng-acad-material-review-location",
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "multiple_choice",
+        "prompt_text": "Which sentence tells when responses were entered?",
+        "context_snippet": "[1] The survey used paper forms. [2] Volunteers entered responses on Monday. [3] The report was published in June.\n\nA. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+        "difficulty": 1,
+        "version": 1
+      },
+      "attempt_id": "att_444bdd4b25014d96",
+      "is_correct": true,
+      "submitted_at": "2026-11-13T00:00:00Z",
+      "evaluation_summary": "答案与本题设定的阅读证据相符。",
+      "review_outcome": "passed_delayed",
+      "retention_verified": true,
+      "retention_eligible": true,
+      "decision_event_id": "evt_fb240d9f688c4890",
+      "knowledge_state_id": "kst_8d1fbfbe53934e5e",
+      "message": null,
+      "is_due": false
+    }
+  },
+  {
+    "method": "get",
+    "url": "/api/v1/profile/knowledge-states",
+    "request": null,
+    "status": 200,
+    "response": [
+      {
+        "id": "kst_8d1fbfbe53934e5e",
+        "learner_id": "default_learner",
+        "topic_id": "ielts-tfng-acad-reading-english",
+        "topic_title": "TFNG · evidence and logic",
+        "topic_slug": "ielts-tfng-acad-reading-english",
+        "status": "transfer_verified",
+        "confidence_is_heuristic": true,
+        "unresolved_error_codes": [],
+        "transition_reason": "Passed independent fresh transfer verification 'ielts-tfng-acad-transfer-location'.",
+        "last_transfer_attempt_id": "att_b4d6aecc8ce74bcc",
+        "updated_at": "2026-11-11T02:52:05.401062",
+        "retention_status": "delayed_check_passed",
+        "retention_evidence_count": 1,
+        "last_reviewed_at": "2026-11-13T00:00:00Z",
+        "last_retention_verified_at": "2026-11-13T00:00:00Z",
+        "unresolved_error_reasons": []
+      }
+    ]
+  },
+  {
+    "database_evidence": {
+      "knowledge_status": "transfer_verified",
+      "last_transfer_attempt_id": "att_b4d6aecc8ce74bcc",
+      "attempts": [
+        {
+          "id": "att_a86edbc542c04c4a",
+          "question_id": "ielts-tfng-acad-initial",
+          "version": 1,
+          "correct": false
+        },
+        {
+          "id": "att_1cc5fa2b57244a1c",
+          "question_id": "ielts-tfng-acad-locate",
+          "version": 1,
+          "correct": false
+        },
+        {
+          "id": "att_5e463c70ab974f64",
+          "question_id": "ielts-tfng-acad-logic",
+          "version": 1,
+          "correct": true
+        },
+        {
+          "id": "att_5ca7125fbd284621",
+          "question_id": "ielts-tfng-acad-practice-location",
+          "version": 1,
+          "correct": true
+        },
+        {
+          "id": "att_b4d6aecc8ce74bcc",
+          "question_id": "ielts-tfng-acad-transfer-location",
+          "version": 1,
+          "correct": true
+        }
+      ],
+      "reviews": [
+        {
+          "id": "rev_83c03b35f24540ec",
+          "hypothesis_id": "hyp_9e928dccbacd4145",
+          "status": "completed",
+          "attempt_id": "att_444bdd4b25014d96",
+          "retention_verified": true,
+          "outcome": "passed_delayed"
+        },
+        {
+          "id": "rev_e4ffa0e4126c4f31",
+          "hypothesis_id": "hyp_9e928dccbacd4145",
+          "status": "pending",
+          "attempt_id": null,
+          "retention_verified": false,
+          "outcome": null
+        }
+      ]
+    }
+  }
+]

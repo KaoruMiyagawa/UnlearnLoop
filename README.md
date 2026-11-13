@@ -6,15 +6,15 @@
 
 **首个目标场景：IELTS Overall Band 8.0。** 这是学习目标，不是当前水平、分数预测或结果保证。长期愿景是帮助学习者真正掌握一门语言，而不只提高考试答题正确率。
 
-[English](README_EN.md) · [当前开发分支](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
+[English](README_EN.md) · [Learn / IELTS 开发基线](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
 
-> **当前状态：** IELTS Academic / General Training 的部分阅读学习、Matching Headings、错误反馈、针对性训练、独立迁移和首轮延迟复习已有实现。IELTS-2B.1 Phase 6 综合验收为 **FAIL**：已知旧版迁移/复习评分证据缺少有效性标记和学习状态重算机制。新内容版本已修正并阻止相关旧版本继续产生新验证，但历史记录的可信度处理尚未完成。当前开发分支的 Phase 4–6 修改仍在本地，未提交；该分支也未合并到 `main`。这不是生产发布。
+> **当前状态：** VerbaTrail 的顶层产品结构为 Learn / Discover / Adapt。Learn 提供 Listening / Speaking / Reading / Writing 四项技能。Reading 接入现有 Academic / General Training 练习，其他三项提供规划页。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**；原 Phase 6 **FAIL** 保留为历史记录。
 
 ## 产品愿景
 
 VerbaTrail 围绕学习者的目标、当前能力证据和可用时间，逐步安排适合的输入、练习、表达、反馈与复习。IELTS Overall 8.0 是首个明确目标场景；产品长期关注的是语言理解、交流和跨情境运用能力。
 
-目标产品关系如下。除下文标明已实现的 Reading 与学习流程外，统一学习者模型、个性化规划和跨技能 Agent 决策仍是规划能力。
+产品包含 **Learn / Discover / Adapt**。Learn 提供 Listening（听力）、Speaking（口语）、Reading（阅读）、Writing（写作）四个一级板块。Discover 提供合法外部学习资源，Adapt 负责个性化规划与决策，两者仍为规划中。词汇、语法、Error DNA、迁移、复习、学习历史与能力评估是跨技能共享能力。
 
 ```mermaid
 flowchart LR
@@ -37,10 +37,10 @@ flowchart LR
 | --- | --- |
 | IELTS Reading | **有限范围已实现：** Academic 与 General Training 的原创阅读内容、TFNG 流程及 Matching Headings 题组作答和逐项评价。不是完整 Reading 题型覆盖。 |
 | 反馈与 Error DNA | **部分实现：** 已有特定 Reading 路径的候选假设、证据、区分性追问和定向训练。状态由服务端规则流程支持；不代表真实模型教学效果或全语言学习者画像。 |
-| 迁移与复习 | **首轮流程已实现，但有质量阻断：** Matching Headings 独立迁移和首轮延迟复习有服务端记录。Phase 6 发现旧版题组答案依据有误，历史证据有效性标记与状态重算尚未完成，详见最终验收报告（本地报告尚未提交）。 |
-| 学习历史与档案 | **基础能力已实现：** 展示现有服务端会话、知识状态、迁移与复习记录；受上述历史证据问题影响，不能据此确认所有旧状态准确。 |
+| 迁移与复习 | Matching Headings 独立迁移和首轮延迟复习有服务端记录。历史证据标记与状态协调已通过隔离复验。 |
+| 学习历史与档案 | 展示服务端会话、知识状态、迁移与复习记录，以及历史证据有效性和重新验证入口。 |
 | 双主题界面 | **已实现：** 一套 React 应用支持 Premium Academic 与 Noir & Champagne。 |
-| Listening、Writing、Speaking | **规划中：** 尚未交付完整学习流程。 |
+| Listening、Speaking、Writing | 本轮提供规划页，音频、录音转写和写作评价尚未实现。 |
 | Vocabulary、Grammar、理解与表达训练 | **规划中：** 尚无统一跨技能能力模型和完整训练体系。 |
 | 学习者模型、个性化计划与自适应 Agent | **规划中：** 目前没有完整的初始能力评估或跨技能学习计划。 |
 | IELTS 模考、UKVI、Life Skills、其他语言 | **尚未实现：** 属于后续方向；当前产品只实现部分英语 IELTS 阅读场景。 |
@@ -60,7 +60,7 @@ flowchart LR
   </tr>
 </table>
 
-IELTS-2B.1 Phase 6 当前截图与验收边界（本地报告尚未提交） · [早期浏览器证据索引](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
+[Learn V1.1 截图](docs/development/learn-v1.1-browser-evidence/README.md) · [IELTS-2B.1 Phase 6.2 最终复验](docs/development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · 原 Phase 6 FAIL 报告见 `docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md` · [早期浏览器证据索引](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/consolidation-browser-evidence/README.md) · [双主题视觉评审](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/theme-visual-acceptance/VISUAL_REVIEW.md)
 
 ## 技术架构
 
@@ -122,7 +122,7 @@ npm run typecheck
 npm run build
 ```
 
-IELTS-2B.1 Phase 6 本轮完整回归记录为后端 **159 passed**、前端 **47 passed**，TypeScript 检查、Production build、Alembic 单一 head、隔离 HTTP 与 Chrome 浏览器脚本均通过。**工程门禁通过不改变综合验收 FAIL 结论：旧版迁移/复习证据尚无可信度标记及重算机制。**测试使用规则和 FakeModelProvider；没有证明真实模型质量、外部专家审校、生产安全或完整 IELTS 覆盖。
+IELTS-2B.1 Phase 6.2 工程复验通过 166 项后端测试、48 项前端测试、TypeScript 检查、Production build、隔离 HTTP 与 Chrome 浏览器回归。Learn V1.1 浏览器截图和验收记录见 [Learn V1.1 证据](docs/development/learn-v1.1-browser-evidence/README.md)。测试使用规则和 FakeModelProvider；没有证明真实模型质量、外部专家审校、生产安全或完整 IELTS 覆盖。
 
 当前身份边界为本地单用户开发：`learner_id` 是筛选字段，不是认证。项目没有生产级账号认证或多租户隔离。项目也未声明开源许可证，请勿据此假定再分发权利。
 

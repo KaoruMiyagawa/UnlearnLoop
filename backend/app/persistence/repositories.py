@@ -1,9 +1,10 @@
 """Repository and domain persistence operations enforcing Stage 2 invariants."""
 
 from datetime import datetime
+import hashlib
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.domain.enums import (
@@ -15,12 +16,15 @@ from app.domain.enums import (
     KnowledgeMasteryStatus,
     ModelCallStatus,
     QuestionRole,
+    QuestionType,
     ReviewStatus,
     SessionStatus,
     UncertaintyLevel,
 )
 from app.domain.exceptions import DomainRuleViolationError
 from app.domain.rules import (
+    transfer_context_key,
+    validate_transfer_entry,
     validate_confidence,
     validate_diagnostic_case_transition,
     validate_hypothesis_transition,
@@ -38,6 +42,8 @@ from app.persistence.models import (
     LearningSession,
     ModelCall,
     Question,
+    ReadingGroupVersion,
+    ReadingRuleVersion,
     ReviewItem,
     utc_now,
 )
@@ -48,6 +54,25 @@ class LearningRepository:
 
     def __init__(self, session: Session) -> None:
         self.session = session
+
+    @staticmethod
+    def _reading_material_fingerprint(question: Question) -> str | None:
+        if not question.material or not question.material.content_body.strip():
+            return None
+        normalized = " ".join(question.material.content_body.casefold().split())
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+    def _attempt_material_fingerprint(self, attempt: Attempt) -> str | None:
+        snapshot = attempt.question_snapshot_json or {}
+        return snapshot.get("material_fingerprint") or self._reading_material_fingerprint(attempt.question)
+
+    def _assigned_reading_materials(self, learner_id: str, topic_id: str, *, exclude_session_id: str | None = None) -> set[str | None]:
+        statement = select(Question).join(LearningSession, LearningSession.current_question_id == Question.id).where(
+            LearningSession.learner_id == learner_id, LearningSession.topic_id == topic_id,
+        )
+        if exclude_session_id is not None:
+            statement = statement.where(LearningSession.id != exclude_session_id)
+        return {self._reading_material_fingerprint(question) for question in self.session.scalars(statement)}
 
     # ------------------------------------------------------------------
     # Topics & Questions
@@ -137,6 +162,91 @@ class LearningRepository:
             stmt = stmt.where(ReviewItem.status == status)
         return list(self.session.scalars(stmt).all())
 
+    def get_review_item(self, review_id: str) -> ReviewItem | None:
+        return self.session.get(ReviewItem, review_id)
+
+    def get_review_item_for_session(self, review_session_id: str) -> ReviewItem | None:
+        return self.session.scalar(
+            select(ReviewItem).where(ReviewItem.review_session_id == review_session_id)
+        )
+
+    def cancel_pending_review_items(
+        self, *, learner_id: str, topic_id: str, except_schedule_key: str,
+    ) -> list[ReviewItem]:
+        items = self.session.scalars(
+            select(ReviewItem).where(
+                ReviewItem.learner_id == learner_id,
+                ReviewItem.topic_id == topic_id,
+                ReviewItem.status == ReviewStatus.PENDING.value,
+                or_(ReviewItem.schedule_key.is_(None), ReviewItem.schedule_key != except_schedule_key),
+            )
+        ).all()
+        for item in items:
+            item.status = ReviewStatus.CANCELLED.value
+            item.review_outcome = "superseded_by_new_independent_transfer"
+        self.session.flush()
+        return list(items)
+
+    def next_review_question(self, item: ReviewItem) -> Question | None:
+        """Choose an unattempted review question with a context unseen by this learner."""
+        candidates = self.session.scalars(
+            select(Question)
+            .where(
+                Question.topic_id == item.topic_id,
+                Question.question_role == QuestionRole.REVIEW.value,
+            )
+            .order_by(Question.difficulty, Question.id)
+        ).all()
+        if item.hypothesis_id:
+            hypothesis = self.session.get(Hypothesis, item.hypothesis_id)
+        else:
+            hypothesis = None
+        if (hypothesis and (hypothesis.diagnostic_case.trigger_attempt.question_snapshot_json or {})
+                .get('diagnostic_protocol') == 'tfng-v1'):
+            state = self.session.get(KnowledgeState, item.knowledge_state_id) if item.knowledge_state_id else None
+            event = self.session.get(DecisionEvent, item.decision_event_id) if item.decision_event_id else None
+            trigger_id = (event.payload_json or {}).get('trigger_attempt_id') if event else None
+            trigger = self.session.get(Attempt, trigger_id) if trigger_id else None
+            if trigger is None and state and state.last_transfer_attempt_id:
+                trigger = self.session.get(Attempt, state.last_transfer_attempt_id)
+            version = (trigger.question_snapshot_json or {}).get('diagnostic_version') if trigger else None
+            candidates = [q for q in candidates if hypothesis is not None and
+                          version is not None and
+                          (q.evaluation_rubric or {}).get('diagnostic_protocol') == 'tfng-v1' and
+                          (q.evaluation_rubric or {}).get('diagnostic_version') == version and
+                          (q.evaluation_rubric or {}).get('target_error_codes') == [hypothesis.error_code]]
+        prior_attempts = self.session.scalars(
+            select(Attempt)
+            .join(LearningSession, Attempt.session_id == LearningSession.id)
+            .where(
+                LearningSession.learner_id == item.learner_id,
+                LearningSession.topic_id == item.topic_id,
+                Attempt.evaluation_status == AttemptEvaluationStatus.EVALUATED.value,
+            )
+        ).all()
+        seen_ids = {attempt.question_id for attempt in prior_attempts}
+        seen_contexts = {
+            transfer_context_key(
+                str(attempt.question_snapshot_json.get("prompt_text", attempt.question.prompt_text)),
+                attempt.question_snapshot_json.get("context_snippet", attempt.question.context_snippet),
+            )
+            for attempt in prior_attempts
+        }
+        is_reading = item.topic.domain_code in {"ielts_academic", "ielts_general_training"}
+        seen_materials = {self._attempt_material_fingerprint(attempt) for attempt in prior_attempts} if is_reading else set()
+        if is_reading:
+            seen_materials.update(self._assigned_reading_materials(item.learner_id, item.topic_id))
+        return next(
+            (
+                question for question in candidates
+                if question.id not in seen_ids
+                and transfer_context_key(question.prompt_text, question.context_snippet) not in seen_contexts
+                and (not is_reading or (None not in seen_materials and self._reading_material_fingerprint(question) is not None
+                     and self._reading_material_fingerprint(question) not in seen_materials))
+            ),
+            None,
+        )
+
     def complete_review_item(
         self,
         review_id: str,
@@ -146,11 +256,9 @@ class LearningRepository:
         item = self.session.get(ReviewItem, review_id)
         if item is None:
             raise DomainRuleViolationError(f"ReviewItem '{review_id}' not found.")
-        item.status = ReviewStatus.COMPLETED.value
-        item.completed_at = utc_now()
-        item.review_notes = review_notes
-        self.session.flush()
-        return item
+        raise DomainRuleViolationError(
+            "Review completion requires a server-assigned question and evaluated learner attempt."
+        )
 
     def get_knowledge_state(
         self,
@@ -184,6 +292,9 @@ class LearningRepository:
         topic_id: str,
         learner_id: str = "local_default_learner",
         current_question_id: str | None = None,
+        status: SessionStatus | str = SessionStatus.ACTIVE,
+        exam_variant: str | None = None,
+        exam_spec_version: str | None = None,
     ) -> LearningSession:
         topic = self.session.get(KnowledgeTopic, topic_id)
         if topic is None:
@@ -200,7 +311,9 @@ class LearningRepository:
             learner_id=learner_id,
             topic_id=topic_id,
             current_question_id=current_question_id,
-            status=SessionStatus.ACTIVE.value,
+            status=SessionStatus(status).value,
+            exam_variant=exam_variant,
+            exam_spec_version=exam_spec_version,
         )
         self.session.add(learning_session)
         self.session.flush()
@@ -219,6 +332,81 @@ class LearningRepository:
         self.session.flush()
         return learning_session
 
+    def latest_diagnostic_case(self, session_id: str) -> DiagnosticCase | None:
+        return self.session.scalars(
+            select(DiagnosticCase).where(DiagnosticCase.session_id == session_id)
+            .order_by(DiagnosticCase.created_at.desc(), DiagnosticCase.id.desc())
+        ).first()
+
+    def fresh_transfer_questions(self, learning_session: LearningSession) -> list[Question]:
+        """Exclude previously attempted IDs AND contexts, including renamed copies."""
+        attempts = list(self.session.scalars(
+            select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
+            .where(LearningSession.learner_id == learning_session.learner_id,
+                   LearningSession.topic_id == learning_session.topic_id)
+        ))
+        excluded_ids = {attempt.question_id for attempt in attempts}
+        excluded_contexts = {
+            transfer_context_key(
+                attempt.question_snapshot_json.get("prompt_text", attempt.question.prompt_text),
+                attempt.question_snapshot_json.get("context_snippet", attempt.question.context_snippet),
+            ) for attempt in attempts
+        }
+        # Catalog role labels alone do not prove a new situation.
+        for question in self.list_questions_for_topic(learning_session.topic_id):
+            if question.question_role != QuestionRole.TRANSFER_CHECK.value:
+                excluded_contexts.add(transfer_context_key(question.prompt_text, question.context_snippet))
+        is_reading = learning_session.topic.domain_code in {"ielts_academic", "ielts_general_training"}
+        excluded_materials = {self._attempt_material_fingerprint(attempt) for attempt in attempts} if is_reading else set()
+        if is_reading:
+            excluded_materials.update(self._assigned_reading_materials(learning_session.learner_id, learning_session.topic_id, exclude_session_id=learning_session.id))
+            excluded_materials.update(self._reading_material_fingerprint(q) for q in self.list_questions_for_topic(learning_session.topic_id)
+                                      if q.question_role in {QuestionRole.INITIAL.value, QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value})
+        return [question for question in self.list_questions_for_topic(
+            learning_session.topic_id, role=QuestionRole.TRANSFER_CHECK
+        ) if question.id not in excluded_ids and transfer_context_key(
+            question.prompt_text, question.context_snippet
+        ) not in excluded_contexts and (not is_reading or (None not in excluded_materials and self._reading_material_fingerprint(question) is not None
+                                and self._reading_material_fingerprint(question) not in excluded_materials))]
+
+    def validate_transfer_readiness(
+        self, learning_session: LearningSession, *, agent_selected: bool = False,
+    ) -> None:
+        attempts = self.list_attempts_for_session(learning_session.id)
+        if learning_session.current_group_version_id or any(attempt.group_version_id for attempt in attempts):
+            from app.decision.matching_headings import MatchingHeadingsRules, supported_protocol
+
+            case = self.latest_diagnostic_case(learning_session.id)
+            trigger = case.trigger_attempt if case else None
+            if (
+                case is None or trigger is None or not supported_protocol(trigger)
+                or learning_session.status not in {SessionStatus.INTERVENING.value, SessionStatus.TRANSFER_CHECKING.value}
+            ):
+                raise DomainRuleViolationError("Matching Headings transfer is not authorized by its diagnostic protocol.")
+            if learning_session.status == SessionStatus.TRANSFER_CHECKING.value:
+                assigned = self.get_question_by_id(learning_session.current_question_id) if learning_session.current_question_id else None
+                if assigned and assigned.question_role == QuestionRole.TRANSFER_CHECK.value:
+                    return
+            practices = [a for a in attempts if a.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
+            if not practices or practices[-1].is_correct is not True or practices[-1].evaluation_status != AttemptEvaluationStatus.EVALUATED.value:
+                raise DomainRuleViolationError("A successful targeted practice is required before Matching Headings transfer.")
+            if MatchingHeadingsRules(self).select_independent_task(learning_session, case, QuestionRole.TRANSFER_CHECK) is None:
+                # Allow the endpoint to return a truthful transfer_unavailable result.
+                return
+            return
+        case = self.latest_diagnostic_case(learning_session.id)
+        practices = [attempt for attempt in attempts if attempt.attempt_role == QuestionRole.TARGETED_PRACTICE.value]
+        validate_transfer_entry(
+            learning_session.status,
+            has_pending_question=bool(learning_session.current_question_id and not any(
+                attempt.question_id == learning_session.current_question_id for attempt in attempts
+            )),
+            practice_required=bool(practices or (case and case.selected_intervention == "targeted_practice")),
+            practice_passed=bool(practices and practices[-1].is_correct is True
+                                 and practices[-1].evaluation_status == AttemptEvaluationStatus.EVALUATED.value),
+            agent_selected=agent_selected,
+        )
+
     def record_attempt(
         self,
         *,
@@ -229,6 +417,13 @@ class LearningRepository:
         evaluation_status: AttemptEvaluationStatus | str = AttemptEvaluationStatus.PENDING,
         evaluation_summary: str | None = None,
         idempotency_key: str | None = None,
+        submitted_at: datetime | None = None,
+        reading_group: ReadingGroupVersion | None = None,
+        structured_answer: dict[str, str] | None = None,
+        item_evaluation: dict[str, Any] | None = None,
+        evaluation_rule_version: str | None = None,
+        diagnostic_protocol: str | None = None,
+        diagnostic_version: str | None = None,
     ) -> Attempt:
         """Record an immutable learner attempt linked to its Question and LearningSession."""
         if idempotency_key:
@@ -258,12 +453,17 @@ class LearningRepository:
         eval_status_enum = AttemptEvaluationStatus(evaluation_status)
         question_snapshot = {
             "question_id": question.id,
+            "diagnostic_version": diagnostic_version if reading_group else (question.evaluation_rubric or {}).get("diagnostic_version"),
+            "diagnostic_protocol": diagnostic_protocol if reading_group else (question.evaluation_rubric or {}).get("diagnostic_protocol"),
+            "rule_version_id": reading_group.rule_version_id if reading_group else None,
             "version": question.version,
             "question_role": question.question_role,
             "question_type": question.question_type,
             "prompt_text": question.prompt_text,
             "context_snippet": question.context_snippet,
-            "standard_answer": question.standard_answer,
+            "standard_answer": question.standard_answer if reading_group is None else None,
+            "material_id": question.material_id,
+            "material_fingerprint": self._reading_material_fingerprint(question),
         }
         attempt = Attempt(
             session_id=session_id,
@@ -272,10 +472,16 @@ class LearningRepository:
             question_snapshot_json=question_snapshot,
             attempt_role=question.question_role,
             submitted_answer=submitted_answer,
+            group_version_id=reading_group.id if reading_group else None,
+            structured_answer_json=structured_answer,
+            group_snapshot_json=reading_group.display_json if reading_group else None,
+            item_evaluation_json=item_evaluation,
+            evaluation_rule_version=evaluation_rule_version,
             is_correct=is_correct,
             evaluation_status=eval_status_enum.value,
             evaluation_summary=evaluation_summary,
             idempotency_key=idempotency_key,
+            submitted_at=submitted_at or utc_now(),
         )
         self.session.add(attempt)
         self.session.flush()
@@ -375,7 +581,21 @@ class LearningRepository:
         """Validate DiagnosticCase state transition and append a DecisionEvent."""
         target_enum = DiagnosticCaseStatus(target_status)
         previous_status = diag_case.status
-        validate_diagnostic_case_transition(previous_status, target_enum)
+        selected_question_answered = False
+        if (
+            previous_status == DiagnosticCaseStatus.QUESTION_SELECTED.value
+            and target_enum == DiagnosticCaseStatus.INTERVENTION_SELECTED
+            and diag_case.current_followup_question_id
+        ):
+            selected_question_answered = any(
+                attempt.question_id == diag_case.current_followup_question_id
+                for attempt in self.list_attempts_for_session(diag_case.session_id)
+            )
+        validate_diagnostic_case_transition(
+            previous_status,
+            target_enum,
+            selected_question_answered=selected_question_answered,
+        )
 
         diag_case.status = target_enum.value
         if uncertainty_note is not None:
@@ -532,12 +752,68 @@ class LearningRepository:
 
         transfer_attempt: Attempt | None = None
         is_retried_transfer = False
+        matching_group_transfer = False
         if transfer_attempt_id is not None:
             transfer_attempt = self.session.get(Attempt, transfer_attempt_id)
             if transfer_attempt is None:
                 raise DomainRuleViolationError(
                     f"Unknown transfer_attempt_id: {transfer_attempt_id}"
                 )
+            if transfer_attempt.session_id != session_id or transfer_attempt.session.learner_id != learner_id:
+                raise DomainRuleViolationError("Transfer evidence must belong to this learner and session.")
+            matching_group_transfer = bool(
+                transfer_attempt.group_version_id
+                and transfer_attempt.question_snapshot_json.get("question_type") == QuestionType.MATCHING_HEADINGS.value
+            )
+            if matching_group_transfer:
+                from app.domain.reading_groups import HeadingAnswerKey
+
+                if target_enum == KnowledgeMasteryStatus.STABLE:
+                    raise DomainRuleViolationError("Matching Headings transfer evidence cannot establish stable mastery.")
+                group = self.session.get(ReadingGroupVersion, transfer_attempt.group_version_id)
+                question = self.session.get(Question, transfer_attempt.question_id)
+                case = self.latest_diagnostic_case(session_id)
+                dispatch = next((event for event in reversed(case.decision_events)
+                                 if event.action == "dispatch_matching_headings_transfer"), None) if case else None
+                payload = dispatch.payload_json if dispatch else {}
+                group_rule = self.session.get(ReadingRuleVersion, group.rule_version_id) if group else None
+                key = HeadingAnswerKey.model_validate(group_rule.private_rules_json) if group_rule else None
+                source_group = self.session.get(ReadingGroupVersion, case.trigger_attempt.group_version_id) if case and case.trigger_attempt.group_version_id else None
+                source_rule = self.session.get(ReadingRuleVersion, source_group.rule_version_id) if source_group else None
+                source_key = HeadingAnswerKey.model_validate(source_rule.private_rules_json) if source_rule else None
+                if (
+                    group is None or question is None
+                    or transfer_attempt.attempt_role != QuestionRole.TRANSFER_CHECK.value
+                    or transfer_attempt.evaluation_status != AttemptEvaluationStatus.EVALUATED.value
+                    or transfer_attempt.is_correct is not True
+                    or question.question_role != QuestionRole.TRANSFER_CHECK.value
+                    or transfer_attempt.question_snapshot_json.get("rule_version_id") != group.rule_version_id
+                    or key is None or key.diagnostics is None
+                    or key.diagnostics.role != QuestionRole.TRANSFER_CHECK.value
+                    or key.diagnostics.targets != [payload.get("target_error_code")]
+                    or source_key is None or source_key.diagnostics is None
+                    or source_key.diagnostics.task_versions.get(question.id) != group.id
+                    or payload.get("selected_question_id") != question.id
+                    or payload.get("group_version_id") != group.id
+                    or not transfer_attempt.item_evaluation_json
+                    or transfer_attempt.item_evaluation_json.get("outcome") != "correct"
+                    or transfer_attempt.item_evaluation_json.get("correct_count") != transfer_attempt.item_evaluation_json.get("total_count")
+                ):
+                    raise DomainRuleViolationError("Matching Headings transfer verification requires a successful protocol-authorized group Attempt.")
+                independence = group.provenance_json.get("independence_review", {})
+                required_group_ids = set()
+                for prior in self.list_attempts_for_session(session_id):
+                    if prior.id == transfer_attempt.id:
+                        continue
+                    prior_group = self.session.get(ReadingGroupVersion, prior.group_version_id) if prior.group_version_id else None
+                    if prior_group is not None:
+                        required_group_ids.add(prior_group.group_id)
+                if (
+                    not independence.get("independence_id")
+                    or not independence.get("independence_basis")
+                    or not required_group_ids.issubset(set(independence.get("independent_from_group_ids", [])))
+                ):
+                    raise DomainRuleViolationError("Matching Headings transfer content lacks the audited independence chain.")
             # Check if this learner previously attempted the same transfer question and failed
             prior_failed_attempt_id = self.session.scalar(
                 select(Attempt.id)
@@ -551,6 +827,34 @@ class LearningRepository:
             )
             if prior_failed_attempt_id is not None:
                 is_retried_transfer = True
+            if target_enum in (KnowledgeMasteryStatus.STABLE, KnowledgeMasteryStatus.TRANSFER_VERIFIED) and not matching_group_transfer:
+                key = transfer_context_key(transfer_attempt.question.prompt_text, transfer_attempt.question.context_snippet)
+                other_attempts = list(self.session.scalars(
+                    select(Attempt).join(LearningSession, Attempt.session_id == LearningSession.id)
+                    .where(LearningSession.learner_id == learner_id, LearningSession.topic_id == topic_id,
+                           Attempt.id != transfer_attempt.id)
+                ))
+                if any(
+                    prior.question_id == transfer_attempt.question_id
+                    or transfer_context_key(prior.question_snapshot_json.get("prompt_text", prior.question.prompt_text),
+                                            prior.question_snapshot_json.get("context_snippet", prior.question.context_snippet)) == key
+                    for prior in other_attempts
+                ):
+                    is_retried_transfer = True
+                if transfer_attempt.question.topic.domain_code in {"ielts_academic", "ielts_general_training"} and not matching_group_transfer:
+                    material_key = self._attempt_material_fingerprint(transfer_attempt)
+                    prior_materials = {self._attempt_material_fingerprint(prior) for prior in other_attempts}
+                    prior_materials.update(self._assigned_reading_materials(learner_id, topic_id, exclude_session_id=session_id))
+                    training_materials = {self._reading_material_fingerprint(q) for q in self.list_questions_for_topic(topic_id)
+                                          if q.question_role in {QuestionRole.INITIAL.value, QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value}}
+                    if material_key is None or None in prior_materials or None in training_materials or material_key in prior_materials or material_key in training_materials:
+                        is_retried_transfer = True
+                if not matching_group_transfer and any(
+                    question.question_role != QuestionRole.TRANSFER_CHECK.value
+                    and transfer_context_key(question.prompt_text, question.context_snippet) == key
+                    for question in self.list_questions_for_topic(topic_id)
+                ):
+                    is_retried_transfer = True
 
         existing = self.session.scalar(
             select(KnowledgeState).where(
@@ -569,7 +873,7 @@ class LearningRepository:
                 transfer_attempt.attempt_role if transfer_attempt else None
             ),
             verified_transfer_is_correct=(
-                transfer_attempt.is_correct if transfer_attempt else None
+                transfer_attempt.is_correct if transfer_attempt and transfer_attempt.evaluation_status == AttemptEvaluationStatus.EVALUATED.value else None
             ),
             verified_transfer_topic_matches=bool(
                 transfer_attempt
@@ -634,18 +938,32 @@ class LearningRepository:
         learner_id: str = "local_default_learner",
         session_id: str | None = None,
         hypothesis_id: str | None = None,
+        trigger_attempt_id: str | None = None,
+        group_version_id: str | None = None,
+        schedule_key: str | None = None,
+        review_stage: int = 0,
     ) -> ReviewItem:
         if not trigger_reason or not trigger_reason.strip():
             raise DomainRuleViolationError("ReviewItem trigger_reason cannot be empty.")
 
+        if schedule_key:
+            existing = self.session.scalar(
+                select(ReviewItem).where(ReviewItem.schedule_key == schedule_key)
+            )
+            if existing is not None:
+                return existing
         review = ReviewItem(
             learner_id=learner_id,
             topic_id=topic_id,
             session_id=session_id,
             hypothesis_id=hypothesis_id,
+            trigger_attempt_id=trigger_attempt_id,
+            group_version_id=group_version_id,
             trigger_reason=trigger_reason.strip(),
             status=ReviewStatus.PENDING.value,
             scheduled_for=scheduled_for or utc_now(),
+            schedule_key=schedule_key,
+            review_stage=review_stage,
         )
         self.session.add(review)
         self.session.flush()
@@ -710,6 +1028,7 @@ class LearningRepository:
             select(func.count(DecisionEvent.id)).where(
                 DecisionEvent.diagnostic_case_id == diagnostic_case_id,
                 DecisionEvent.action == "select_diagnostic_followup",
+                DecisionEvent.event_type != "diagnostic_step_completed",
             )
         )
         return int(count or 0)

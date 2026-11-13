@@ -1,0 +1,54 @@
+{
+  "pack_id": "verbatrail-original-reading-v1",
+  "domain_code": "ielts_academic",
+  "topics": [
+    {
+      "id": "ielts-academic-reading",
+      "slug": "ielts-academic-reading",
+      "domain_code": "ielts_academic",
+      "title": "Academic 阅读：城市湿地",
+      "summary": "原创短文与证据定位练习。答案由规则评价；错误原因仍需 Agent 收集证据。",
+      "difficulty_level": 2,
+      "common_error_patterns": [
+        {"error_code": "IELTS_READING_KEYWORD_MATCH", "name": "关键词匹配偏差", "description": "可能依据相同词语而忽略句意关系。"},
+        {"error_code": "IELTS_READING_INFERENCE", "name": "推断范围偏差", "description": "可能把文本没有支持的推论当作事实。"}
+      ],
+      "materials": [
+        {"id":"ielts-acad-mat-1","title":"城市湿地的价值","summary":"原创 Academic 风格说明文","content_body":"## 城市湿地的价值\n\n在快速扩张的城市边缘，湿地常被视为等待开发的空地。近年的规划研究却发现，小型湿地可以暂存暴雨径流，并为迁徙鸟类提供停歇点。它们的效果取决于水道连通性和长期维护；单独种植更多树木并不能替代这些条件。\n\n一项由市政团队开展的三年观察记录显示，恢复水道后，部分街区积水时间缩短。研究人员同时提醒，这一结果不能证明每一种湿地设计都有效，因为各地点的土壤与降雨不同。","content_format":"markdown"},
+        {"id":"ielts-acad-mat-2","title":"证据与推断","summary":"用于区分字面信息与推断","content_body":"## 社区实验\n\n一所大学与两个社区合作，在雨水花园中测试不同土壤组合。第一年，较粗的土壤排水更快；第二年，团队增加了植物覆盖，差异变小。研究者没有把变化归因于单一因素，因为降雨量也发生了变化。","content_format":"markdown"},
+        {"id":"ielts-acad-mat-3","title":"迁移阅读：公共交通数据","summary":"不同情境的独立验证材料","content_body":"## 公交专用道试点\n\n市议会在两条道路试行公交专用道。平均行程时间下降，但高峰期数据改善更明显。报告指出，样本只覆盖工作日，因此不能据此判断周末服务的变化。","content_format":"markdown"}
+      ],
+      "questions": [
+        {"id":"ielts-acad-q-initial","material_id":"ielts-acad-mat-1","question_role":"initial","question_type":"multiple_choice","prompt_text":"根据短文，湿地效果取决于哪项条件？","context_snippet":"A. 只增加树木数量\nB. 水道连通性与长期维护\nC. 将所有湿地改造成公园\nD. 每个地点采用相同土壤","standard_answer":"B","answer_explanation":"短文明确提到连通性与维护。","evaluation_rubric":{"accepted_answers":["B","水道连通性与长期维护"],"candidate_error_mappings":[{"answer":"A","error_code":"IELTS_READING_KEYWORD_MATCH"},{"answer":"A","error_code":"IELTS_READING_INFERENCE"},{"answer":"C","error_code":"IELTS_READING_INFERENCE"}]},"difficulty":2},
+        {"id":"ielts-acad-q-followup","material_id":"ielts-acad-mat-2","question_role":"diagnostic_followup","question_type":"short_text","prompt_text":"研究者为什么没有把第二年差异变化归因于单一因素？请用短文中的依据回答。","context_snippet":"","standard_answer":"因为植物覆盖和降雨量都发生了变化。","answer_explanation":"要求区分观察与因果推断。","evaluation_rubric":{"accepted_answers":["植物覆盖和降雨量都发生了变化","植物覆盖与降雨量都变化了","both plant cover and rainfall changed"],"candidate_error_mappings":[]},"difficulty":2},
+        {"id":"ielts-acad-q-practice","material_id":"ielts-acad-mat-2","question_role":"targeted_practice","question_type":"multiple_choice","prompt_text":"第二年观察结果能证明粗土壤单独导致排水差异变小吗？","context_snippet":"A. 能，因为变化只发生在土壤\nB. 不能，植物覆盖也改变了\nC. 能，因为所有降雨都相同\nD. 不能，研究没有记录任何数据","standard_answer":"B","answer_explanation":"多项条件变化，不能归因单一变量。","evaluation_rubric":{"accepted_answers":["B","不能，植物覆盖也改变了"],"candidate_error_mappings":[{"answer":"A","error_code":"IELTS_READING_INFERENCE"},{"answer":"C","error_code":"IELTS_READING_KEYWORD_MATCH"}]},"difficulty":2},
+        {"id":"ielts-acad-q-transfer","material_id":"ielts-acad-mat-3","question_role":"transfer_check","question_type":"multiple_choice","prompt_text":"报告允许得出哪项结论？","context_snippet":"A. 周末行程也一定缩短\nB. 试点中工作日平均行程缩短，且高峰改善更明显\nC. 所有道路都适合公交专用道\nD. 高峰期没有变化","standard_answer":"B","answer_explanation":"只概括报告有数据支持的范围。","evaluation_rubric":{"accepted_answers":["B","工作日平均行程缩短，且高峰改善更明显"],"candidate_error_mappings":[{"answer":"A","error_code":"IELTS_READING_INFERENCE"},{"answer":"C","error_code":"IELTS_READING_INFERENCE"}]},"difficulty":3},
+        {"id":"ielts-acad-q-review","material_id":"ielts-acad-mat-3","question_role":"review","question_type":"short_text","prompt_text":"报告明确限制了对哪类日期的结论？","context_snippet":"","standard_answer":"周末","answer_explanation":"样本仅覆盖工作日。","evaluation_rubric":{"accepted_answers":["周末","weekends","weekend"],"candidate_error_mappings":[]},"difficulty":2}
+      ]
+    },
+    {
+      "id": "ielts-general-reading",
+      "slug": "ielts-general-reading",
+      "domain_code": "ielts_general_training",
+      "title": "General Training 阅读：社区信息",
+      "summary": "原创日常与工作场景公告阅读练习。",
+      "difficulty_level": 1,
+      "common_error_patterns": [
+        {"error_code": "IELTS_READING_KEYWORD_MATCH", "name": "关键词匹配偏差", "description": "可能依据相同词语而忽略条件。"},
+        {"error_code": "IELTS_READING_INFERENCE", "name": "条件范围偏差", "description": "可能忽略公告中的适用范围或例外。"}
+      ],
+      "materials": [
+        {"id":"ielts-gt-mat-1","title":"图书馆通知","summary":"原创公共服务公告","content_body":"## 图书馆周末安排\n\n中央图书馆将于六月的三个周六延长开放至晚上八点。自习室需要提前预约，但借还书柜仍可在正常闭馆时间后使用。活动期间儿童阅读区会在下午六点关闭。","content_format":"markdown"},
+        {"id":"ielts-gt-mat-2","title":"志愿者排班邮件","summary":"原创工作沟通文本","content_body":"## 志愿者安排\n\n本周食品分发活动提前一小时开始。已登记的志愿者请在周四中午前回复是否能够参加；未回复者不会自动安排班次。新志愿者需要先参加简短说明会。","content_format":"markdown"},
+        {"id":"ielts-gt-mat-3","title":"课程报名说明","summary":"不同情境迁移验证材料","content_body":"## 夜间课程报名\n\n社区中心的摄影课程每周二晚开课。报名者可在首课前取消并获得退款；课程开始后，缺席者可以查看讲义，但不会安排补课。","content_format":"markdown"}
+      ],
+      "questions": [
+        {"id":"ielts-gt-q-initial","material_id":"ielts-gt-mat-1","question_role":"initial","question_type":"multiple_choice","prompt_text":"以下哪项在延长开放期间仍需要提前预约？","context_snippet":"A. 借还书柜\nB. 自习室\nC. 图书馆入口\nD. 儿童阅读区","standard_answer":"B","answer_explanation":"通知明确指出自习室需要预约。","evaluation_rubric":{"accepted_answers":["B","自习室"],"candidate_error_mappings":[{"answer":"A","error_code":"IELTS_READING_KEYWORD_MATCH"},{"answer":"D","error_code":"IELTS_READING_INFERENCE"}]},"difficulty":1},
+        {"id":"ielts-gt-q-followup","material_id":"ielts-gt-mat-2","question_role":"diagnostic_followup","question_type":"short_text","prompt_text":"未回复邮件的已登记志愿者会怎样？","context_snippet":"","standard_answer":"不会自动安排班次。","answer_explanation":"定位回复条件及其后果。","evaluation_rubric":{"accepted_answers":["不会自动安排班次","不会被安排班次","will not be scheduled"],"candidate_error_mappings":[]},"difficulty":1},
+        {"id":"ielts-gt-q-practice","material_id":"ielts-gt-mat-2","question_role":"targeted_practice","question_type":"multiple_choice","prompt_text":"新志愿者参加活动前需要做什么？","context_snippet":"A. 先参加说明会\nB. 周四中午前取消\nC. 自动选择班次\nD. 先完成课程","standard_answer":"A","answer_explanation":"邮件说明新志愿者需要参加简短说明会。","evaluation_rubric":{"accepted_answers":["A","先参加说明会"],"candidate_error_mappings":[{"answer":"C","error_code":"IELTS_READING_INFERENCE"}]},"difficulty":1},
+        {"id":"ielts-gt-q-transfer","material_id":"ielts-gt-mat-3","question_role":"transfer_check","question_type":"multiple_choice","prompt_text":"何时仍可获得退款？","context_snippet":"A. 首课开始前取消\nB. 任意缺席后\nC. 课程结束后\nD. 讲义查看后","standard_answer":"A","answer_explanation":"退款条件是首课前取消。","evaluation_rubric":{"accepted_answers":["A","首课开始前取消"],"candidate_error_mappings":[{"answer":"B","error_code":"IELTS_READING_INFERENCE"}]},"difficulty":2},
+        {"id":"ielts-gt-q-review","material_id":"ielts-gt-mat-3","question_role":"review","question_type":"short_text","prompt_text":"课程开始后，缺席者可以查看什么？","context_snippet":"","standard_answer":"讲义","answer_explanation":"通知允许查看讲义，不安排补课。","evaluation_rubric":{"accepted_answers":["讲义","课程讲义","handouts"],"candidate_error_mappings":[]},"difficulty":1}
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-# UnlearnLoop 设计系统
+# VerbaTrail 设计系统
 
 ## 1. 设计原则
 

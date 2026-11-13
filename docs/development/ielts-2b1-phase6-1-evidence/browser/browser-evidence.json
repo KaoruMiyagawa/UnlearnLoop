@@ -1,0 +1,42 @@
+{
+  "browser": "Headless Chrome via Chrome DevTools Protocol",
+  "api": "isolated Uvicorn/FastAPI + SQLite fixture; rules provider; remote models disabled",
+  "verified": [
+    "profile shows invalidated historical evidence and revalidation CTA",
+    "revalidation CTA opens the eligible v2 Matching Headings session",
+    "completed historical review shows retained history without current retention claim",
+    "desktop 1440px and mobile 390px have no horizontal overflow",
+    "Premium and Noir themes render with the expected evidence warning"
+  ],
+  "screenshots": [
+    {
+      "file": "profile-premium-desktop.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425
+    },
+    {
+      "file": "profile-noir-mobile.png",
+      "theme": "noir",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390
+    },
+    {
+      "file": "invalid-review-premium-desktop.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425
+    },
+    {
+      "file": "invalid-review-noir-mobile.png",
+      "theme": "noir",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390
+    }
+  ],
+  "browser_errors": []
+}

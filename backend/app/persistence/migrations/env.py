@@ -1,4 +1,4 @@
-"""Alembic migration environment for UnlearnLoop."""
+"""Alembic migration environment for VerbaTrail."""
 
 from logging.config import fileConfig
 

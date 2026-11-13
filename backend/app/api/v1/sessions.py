@@ -12,6 +12,7 @@ from app.api.v1.schemas import (
     SessionActionRequest,
     SessionDetailResponse,
     SessionSummaryResponse,
+    LearningMaterialResponse,
     SubmitAttemptRequest,
     TransferCheckDispatchResponse,
 )
@@ -35,6 +36,8 @@ def create_session(
         topic_id=payload.topic_id,
         learner_id=payload.learner_id,
         initial_question_id=payload.initial_question_id,
+        exam_variant=payload.exam_variant,
+        question_type=payload.question_type,
     )
 
 
@@ -63,6 +66,15 @@ def get_session(
 ) -> SessionDetailResponse:
     """Retrieve current state of a learning session, current question, and diagnostic pointers."""
     return service.get_session_detail(session_id)
+
+
+@router.get("/sessions/{session_id}/material", response_model=LearningMaterialResponse | None)
+def get_current_session_material(
+    session_id: str,
+    service: LearningAppService = Depends(get_learning_service),
+) -> LearningMaterialResponse | None:
+    """Expose only the material of the question currently assigned to this session."""
+    return service.get_current_session_material(session_id)
 
 
 @router.post(
@@ -131,6 +143,8 @@ def submit_attempt(
         session_id=session_id,
         question_id=payload.question_id,
         submitted_answer=payload.submitted_answer,
+        structured_answer=payload.structured_answer,
+        group_version_id=payload.group_version_id,
         idempotency_key=payload.idempotency_key,
     )
 

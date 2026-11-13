@@ -1,0 +1,3679 @@
+{
+  "checks": {
+    "A": {
+      "id": "att_fe84484c71f3465a",
+      "session_id": "sess_60d32ec0994847c3",
+      "question_id": "ielts-mh-academic-initial",
+      "question_role": "initial",
+      "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"i\",\"paragraph-c\":\"iv\"}",
+      "structured_answer": {
+        "paragraph-a": "ii",
+        "paragraph-b": "i",
+        "paragraph-c": "iv"
+      },
+      "group_evaluation": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_c1769c55d6c3bc186a62383734bc94a4",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_2d70e85109fc9f240d5dc8badc858d49",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": true,
+      "evaluation_status": "evaluated",
+      "evaluation_summary": "标题匹配正确 3/3 项。",
+      "submitted_at": "2026-04-01T12:00:00"
+    },
+    "I": {
+      "themes": [
+        "premium",
+        "noir"
+      ],
+      "restored": true
+    },
+    "L": {
+      "keyboardSelectedAllAndSubmitted": true,
+      "visibleFocus": true,
+      "touchedPassageLink": true
+    },
+    "sessionRestoreRace": {
+      "delayedOldSession": "sess_60d32ec0994847c3",
+      "catalogBlockedUntilRestored": true,
+      "newSession": "sess_9263e67ee92c425b"
+    },
+    "J": {
+      "replayedOfflineIntent": "7252ede7-f00b-4756-a602-884a3d6cb011",
+      "recoveredTimeoutAttempt": "att_40d8ce44f7c44761",
+      "interceptedCommittedStatus": 201
+    },
+    "B": {
+      "id": "att_40d8ce44f7c44761",
+      "session_id": "sess_9263e67ee92c425b",
+      "question_id": "ielts-mh-academic-initial",
+      "question_role": "initial",
+      "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"iv\"}",
+      "structured_answer": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "iv"
+      },
+      "group_evaluation": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": true
+        },
+        "correct_count": 2,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_c1769c55d6c3bc186a62383734bc94a4",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_2d70e85109fc9f240d5dc8badc858d49",
+        "evaluation_source": "rule_check"
+      },
+      "is_correct": false,
+      "evaluation_status": "evaluated",
+      "evaluation_summary": "标题匹配正确 2/3 项。",
+      "submitted_at": "2026-04-01T12:00:00"
+    },
+    "D": {
+      "id": "sess_9263e67ee92c425b",
+      "topic_id": "ielts-mh-academic",
+      "topic_title": "Matching Headings · Measuring street heat",
+      "learner_id": "default_learner",
+      "exam_variant": "academic",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "completed",
+      "knowledge_state_status": "transfer_verified",
+      "topic_mastered": false,
+      "current_question_id": "ielts-mh-academic-main-transfer",
+      "current_question": {
+        "id": "ielts-mh-academic-main-transfer",
+        "topic_id": "ielts-mh-academic",
+        "material_id": null,
+        "parent_question_id": null,
+        "question_role": "transfer_check",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "context_snippet": null,
+        "difficulty": 3,
+        "version": 1,
+        "group_version_id": "rg_18f0dd83694586a65c2998646e3cef61",
+        "group_display": {
+          "id": "ielts-mh-academic-main-transfer-group",
+          "section_id": "academic-reading",
+          "display_schema_version": "1",
+          "question_type": "matching_headings",
+          "passage": {
+            "id": "ielts-mh-academic-main-transfer-group-passage",
+            "content_version": "1",
+            "title": "River Paths and Summer Cooling",
+            "paragraphs": [
+              {
+                "id": "para-1",
+                "text": "A municipal research team compared three riverside paths over two summers. Shaded sections stayed cooler at midday, but the main finding was that connected paths offered residents a continuous route to cooler districts. A single shaded bench helped locally; it did not provide the same city-wide access."
+              },
+              {
+                "id": "para-2",
+                "text": "The project began with inexpensive temperature sensors attached to lamp posts. Some readings were inaccurate after rain, so researchers checked them against handheld instruments. Replacing every sensor was considered, but the comparison showed that a small calibration adjustment was sufficient."
+              },
+              {
+                "id": "para-3",
+                "text": "Residents used the paths more often when signs linked them to bus stops and public buildings. The team therefore recommended treating the routes as part of a transport network, rather than as isolated landscaping improvements."
+              }
+            ]
+          },
+          "options": [
+            {
+              "id": "h1",
+              "text": "A network that makes cooler routes accessible"
+            },
+            {
+              "id": "h2",
+              "text": "A bench that attracted visitors"
+            },
+            {
+              "id": "h3",
+              "text": "How rain damaged electronic equipment"
+            },
+            {
+              "id": "h4",
+              "text": "Why researchers replaced every sensor"
+            },
+            {
+              "id": "h5",
+              "text": "Signs used in public buildings"
+            }
+          ],
+          "items": [
+            {
+              "id": "item-1",
+              "paragraph_id": "para-1"
+            },
+            {
+              "id": "item-2",
+              "paragraph_id": "para-2"
+            },
+            {
+              "id": "item-3",
+              "paragraph_id": "para-3"
+            }
+          ],
+          "allow_reuse": false
+        }
+      },
+      "active_diagnostic_case_id": "diag_b2819a237e9b4770",
+      "latest_attempt_result": {
+        "attempt_id": "att_1acf54978de0425d",
+        "session_id": "sess_9263e67ee92c425b",
+        "question_id": "ielts-mh-academic-main-transfer",
+        "question_role": "transfer_check",
+        "is_correct": true,
+        "evaluation_summary": "标题匹配正确 3/3 项。",
+        "feedback_text": "标题匹配正确 3/3 项。",
+        "next_action": "matching_headings_transfer_verified",
+        "next_question": null,
+        "diagnostic_case_id": "diag_b2819a237e9b4770",
+        "knowledge_state_status": null,
+        "evaluation_source": "rule_check",
+        "mastery_note": null,
+        "group_evaluation": {
+          "correct_by_item": {
+            "item-1": true,
+            "item-2": true,
+            "item-3": true
+          },
+          "correct_count": 3,
+          "total_count": 3,
+          "outcome": "correct",
+          "group_version_id": "rg_18f0dd83694586a65c2998646e3cef61",
+          "content_version": "1",
+          "display_schema_version": "1",
+          "evaluation_rule_version": "1",
+          "rule_version_id": "rr_b9c654500e5c81a558f4ed13dfb6263c",
+          "evaluation_source": "rule_check"
+        }
+      },
+      "can_dispatch_transfer": false,
+      "transfer_unavailable_reason": null,
+      "attempts_count": 4,
+      "started_at": "2026-11-12T11:26:15.895497",
+      "updated_at": "2026-11-12T11:26:26.680310",
+      "completed_at": "2026-11-12T11:26:26.679845"
+    },
+    "C": {
+      "sessionId": "sess_a5d917434fc747fb",
+      "practice": "ielts-mh-gt-main-practice"
+    },
+    "E": {
+      "id": "rev_e5defd51fa074822",
+      "topic_id": "ielts-mh-academic",
+      "topic_title": "Matching Headings · Measuring street heat",
+      "session_id": "sess_9263e67ee92c425b",
+      "learner_id": "default_learner",
+      "trigger_reason": "Independent Matching Headings transfer passed; schedule delayed retention evidence.",
+      "scheduled_for": "2026-04-02T12:00:00Z",
+      "status": "completed",
+      "created_at": "2026-11-12T11:26:26.668172Z",
+      "completed_at": "2026-04-02T12:00:00Z",
+      "review_stage": 0,
+      "review_session_id": "sess_059768493c964962",
+      "question_id": "ielts-mh-academic-main-review",
+      "current_question": null,
+      "review_question": {
+        "id": "ielts-mh-academic-main-review",
+        "topic_id": "ielts-mh-academic",
+        "material_id": null,
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "context_snippet": null,
+        "difficulty": 4,
+        "version": 1,
+        "group_version_id": "rg_8d3e23bfa135547a51f01e2302a0f60a",
+        "group_display": {
+          "id": "ielts-mh-academic-main-review-group",
+          "section_id": "academic-reading",
+          "display_schema_version": "1",
+          "question_type": "matching_headings",
+          "passage": {
+            "id": "ielts-mh-academic-main-review-group-passage",
+            "content_version": "1",
+            "title": "Repair Cafés and Shared Skills",
+            "paragraphs": [
+              {
+                "id": "para-1",
+                "text": "A neighbourhood repair café first set out to reduce the number of small appliances discarded each year. Its organisers soon found that the larger benefit was social: residents with different skills began solving problems together and sharing techniques beyond the monthly event."
+              },
+              {
+                "id": "para-2",
+                "text": "At one session, a volunteer replaced a plug on a lamp while another participant recorded the steps. The written guide was useful, but organisers said the lasting change came from people becoming confident enough to attempt simple repairs at home."
+              },
+              {
+                "id": "para-3",
+                "text": "The café now lends basic tools between meetings. This has made the service more convenient, although the organisers still see the exchange of knowledge as its central purpose. They plan to invite more residents to demonstrate repairs next season."
+              }
+            ]
+          },
+          "options": [
+            {
+              "id": "h1",
+              "text": "A community built around practical cooperation"
+            },
+            {
+              "id": "h2",
+              "text": "A guide to selecting a replacement plug"
+            },
+            {
+              "id": "h3",
+              "text": "The storage of borrowed equipment"
+            },
+            {
+              "id": "h4",
+              "text": "Why monthly events are inconvenient"
+            },
+            {
+              "id": "h5",
+              "text": "A plan to close the repair café"
+            }
+          ],
+          "items": [
+            {
+              "id": "item-1",
+              "paragraph_id": "para-1"
+            },
+            {
+              "id": "item-2",
+              "paragraph_id": "para-2"
+            },
+            {
+              "id": "item-3",
+              "paragraph_id": "para-3"
+            }
+          ],
+          "allow_reuse": false
+        }
+      },
+      "attempt_id": "att_4874ad61237c4fb6",
+      "trigger_attempt_id": "att_1acf54978de0425d",
+      "group_version_id": "rg_8d3e23bfa135547a51f01e2302a0f60a",
+      "group_evaluation": {
+        "correct_by_item": {
+          "item-1": true,
+          "item-2": true,
+          "item-3": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_8d3e23bfa135547a51f01e2302a0f60a",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_9a9be2bb551112d7f2c103cff43485f2",
+        "evaluation_source": "rule_check"
+      },
+      "question_unavailable": false,
+      "is_correct": true,
+      "submitted_at": "2026-04-02T12:00:00Z",
+      "evaluation_summary": "标题匹配正确 3/3 项。",
+      "review_outcome": "passed_delayed",
+      "retention_verified": true,
+      "retention_eligible": true,
+      "decision_event_id": "evt_23d7c033b6d749d6",
+      "knowledge_state_id": "kst_665cd25acb5d438d",
+      "message": null,
+      "is_due": false
+    },
+    "F": {
+      "id": "rev_6d9dc17b89ab4213",
+      "topic_id": "ielts-mh-general-training",
+      "topic_title": "Matching Headings · The neighbourhood tool library",
+      "session_id": "sess_a5d917434fc747fb",
+      "learner_id": "default_learner",
+      "trigger_reason": "Independent Matching Headings transfer passed; schedule delayed retention evidence.",
+      "scheduled_for": "2026-04-02T12:00:00Z",
+      "status": "completed",
+      "created_at": "2026-11-12T11:26:29.261527Z",
+      "completed_at": "2026-04-02T12:00:00Z",
+      "review_stage": 0,
+      "review_session_id": "sess_9bd998f0217240df",
+      "question_id": "ielts-mh-gt-main-review",
+      "current_question": null,
+      "review_question": {
+        "id": "ielts-mh-gt-main-review",
+        "topic_id": "ielts-mh-general-training",
+        "material_id": null,
+        "parent_question_id": null,
+        "question_role": "review",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "context_snippet": null,
+        "difficulty": 4,
+        "version": 1,
+        "group_version_id": "rg_5256e1cc13448f475ace7912b679945a",
+        "group_display": {
+          "id": "ielts-mh-gt-main-review-group",
+          "section_id": "general_training-reading",
+          "display_schema_version": "1",
+          "question_type": "matching_headings",
+          "passage": {
+            "id": "ielts-mh-gt-main-review-group-passage",
+            "content_version": "1",
+            "title": "Saturday Skills Exchange",
+            "paragraphs": [
+              {
+                "id": "para-1",
+                "text": "The town hall started a Saturday skills exchange to help neighbours learn practical tasks from one another. The organisers hoped it would create stronger local connections, not simply provide a timetable of demonstrations. People who attended one session often returned to teach something themselves."
+              },
+              {
+                "id": "para-2",
+                "text": "A retired tailor showed visitors how to mend a torn seam. The hall provided needles and thread, but the organisers believe the informal conversation mattered just as much as the materials. Participants later arranged to practise together in a nearby café."
+              },
+              {
+                "id": "para-3",
+                "text": "The next programme will include bicycle checks and basic food preservation. Organisers will choose sessions that volunteers can safely lead and that residents have requested, rather than selecting topics only because they are easy to advertise."
+              }
+            ]
+          },
+          "options": [
+            {
+              "id": "h1",
+              "text": "Learning together strengthens neighbourhood ties"
+            },
+            {
+              "id": "h2",
+              "text": "A list of materials for sewing"
+            },
+            {
+              "id": "h3",
+              "text": "Choosing safe and requested sessions"
+            },
+            {
+              "id": "h4",
+              "text": "Why the hall is moving to weekdays"
+            },
+            {
+              "id": "h5",
+              "text": "The cost of advertising local events"
+            }
+          ],
+          "items": [
+            {
+              "id": "item-1",
+              "paragraph_id": "para-1"
+            },
+            {
+              "id": "item-2",
+              "paragraph_id": "para-2"
+            },
+            {
+              "id": "item-3",
+              "paragraph_id": "para-3"
+            }
+          ],
+          "allow_reuse": false
+        }
+      },
+      "attempt_id": "att_3d748cbaa3294c5e",
+      "trigger_attempt_id": "att_f13f946b77f24506",
+      "group_version_id": "rg_5256e1cc13448f475ace7912b679945a",
+      "group_evaluation": {
+        "correct_by_item": {
+          "item-1": false,
+          "item-2": false,
+          "item-3": true
+        },
+        "correct_count": 1,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_5256e1cc13448f475ace7912b679945a",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_bd7894818f955259ede65d9c1a35808a",
+        "evaluation_source": "rule_check"
+      },
+      "question_unavailable": false,
+      "is_correct": false,
+      "submitted_at": "2026-04-02T12:00:00Z",
+      "evaluation_summary": "标题匹配正确 1/3 项。",
+      "review_outcome": "failed",
+      "retention_verified": false,
+      "retention_eligible": true,
+      "decision_event_id": "evt_f9a536e6c8ec49b3",
+      "knowledge_state_id": "kst_e27fbcef57a843ce",
+      "message": null,
+      "is_due": false
+    },
+    "G": {
+      "id": "sess_fd8c648b959f4d28",
+      "topic_id": "ielts-mh-academic",
+      "topic_title": "Matching Headings · Measuring street heat",
+      "learner_id": "default_learner",
+      "exam_variant": "academic",
+      "exam_spec_version": "ielts-spec-catalog-2026-03",
+      "status": "intervening",
+      "knowledge_state_status": "needs_practice",
+      "topic_mastered": false,
+      "current_question_id": "ielts-mh-academic-main-practice",
+      "current_question": {
+        "id": "ielts-mh-academic-main-practice",
+        "topic_id": "ielts-mh-academic",
+        "material_id": null,
+        "parent_question_id": null,
+        "question_role": "targeted_practice",
+        "question_type": "matching_headings",
+        "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once.",
+        "context_snippet": null,
+        "difficulty": 1,
+        "version": 1,
+        "group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f",
+        "group_display": {
+          "id": "ielts-mh-academic-main-practice-group",
+          "section_id": "academic-reading",
+          "display_schema_version": "1",
+          "question_type": "matching_headings",
+          "passage": {
+            "id": "ielts-mh-academic-main-practice-passage",
+            "content_version": "1",
+            "title": "Finding the claim behind an example",
+            "paragraphs": [
+              {
+                "id": "p1",
+                "text": "A survey found that benches near trees were used more often at midday than benches in open areas. One bench beside a fountain was particularly popular. The researchers concluded that the main pattern across the park was a preference for sheltered places when the sun was strongest."
+              }
+            ]
+          },
+          "options": [
+            {
+              "id": "main-practice-distractor",
+              "text": "Why one bench near a fountain was popular"
+            },
+            {
+              "id": "main-practice-heading",
+              "text": "A general preference for shade at midday"
+            },
+            {
+              "id": "main-practice-other",
+              "text": "How fountain water is recycled"
+            }
+          ],
+          "items": [
+            {
+              "id": "main-practice",
+              "paragraph_id": "p1"
+            }
+          ],
+          "allow_reuse": false
+        }
+      },
+      "active_diagnostic_case_id": "diag_21a8ba8508d34dec",
+      "latest_attempt_result": {
+        "attempt_id": "att_e5b67d83e6a44f16",
+        "session_id": "sess_fd8c648b959f4d28",
+        "question_id": "ielts-mh-academic-main-practice",
+        "question_role": "targeted_practice",
+        "is_correct": true,
+        "evaluation_summary": "标题匹配正确 1/1 项。",
+        "feedback_text": "标题匹配正确 1/1 项。",
+        "next_action": "matching_headings_transfer_pending",
+        "next_question": null,
+        "diagnostic_case_id": "diag_21a8ba8508d34dec",
+        "knowledge_state_status": null,
+        "evaluation_source": "rule_check",
+        "mastery_note": null,
+        "group_evaluation": {
+          "correct_by_item": {
+            "main-practice": true
+          },
+          "correct_count": 1,
+          "total_count": 1,
+          "outcome": "correct",
+          "group_version_id": "rg_c055b093e8a64361ccc23a6f4aad0e6f",
+          "content_version": "1",
+          "display_schema_version": "1",
+          "evaluation_rule_version": "1",
+          "rule_version_id": "rr_f75ead8ef56043bf07d5bf722cc8ac51",
+          "evaluation_source": "rule_check"
+        }
+      },
+      "can_dispatch_transfer": false,
+      "transfer_unavailable_reason": "暂无符合当前诊断目标的独立迁移文章，本次迁移仍未验证。",
+      "attempts_count": 3,
+      "started_at": "2026-11-12T11:26:32.027753",
+      "updated_at": "2026-11-12T11:26:32.653782",
+      "completed_at": null
+    },
+    "H": {
+      "id": "rev_324bed98f6cc489e",
+      "topic_id": "ielts-mh-academic",
+      "topic_title": "Matching Headings · Measuring street heat",
+      "session_id": "sess_9263e67ee92c425b",
+      "learner_id": "default_learner",
+      "trigger_reason": "Matching Headings delayed review passed; schedule the next spaced check.",
+      "scheduled_for": "2026-04-05T12:00:00Z",
+      "status": "pending",
+      "created_at": "2026-11-12T11:26:30.429700Z",
+      "completed_at": null,
+      "review_stage": 1,
+      "review_session_id": null,
+      "question_id": null,
+      "current_question": null,
+      "review_question": null,
+      "attempt_id": null,
+      "trigger_attempt_id": "att_4874ad61237c4fb6",
+      "group_version_id": null,
+      "group_evaluation": null,
+      "question_unavailable": true,
+      "is_correct": null,
+      "submitted_at": null,
+      "evaluation_summary": null,
+      "review_outcome": null,
+      "retention_verified": false,
+      "retention_eligible": true,
+      "decision_event_id": "evt_30406a0190624074",
+      "knowledge_state_id": "kst_665cd25acb5d438d",
+      "message": "题库中没有未作答且情境不同的复习题。任务仍保留待办，不会记为通过。",
+      "is_due": true
+    },
+    "K": {
+      "id": "att_4514239b07d4459b",
+      "session_id": "sess_a08296fd736045e6",
+      "question_id": "ielts-tfng-acad-initial",
+      "question_role": "initial",
+      "submitted_answer": "FALSE",
+      "structured_answer": null,
+      "group_evaluation": null,
+      "is_correct": false,
+      "evaluation_status": "evaluated",
+      "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+      "submitted_at": "2026-04-05T12:00:00"
+    }
+  },
+  "screenshots": [
+    {
+      "screenshot": "I-premium-desktop.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": 2,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "I-noir-desktop.png",
+      "theme": "noir",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": 2,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "I-noir-mobile.png",
+      "theme": "noir",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "columns": 1,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "I-premium-mobile.png",
+      "theme": "premium",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "columns": 1,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "L-mobile-answer.png",
+      "theme": "premium",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "columns": 1,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "J-offline.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": 2,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "A-academic-correct.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "J-timeout.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": 2,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "B-academic-partial.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "B-error-dna.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "D-academic-transfer-not-due.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "C-gt-structured-practice.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": 2,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "C-gt-targeted-training.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "E-review-draft-restored.png",
+      "theme": "premium",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "columns": 1,
+      "minTarget": 44,
+      "readingPaper": "rgb(247, 244, 234)",
+      "optionWrap": "anywhere"
+    },
+    {
+      "screenshot": "E-academic-retention-pass.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "F-gt-retention-fail.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "G-transfer-exhausted.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "H-review-exhausted.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    },
+    {
+      "screenshot": "K-tfng-regression.png",
+      "theme": "premium",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1425,
+      "columns": null,
+      "minTarget": null,
+      "readingPaper": null,
+      "optionWrap": null
+    }
+  ],
+  "traffic": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "request": "{\"exam_variant\":\"academic\",\"target_overall_band\":8,\"target_skill_bands\":{\"listening\":8,\"reading\":8,\"writing\":8,\"speaking\":8},\"exam_date\":null}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions",
+      "request": "{\"topic_id\":\"ielts-mh-academic\",\"learner_id\":\"default_learner\",\"exam_variant\":\"academic\",\"question_type\":\"matching_headings\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-initial\",\"group_version_id\":\"rg_c1769c55d6c3bc186a62383734bc94a4\",\"structured_answer\":{\"paragraph-a\":\"ii\",\"paragraph-b\":\"i\",\"paragraph-c\":\"iv\"},\"idempotency_key\":\"7252ede7-f00b-4756-a602-884a3d6cb011\"}",
+      "failure": "net::ERR_INTERNET_DISCONNECTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-initial\",\"group_version_id\":\"rg_c1769c55d6c3bc186a62383734bc94a4\",\"structured_answer\":{\"paragraph-a\":\"ii\",\"paragraph-b\":\"i\",\"paragraph-c\":\"iv\"},\"idempotency_key\":\"7252ede7-f00b-4756-a602-884a3d6cb011\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "request": "{\"exam_variant\":\"academic\",\"target_overall_band\":8,\"target_skill_bands\":{\"listening\":8,\"reading\":8,\"writing\":8,\"speaking\":8},\"exam_date\":null}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_60d32ec0994847c3/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions",
+      "request": "{\"topic_id\":\"ielts-mh-academic\",\"learner_id\":\"default_learner\",\"exam_variant\":\"academic\",\"question_type\":\"matching_headings\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-initial\",\"group_version_id\":\"rg_c1769c55d6c3bc186a62383734bc94a4\",\"structured_answer\":{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"iv\"},\"idempotency_key\":\"d2017c85-6ac7-4751-a27b-0d1b1ddf68db\"}",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_40d8ce44f7c44761",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/step",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/step",
+      "request": "{\"idempotency_key\":\"0b7a86ff-7c36-4efc-90b7-89e4ae1c650a\"}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_40d8ce44f7c44761",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-diagnostic\",\"group_version_id\":\"rg_6c0914d12eaa70cba2fa5e50fb68582e\",\"structured_answer\":{\"probe-main\":\"probe-main-distractor\",\"probe-keyword\":\"probe-keyword-heading\"},\"idempotency_key\":\"3e3ee32a-dd1f-4a85-8c97-1b475c0432ac\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_40d8ce44f7c44761",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/step",
+      "request": "{\"idempotency_key\":\"f2d98e6d-633c-4543-8b8c-002129a4d97f\"}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_40d8ce44f7c44761",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-main-practice\",\"group_version_id\":\"rg_c055b093e8a64361ccc23a6f4aad0e6f\",\"structured_answer\":{\"main-practice\":\"main-practice-heading\"},\"idempotency_key\":\"7b576782-d970-4d72-8cc2-df1c37a0bb02\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_40d8ce44f7c44761",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/transfer-check",
+      "request": "{\"force_fresh\":true}",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/transfer-check",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-main-transfer\",\"group_version_id\":\"rg_18f0dd83694586a65c2998646e3cef61\",\"structured_answer\":{\"item-1\":\"h1\",\"item-2\":\"h3\",\"item-3\":\"h5\"},\"idempotency_key\":\"843fa567-d37b-446a-8bd0-29f6e40e3a60\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_40d8ce44f7c44761",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "request": "{\"exam_variant\":\"general_training\",\"target_overall_band\":8,\"target_skill_bands\":{\"listening\":8,\"reading\":8,\"writing\":8,\"speaking\":8},\"exam_date\":null}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9263e67ee92c425b/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_b2819a237e9b4770",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions",
+      "request": "{\"topic_id\":\"ielts-mh-general-training\",\"learner_id\":\"default_learner\",\"exam_variant\":\"general_training\",\"question_type\":\"matching_headings\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "request": "{\"question_id\":\"ielts-mh-gt-initial\",\"group_version_id\":\"rg_6e1529576560c7e193f381ce0f7cad9e\",\"structured_answer\":{\"paragraph-a\":\"i\",\"paragraph-b\":\"v\",\"paragraph-c\":\"iv\"},\"idempotency_key\":\"bfc66644-e8e4-496e-8659-71036321bd04\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_b0ff75fb509047e9",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/step",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/step",
+      "request": "{\"idempotency_key\":\"ac25289b-94a5-48ed-8016-511e7d549fd3\"}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_b0ff75fb509047e9",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "request": "{\"question_id\":\"ielts-mh-gt-diagnostic\",\"group_version_id\":\"rg_811ea35c63fec6ce15f805b917cf7025\",\"structured_answer\":{\"probe-main\":\"probe-main-distractor\",\"probe-keyword\":\"probe-keyword-heading\"},\"idempotency_key\":\"1ba20364-db91-472f-ba6d-5649e2f1748f\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_b0ff75fb509047e9",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/step",
+      "request": "{\"idempotency_key\":\"81b9fb08-8c95-48d5-83bf-1c95b61fe96e\"}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_b0ff75fb509047e9",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "request": "{\"question_id\":\"ielts-mh-gt-main-practice\",\"group_version_id\":\"rg_da6833bb6ad055c589f5e101015a2fb2\",\"structured_answer\":{\"main-practice\":\"main-practice-heading\"},\"idempotency_key\":\"a9db03c2-9691-4a09-9111-32036921c42f\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_b0ff75fb509047e9",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/transfer-check",
+      "request": "{\"force_fresh\":true}",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/transfer-check",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "request": "{\"question_id\":\"ielts-mh-gt-main-transfer\",\"group_version_id\":\"rg_7cdd91685f6e669738affb2c70ee9b6b\",\"structured_answer\":{\"item-1\":\"h1\",\"item-2\":\"h2\",\"item-3\":\"h5\"},\"idempotency_key\":\"404e8b85-f249-41d4-bcc7-9d57b3b9bd8b\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_b0ff75fb509047e9",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_e5defd51fa074822/start?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_e5defd51fa074822?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_e5defd51fa074822?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_059768493c964962/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-main-review\",\"group_version_id\":\"rg_8d3e23bfa135547a51f01e2302a0f60a\",\"structured_answer\":{\"item-1\":\"h1\",\"item-2\":\"h2\",\"item-3\":\"h5\"},\"idempotency_key\":\"db4ef022-3a44-4538-afae-891021badb7f\"}",
+      "status": 201
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_059768493c964962/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_e5defd51fa074822?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_059768493c964962/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_e5defd51fa074822?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_059768493c964962/material",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_6d9dc17b89ab4213/start?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_6d9dc17b89ab4213?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9bd998f0217240df/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9bd998f0217240df/attempts",
+      "request": "{\"question_id\":\"ielts-mh-gt-main-review\",\"group_version_id\":\"rg_5256e1cc13448f475ace7912b679945a\",\"structured_answer\":{\"item-1\":\"h2\",\"item-2\":\"h1\",\"item-3\":\"h3\"},\"idempotency_key\":\"3a16a2ca-48a1-4a36-a9ed-b2d6c95e5cef\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_6d9dc17b89ab4213?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9bd998f0217240df/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "request": "{\"exam_variant\":\"academic\",\"target_overall_band\":8,\"target_skill_bands\":{\"listening\":8,\"reading\":8,\"writing\":8,\"speaking\":8},\"exam_date\":null}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a5d917434fc747fb/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_af5aab902c054d4a",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions",
+      "request": "{\"topic_id\":\"ielts-mh-academic\",\"learner_id\":\"default_learner\",\"exam_variant\":\"academic\",\"question_type\":\"matching_headings\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-initial\",\"group_version_id\":\"rg_c1769c55d6c3bc186a62383734bc94a4\",\"structured_answer\":{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"iv\"},\"idempotency_key\":\"93f5c094-2f07-4669-ad0d-a70fc0edcf6e\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_28f2ce8c8c6f4aeb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/step",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/step",
+      "request": "{\"idempotency_key\":\"d03e6e4b-4cbe-4185-8c82-459b9652582a\"}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_28f2ce8c8c6f4aeb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-diagnostic\",\"group_version_id\":\"rg_6c0914d12eaa70cba2fa5e50fb68582e\",\"structured_answer\":{\"probe-main\":\"probe-main-distractor\",\"probe-keyword\":\"probe-keyword-heading\"},\"idempotency_key\":\"370de94b-3129-4823-bcf7-10bf13fa8dad\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_28f2ce8c8c6f4aeb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/step",
+      "request": "{\"idempotency_key\":\"efdcbfbc-05b6-4ebb-bcd4-90cdf4553d0a\"}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_28f2ce8c8c6f4aeb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "request": "{\"question_id\":\"ielts-mh-academic-main-practice\",\"group_version_id\":\"rg_c055b093e8a64361ccc23a6f4aad0e6f\",\"structured_answer\":{\"main-practice\":\"main-practice-heading\"},\"idempotency_key\":\"2dcc7148-38ac-46d5-ae71-17de2453c660\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_28f2ce8c8c6f4aeb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/transfer-check",
+      "request": "{\"force_fresh\":true}",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/transfer-check",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_28f2ce8c8c6f4aeb",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_6d9dc17b89ab4213?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_9bd998f0217240df/material",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_324bed98f6cc489e/start?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_324bed98f6cc489e?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/history?learner_id=default_learner&limit=100",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews/rev_324bed98f6cc489e?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/exams/catalog",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "request": "{\"exam_variant\":\"academic\",\"target_overall_band\":8,\"target_skill_bands\":{\"listening\":8,\"reading\":8,\"writing\":8,\"speaking\":8},\"exam_date\":null}",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/topics",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/exam-preparation?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_fd8c648b959f4d28/material",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_21a8ba8508d34dec",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions",
+      "request": "{\"topic_id\":\"ielts-tfng-acad-reading-english\",\"learner_id\":\"default_learner\",\"exam_variant\":\"academic\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a08296fd736045e6/material",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a08296fd736045e6/attempts",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a08296fd736045e6/attempts",
+      "request": "{\"question_id\":\"ielts-tfng-acad-initial\",\"submitted_answer\":\"FALSE\",\"idempotency_key\":\"d5f7ae15-4243-491a-a9a2-d279f5df4772\"}",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a08296fd736045e6",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions/sess_a08296fd736045e6/attempts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_70787b4eb8f64bf1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/sessions?learner_id=default_learner"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/profile/knowledge-states?learner_id=default_learner",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=pending",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/reviews?learner_id=default_learner&status=completed",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_70787b4eb8f64bf1/hypotheses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/diagnoses/diag_70787b4eb8f64bf1/evidence",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3630/api/v1/attempts/att_4514239b07d4459b",
+      "status": 200
+    }
+  ],
+  "browserErrors": []
+}

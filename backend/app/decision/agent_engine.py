@@ -1,4 +1,4 @@
-"""State-constrained Diagnostic Agent decision engine for UnlearnLoop Stage 3.
+"""State-constrained Diagnostic Agent decision engine for VerbaTrail Stage 3.
 
 Orchestrates:
 1. Context gathering via whitelisted read tools (`read_material_and_question`, `query_attempts_and_evidence`)
@@ -18,6 +18,8 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.decision.heuristics import rank_followup_questions
+from app.decision.matching_headings import MatchingHeadingsRules, attempt_protocol
+from app.decision.tfng_rules import tfng_proposal
 from app.decision.schemas import (
     AgentDecisionProposal,
     AgentToolCallProposal,
@@ -41,6 +43,8 @@ from app.domain.enums import (
 )
 from app.domain.exceptions import DomainRuleViolationError
 from app.evaluation.rule_evaluator import RuleEvaluationResult, RuleEvaluator
+from app.evaluation.registry import evaluator_for_domain
+from app.evaluation.reading_error_taxonomy import TAXONOMY_VERSION
 from app.model_provider import (
     ModelProvider,
     ModelProviderError,
@@ -59,7 +63,7 @@ from app.persistence.models import (
 )
 from app.persistence.repositories import LearningRepository
 
-SYSTEM_PROMPT_V1 = """You are the UnlearnLoop Diagnostic Agent.
+SYSTEM_PROMPT_V1 = """You are the VerbaTrail Diagnostic Agent.
 You operate strictly as a domain-state-constrained decision maker, NOT a free-form chat assistant.
 Rules:
 1. Maintain multiple competing error hypotheses when evidence is insufficient; never force a single premature conclusion.
@@ -185,6 +189,23 @@ class DiagnosticAgentEngine:
                     summary=draft_ev.summary,
                     reliability_note=draft_ev.reliability_note,
                 )
+                # A new, explicitly configured follow-up may strengthen or
+                # weaken an existing hypothesis, never confirm it by itself.
+                if (attempt.attempt_role == QuestionRole.DIAGNOSTIC_FOLLOWUP.value
+                        and draft_ev.source_ref.startswith(f"{TAXONOMY_VERSION}:")
+                        and target_hyp.status not in (HypothesisStatus.RULED_OUT.value, HypothesisStatus.CONFIRMED.value)):
+                    from app.domain.enums import EvidenceRelation
+                    target_status = {
+                        EvidenceRelation.SUPPORTS: HypothesisStatus.SUPPORTED,
+                        EvidenceRelation.CONTRADICTS: HypothesisStatus.LOWERED,
+                    }.get(draft_ev.relation)
+                    if target_status is not None:
+                        self.repo.update_hypothesis(
+                            target_hyp, new_status=target_status,
+                            new_confidence=target_hyp.confidence,
+                            reason="版本化追问证据更新；仍需独立验证。",
+                            missing_evidence_desc="需要独立任务和更多证据验证。",
+                        )
         self.session.refresh(diag_case)
 
     def run_diagnostic_step(
@@ -205,6 +226,20 @@ class DiagnosticAgentEngine:
             raise DomainRuleViolationError(
                 f"Attempt {attempt_id} does not exist or does not belong to session {session_id}."
             )
+
+        pinned_case = self.session.get(DiagnosticCase, diagnostic_case_id) if diagnostic_case_id else None
+        if diagnostic_case_id and (pinned_case is None or pinned_case.session_id != session_id):
+            raise DomainRuleViolationError("The diagnostic case does not belong to this session.")
+        trigger = pinned_case.trigger_attempt if pinned_case else attempt
+        if trigger.group_version_id is not None:
+            if pinned_case is None:
+                raise DomainRuleViolationError("Matching Headings requires the existing diagnostic case.")
+            return MatchingHeadingsRules(self.repo).step(
+                learning_session, pinned_case, idempotency_key=idempotency_key, settings=self.settings,
+            )
+        protocol, version = attempt_protocol(trigger)
+        if protocol is not None and (protocol, version) != ("tfng-v1", TAXONOMY_VERSION):
+            raise DomainRuleViolationError("Insufficient evidence: unsupported diagnostic protocol or version.")
 
         question = self.session.get(Question, attempt.question_id)
         topic = self.session.get(KnowledgeTopic, learning_session.topic_id)
@@ -272,7 +307,7 @@ class DiagnosticAgentEngine:
             )
 
         # Step 1: Run local deterministic rule pre-evaluation
-        rule_result = self.rule_evaluator.evaluate_attempt(
+        rule_result = evaluator_for_domain(topic.domain_code).evaluate_attempt(
             attempt=attempt,
             question=question,
             topic=topic,
@@ -391,133 +426,143 @@ class DiagnosticAgentEngine:
                 ),
             )
 
-        # Step 4: Invoke ModelProvider for structured Agent decision proposal
-        available_questions = {
-            role.value: [
-                {"id": q.id, "prompt_text": q.prompt_text}
-                for q in self.repo.list_questions_for_topic(topic.id, role=role)
-            ]
-            for role in QuestionRole
-        }
-        user_prompt_payload = {
-            "material_and_question": material_context,
-            "history_and_evidence": history_context,
-            "rule_pre_evaluation": {
-                "answer_matches_standard": rule_result.answer_matches_standard,
-                "has_reasoning_or_trace": rule_result.has_reasoning_or_trace,
-                "summary": rule_result.summary,
-            },
-            "available_questions_by_role": available_questions,
-            "constraints": {
-                "followup_turns_used": followup_turns_used,
-                "max_followup_turns": max_followup_turns,
-                "remaining_token_budget": session_token_budget - tokens_used_so_far,
-            },
-        }
-
-        serialized_payload = json.dumps(user_prompt_payload, ensure_ascii=False)
-        # Conservative prompt token estimation (characters // 3 for bilingual JSON prompt)
-        estimated_prompt_tokens = max(
-            128,
-            (len(SYSTEM_PROMPT_V1) + len(serialized_payload)) // 3,
-        )
-        # Dynamically clamp completion max_tokens to prevent large overshoots
-        safe_completion_budget = max(64, remaining_budget - estimated_prompt_tokens)
-
-        model_request = ModelRequest(
-            prompt_version="diag_agent_v1",
-            system_prompt=SYSTEM_PROMPT_V1,
-            user_prompt=serialized_payload,
-            max_tokens=min(
-                self.settings.model_max_tokens_per_call,
-                safe_completion_budget,
-            ),
-            temperature=self.settings.model_temperature,
-            session_id=learning_session.id,
-            diagnostic_case_id=diag_case.id,
-            metadata={"attempt_id": attempt.id, "question_role": attempt.attempt_role},
-        )
-
-        try:
-            model_resp = self.model_provider.generate_structured(
-                model_request, AgentDecisionProposal
-            )
-            self.repo.record_model_call(
-                provider_name=model_resp.provider_name,
-                model_name=model_resp.model_name,
-                prompt_version=model_resp.prompt_version,
-                status=ModelCallStatus.SUCCEEDED,
-                redacted_summary=model_resp.redacted_summary,
-                latency_ms=model_resp.latency_ms,
-                prompt_tokens=model_resp.usage.prompt_tokens,
-                completion_tokens=model_resp.usage.completion_tokens,
-                total_tokens=model_resp.usage.total_tokens,
-                attempt_count=model_resp.attempt_count,
-                session_id=learning_session.id,
-                diagnostic_case_id=diag_case.id,
-            )
-        except ModelProviderError as exc:
-            # Failure recovery: preserve Attempt & existing Evidence, enter RETRY_WAITING
-            self.repo.record_model_call(
-                provider_name=self.model_provider.provider_name,
-                model_name=self.model_provider.model_name,
-                prompt_version=model_request.prompt_version,
-                status=exc.status,
-                redacted_summary=redact_sensitive_text(
-                    f"Model call failed ({exc.error_code}): {exc.redacted_message}"
-                ),
-                latency_ms=exc.latency_ms,
-                attempt_count=exc.attempt_count,
-                error_code=exc.error_code,
-                session_id=learning_session.id,
-                diagnostic_case_id=diag_case.id,
-            )
-            fallback_note = (
-                f"模型调用未成功 ({exc.error_code})，已完整保留作答与规则证据，进入等待重试状态。"
-            )
-            diag_case.status = DiagnosticCaseStatus.RETRY_WAITING.value
-            diag_case.uncertainty_note = fallback_note
-            evt = self.repo.append_decision_event(
-                session_id=learning_session.id,
-                diagnostic_case_id=diag_case.id,
-                event_type="model_call_failed_fallback",
-                from_state=DiagnosticCaseStatus.HYPOTHESES_GENERATED.value,
-                to_state=DiagnosticCaseStatus.RETRY_WAITING.value,
-                action="enter_retry_waiting",
-                reason=fallback_note,
-                uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
-                payload_json={
-                    "error_code": exc.error_code,
-                    "executed_tool": "enter_retry_waiting",
-                    "degraded_mode": True,
-                    "degradation_reason": fallback_note,
+        # Versioned TFNG protocol makes auditable rule decisions without a model call.
+        proposal = tfng_proposal(learning_session, diag_case, self.repo)
+        if proposal is not None:
+            if diag_case.status == DiagnosticCaseStatus.QUESTION_SELECTED.value:
+                self.repo.transition_diagnostic_case(
+                    diag_case, DiagnosticCaseStatus.HYPOTHESES_UPDATED,
+                    action="tfng_evidence_review", reason=proposal.reasoning,
+                    uncertainty_level=proposal.uncertainty_level,
+                )
+        else:
+            # Step 4: Invoke ModelProvider for structured Agent decision proposal
+            available_questions = {
+                role.value: [
+                    {"id": q.id, "prompt_text": q.prompt_text}
+                    for q in self.repo.list_questions_for_topic(topic.id, role=role)
+                ]
+                for role in QuestionRole
+            }
+            user_prompt_payload = {
+                "material_and_question": material_context,
+                "history_and_evidence": history_context,
+                "rule_pre_evaluation": {
+                    "answer_matches_standard": rule_result.answer_matches_standard,
+                    "has_reasoning_or_trace": rule_result.has_reasoning_or_trace,
+                    "summary": rule_result.summary,
                 },
-                idempotency_key=idempotency_key,
+                "available_questions_by_role": available_questions,
+                "constraints": {
+                    "followup_turns_used": followup_turns_used,
+                    "max_followup_turns": max_followup_turns,
+                    "remaining_token_budget": session_token_budget - tokens_used_so_far,
+                },
+            }
+
+            serialized_payload = json.dumps(user_prompt_payload, ensure_ascii=False)
+            # Conservative prompt token estimation (characters // 3 for bilingual JSON prompt)
+            estimated_prompt_tokens = max(
+                128,
+                (len(SYSTEM_PROMPT_V1) + len(serialized_payload)) // 3,
             )
-            return DiagnosticStepResult(
+            # Dynamically clamp completion max_tokens to prevent large overshoots
+            safe_completion_budget = max(64, remaining_budget - estimated_prompt_tokens)
+
+            model_request = ModelRequest(
+                prompt_version="diag_agent_v1",
+                system_prompt=SYSTEM_PROMPT_V1,
+                user_prompt=serialized_payload,
+                max_tokens=min(
+                    self.settings.model_max_tokens_per_call,
+                    safe_completion_budget,
+                ),
+                temperature=self.settings.model_temperature,
                 session_id=learning_session.id,
                 diagnostic_case_id=diag_case.id,
-                attempt_id=attempt.id,
-                case_status=DiagnosticCaseStatus.RETRY_WAITING,
-                executed_tool="enter_retry_waiting",
-                selected_intervention=None,
-                uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
-                uncertainty_note=fallback_note,
-                confidence_is_heuristic=True,
-                followup_turns_used=followup_turns_used,
-                max_followup_turns=max_followup_turns,
-                tokens_used_in_case=self.repo.get_case_token_usage(diag_case.id),
-                session_token_budget=session_token_budget,
-                degraded_mode=True,
-                degradation_reason=fallback_note,
-                decision_event_id=evt.id,
-                hypotheses_snapshot=self._serialize_hypotheses(diag_case),
-                knowledge_state_status=self._get_current_knowledge_state_status(
-                    learning_session.learner_id, learning_session.topic_id
-                ),
+                metadata={"attempt_id": attempt.id, "question_role": attempt.attempt_role, "domain_code": topic.domain_code},
             )
 
-        proposal = model_resp.parsed_output
+            try:
+                model_resp = self.model_provider.generate_structured(
+                    model_request, AgentDecisionProposal
+                )
+                self.repo.record_model_call(
+                    provider_name=model_resp.provider_name,
+                    model_name=model_resp.model_name,
+                    prompt_version=model_resp.prompt_version,
+                    status=ModelCallStatus.SUCCEEDED,
+                    redacted_summary=model_resp.redacted_summary,
+                    latency_ms=model_resp.latency_ms,
+                    prompt_tokens=model_resp.usage.prompt_tokens,
+                    completion_tokens=model_resp.usage.completion_tokens,
+                    total_tokens=model_resp.usage.total_tokens,
+                    attempt_count=model_resp.attempt_count,
+                    session_id=learning_session.id,
+                    diagnostic_case_id=diag_case.id,
+                )
+            except ModelProviderError as exc:
+                # Failure recovery: preserve Attempt & existing Evidence, enter RETRY_WAITING
+                self.repo.record_model_call(
+                    provider_name=self.model_provider.provider_name,
+                    model_name=self.model_provider.model_name,
+                    prompt_version=model_request.prompt_version,
+                    status=exc.status,
+                    redacted_summary=redact_sensitive_text(
+                        f"Model call failed ({exc.error_code}): {exc.redacted_message}"
+                    ),
+                    latency_ms=exc.latency_ms,
+                    attempt_count=exc.attempt_count,
+                    error_code=exc.error_code,
+                    session_id=learning_session.id,
+                    diagnostic_case_id=diag_case.id,
+                )
+                fallback_note = (
+                    f"模型调用未成功 ({exc.error_code})，已完整保留作答与规则证据，进入等待重试状态。"
+                )
+                diag_case.status = DiagnosticCaseStatus.RETRY_WAITING.value
+                diag_case.uncertainty_note = fallback_note
+                evt = self.repo.append_decision_event(
+                    session_id=learning_session.id,
+                    diagnostic_case_id=diag_case.id,
+                    event_type="model_call_failed_fallback",
+                    from_state=DiagnosticCaseStatus.HYPOTHESES_GENERATED.value,
+                    to_state=DiagnosticCaseStatus.RETRY_WAITING.value,
+                    action="enter_retry_waiting",
+                    reason=fallback_note,
+                    uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                    payload_json={
+                        "error_code": exc.error_code,
+                        "executed_tool": "enter_retry_waiting",
+                        "degraded_mode": True,
+                        "degradation_reason": fallback_note,
+                    },
+                    idempotency_key=idempotency_key,
+                )
+                return DiagnosticStepResult(
+                    session_id=learning_session.id,
+                    diagnostic_case_id=diag_case.id,
+                    attempt_id=attempt.id,
+                    case_status=DiagnosticCaseStatus.RETRY_WAITING,
+                    executed_tool="enter_retry_waiting",
+                    selected_intervention=None,
+                    uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+                    uncertainty_note=fallback_note,
+                    confidence_is_heuristic=True,
+                    followup_turns_used=followup_turns_used,
+                    max_followup_turns=max_followup_turns,
+                    tokens_used_in_case=self.repo.get_case_token_usage(diag_case.id),
+                    session_token_budget=session_token_budget,
+                    degraded_mode=True,
+                    degradation_reason=fallback_note,
+                    decision_event_id=evt.id,
+                    hypotheses_snapshot=self._serialize_hypotheses(diag_case),
+                    knowledge_state_status=self._get_current_knowledge_state_status(
+                        learning_session.learner_id, learning_session.topic_id
+                    ),
+                )
+
+            proposal = model_resp.parsed_output
 
         # Step 5: Apply competing hypothesis updates & evidence links
         if proposal.hypothesis_updates:

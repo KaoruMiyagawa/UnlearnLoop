@@ -1,13 +1,16 @@
 """FastAPI application factory and entry point."""
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.v1.dependencies import get_or_create_engine_and_factory
 from app.api.v1.router import api_v1_router
 from app.application.exceptions import ApplicationError
 from app.config import Settings, get_settings
@@ -20,9 +23,8 @@ from app.domain.exceptions import (
 )
 from app.model_provider import ModelProviderError
 from app.observability import RequestIdMiddleware
-from app.persistence.database import create_db_engine, create_session_factory
 from app.persistence.migrations_runner import upgrade_database
-from app.persistence.seed import import_content_pack
+from app.persistence.seed import import_content_pack, load_matching_headings_diagnostic_pack
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -31,23 +33,40 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        # In development mode, auto-migrate schema and seed baseline content if empty
+        # In development mode, incrementally migrate schema to head and seed baseline content
+        # without dropping existing tables or silently swallowing critical initialization errors.
         if resolved_settings.app_env == "development":
-            engine = create_db_engine(resolved_settings)
+            engine, factory = get_or_create_engine_and_factory(resolved_settings)
             upgrade_database(database_url=resolved_settings.database_url, engine=engine)
-            factory = create_session_factory(engine)
             with factory() as session:
                 try:
                     import_content_pack(session)
+                    import_content_pack(
+                        session,
+                        pack_path=Path(__file__).parent / "content" / "ielts_reading_pack.json",
+                    )
+                    import_content_pack(
+                        session,
+                        pack_path=Path(__file__).parent / "content" / "ielts_reading_english_pack.json",
+                    )
+                    import_content_pack(
+                        session,
+                        pack_path=Path(__file__).parent / "content" / "ielts_tfng_diagnostic_pack.json",
+                    )
+                    import_content_pack(
+                        session,
+                        pack_data=load_matching_headings_diagnostic_pack(session),
+                    )
                     session.commit()
                 except Exception:
                     session.rollback()
+                    raise
         yield
 
     app = FastAPI(
         title=resolved_settings.app_name,
         version=resolved_settings.app_version,
-        description="UnlearnLoop — Evidence-based AI adaptive learning system API",
+        description="VerbaTrail — evidence-based English learning system API",
         docs_url="/docs",
         redoc_url="/redoc",
         lifespan=lifespan,
@@ -201,7 +220,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "code": "VALIDATION_ERROR",
                 "message": "请求参数校验失败",
                 "request_id": request_id,
-                "details": exc.errors(),
+                "details": jsonable_encoder([{key: value for key, value in error.items() if key != "ctx"} for error in exc.errors()]),
             },
         )
 

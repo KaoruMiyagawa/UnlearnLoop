@@ -1,0 +1,133 @@
+{
+  "operation": "immutable read-only SQLite snapshot; aggregate scan only",
+  "source_path": "D:\\Projects\\VerbaTrail\\backend\\unlearnloop.db",
+  "source_sha256_before": "bc4656aa2bc624f0a257254ba25597db3031126fdfcbe79e5f3bb0cb607793e0",
+  "source_sha256_after": "bc4656aa2bc624f0a257254ba25597db3031126fdfcbe79e5f3bb0cb607793e0",
+  "source_hash_unchanged": true,
+  "sqlite_sidecars_present": [],
+  "snapshot_integrity_check": "ok",
+  "alembic_versions": [
+    "0002_stage3_model_calls"
+  ],
+  "schema_tables": [
+    "alembic_version",
+    "attempts",
+    "decision_events",
+    "diagnostic_cases",
+    "evidence_links",
+    "hypotheses",
+    "knowledge_states",
+    "knowledge_topic_dependencies",
+    "knowledge_topics",
+    "learning_materials",
+    "learning_sessions",
+    "model_calls",
+    "questions",
+    "review_items"
+  ],
+  "relevant_schema_columns": {
+    "reading_group_versions": [],
+    "questions": [
+      "id",
+      "topic_id",
+      "material_id",
+      "parent_question_id",
+      "question_role",
+      "question_type",
+      "prompt_text",
+      "context_snippet",
+      "standard_answer",
+      "answer_explanation",
+      "evaluation_rubric",
+      "difficulty",
+      "version",
+      "created_at",
+      "updated_at"
+    ],
+    "attempts": [
+      "id",
+      "session_id",
+      "question_id",
+      "question_version",
+      "question_snapshot_json",
+      "attempt_role",
+      "submitted_answer",
+      "is_correct",
+      "evaluation_status",
+      "evaluation_summary",
+      "idempotency_key",
+      "submitted_at"
+    ],
+    "review_items": [
+      "id",
+      "learner_id",
+      "topic_id",
+      "session_id",
+      "hypothesis_id",
+      "trigger_reason",
+      "status",
+      "scheduled_for",
+      "completed_at",
+      "review_outcome",
+      "created_at"
+    ],
+    "knowledge_states": [
+      "id",
+      "learner_id",
+      "topic_id",
+      "status",
+      "unresolved_error_codes",
+      "last_evidence_id",
+      "last_decision_event_id",
+      "last_transfer_attempt_id",
+      "transition_reason",
+      "updated_at"
+    ],
+    "evidence_links": [
+      "id",
+      "hypothesis_id",
+      "attempt_id",
+      "decision_event_id",
+      "source_type",
+      "source_ref",
+      "relation",
+      "summary",
+      "reliability_note",
+      "created_at"
+    ],
+    "decision_events": [
+      "id",
+      "session_id",
+      "diagnostic_case_id",
+      "event_type",
+      "from_state",
+      "to_state",
+      "action",
+      "reason",
+      "uncertainty_level",
+      "payload_json",
+      "idempotency_key",
+      "created_at"
+    ]
+  },
+  "aggregate_counts": {
+    "table_counts": {
+      "questions": 23,
+      "attempts": 0,
+      "review_items": 0,
+      "knowledge_states": 0,
+      "evidence_links": 0,
+      "decision_events": 0
+    },
+    "matching_headings_question_count": 0,
+    "matching_headings_attempt_count": 0,
+    "matching_headings_attempt_role_counts": {},
+    "matching_headings_missing_group_provenance_count": 0,
+    "matching_headings_distinct_learner_count": 0,
+    "matching_headings_dependent_review_count": 0,
+    "matching_headings_affected_knowledge_state_count": 0,
+    "unknown_matching_headings_version_count": 0
+  },
+  "learner_identifiers_exported": false,
+  "migration_or_apply_executed": false
+}

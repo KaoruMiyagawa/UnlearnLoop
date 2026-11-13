@@ -84,7 +84,10 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["var_assign_reactive_formula", "var_assign_reverse_direction"],
+            "target_error_codes": [
+              "var_assign_reactive_formula",
+              "var_assign_reverse_direction"
+            ],
             "discriminating_rationale": "若回答位置 1 为 15、位置 2 变为 25，则确诊为 `var_assign_reactive_formula`；若两处均为 15，则排除联动公式误解。"
           }
         },
@@ -101,7 +104,9 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["var_assign_reactive_formula"]
+            "target_error_codes": [
+              "var_assign_reactive_formula"
+            ]
           }
         },
         {
@@ -118,7 +123,9 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_var_assign",
-            "target_error_codes": ["var_assign_reactive_formula"]
+            "target_error_codes": [
+              "var_assign_reactive_formula"
+            ]
           }
         }
       ]
@@ -130,7 +137,9 @@
       "title": "条件判断与 if-elif-else 互斥分支",
       "summary": "掌握 `if / elif / else` 单次命中短路机制与多个独立 `if` 语句的执行差异。",
       "difficulty_level": 1,
-      "prerequisites": ["py-variable-assignment"],
+      "prerequisites": [
+        "py-variable-assignment"
+      ],
       "common_error_patterns": [
         {
           "error_code": "cond_elif_treated_as_independent_if",
@@ -197,7 +206,9 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["cond_elif_treated_as_independent_if"],
+            "target_error_codes": [
+              "cond_elif_treated_as_independent_if"
+            ],
             "discriminating_rationale": "若认为 `res1` 也是 `CB`，则确认对 `elif` 互斥短路机制存在概念误解。"
           }
         },
@@ -214,7 +225,10 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["cond_elif_treated_as_independent_if", "cond_boundary_equality_missed"]
+            "target_error_codes": [
+              "cond_elif_treated_as_independent_if",
+              "cond_boundary_equality_missed"
+            ]
           }
         },
         {
@@ -231,7 +245,9 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_cond_branch",
-            "target_error_codes": ["cond_elif_treated_as_independent_if"]
+            "target_error_codes": [
+              "cond_elif_treated_as_independent_if"
+            ]
           }
         }
       ]
@@ -243,7 +259,9 @@
       "title": "range() 序列起点、终点与步长规则",
       "summary": "理解 `range(stop)` 与 `range(start, stop, step)` 左闭右开区间 `[start, stop)` 的精确含义。",
       "difficulty_level": 1,
-      "prerequisites": ["py-variable-assignment"],
+      "prerequisites": [
+        "py-variable-assignment"
+      ],
       "common_error_patterns": [
         {
           "error_code": "range_start_at_one",
@@ -315,7 +333,10 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["range_start_at_one", "range_stop_inclusive"],
+            "target_error_codes": [
+              "range_start_at_one",
+              "range_stop_inclusive"
+            ],
             "discriminating_rationale": "回答 `[1, 2, 3]` 对应默认起点与终点双重偏差；回答 `[0, 1, 2, 3]` 对应仅终点包含误解。"
           }
         },
@@ -332,7 +353,9 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["range_stop_inclusive"]
+            "target_error_codes": [
+              "range_stop_inclusive"
+            ]
           }
         },
         {
@@ -349,7 +372,9 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_range_func",
-            "target_error_codes": ["range_stop_inclusive"]
+            "target_error_codes": [
+              "range_stop_inclusive"
+            ]
           }
         }
       ]
@@ -361,7 +386,10 @@
       "title": "for 循环迭代与累加状态追踪",
       "summary": "追踪 `for` 循环在每一轮迭代中循环变量与累加器变量的中间状态变化。",
       "difficulty_level": 2,
-      "prerequisites": ["py-variable-assignment", "py-range-function"],
+      "prerequisites": [
+        "py-variable-assignment",
+        "py-range-function"
+      ],
       "common_error_patterns": [
         {
           "error_code": "loop_memorized_result_without_trace",
@@ -433,7 +461,10 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["loop_memorized_result_without_trace", "range_start_at_one"],
+            "target_error_codes": [
+              "loop_memorized_result_without_trace",
+              "range_start_at_one"
+            ],
             "discriminating_rationale": "若回答 `1、3`（共两轮，认为 1+2=3），则暴露其将 `range(3)` 误解为 `[1, 2]` 却碰巧算得总和 3！"
           }
         },
@@ -450,7 +481,29 @@
           "difficulty": 2,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["loop_reset_accumulator_inside_body", "loop_memorized_result_without_trace"]
+            "target_error_codes": [
+              "loop_reset_accumulator_inside_body",
+              "loop_memorized_result_without_trace"
+            ]
+          }
+        },
+        {
+          "id": "q_py_loop_practice_02",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_initial_01",
+          "question_role": "targeted_practice",
+          "question_type": "code_trace",
+          "prompt_text": "再次练习逐轮追踪：写出最终输出，并说明每轮 total 的变化。",
+          "context_snippet": "total = 2\nfor n in range(4):\n    total += n\nprint(total)",
+          "standard_answer": "8",
+          "answer_explanation": "total 从 2 开始，依次加上 0、1、2、3，最终得到 8。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "target_error_codes": [
+              "range_start_at_one",
+              "loop_memorized_result_without_trace"
+            ]
           }
         },
         {
@@ -467,7 +520,9 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_for_loop",
-            "target_error_codes": ["loop_memorized_result_without_trace"]
+            "target_error_codes": [
+              "loop_memorized_result_without_trace"
+            ]
           }
         },
         {
@@ -484,7 +539,90 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_for_loop",
-            "target_error_codes": ["loop_memorized_result_without_trace", "range_start_at_one"]
+            "target_error_codes": [
+              "loop_memorized_result_without_trace",
+              "range_start_at_one"
+            ]
+          }
+        },
+        {
+          "id": "q_py_loop_review_01",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_transfer_02",
+          "question_role": "review",
+          "question_type": "code_trace",
+          "prompt_text": "仓库盘点时记录了三批零件数量。写出最后打印的批次数和总件数。",
+          "context_snippet": "batches = [2, 4, 6]\ntotal = 0\nfor batch in batches:\n    total += batch\nprint(len(batches), total)",
+          "standard_answer": "3 12",
+          "answer_explanation": "循环逐项累加 2、4、6 得到 12；列表有三项。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "3 12"
+          }
+        },
+        {
+          "id": "q_py_loop_review_02",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_transfer_02",
+          "question_role": "review",
+          "question_type": "code_trace",
+          "prompt_text": "传感器读数中有多少个值大于 4？写出打印结果。",
+          "context_snippet": "readings = [3, 5, 7]\ncount = 0\nfor reading in readings:\n    if reading > 4:\n        count += 1\nprint(count)",
+          "standard_answer": "2",
+          "answer_explanation": "5 和 7 满足大于 4 的条件，因此计数为 2。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "2"
+          }
+        },
+        {
+          "id": "q_py_loop_review_03",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_transfer_02",
+          "question_role": "review",
+          "question_type": "code_trace",
+          "prompt_text": "逐个处理测量值。写出最后列表。",
+          "context_snippet": "samples = [1, 3, 5, 7]\nadjusted = []\nfor sample in samples:\n    if sample % 2:\n        adjusted.append(sample + 1)\nprint(adjusted)",
+          "standard_answer": "[2, 4, 6, 8]",
+          "answer_explanation": "四个奇数都满足条件，各自加一后追加到新列表。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "[2, 4, 6, 8]"
+          }
+        },
+        {
+          "id": "q_py_loop_review_04",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_transfer_02",
+          "question_role": "review",
+          "question_type": "code_trace",
+          "prompt_text": "设备编号从 2 开始，每次增加 3，直到 10 之前。写出编号总和。",
+          "context_snippet": "total = 0\nfor device_id in range(2, 10, 3):\n    total += device_id\nprint(total)",
+          "standard_answer": "15",
+          "answer_explanation": "range 产生 2、5、8，三者之和为 15。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "15"
+          }
+        },
+        {
+          "id": "q_py_loop_review_05",
+          "material_id": "mat_py_for_loop_01",
+          "parent_question_id": "q_py_loop_transfer_02",
+          "question_role": "review",
+          "question_type": "code_trace",
+          "prompt_text": "停车场逐个检查 4 个车位，写出已占用和空闲车位数量。",
+          "context_snippet": "seats = [0, 1, 0, 1]\noccupied = 0\nfor seat in seats:\n    occupied += seat\nfree = len(seats) - occupied\nprint(occupied, free)",
+          "standard_answer": "2 2",
+          "answer_explanation": "列表中的两个 1 表示占用；4 个车位减去 2 个占用，空闲 2 个。",
+          "difficulty": 2,
+          "version": 1,
+          "evaluation_rubric": {
+            "expected_output": "2 2"
           }
         }
       ]
@@ -496,7 +634,10 @@
       "title": "列表零基索引、负向索引与切片边界",
       "summary": "掌握 Python 列表从 0 开始的正向索引、从 -1 开始的尾部负向索引以及切片左闭右开规则。",
       "difficulty_level": 2,
-      "prerequisites": ["py-variable-assignment", "py-range-function"],
+      "prerequisites": [
+        "py-variable-assignment",
+        "py-range-function"
+      ],
       "common_error_patterns": [
         {
           "error_code": "list_one_based_indexing",
@@ -567,7 +708,10 @@
           "difficulty": 1,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["list_one_based_indexing", "list_negative_index_off_by_one"],
+            "target_error_codes": [
+              "list_one_based_indexing",
+              "list_negative_index_off_by_one"
+            ],
             "discriminating_rationale": "能否正确写出 `scores[0]` 与 `scores[-2]` 直接区分正向与负向索引心智模型。"
           }
         },
@@ -584,7 +728,10 @@
           "difficulty": 2,
           "version": 1,
           "evaluation_rubric": {
-            "target_error_codes": ["list_one_based_indexing", "list_negative_index_off_by_one"]
+            "target_error_codes": [
+              "list_one_based_indexing",
+              "list_negative_index_off_by_one"
+            ]
           }
         },
         {
@@ -601,7 +748,10 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_list_index",
-            "target_error_codes": ["list_one_based_indexing", "range_stop_inclusive"]
+            "target_error_codes": [
+              "list_one_based_indexing",
+              "range_stop_inclusive"
+            ]
           }
         },
         {
@@ -618,7 +768,10 @@
           "version": 1,
           "evaluation_rubric": {
             "verifies_transfer_of": "topic_py_list_index",
-            "target_error_codes": ["list_one_based_indexing", "list_negative_index_off_by_one"]
+            "target_error_codes": [
+              "list_one_based_indexing",
+              "list_negative_index_off_by_one"
+            ]
           }
         }
       ]

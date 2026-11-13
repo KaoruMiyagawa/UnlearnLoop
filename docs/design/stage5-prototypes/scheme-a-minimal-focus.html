@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnlearnLoop · 方案 A：极简专注型 (Minimal Focus)</title>
+  <style>
+    :root {
+      --bg-paper: #FAF8F5;
+      --bg-sheet: #FFFFFF;
+      --bg-subtle: #F2EFE9;
+      --bg-inset: #EAE6DF;
+      --ink-primary: #18181B;
+      --ink-secondary: #52525B;
+      --ink-muted: #71717A;
+      --border-hairline: #E4E0D8;
+      --border-strong: #C8C2B8;
+      --accent-Zen: #14532D;
+      --accent-Zen-soft: #ECFDF3;
+      --warn-ochre: #9A5B13;
+      --warn-ochre-soft: #FEF7EC;
+      --danger-rust: #9E2A2B;
+      --danger-rust-soft: #FDF2F2;
+      --info-slate: #334155;
+      --info-slate-soft: #F1F5F9;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-serif: "Songti SC", "Noto Serif SC", Georgia, "Times New Roman", serif;
+      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-paper);
+      color: var(--ink-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Minimal Editorial Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(250, 248, 245, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--ink-secondary);
+    }
+    .brand-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--ink-primary);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+    .scheme-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      color: var(--ink-secondary);
+      background: var(--bg-subtle);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .nav-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink-secondary);
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .nav-btn:hover {
+      color: var(--ink-primary);
+      background: var(--bg-subtle);
+    }
+    .nav-btn.active {
+      color: var(--ink-primary);
+      background: var(--bg-inset);
+      font-weight: 600;
+    }
+    .nav-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+      margin-right: 4px;
+    }
+    .hub-link {
+      font-size: 13px;
+      color: var(--accent-Zen);
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 1px;
+      white-space: nowrap;
+    }
+
+    /* Mock Data Banner */
+    .mock-strip {
+      max-width: 780px;
+      margin: 18px auto 0;
+      padding: 8px 14px;
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-subtle);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--ink-secondary);
+    }
+    .mock-strip strong { color: var(--ink-primary); }
+
+    /* Single-Column Zen Spine */
+    .spine {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 28px 20px 96px;
+    }
+
+    .editorial-header {
+      border-bottom: 1px solid var(--border-hairline);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+    }
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      line-height: 1.28;
+      font-weight: 600;
+      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 21px;
+      line-height: 1.35;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+    .subtitle {
+      color: var(--ink-secondary);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    /* Sheet & Sections */
+    .sheet {
+      background: var(--bg-sheet);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .sheet-subtle {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-hairline);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--ink-muted);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    /* Status Labels (Always Text + Symbol, never color-only) */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+    }
+    .pill.zen { background: var(--accent-Zen-soft); color: var(--accent-Zen); border-color: #BBF7D0; }
+    .pill.ochre { background: var(--warn-ochre-soft); color: var(--warn-ochre); border-color: #FDE68A; }
+    .pill.rust { background: var(--danger-rust-soft); color: var(--danger-rust); border-color: #FECACA; }
+    .pill.slate { background: var(--info-slate-soft); color: var(--info-slate); border-color: #CBD5E1; }
+
+    /* Code & Prompt Block */
+    .code-sheet {
+      background: #1C1B18;
+      color: #F4F1EA;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .code-bar {
+      padding: 8px 14px;
+      border-bottom: 1px solid #302E29;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #A8A29E;
+      display: flex;
+      justify-content: space-between;
+    }
+    .code-sheet pre {
+      margin: 0;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    /* Inputs & Buttons */
+    label.field-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--ink-primary);
+    }
+    .field-hint {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin-bottom: 10px;
+    }
+    textarea.zen-input {
+      width: 100%;
+      min-height: 112px;
+      padding: 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      background: var(--bg-paper);
+      color: var(--ink-primary);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      resize: vertical;
+    }
+    textarea.zen-input:focus {
+      outline: 2px solid var(--accent-Zen);
+      background: var(--bg-sheet);
+    }
+
+    .btn-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-sheet);
+      color: var(--ink-primary);
+      padding: 9px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: var(--bg-subtle);
+      border-color: var(--ink-secondary);
+    }
+    .btn.primary {
+      background: var(--accent-Zen);
+      border-color: var(--accent-Zen);
+      color: #FFFFFF;
+    }
+    .btn.primary:hover {
+      background: #0F3F22;
+    }
+    .btn.subtle {
+      border-color: transparent;
+      background: transparent;
+      color: var(--ink-secondary);
+      text-decoration: underline;
+    }
+
+    /* Marginalia / Inline Foldouts */
+    .marginalia {
+      border-left: 3px solid var(--border-strong);
+      padding-left: 18px;
+      margin: 20px 0;
+    }
+    .marginalia.ochre { border-left-color: var(--warn-ochre); }
+    .marginalia.zen { border-left-color: var(--accent-Zen); }
+    .marginalia.rust { border-left-color: var(--danger-rust); }
+
+    .hyp-row {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .hyp-row:last-child { border-bottom: none; }
+    .hyp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .conf-meter {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink-secondary);
+    }
+    .evidence-list {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+      font-size: 13.5px;
+    }
+    .ev-item {
+      padding: 8px 12px;
+      background: var(--bg-paper);
+      border: 1px solid var(--border-hairline);
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Stage Sub-switcher */
+    .stage-switcher {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-hairline);
+      border-radius: 6px;
+      margin-bottom: 22px;
+      font-size: 13px;
+    }
+    .stage-switcher span.label {
+      font-weight: 600;
+      color: var(--ink-secondary);
+      margin-right: 6px;
+    }
+    .chip-btn {
+      border: 1px solid var(--border-strong);
+      background: var(--bg-sheet);
+      color: var(--ink-secondary);
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .chip-btn.active {
+      background: var(--ink-primary);
+      color: #FFFFFF;
+      border-color: var(--ink-primary);
+      font-weight: 600;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border-hairline);
+      margin: 24px 0;
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .list-row:last-child { border-bottom: none; }
+
+    @media (max-width: 640px) {
+      .topbar { height: auto; padding: 12px 16px; flex-wrap: wrap; }
+      .sheet { padding: 18px; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-cluster">
+      <a class="brand-title" href="./index.html">UnlearnLoop</a>
+      <span class="scheme-badge">方案 A · 极简专注型</span>
+    </div>
+    <nav class="nav-tabs" aria-label="主视图切换">
+      <button class="nav-btn active" data-view="home"><span class="nav-num">01</span>学习首页</button>
+      <button class="nav-btn" data-view="workspace"><span class="nav-num">02</span>学习工作区</button>
+      <button class="nav-btn" data-view="diagnosis"><span class="nav-num">03</span>Agent 诊断手稿</button>
+      <button class="nav-btn" data-view="transfer"><span class="nav-num">04</span>迁移验证</button>
+      <button class="nav-btn" data-view="progress"><span class="nav-num">05</span>掌握状态与档案</button>
+    </nav>
+    <a class="hub-link" href="./index.html">返回三方案对比总览 ↗</a>
+  </header>
+
+  <div class="mock-strip">
+    <span><strong>[MOCK DATA · 审美评审原型]</strong> 方案 A 采用“单栏渐进手稿流（Zen Editorial Spine）”，无侧边栏干扰，诊断与证据以页边批注折页内联展开。</span>
+    <span>快捷键：数字键 <code>1-5</code> 切换页面</span>
+  </div>
+
+  <main class="spine" id="app-root"></main>
+
+  <script>
+    const state = {
+      view: 'home',
+      workspacePreset: 'bare_three', // 'bare_three' | 'wrong_four' | 'full_trace'
+      diagStage: 'step1_followup',   // 'step1_followup' | 'step2_practice' | 'degraded_budget'
+      transferStage: 'retry_blocked', // 'first_fail' | 'retry_blocked' | 'fresh_pass'
+      sessionEndingMode: 'ended_needs_practice' // 'ended_needs_practice' | 'mastered_stable'
+    };
+
+    function setView(v) {
+      state.view = v;
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === v);
+      });
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderHome() {
+      return `
+        <div class="editorial-header">
+          <div class="kicker">ISSUE 04 · 专注式认知校准工作流</div>
+          <h1>今天只理清一个概念边界。</h1>
+          <p class="subtitle">不堆砌仪表盘卡片，只呈现当前最需要补充区分性证据的 1 个学习断点。</p>
+        </div>
+
+        <section class="sheet">
+          <div class="meta-row">
+            <span>当前进行中会话 · <code>sess_9e46af87</code></span>
+            <span class="pill ochre">● 诊断进行中 · 需要 1 条区分性证据</span>
+          </div>
+          <h2>Python 循环与状态累加（<code>py-for-loop</code>）</h2>
+          <p style="color:var(--ink-secondary)">
+            你在 12 分钟前提交了初始答案 <code>"3"</code>。输出结果与标准答案一致，但系统存在两个并列的竞争性假设（“心算正确但省略过程” vs “误以为 <code>range(3)</code> 生成 <code>[1, 2]</code> 碰巧相加得 3”）。
+          </p>
+          <div class="marginalia ochre">
+            <strong>为什么现在不直接判定你“已掌握”？</strong>
+            <div style="font-size:14px;color:var(--ink-secondary);margin-top:4px;">
+              单一结果 <code>3</code> 无法区分 <code>0 + 1 + 2 = 3</code> 与 <code>1 + 2 = 3</code>。回答 1 道 30 秒的循环内部打印追问，即可排除巧合假设。
+            </div>
+          </div>
+          <div class="btn-bar">
+            <button class="btn primary" onclick="setView('workspace')">继续当前学习工作区 →</button>
+            <button class="btn" onclick="setView('diagnosis')">直接查阅 Agent 诊断手稿</button>
+          </div>
+        </section>
+
+        <section class="sheet-subtle">
+          <div class="kicker">待处理队列 · 按证据优先级排序</div>
+          <div class="list-row">
+            <div>
+              <strong>1. 列表引用与浅拷贝（<code>py-list-reference</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">昨日迁移验证未通过（<code>needs_practice</code>）· 已安排新情境变式题</div>
+            </div>
+            <button class="btn" onclick="setView('transfer')">进入迁移验证</button>
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>2. <code>range()</code> 左闭右开边界（<code>py-range-function</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">前置依赖知识点 · 已通过独立新题迁移验证</div>
+            </div>
+            <span class="pill zen">✓ 操作性掌握 (stable)</span>
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>3. 条件分支互斥性（<code>py-if-elif-else</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">已生成 2 个候选错误假设，等待追问回应</div>
+            </div>
+            <span class="pill ochre">? 证据不足 (insufficient_evidence)</span>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderWorkspace() {
+      const presets = {
+        bare_three: {
+          answer: '3',
+          statusPill: '<span class="pill ochre">! 结果匹配但缺少过程证据 · 转入诊断追问</span>',
+          summary: '规则预评估（RuleEvaluator）：最终输出 "3" 匹配标准答案，但未提供每轮循环变量 i 与 total 的变化追踪，无法排除 range(3)=[1,2] 的巧合正确。',
+          nextBtn: `<button class="btn primary" onclick="setView('diagnosis')">展开 Agent 区分性追问 →</button>`
+        },
+        wrong_four: {
+          answer: '4\n因为 i 从 1 加到 3，最后多加了一次 1。',
+          statusPill: '<span class="pill rust">✕ 与预期输出不符 · 触发多假设归因</span>',
+          summary: '规则预评估（RuleEvaluator）：提交输出 "4" 与标准输出 "3" 不一致。触发候选假设 H2（range_stop_inclusive：误以为包含终点 3）与 H3（初始值偏移）。',
+          nextBtn: `<button class="btn primary" onclick="setView('diagnosis')">查看竞争性假设与证据 →</button>`
+        },
+        full_trace: {
+          answer: '最终输出 3。\n第 1 轮：i=0, total=0\n第 2 轮：i=1, total=1\n第 3 轮：i=2, total=3',
+          statusPill: '<span class="pill zen">✓ 结果与每轮追踪均吻合 · 解锁迁移验证</span>',
+          summary: '规则预评估（RuleEvaluator）：输出结果与三轮状态追踪完整匹配。但根据核心原则，单题答对不等于掌握，需完成一道不同情境的迁移验证题。',
+          nextBtn: `<button class="btn primary" onclick="setView('transfer')">进入独立迁移验证 →</button>`
+        }
+      };
+      const cur = presets[state.workspacePreset];
+
+      return `
+        <div class="editorial-header">
+          <div class="kicker">WORKSPACE · 单栏沉浸式作答页</div>
+          <h1>Python <code>for</code> 循环与累加器状态追踪</h1>
+          <p class="subtitle">阅读核心概念摘要后写下你的预测与推理过程。页面不设倒计时，草稿实时保存在本地会话。</p>
+        </div>
+
+        <div class="stage-switcher">
+          <span class="label">预览不同作答输入反馈：</span>
+          <button class="chip-btn ${state.workspacePreset === 'bare_three' ? 'active' : ''}" onclick="state.workspacePreset='bare_three';render()">场景 1：仅填结果 "3"（触发巧合排查）</button>
+          <button class="chip-btn ${state.workspacePreset === 'wrong_four' ? 'active' : ''}" onclick="state.workspacePreset='wrong_four';render()">场景 2：答错填 "4"（触发边界诊断）</button>
+          <button class="chip-btn ${state.workspacePreset === 'full_trace' ? 'active' : ''}" onclick="state.workspacePreset='full_trace';render()">场景 3：完整写出 3 轮追踪（进入迁移验证）</button>
+        </div>
+
+        <section class="sheet-subtle">
+          <div class="meta-row" style="margin-bottom:10px;padding-bottom:8px;">
+            <span>核心材料 · <code>mat_py_loop_01</code>（版本 v1）</span>
+            <span>阅读耗时约 1 分钟</span>
+          </div>
+          <p style="margin:0;font-size:15px;color:var(--ink-secondary);">
+            在 Python 中，<code>for x in range(n)</code> 会按顺序从 <code>0</code> 遍历至 <code>n - 1</code>（共 <code>n</code> 轮，不包含终点 <code>n</code>）。累加器变量（如 <code>total</code>）在每一轮循环体执行时基于上一轮的值更新。
+          </p>
+        </section>
+
+        <section class="sheet">
+          <div class="meta-row">
+            <span>当前合法派发题目 · <code>q_py_loop_initial_01</code> · 角色：<code>initial</code></span>
+            <span class="pill slate">题库版本 v1 · 已脱敏（不含标准答案）</span>
+          </div>
+          <h2>请阅读下方代码片段，写出最终打印的值，并简述每一轮循环中变量的变化：</h2>
+          <div class="code-sheet">
+            <div class="code-bar">
+              <span>snippet.py · Python 3</span>
+              <span>只读分析文本 · 不提供盲目运行按钮</span>
+            </div>
+            <pre>total = 0
+for i in range(3):
+    total = total + i
+print(total)</pre>
+          </div>
+
+          <label class="field-label" for="zen-answer-box">你的作答与每轮推理记录</label>
+          <div class="field-hint">提示：写明每一轮 <code>i</code> 和 <code>total</code> 的值，有助于系统直接验证你的执行模型。</div>
+          <textarea id="zen-answer-box" class="zen-input">${cur.answer}</textarea>
+
+          <div class="btn-bar">
+            <button class="btn primary" onclick="render()">提交答案并生成证据快照</button>
+            <span style="font-size:12px;color:var(--ink-muted)">幂等键保护：<code>idem_sub_001</code> · 草稿已保存</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="marginalia ochre">
+            <div style="margin-bottom:8px;">${cur.statusPill}</div>
+            <p style="margin:0 0 12px;font-size:14.5px;color:var(--ink-primary);">${cur.summary}</p>
+            ${cur.nextBtn}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderDiagnosis() {
+      return `
+        <div class="editorial-header">
+          <div class="kicker">DIAGNOSTIC MANUSCRIPT · 诊断案例 #diag_014</div>
+          <h1>为什么系统还没有下唯一结论？</h1>
+          <p class="subtitle">不把 AI 包装成全知聊天机器人——这里展示你的原始作答快照、相互竞争的错误假设、正反证据链，以及下一步动作的决策依据。</p>
+        </div>
+
+        <div class="stage-switcher">
+          <span class="label">切换诊断演进阶段：</span>
+          <button class="chip-btn ${state.diagStage === 'step1_followup' ? 'active' : ''}" onclick="state.diagStage='step1_followup';render()">阶段 A：初答后证据不足 → 派发区分性追问</button>
+          <button class="chip-btn ${state.diagStage === 'step2_practice' ? 'active' : ''}" onclick="state.diagStage='step2_practice';render()">阶段 B：追问回答 "1、3" 后 → 确诊假设并干预练习</button>
+          <button class="chip-btn ${state.diagStage === 'degraded_budget' ? 'active' : ''}" onclick="state.diagStage='degraded_budget';render()">阶段 C：异常/预算上限安全降级视图</button>
+        </div>
+
+        <!-- 1. Learner Raw Attempt Snapshot -->
+        <section class="sheet-subtle">
+          <div class="meta-row" style="margin-bottom:10px;padding-bottom:8px;">
+            <span><strong>学习者原始作答不可变快照</strong> · <code>Attempt #att_01</code>（题目 v1）</span>
+            <span class="pill slate">不可篡改记录 · 10:18:04 UTC</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div style="background:var(--bg-sheet);padding:12px 14px;border:1px solid var(--border-hairline);border-radius:6px;">
+              <div style="font-size:12px;color:var(--ink-muted)">初始题提交内容 (<code>q_py_loop_initial_01</code>)</div>
+              <div style="font-family:var(--font-mono);font-size:15px;margin-top:4px;font-weight:600;">"3" <span style="font-weight:400;font-size:13px;color:var(--ink-muted)">（未写中间循环过程）</span></div>
+            </div>
+            <div style="background:var(--bg-sheet);padding:12px 14px;border:1px solid var(--border-hairline);border-radius:6px;">
+              <div style="font-size:12px;color:var(--ink-muted)">区分性追问回应 (<code>q_py_loop_followup_01</code>)</div>
+              <div style="font-family:var(--font-mono);font-size:15px;margin-top:4px;font-weight:600;">
+                ${state.diagStage === 'step1_followup' ? '<span style="color:var(--warn-ochre)">等待学习者作答…</span>' : '"依次打印 1、3"'}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Uncertainty & Insufficient Evidence Banner -->
+        <section class="sheet">
+          <div class="meta-row">
+            <span>当前诊断不确定性状态</span>
+            ${
+              state.diagStage === 'step1_followup'
+                ? '<span class="pill ochre">? 诊断证据不足 (INSUFFICIENT_EVIDENCE)</span>'
+                : state.diagStage === 'step2_practice'
+                ? '<span class="pill zen">● 核心卡点已收敛 (LOW UNCERTAINTY)</span>'
+                : '<span class="pill rust">! 预算护栏触发 · 保留不确定性降级 (DEGRADED_MODE)</span>'
+            }
+          </div>
+
+          ${
+            state.diagStage === 'step1_followup'
+              ? `<div class="marginalia ochre">
+                  <strong>证据不足说明（拒绝武断归因）</strong>
+                  <p style="margin:6px 0 0;font-size:14.5px;color:var(--ink-secondary)">
+                    单一输出 <code>"3"</code> 同时兼容 <code>0+1+2=3</code>（正确理解但省略过程）与 <code>1+2=3</code>（误以为 <code>range(3)</code> 从 1 开始且不含 3）。当前证据不足以唯一锁定原因，因此并列保留 2 个竞争假设。
+                  </p>
+                </div>`
+              : state.diagStage === 'step2_practice'
+              ? `<div class="marginalia zen">
+                  <strong>新证据已更新竞争假设</strong>
+                  <p style="margin:6px 0 0;font-size:14.5px;color:var(--ink-secondary)">
+                    学习者对追问回答 <code>"依次打印 1、3"</code>：证明其确实在逐轮累加（反驳了“死记结果不追踪状态”假设），但首轮输出为 1 且仅两轮，支持并确认了 <code>range_start_at_one</code> 假设。
+                  </p>
+                </div>`
+              : `<div class="marginalia rust">
+                  <strong>事前 Token 预算保护 / 追问轮次上限已触发</strong>
+                  <p style="margin:6px 0 0;font-size:14.5px;color:var(--ink-secondary)">
+                    当前诊断案例已达最大追问轮数（<code>MAX_DIAGNOSTIC_FOLLOWUP_TURNS = 2</code>）或剩余 Token 低于单次最小安全预留阈值（256 tokens）。系统拒绝强行捏造唯一结论，保留候选假设为 <code>insufficient_evidence</code>，并自动安排针对性练习与复习计划。
+                  </p>
+                </div>`
+          }
+
+          <h2 style="margin-top:22px;">竞争性错误假设与正反证据链</h2>
+          <p style="font-size:13px;color:var(--ink-muted);margin-top:-6px;">
+            注：下方置信度为启发式工作权重（<code>confidence_is_heuristic = true</code>），非校准统计概率。
+          </p>
+
+          <!-- Hypothesis 1 -->
+          <div class="hyp-row">
+            <div class="hyp-top">
+              <div>
+                <strong>H1 · 误以为 <code>range(3)</code> 从 1 开始生成 <code>[1, 2]</code></strong>
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-muted)"> (range_start_at_one)</span>
+              </div>
+              <div class="conf-meter">
+                启发式权重：<strong>${state.diagStage === 'step2_practice' ? '0.86' : '0.38'}</strong> ·
+                ${state.diagStage === 'step2_practice' ? '<span class="pill zen">已确认 (confirmed)</span>' : '<span class="pill ochre">候选待验 (candidate)</span>'}
+              </div>
+            </div>
+            <div class="evidence-list">
+              <div class="ev-item">
+                <span><strong>[中立 NEUTRAL]</strong> 初始答案输出 <code>3</code> 与 <code>1 + 2 = 3</code> 数学上兼容</span>
+                <span style="color:var(--ink-muted)">来源：<code>initial_attempt (#att_01)</code></span>
+              </div>
+              ${
+                state.diagStage === 'step2_practice'
+                  ? `<div class="ev-item" style="border-color:#BBF7D0;background:var(--accent-Zen-soft);">
+                      <span><strong>[支持 SUPPORTS +]</strong> 追问回答“依次打印 1、3”，证实第一轮将 i 算作 1 且仅迭代两轮</span>
+                      <span style="color:var(--accent-Zen)">来源：<code>followup_response (#att_02)</code></span>
+                    </div>`
+                  : `<div class="ev-item">
+                      <span><strong>[缺失证据 MISSING]</strong> 需确认第一轮循环体内 <code>total</code> 打印值是 0 还是 1</span>
+                      <span style="color:var(--warn-ochre)">待采集</span>
+                    </div>`
+              }
+            </div>
+          </div>
+
+          <!-- Hypothesis 2 -->
+          <div class="hyp-row">
+            <div class="hyp-top">
+              <div>
+                <strong>H2 · 仅记忆最终结果，未在脑中执行逐轮状态追踪</strong>
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-muted)"> (loop_memorized_result_without_trace)</span>
+              </div>
+              <div class="conf-meter">
+                启发式权重：<strong>${state.diagStage === 'step2_practice' ? '0.15' : '0.48'}</strong> ·
+                ${state.diagStage === 'step2_practice' ? '<span class="pill slate">已降低 (lowered)</span>' : '<span class="pill ochre">证据不足 (insufficient_evidence)</span>'}
+              </div>
+            </div>
+            <div class="evidence-list">
+              <div class="ev-item">
+                <span><strong>[支持 SUPPORTS +]</strong> 初始提交仅含单个数字 <code>3</code>，未附带任何循环轮次说明</span>
+                <span style="color:var(--ink-muted)">来源：<code>rule_check (RuleEvaluator)</code></span>
+              </div>
+              ${
+                state.diagStage === 'step2_practice'
+                  ? `<div class="ev-item" style="border-color:#FECACA;background:var(--danger-rust-soft);">
+                      <span><strong>[反驳 CONTRADICTS −]</strong> 学习者在追问中能按轮次写出 1 → 3 的累加过程，并非盲目猜数</span>
+                      <span style="color:var(--danger-rust)">来源：<code>followup_response (#att_02)</code></span>
+                    </div>`
+                  : ''
+              }
+            </div>
+          </div>
+
+          <!-- Hypothesis 3 -->
+          <div class="hyp-row">
+            <div class="hyp-top">
+              <div>
+                <strong>H3 · 误以为 <code>range(3)</code> 包含右端点 3（生成 0,1,2,3）</strong>
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-muted)"> (range_stop_inclusive)</span>
+              </div>
+              <div class="conf-meter">
+                启发式权重：<strong>0.05</strong> · <span class="pill slate">已排除 (ruled_out)</span>
+              </div>
+            </div>
+            <div class="evidence-list">
+              <div class="ev-item">
+                <span><strong>[反驳 CONTRADICTS −]</strong> 若包含终点 3，累加结果应为 6；学习者输出 3 已排除该假设</span>
+                <span style="color:var(--ink-muted)">来源：<code>rule_check (RuleEvaluator)</code></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Agent Next Action & Interactive Continuation -->
+        <section class="sheet">
+          <div class="meta-row">
+            <span>Agent 授权白名单工具决策 · <code>DecisionEvent #evt_882</code></span>
+            <span class="pill slate">运行模式：Mock / Demo (<code>is_mock_provider = true</code>)</span>
+          </div>
+          ${
+            state.diagStage === 'step1_followup'
+              ? `<h2>下一步动作：执行区分性追问（<code>select_diagnostic_followup</code>）</h2>
+                 <p style="color:var(--ink-secondary);font-size:14.5px;">
+                   <strong>为什么问这个问题：</strong>为了在 H1（<code>range(3)</code> 从 1 开始）与 H2（省略过程）之间取得最高信息增益，系统派发追问题 <code>q_py_loop_followup_01</code>：
+                 </p>
+                 <div class="sheet-subtle" style="margin-top:14px;">
+                   <strong>追问题目：</strong>如果把 <code>print(total)</code> 缩进放进 <code>for</code> 循环体内部，每一轮会依次打印什么？
+                   <div class="btn-bar">
+                     <button class="btn primary" onclick="state.diagStage='step2_practice';render()">模拟提交追问回答 "依次打印 1、3" →</button>
+                   </div>
+                 </div>`
+              : `<h2>下一步动作：针对性解释与练习（<code>assign_targeted_practice</code>）</h2>
+                 <p style="color:var(--ink-secondary);font-size:14.5px;">
+                   <strong>针对性概念纠偏：</strong><code>range(3)</code> 省略起点参数时，默认从 <code>0</code> 开始而非 <code>1</code>，生成序列为 <code>0, 1, 2</code>。只有显式写成 <code>range(1, 3)</code> 时才从 1 开始。
+                 </p>
+                 <div class="sheet-subtle" style="margin-top:14px;">
+                   <strong>针对性练习题（<code>q_py_loop_practice_01</code>）：</strong>当代码改为显式双参数 <code>for i in range(1, 4): total += i</code> 时，最终 <code>total</code> 输出什么？
+                   <div class="btn-bar">
+                     <button class="btn primary" onclick="setView('transfer')">提交练习答案 "6" 并进入独立迁移验证 →</button>
+                   </div>
+                 </div>`
+          }
+        </section>
+      `;
+    }
+
+    function renderTransfer() {
+      return `
+        <div class="editorial-header">
+          <div class="kicker">TRANSFER VERIFICATION · 独立迁移验证机制</div>
+          <h1>真正掌握的标志，是在新情境中独立跑通。</h1>
+          <p class="subtitle">严格执行核心防刷分规则：迁移验证失败后，同题重复答对绝不晋升 <code>stable</code>；必须通过未作答过的新情境迁移题。</p>
+        </div>
+
+        <div class="stage-switcher">
+          <span class="label">体验迁移验证三阶段防作弊保护：</span>
+          <button class="chip-btn ${state.transferStage === 'first_fail' ? 'active' : ''}" onclick="state.transferStage='first_fail';render()">1. 首次迁移题答错 ("3 15")</button>
+          <button class="chip-btn ${state.transferStage === 'retry_blocked' ? 'active' : ''}" onclick="state.transferStage='retry_blocked';render()">2. 同题重试答对 ("3 17") · 拦截晋升</button>
+          <button class="chip-btn ${state.transferStage === 'fresh_pass' ? 'active' : ''}" onclick="state.transferStage='fresh_pass';render()">3. 派发独立新题 ("3 60") · 合法晋升 stable</button>
+        </div>
+
+        ${
+          state.transferStage !== 'fresh_pass'
+            ? `<section class="sheet">
+                <div class="meta-row">
+                  <span>迁移验证题 #1 · <code>q_py_loop_transfer_01</code> · 角色：<code>transfer_check</code></span>
+                  <span class="pill ochre">表面结构已改变：双变量库存盘点情境</span>
+                </div>
+                <h2>新情境验证：仓库批次盘点双变量循环</h2>
+                <div class="code-sheet">
+                  <div class="code-bar"><span>transfer_inventory.py</span><span>考查目标：py-for-loop</span></div>
+                  <pre>count = 0
+running_sum = 5
+for step in range(1, 7, 2):
+    count += 1
+    running_sum += step * 2
+print(count, running_sum)</pre>
+                </div>
+
+                ${
+                  state.transferStage === 'first_fail'
+                    ? `<div class="marginalia rust">
+                        <div><span class="pill rust">✕ 首次迁移验证未通过 (transfer_failed_needs_practice)</span></div>
+                        <p style="margin:8px 0 0;font-size:14.5px;">
+                          学习者提交答案：<code>"3 15"</code>（遗漏了初始值或步长折算）。<br/>
+                          <strong>系统处理：</strong>知识点状态保持 <code>needs_practice</code>，并自动生成间隔复习任务 <code>ReviewItem #rev_01</code>。
+                        </p>
+                        <div class="btn-bar">
+                          <button class="btn primary" onclick="state.transferStage='retry_blocked';render()">测试：如果立刻重答同一道题并填对 "3 17" 会怎样？ →</button>
+                        </div>
+                      </div>`
+                    : `<div class="marginalia ochre">
+                        <div><span class="pill ochre">🚫 同题重试拦截 (transfer_retry_blocked) · 拒绝晋升 stable</span></div>
+                        <p style="margin:8px 0 0;font-size:14.5px;">
+                          学习者对同一道题 <code>q_py_loop_transfer_01</code> 再次提交：<code>"3 17"</code>（答案文本正确）。<br/>
+                          <strong>系统防伪造掌握拦截：</strong>检测到你此前在该题存在失败记录（<code>Attempt #att_04: "3 15"</code>）。同题重答正确无法区分“真正理解”与“试错记住答案”，因此<strong>KnowledgeState 锁定保持 <code>needs_practice</code></strong>，必须申请一道未接触过的新情境迁移题！
+                        </p>
+                        <div class="btn-bar">
+                          <button class="btn primary" onclick="state.transferStage='fresh_pass';render()">调用 POST /transfer-check 派发独立新情境迁移题 #2 →</button>
+                        </div>
+                      </div>`
+                }
+              </section>`
+            : `<section class="sheet">
+                <div class="meta-row">
+                  <span>独立新情境迁移题 #2 · <code>q_py_loop_transfer_02</code>（此前从未作答）</span>
+                  <span class="pill zen">✓ 独立首次验证通过 · 晋升 stable</span>
+                </div>
+                <h2>全新应用情境：温控传感器采样阈值累加</h2>
+                <div class="code-sheet">
+                  <div class="code-bar"><span>transfer_sensor.py</span><span>考查目标：py-for-loop（新表面结构）</span></div>
+                  <pre>alerts = 0
+energy = 15
+for tick in range(2, 8, 2):
+    alerts += 1
+    energy += tick * 3
+print(alerts, energy)</pre>
+                </div>
+                <div class="marginalia zen">
+                  <div><span class="pill zen">✓ 迁移验证通过 (mastery_achieved) · KnowledgeState → stable</span></div>
+                  <p style="margin:8px 0 0;font-size:14.5px;">
+                    学习者首次作答该独立新题即提交正确结果 <code>"3 60"</code>。<br/>
+                    <strong>可追溯审计记录：</strong>关联验证作答 <code>last_transfer_attempt_id = #att_06</code>，决策事件 <code>#evt_890</code>。当前状态定义为“当前证据下的操作性掌握（<code>stable</code>）”，系统仍将通过间隔复习追踪长期保持情况。
+                  </p>
+                  <div class="btn-bar">
+                    <button class="btn primary" onclick="setView('progress')">查看会话结束语义与学习档案 →</button>
+                  </div>
+                </div>
+              </section>`
+        }
+      `;
+    }
+
+    function renderProgress() {
+      return `
+        <div class="editorial-header">
+          <div class="kicker">MASTERY & ARCHIVE · 学习进度与会话结束语义</div>
+          <h1>严格区分“会话已结束”与“知识点已掌握”。</h1>
+          <p class="subtitle">不展示未经验证的能力百分比，只按证据链展示每个知识点的操作性掌握状态与待复习原因。</p>
+        </div>
+
+        <div class="stage-switcher">
+          <span class="label">对比会话结束（complete_session）的两种不同语义：</span>
+          <button class="chip-btn ${state.sessionEndingMode === 'ended_needs_practice' ? 'active' : ''}" onclick="state.sessionEndingMode='ended_needs_practice';render()">情形 1：迁移失败后主动结束今日会话（未掌握）</button>
+          <button class="chip-btn ${state.sessionEndingMode === 'mastered_stable' ? 'active' : ''}" onclick="state.sessionEndingMode='mastered_stable';render()">情形 2：独立新题迁移通过后结束会话（已掌握）</button>
+        </div>
+
+        <section class="sheet">
+          <div class="meta-row">
+            <span>当前会话结案契约 · <code>SessionDetailResponse</code></span>
+            ${
+              state.sessionEndingMode === 'ended_needs_practice'
+                ? '<span class="pill ochre">会话已结束 (completed) · 知识点仍需练习 (needs_practice)</span>'
+                : '<span class="pill zen">会话已结束 (completed) · 知识点已验证掌握 (stable)</span>'
+            }
+          </div>
+          ${
+            state.sessionEndingMode === 'ended_needs_practice'
+              ? `<h2>会话状态：<code>completed</code> ≠ 掌握状态：<code>needs_practice</code>（<code>topic_mastered = false</code>）</h2>
+                 <p style="color:var(--ink-secondary);font-size:14.5px;">
+                   学习者在完成一次迁移验证尝试（<code>"3 15"</code>，未通过）后选择结束今日学习会话。系统合法关闭会话（<code>session.status = "completed"</code>，记录事件 <code>session_completed_without_mastery</code>），<strong>绝不伪造迁移成功</strong>，知识点状态严格保持为 <code>needs_practice</code>。
+                 </p>`
+              : `<h2>会话状态：<code>completed</code> + 掌握状态：<code>stable</code>（<code>topic_mastered = true</code>）</h2>
+                 <p style="color:var(--ink-secondary);font-size:14.5px;">
+                   学习者通过了全新未接触过的迁移验证题 <code>q_py_loop_transfer_02</code>，系统校验无同题失败历史后，将 <code>KnowledgeState</code> 更新为 <code>stable</code>，并正常结束本次会话。
+                 </p>`
+          }
+        </section>
+
+        <section class="sheet">
+          <h2>Python 基础内容包 · 5 个知识点状态全览</h2>
+          <div class="list-row">
+            <div>
+              <strong>1. 变量赋值与覆盖更新（<code>py-variable-assignment</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">前置依赖：无 · 最近验证：<code>#att_var_t1</code></div>
+            </div>
+            <span class="pill zen">✓ 稳定掌握 (stable)</span>
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>2. <code>range()</code> 函数参数与左闭右开（<code>py-range-function</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">前置依赖：<code>py-variable-assignment</code> · 最近验证：<code>#att_rng_t1</code></div>
+            </div>
+            <span class="pill zen">✓ 稳定掌握 (stable)</span>
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>3. <code>for</code> 循环与状态累加（<code>py-for-loop</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">前置依赖：变量赋值 + range 函数 · 启发式标记：<code>confidence_is_heuristic=true</code></div>
+            </div>
+            ${
+              state.sessionEndingMode === 'ended_needs_practice'
+                ? '<span class="pill ochre">! 仍需练习 (needs_practice)</span>'
+                : '<span class="pill zen">✓ 稳定掌握 (stable)</span>'
+            }
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>4. 条件分支互斥性（<code>py-if-elif-else</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">未解决错误码：<code>elif_treated_as_independent_if</code></div>
+            </div>
+            <span class="pill ochre">? 证据不足 (insufficient_evidence)</span>
+          </div>
+          <div class="list-row">
+            <div>
+              <strong>5. 列表引用与原地修改（<code>py-list-reference</code>）</strong>
+              <div style="font-size:13px;color:var(--ink-muted)">待复习队列：迁移验证失败触发（<code>ReviewItem #rev_02</code>）</div>
+            </div>
+            <span class="pill rust">↻ 待复习与再练习 (needs_practice)</span>
+          </div>
+        </section>
+      `;
+    }
+
+    function render() {
+      const root = document.getElementById('app-root');
+      if (state.view === 'home') root.innerHTML = renderHome();
+      else if (state.view === 'workspace') root.innerHTML = renderWorkspace();
+      else if (state.view === 'diagnosis') root.innerHTML = renderDiagnosis();
+      else if (state.view === 'transfer') root.innerHTML = renderTransfer();
+      else root.innerHTML = renderProgress();
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => setView(btn.dataset.view));
+    });
+
+    window.addEventListener('keydown', e => {
+      if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName)) return;
+      const map = { '1': 'home', '2': 'workspace', '3': 'diagnosis', '4': 'transfer', '5': 'progress' };
+      if (map[e.key]) setView(map[e.key]);
+    });
+
+    render();
+  </script>
+</body>
+</html>

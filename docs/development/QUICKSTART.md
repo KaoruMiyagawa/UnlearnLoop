@@ -1,6 +1,8 @@
-# 本地快速启动：main
+# VerbaTrail 本地快速启动
 
-本指南针对默认分支的后端与前端占位界面，面向本机开发，不是生产部署指南。需要 Python 3.11+、Node.js 和 npm；命令从仓库根目录的 Windows PowerShell 执行。
+本指南适用于 Windows 本机开发，不是生产部署方案。需要 Python 3.11+、Node.js、npm 和 Git。命令从 `D:\Projects\VerbaTrail` 仓库根目录开始。
+
+## 安装依赖
 
 ```powershell
 python -m venv .venv
@@ -10,18 +12,40 @@ npm ci
 cd ..
 ```
 
-在后端终端：
+## 启动后端
+
+在第一个 PowerShell 终端运行：
 
 ```powershell
-$env:DATABASE_URL = 'sqlite:///./unlearnloop-local-new.db'
+$env:DATABASE_URL = 'sqlite:///./verbatrail-local.db'
+$env:APP_NAME = 'VerbaTrail'
 $env:MODEL_PROVIDER = 'fake'
 $env:ALLOW_REMOTE_MODEL_CALLS = 'false'
 cd backend
 ..\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 18000
 ```
 
-路径相对于 `backend/`，请选一个新文件；开发模式启动会自动迁移数据库并导入内容，使用已有数据库前应自行备份。另开终端从仓库根目录运行 `cd frontend`、`npm run dev`，访问 `http://127.0.0.1:15173`；API 文档位于 `http://127.0.0.1:18000/docs`。确认端口空闲；使用其他端口时相应配置 `VITE_API_BASE_URL` 和 `CORS_ORIGINS`。各终端使用 Ctrl+C 停止。
+`DATABASE_URL` 相对于 `backend/` 目录。第一次启动会运行 Alembic 迁移并导入内容包。为现有数据库建立并验证可恢复备份后再启动使用；本示例选择全新 `backend/verbatrail-local.db`，不会使用归档的 `backend/unlearnloop.db`。API 文档：`http://127.0.0.1:18000/docs`。
 
-前端学习工作空间目前为占位界面；IELTS 分支有独立的完整流程和启动指南。默认禁用远程模型调用；FakeProvider 并非真实 AI 推理。仅在本机可信环境使用，learner ID 不提供认证。
+## 启动前端
 
-当前 main 的 `get_session_factory` 缺少 `create_db_engine` 导入；数据库 API 请求会受此缺陷阻断，需在单独的代码变更中修复。启动和健康检查并不证明这些 API 可正常工作。
+在第二个终端运行：
+
+```powershell
+cd D:\Projects\VerbaTrail\frontend
+npm run dev
+```
+
+访问 `http://127.0.0.1:15173`。结束服务时在对应终端按 Ctrl+C。`./start-verbatrail.ps1` 可在 Windows 统一启动服务；脚本只管理它自己记录且命令行/路径均匹配的进程，不接管其他服务。
+
+如端口被占用，不要结束未知进程；选择未占用端口并同步修改 Vite 配置、`VITE_API_BASE_URL` 与后端 `CORS_ORIGINS`。
+
+## 数据、模型与模式
+
+- `FakeModelProvider` 为离线模拟，不会调用真实模型；远程模型调用默认关闭。
+- 前端 Demo 是演示界面；Real 使用后端 API，并不代表使用了真实大模型。
+- 服务端启动会迁移配置中的数据库。旧数据库已在整合备份中另存，开发默认使用独立数据库文件。
+- 不提交 `.env`、API key、学习者答案、SQLite 数据库、日志或本地环境目录。
+- 项目默认监听 loopback；`learner_id` 不构成认证，当前不可当作多用户生产服务。
+
+更多测试命令见[中文 README](../../README.md#测试与工程检查)。

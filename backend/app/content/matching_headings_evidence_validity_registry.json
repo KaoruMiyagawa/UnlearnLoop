@@ -1,0 +1,134 @@
+{
+  "registry_version": "1",
+  "source": "docs/development/IELTS_2B1_FINAL_ACCEPTANCE.md#content-review",
+  "entries": [
+    {
+      "group_id": "ielts-mh-academic-main-transfer-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 heading key for the riverside passage does not summarize the paragraph evidence; Phase 6 identified a contradiction between the assigned heading and the paragraph about calibration/transit links.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-academic-main-review-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 review heading key was included in the eight transfer/review groups whose paragraph-to-heading evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-academic-keyword-transfer-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 transfer group was included in the eight Matching Headings transfer/review groups whose answer evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-academic-keyword-review-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 review group was included in the eight Matching Headings transfer/review groups whose answer evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-gt-main-transfer-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 transfer group was included in the eight Matching Headings transfer/review groups whose answer evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-gt-main-review-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 review group was included in the eight Matching Headings transfer/review groups whose answer evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-gt-keyword-transfer-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 transfer group was included in the eight Matching Headings transfer/review groups whose answer evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-gt-keyword-review-group",
+      "content_version": "1",
+      "rules_version": "1",
+      "status": "invalidated",
+      "reason": "The v1 review group was included in the eight Matching Headings transfer/review groups whose answer evidence was found incorrect or materially misleading during Phase 6 content review.",
+      "replacement_content_version": "2"
+    },
+    {
+      "group_id": "ielts-mh-academic-main-transfer-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-academic-main-review-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-academic-keyword-transfer-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-academic-keyword-review-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-gt-main-transfer-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-gt-main-review-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-gt-keyword-transfer-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    },
+    {
+      "group_id": "ielts-mh-gt-keyword-review-group",
+      "content_version": "2",
+      "rules_version": "2",
+      "status": "eligible",
+      "reason": "Phase 6 corrected replacement version; eligible for future evidence after normal learner submission.",
+      "replacement_content_version": null
+    }
+  ]
+}

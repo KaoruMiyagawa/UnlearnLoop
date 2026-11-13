@@ -1,4 +1,4 @@
-"""Pure domain rules and state transition matrices for UnlearnLoop."""
+"""Pure domain rules and state transition matrices for VerbaTrail."""
 
 from app.domain.enums import (
     DiagnosticCaseStatus,
@@ -13,12 +13,37 @@ from app.domain.exceptions import (
     UnverifiedMasteryError,
 )
 
+
+def transfer_context_key(prompt: str, context: str | None) -> str:
+    """Compare task content rather than IDs; code whitespace must not grant freshness."""
+    return " ".join((context or prompt).split())
+
+
+def validate_transfer_entry(
+    session_status: str,
+    *,
+    has_pending_question: bool,
+    practice_required: bool,
+    practice_passed: bool,
+    agent_selected: bool = False,
+) -> None:
+    """Guard existing workflow transitions; only an Agent may choose an early transfer."""
+    if session_status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value):
+        raise DomainRuleViolationError("Cannot dispatch transfer in a paused or completed session.")
+    if has_pending_question:
+        raise DomainRuleViolationError("Answer the currently assigned question before transfer verification.")
+    if practice_required and not practice_passed:
+        raise DomainRuleViolationError("The assigned targeted practice must pass before transfer verification.")
+    if not agent_selected and session_status != SessionStatus.TRANSFER_CHECKING.value:
+        raise DomainRuleViolationError("Transfer verification has not been authorized by the server workflow.")
+
 # Controlled state transitions for LearningSession
 ALLOWED_SESSION_TRANSITIONS: dict[SessionStatus, set[SessionStatus]] = {
     SessionStatus.ACTIVE: {
         SessionStatus.DIAGNOSING,
         SessionStatus.INTERVENING,
         SessionStatus.TRANSFER_CHECKING,
+        SessionStatus.REVIEWING,
         SessionStatus.PAUSED,
     },
     SessionStatus.DIAGNOSING: {
@@ -35,6 +60,11 @@ ALLOWED_SESSION_TRANSITIONS: dict[SessionStatus, set[SessionStatus]] = {
     SessionStatus.TRANSFER_CHECKING: {
         SessionStatus.DIAGNOSING,
         SessionStatus.INTERVENING,
+        SessionStatus.COMPLETED,
+        SessionStatus.PAUSED,
+    },
+    SessionStatus.REVIEWING: {
+        SessionStatus.DIAGNOSING,
         SessionStatus.COMPLETED,
         SessionStatus.PAUSED,
     },
@@ -88,6 +118,9 @@ ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS: dict[
         DiagnosticCaseStatus.HYPOTHESES_UPDATED,
         DiagnosticCaseStatus.NEEDS_EVIDENCE,
         DiagnosticCaseStatus.INSUFFICIENT_EVIDENCE,
+        # A valid Agent proposal may choose an intervention without changing
+        # hypothesis statuses (for example, the offline FakeModelProvider path).
+        DiagnosticCaseStatus.INTERVENTION_SELECTED,
         DiagnosticCaseStatus.RETRY_WAITING,
         DiagnosticCaseStatus.PAUSED,
     },
@@ -195,10 +228,20 @@ def validate_session_transition(
 def validate_diagnostic_case_transition(
     current: DiagnosticCaseStatus | str,
     target: DiagnosticCaseStatus | str,
+    *,
+    selected_question_answered: bool = False,
 ) -> None:
     """Validate that a DiagnosticCase status transition is permitted."""
     current_enum = DiagnosticCaseStatus(current)
     target_enum = DiagnosticCaseStatus(target)
+    if (
+        current_enum == DiagnosticCaseStatus.QUESTION_SELECTED
+        and target_enum == DiagnosticCaseStatus.INTERVENTION_SELECTED
+        and not selected_question_answered
+    ):
+        raise InvalidStateTransitionError(
+            "Cannot select an intervention until the selected diagnostic question has been answered."
+        )
     if target_enum not in ALLOWED_DIAGNOSTIC_CASE_TRANSITIONS.get(current_enum, set()):
         raise InvalidStateTransitionError(
             f"Illegal DiagnosticCase state transition: {current_enum} -> {target_enum}"
@@ -249,7 +292,7 @@ def validate_mastery_transition(
             "KnowledgeState transition must reference a recorded DecisionEvent."
         )
 
-    if target_enum == KnowledgeMasteryStatus.STABLE:
+    if target_enum in (KnowledgeMasteryStatus.STABLE, KnowledgeMasteryStatus.TRANSFER_VERIFIED):
         if verified_transfer_attempt_role is None:
             raise UnverifiedMasteryError(
                 "Cannot mark KnowledgeState as 'stable' without a verified transfer_check attempt."

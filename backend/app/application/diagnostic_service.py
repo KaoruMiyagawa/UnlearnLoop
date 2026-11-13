@@ -10,26 +10,32 @@ from app.api.v1.schemas import (
     DiagnosticStepResponse,
     EvidenceLinkResponse,
     HypothesisResponse,
+    ReadingEvidenceSource,
 )
 from app.application.exceptions import EntityNotFoundError, InvalidSessionOperationError
+from app.application.evidence_validity import evidence_reason, evidence_status
 from app.application.learning_service import LearningAppService
 from app.config import Settings
 from app.decision.agent_engine import DiagnosticAgentEngine
+from app.decision.matching_headings import attempt_protocol, supported_protocol
 from app.domain.enums import (
     DiagnosticCaseStatus,
+    EvidenceValidityStatus,
     EvidenceRelation,
     EvidenceSourceType,
     HypothesisStatus,
     SessionStatus,
     UncertaintyLevel,
 )
-from app.model_provider import ModelProvider
+from app.evaluation.reading_error_taxonomy import TAXONOMY_VERSION
+from app.model_provider import FakeModelProvider, ModelProvider
 from app.persistence.models import (
     Attempt,
     DecisionEvent,
     DiagnosticCase,
     LearningSession,
     Question,
+    ReadingGroupVersion,
 )
 from app.persistence.repositories import LearningRepository
 
@@ -47,6 +53,18 @@ class DiagnosticAppService:
         self.repo = LearningRepository(db_session)
         self.model_provider = model_provider
         self.settings = settings
+
+    def _execution_metadata(self, case: DiagnosticCase) -> dict[str, Any]:
+        trigger = case.trigger_attempt
+        protocol, version = attempt_protocol(trigger)
+        if supported_protocol(trigger):
+            return {"model_provider_name": f"rules:{protocol}-v{version}", "is_mock_provider": False, "execution_mode": "rules"}
+        if (protocol, version) == ("tfng-v1", TAXONOMY_VERSION):
+            return {"model_provider_name": "rules:tfng-v1", "is_mock_provider": False, "execution_mode": "rules"}
+        if trigger.group_version_id or protocol:
+            return {"model_provider_name": "unavailable", "is_mock_provider": False, "execution_mode": "unavailable"}
+        mock = isinstance(self.model_provider, FakeModelProvider) or self.model_provider.provider_name == "fake"
+        return {"model_provider_name": self.model_provider.provider_name, "is_mock_provider": mock, "execution_mode": "mock" if mock else "live"}
 
     def get_diagnostic_case(self, case_id: str) -> DiagnosticCaseResponse:
         """Fetch full diagnostic case view with current hypotheses and evidence count."""
@@ -96,6 +114,7 @@ class DiagnosticAppService:
             uncertainty_note=diag_case.uncertainty_note,
             followup_turn_count=followup_turns,
             tokens_used=tokens_used,
+            **self._execution_metadata(diag_case),
             hypotheses=hypotheses_dto,
             evidence_count=len(evidence_links),
             created_at=diag_case.created_at,
@@ -121,10 +140,15 @@ class DiagnosticAppService:
                 attempt_id=ev.attempt_id,
                 source_type=EvidenceSourceType(ev.source_type),
                 source_ref=ev.source_ref,
+                decision_event_id=ev.decision_event_id,
+                observation=ReadingEvidenceSource.model_validate(ev.decision_event.payload_json["observation"])
+                if ev.decision_event and ev.decision_event.action == "observe_matching_heading_item" else None,
                 relation=EvidenceRelation(ev.relation),
                 summary=ev.summary,
                 reliability_note=ev.reliability_note,
                 created_at=ev.created_at,
+                evidence_validity_status=EvidenceValidityStatus(evidence_status(self.db, "evidence_link", ev.id)),
+                evidence_validity_reason=evidence_reason(self.db, "evidence_link", ev.id),
             )
             for ev in links
         ]
@@ -143,11 +167,35 @@ class DiagnosticAppService:
         if sess is None:
             raise EntityNotFoundError("LearningSession", diag_case.session_id)
 
-        if sess.status == SessionStatus.PAUSED.value:
+        structured = diag_case.trigger_attempt.group_version_id is not None
+        if not structured and (sess.status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value) or diag_case.status in (
+            DiagnosticCaseStatus.PAUSED.value, DiagnosticCaseStatus.RESOLVED.value,
+        )):
             raise InvalidSessionOperationError(
-                "Cannot execute diagnostic step on a paused session; resume first.",
+                "Cannot execute a diagnostic step on a paused or completed session/case.",
                 current_state=sess.status,
             )
+
+        replaying = bool(not structured and idempotency_key and self.db.scalar(select(DecisionEvent).where(
+            DecisionEvent.diagnostic_case_id == case_id,
+            DecisionEvent.idempotency_key == idempotency_key,
+        )))
+        if not structured and not replaying and sess.current_question_id and not any(
+            attempt.question_id == sess.current_question_id
+            for attempt in self.repo.list_attempts_for_session(sess.id)
+        ):
+            raise InvalidSessionOperationError(
+                "Cannot execute a diagnostic step while the currently dispatched question is unanswered.",
+                current_state=sess.status,
+            )
+
+        # Use the most recent attempt in the session so multi-turn follow-up/practice evidence is attributed accurately
+        session_attempts = self.repo.list_attempts_for_session(sess.id)
+        active_attempt_id = (
+            session_attempts[-1].id
+            if session_attempts
+            else diag_case.trigger_attempt_id
+        )
 
         # Release any uncommitted locks before model call
         self.db.commit()
@@ -160,7 +208,7 @@ class DiagnosticAppService:
 
         step_result = engine.run_diagnostic_step(
             session_id=sess.id,
-            attempt_id=diag_case.trigger_attempt_id,
+            attempt_id=active_attempt_id,
             diagnostic_case_id=diag_case.id,
             idempotency_key=idempotency_key,
         )
@@ -172,12 +220,19 @@ class DiagnosticAppService:
             q = self.repo.get_question_by_id(step_result.selected_question_id)
             if q is not None:
                 next_q_dto = LearningAppService.sanitize_question(q)
+                if step_result.selected_group_version_id:
+                    group = self.db.get(ReadingGroupVersion, step_result.selected_group_version_id)
+                    next_q_dto.group_version_id = group.id
+                    next_q_dto.group_display = group.display_json
 
+        execution = self._execution_metadata(diag_case)
         return DiagnosticStepResponse(
             session_id=step_result.session_id,
             diagnostic_case_id=step_result.diagnostic_case_id,
             case_status=step_result.case_status,
             executed_tool=step_result.executed_tool,
+            decision_event_id=step_result.decision_event_id,
+            decision_reason=(self.db.get(DecisionEvent, step_result.decision_event_id).reason if execution["execution_mode"] == "rules" else None),
             selected_intervention=step_result.selected_intervention,
             selected_question_id=step_result.selected_question_id,
             next_question=next_q_dto,
@@ -189,6 +244,7 @@ class DiagnosticAppService:
             max_followup_turns=step_result.max_followup_turns,
             tokens_used_in_case=step_result.tokens_used_in_case,
             session_token_budget=step_result.session_token_budget,
+            **execution,
             degraded_mode=step_result.degraded_mode,
             degradation_reason=step_result.degradation_reason,
             knowledge_state_status=step_result.knowledge_state_status,

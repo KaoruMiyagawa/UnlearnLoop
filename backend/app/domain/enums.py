@@ -1,4 +1,4 @@
-"""Domain enumerations for UnlearnLoop (subject-agnostic)."""
+"""Domain enumerations for VerbaTrail (subject-agnostic)."""
 
 from enum import StrEnum
 
@@ -10,6 +10,7 @@ class QuestionRole(StrEnum):
     DIAGNOSTIC_FOLLOWUP = "diagnostic_followup"
     TARGETED_PRACTICE = "targeted_practice"
     TRANSFER_CHECK = "transfer_check"
+    REVIEW = "review"
 
 
 class QuestionType(StrEnum):
@@ -19,6 +20,7 @@ class QuestionType(StrEnum):
     CODE_TRACE = "code_trace"
     CODE_WRITING = "code_writing"
     MULTIPLE_CHOICE = "multiple_choice"
+    MATCHING_HEADINGS = "matching_headings"
 
 
 class SessionStatus(StrEnum):
@@ -28,6 +30,7 @@ class SessionStatus(StrEnum):
     DIAGNOSING = "diagnosing"
     INTERVENING = "intervening"
     TRANSFER_CHECKING = "transfer_checking"
+    REVIEWING = "reviewing"
     COMPLETED = "completed"
     PAUSED = "paused"
 
@@ -112,6 +115,7 @@ class KnowledgeMasteryStatus(StrEnum):
     INSUFFICIENT_EVIDENCE = "insufficient_evidence"
     NEEDS_DIAGNOSIS = "needs_diagnosis"
     NEEDS_PRACTICE = "needs_practice"
+    TRANSFER_VERIFIED = "transfer_verified"
     STABLE = "stable"
 
 
@@ -121,6 +125,15 @@ class ReviewStatus(StrEnum):
     PENDING = "pending"
     COMPLETED = "completed"
     REOPENED = "reopened"
+    CANCELLED = "cancelled"
+
+
+class EvidenceValidityStatus(StrEnum):
+    """Current evidentiary fitness without rewriting the original assessment."""
+
+    ELIGIBLE = "eligible"
+    INVALIDATED = "invalidated"
+    REVIEW_REQUIRED = "review_required"
 
 
 class ModelCallStatus(StrEnum):

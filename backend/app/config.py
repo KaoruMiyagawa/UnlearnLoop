@@ -20,7 +20,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = Field(default="UnlearnLoop", validation_alias="APP_NAME")
+    app_name: str = Field(default="VerbaTrail", validation_alias="APP_NAME")
     app_env: Literal["development", "testing", "production"] = Field(
         default="development",
         validation_alias="APP_ENV",
@@ -74,6 +74,11 @@ class Settings(BaseSettings):
     diagnostic_session_token_budget: int = Field(
         default=4096,
         validation_alias="DIAGNOSTIC_SESSION_TOKEN_BUDGET",
+    )
+
+    # JSON array in the environment, e.g. REVIEW_INTERVALS_DAYS='[1,3,7,14,30]'.
+    review_intervals_days: tuple[int, ...] = Field(
+        default=(1, 3, 7, 14, 30), validation_alias="REVIEW_INTERVALS_DAYS"
     )
 
     @property

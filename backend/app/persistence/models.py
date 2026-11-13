@@ -1,4 +1,4 @@
-"""SQLAlchemy 2.x ORM models for UnlearnLoop Stage 2.
+"""SQLAlchemy 2.x ORM models for VerbaTrail Stage 2.
 
 Subject-agnostic schema covering:
 - KnowledgeTopic & KnowledgeTopicDependency
@@ -14,7 +14,7 @@ Subject-agnostic schema covering:
 - ReviewItem
 """
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 from uuid import uuid4
 
@@ -26,13 +26,15 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    Index,
     String,
     Text,
     UniqueConstraint,
     event,
     inspect,
+    text,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
 from app.domain.enums import (
     AttemptEvaluationStatus,
@@ -48,7 +50,7 @@ from app.domain.enums import (
     SessionStatus,
     UncertaintyLevel,
 )
-from app.domain.exceptions import ImmutableRecordError
+from app.domain.exceptions import DomainRuleViolationError, ImmutableRecordError
 from app.persistence.database import Base
 
 
@@ -174,6 +176,68 @@ class LearningMaterial(Base):
     questions: Mapped[list["Question"]] = relationship(back_populates="material")
 
 
+class ReadingRuleVersion(Base):
+    """Private, immutable rule payload. Never include this in a learner DTO."""
+
+    __tablename__ = "reading_rule_versions"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    rules_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    private_rules_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class ReadingGroupVersion(Base):
+    """Immutable public content version with a server-only scoring rule reference."""
+
+    __tablename__ = "reading_group_versions"
+    __table_args__ = (UniqueConstraint("group_id", "content_hash", name="uq_reading_group_content"),)
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    group_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    question_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    exam_variant: Mapped[str] = mapped_column(String(32), nullable=False)
+    content_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    display_schema_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    display_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    rule_version_id: Mapped[str] = mapped_column(ForeignKey("reading_rule_versions.id", ondelete="RESTRICT"), nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    provenance_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class EvidenceValidityEvent(Base):
+    """Append-only audit event for whether stored evidence may support learning state."""
+
+    __tablename__ = "evidence_validity_events"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_evidence_validity_idempotency_key"),
+        CheckConstraint(
+            "status IN ('eligible', 'invalidated', 'review_required')",
+            name="ck_evidence_validity_status",
+        ),
+        Index("ix_evidence_validity_target", "target_type", "target_id", "audited_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("evv"))
+    target_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    target_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), nullable=False)
+    group_version_id: Mapped[str | None] = mapped_column(
+        ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True
+    )
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    content_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    rules_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(256), nullable=False)
+    replacement_group_version_id: Mapped[str | None] = mapped_column(
+        ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True
+    )
+    affected_refs_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    idempotency_key: Mapped[str] = mapped_column(String(192), nullable=False)
+    audited_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
 class Question(Base):
     """Question item supporting initial, diagnostic_followup, targeted_practice, and transfer_check."""
 
@@ -188,6 +252,7 @@ class Question(Base):
         primary_key=True,
         default=lambda: new_id("q"),
     )
+    reading_group_version_id: Mapped[str | None] = mapped_column(ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True)
     topic_id: Mapped[str] = mapped_column(
         String(64),
         ForeignKey("knowledge_topics.id", ondelete="RESTRICT"),
@@ -272,11 +337,16 @@ class LearningSession(Base):
         ForeignKey("questions.id", ondelete="SET NULL"),
         nullable=True,
     )
+    current_group_version_id: Mapped[str | None] = mapped_column(ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True)
     status: Mapped[str] = mapped_column(
         String(32),
         nullable=False,
         default=SessionStatus.ACTIVE.value,
     )
+    # Null for all pre-IELTS sessions; new IELTS sessions snapshot the selected exam
+    # and product's official-spec catalogue version without rewriting history.
+    exam_variant: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    exam_spec_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -309,10 +379,53 @@ class LearningSession(Base):
     )
 
 
+class ExamPreparationProfile(Base):
+    """Persisted exam choice and targets; assessed ability remains absent until evidence exists."""
+
+    __tablename__ = "exam_preparation_profiles"
+    __table_args__ = (
+        CheckConstraint(
+            "goal_type = 'band' AND target_overall_band IS NOT NULL AND target_outcome IS NULL "
+            "OR goal_type = 'pass' AND target_overall_band IS NULL AND target_outcome = 'pass'",
+            name="ck_exam_profile_goal_matches_scoring_system",
+        ),
+        CheckConstraint(
+            "actual_level_status IN ('not_assessed', 'assessed')",
+            name="ck_exam_profile_actual_level_status",
+        ),
+    )
+
+    learner_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    exam_variant: Mapped[str] = mapped_column(String(32), nullable=False)
+    goal_type: Mapped[str] = mapped_column(String(16), nullable=False, default="band")
+    target_overall_band: Mapped[float | None] = mapped_column(Float, nullable=True)
+    target_skill_bands: Mapped[dict[str, float] | None] = mapped_column(JSON, nullable=True)
+    target_outcome: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    exam_date: Mapped[date | None] = mapped_column(nullable=True)
+    actual_level_status: Mapped[str] = mapped_column(
+        String(24), nullable=False, default="not_assessed"
+    )
+    # This is our catalogue snapshot identifier, not an IELTS-issued version label.
+    spec_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now
+    )
+
+
 class Attempt(Base):
     """Immutable learner attempt snapshot associated with a Question and LearningSession."""
 
     __tablename__ = "attempts"
+    __table_args__ = (
+        Index(
+            "uq_review_attempt_session_question",
+            "session_id",
+            "question_id",
+            unique=True,
+            sqlite_where=text("attempt_role = 'review'"),
+            postgresql_where=text("attempt_role = 'review'"),
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         String(64),
@@ -343,6 +456,11 @@ class Attempt(Base):
         default=QuestionRole.INITIAL.value,
     )
     submitted_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    group_version_id: Mapped[str | None] = mapped_column(ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True)
+    structured_answer_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    group_snapshot_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    item_evaluation_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    evaluation_rule_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     is_correct: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     evaluation_status: Mapped[str] = mapped_column(
         String(32),
@@ -363,6 +481,30 @@ class Attempt(Base):
 
     session: Mapped["LearningSession"] = relationship(back_populates="attempts")
     question: Mapped["Question"] = relationship(back_populates="attempts")
+
+
+@event.listens_for(LearningSession.current_question_id, "set")
+def _mark_question_assignment(target: LearningSession, _value: Any, _old: Any, _initiator: Any) -> None:
+    # An explicit re-dispatch may choose the same question ID again.
+    target.__dict__["_reading_assignment_pending"] = True
+
+
+@event.listens_for(Session, "before_flush")
+def _pin_assigned_reading_group(db: Session, _context: Any, _instances: Any) -> None:
+    """Pin content when any existing dispatch path changes the current question."""
+    for obj in db.new.union(db.dirty):
+        if not isinstance(obj, LearningSession):
+            continue
+        if obj not in db.new and not obj.__dict__.get("_reading_assignment_pending"):
+            continue
+        question = db.get(Question, obj.current_question_id) if obj.current_question_id else None
+        version_id = question.reading_group_version_id if question else None
+        if version_id:
+            version = db.get(ReadingGroupVersion, version_id)
+            if version is None or version.exam_variant != obj.exam_variant or version.question_type != question.question_type:
+                raise DomainRuleViolationError("Assigned reading content does not match the session exam variant.")
+        obj.current_group_version_id = version_id
+        obj.__dict__.pop("_reading_assignment_pending", None)
 
 
 class DiagnosticCase(Base):
@@ -687,6 +829,10 @@ class ReviewItem(Base):
     """Scheduled review task tied to unresolved error patterns or transfer results."""
 
     __tablename__ = "review_items"
+    __table_args__ = (
+        UniqueConstraint("schedule_key", name="uq_review_items_schedule_key"),
+        UniqueConstraint("review_session_id", name="uq_review_items_review_session_id"),
+    )
 
     id: Mapped[str] = mapped_column(
         String(64),
@@ -731,6 +877,31 @@ class ReviewItem(Base):
         nullable=True,
     )
     review_outcome: Mapped[str | None] = mapped_column(Text, nullable=True)
+    schedule_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    review_stage: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    review_session_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("learning_sessions.id", ondelete="RESTRICT"), nullable=True
+    )
+    question_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("questions.id", ondelete="RESTRICT"), nullable=True
+    )
+    attempt_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("attempts.id", ondelete="RESTRICT"), nullable=True
+    )
+    trigger_attempt_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("attempts.id", ondelete="RESTRICT"), nullable=True
+    )
+    group_version_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("reading_group_versions.id", ondelete="RESTRICT"), nullable=True
+    )
+    decision_event_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("decision_events.id", ondelete="RESTRICT"), nullable=True
+    )
+    knowledge_state_id: Mapped[str | None] = mapped_column(
+        String(64), ForeignKey("knowledge_states.id", ondelete="RESTRICT"), nullable=True
+    )
+    retention_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    retention_eligible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -738,8 +909,10 @@ class ReviewItem(Base):
     )
 
     topic: Mapped["KnowledgeTopic"] = relationship()
-    session: Mapped["LearningSession | None"] = relationship()
+    session: Mapped["LearningSession | None"] = relationship(foreign_keys=[session_id])
+    review_session: Mapped["LearningSession | None"] = relationship(foreign_keys=[review_session_id])
     hypothesis: Mapped["Hypothesis | None"] = relationship()
+    trigger_attempt: Mapped["Attempt | None"] = relationship(foreign_keys=[trigger_attempt_id])
 
 
 class ModelCall(Base):
@@ -866,6 +1039,10 @@ def _prevent_attempt_snapshot_mutation(
         "attempt_role",
         "submitted_at",
         "idempotency_key",
+        "group_version_id",
+        "structured_answer_json",
+        "group_snapshot_json",
+        "evaluation_rule_version",
     )
     for field_name in immutable_fields:
         hist = state.attrs[field_name].history
@@ -877,11 +1054,19 @@ def _prevent_attempt_snapshot_mutation(
     eval_status_hist = state.attrs["evaluation_status"].history
     old_statuses = eval_status_hist.deleted or [target.evaluation_status]
     if old_statuses and old_statuses[0] == AttemptEvaluationStatus.EVALUATED.value:
-        for eval_field in ("evaluation_status", "is_correct", "evaluation_summary"):
+        for eval_field in ("evaluation_status", "is_correct", "evaluation_summary", "item_evaluation_json"):
             if state.attrs[eval_field].history.has_changes():
                 raise ImmutableRecordError(
                     f"Attempt.{eval_field} cannot be overwritten once evaluation_status is 'evaluated'."
                 )
+
+
+@event.listens_for(ReadingGroupVersion, "before_update")
+@event.listens_for(ReadingGroupVersion, "before_delete")
+@event.listens_for(ReadingRuleVersion, "before_update")
+@event.listens_for(ReadingRuleVersion, "before_delete")
+def _prevent_reading_version_mutation(_mapper: Any, _connection: Any, _target: Any) -> None:
+    raise ImmutableRecordError("Reading content and rule versions are immutable.")
 
 
 @event.listens_for(ModelCall, "before_update")
@@ -900,3 +1085,11 @@ def _prevent_model_call_delete(
     raise ImmutableRecordError(
         "ModelCall audit records are append-only and cannot be deleted."
     )
+
+
+@event.listens_for(EvidenceValidityEvent, "before_update")
+@event.listens_for(EvidenceValidityEvent, "before_delete")
+def _prevent_evidence_validity_event_mutation(
+    _mapper: Any, _connection: Any, _target: EvidenceValidityEvent
+) -> None:
+    raise ImmutableRecordError("Evidence validity audit events are append-only.")

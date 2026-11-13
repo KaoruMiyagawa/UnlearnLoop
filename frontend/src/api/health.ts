@@ -1,21 +1,7 @@
 import { apiRequest } from './client';
+import type { HealthResponse } from './types';
 
-export interface SubsystemReadiness {
-  persistence: 'configured' | 'unconfigured';
-  model_provider: string;
-  remote_model_enabled: boolean;
-}
-
-export interface HealthResponse {
-  status: 'ok';
-  service: string;
-  version: string;
-  environment: 'development' | 'testing' | 'production';
-  stage: string;
-  timestamp: string;
-  request_id: string;
-  subsystems: SubsystemReadiness;
-}
+export type { HealthResponse, SubsystemReadiness } from './types';
 
 export async function fetchBackendHealth(): Promise<HealthResponse> {
   return apiRequest<HealthResponse>('/api/v1/health', {

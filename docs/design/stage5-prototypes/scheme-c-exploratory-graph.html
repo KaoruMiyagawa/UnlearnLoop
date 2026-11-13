@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnlearnLoop · 方案 C：探索式学习型 (Exploratory Evidence & Knowledge Graph)</title>
+  <style>
+    :root {
+      --canvas-bg: #F2F4F8;
+      --canvas-dot: #CBD5E1;
+      --node-bg: #FFFFFF;
+      --node-subtle: #F8FAFC;
+      --ink-main: #0F172A;
+      --ink-sub: #475569;
+      --ink-dim: #64748B;
+      --line-soft: #E2E8F0;
+      --line-bold: #94A3B8;
+      --indigo: #4F46E5;
+      --indigo-soft: #EEF2FF;
+      --teal: #0D9488;
+      --teal-soft: #F0FDFA;
+      --amber: #D97706;
+      --amber-soft: #FFFBEB;
+      --rose: #E11D48;
+      --rose-soft: #FFF1F2;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(var(--canvas-dot) 1.25px, transparent 1.25px);
+      background-size: 22px 22px;
+      color: var(--ink-main);
+      font-family: var(--font-sans);
+      font-size: 14.5px;
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    /* Floating Spatial Lens Dock */
+    .lens-dock-wrap {
+      position: sticky;
+      top: 14px;
+      z-index: 30;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+    }
+    .lens-dock {
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      color: #F8FAFC;
+      border-radius: 99px;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+      flex-wrap: wrap;
+    }
+    .dock-brand {
+      padding: 4px 12px;
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #A5B4FC;
+      border-right: 1px solid #334155;
+      text-decoration: none;
+    }
+    .lens-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #CBD5E1;
+      padding: 7px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .lens-btn:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.1); }
+    .lens-btn.active { background: var(--indigo); color: #FFFFFF; }
+    .dock-back {
+      padding: 4px 12px;
+      font-size: 12px;
+      color: #38BDF8;
+      text-decoration: none;
+      border-left: 1px solid #334155;
+    }
+
+    .canvas-stage {
+      max-width: 1340px;
+      margin: 22px auto 80px;
+      padding: 0 22px;
+    }
+
+    .canvas-banner {
+      background: var(--node-bg);
+      border: 1px solid var(--line-soft);
+      border-left: 4px solid var(--indigo);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .node-card {
+      background: var(--node-bg);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .chip.indigo { background: var(--indigo-soft); color: var(--indigo); }
+    .chip.teal { background: var(--teal-soft); color: var(--teal); }
+    .chip.amber { background: var(--amber-soft); color: var(--amber); }
+    .chip.rose { background: var(--rose-soft); color: var(--rose); }
+    .chip.slate { background: #F1F5F9; color: var(--ink-sub); }
+
+    /* Hypothesis x Evidence Cross-Matrix Table */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+    .matrix-table th, .matrix-table td {
+      border: 1px solid var(--line-soft);
+      padding: 12px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .matrix-table th {
+      background: var(--node-subtle);
+      font-weight: 650;
+      color: var(--ink-main);
+    }
+    .cell-sup { background: var(--teal-soft); color: var(--teal); font-weight: 600; }
+    .cell-con { background: var(--rose-soft); color: var(--rose); font-weight: 600; }
+    .cell-mis { background: var(--amber-soft); color: var(--amber); }
+    .cell-neu { background: #F8FAFC; color: var(--ink-dim); }
+
+    /* Time-Travel Evolution Bar */
+    .time-slider-box {
+      background: var(--indigo-soft);
+      border: 1px solid #C7D2FE;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .t-btn {
+      border: 1px solid #A5B4FC;
+      background: #FFFFFF;
+      color: var(--indigo);
+      padding: 6px 13px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .t-btn.active {
+      background: var(--indigo);
+      color: #FFFFFF;
+      border-color: var(--indigo);
+    }
+
+    .topology-layout {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--line-bold);
+      background: #FFFFFF;
+      color: var(--ink-main);
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn.primary {
+      background: var(--indigo);
+      border-color: var(--indigo);
+      color: #FFFFFF;
+    }
+
+    @media (max-width: 980px) {
+      .topology-layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lens-dock-wrap">
+    <nav class="lens-dock" aria-label="探索式画布视角切换">
+      <a class="dock-brand" href="./index.html">UnlearnLoop · 方案 C 探索型</a>
+      <button class="lens-btn active" data-view="home">1. 知识依赖拓扑首页</button>
+      <button class="lens-btn" data-view="workspace">2. 思维追踪取证台</button>
+      <button class="lens-btn" data-view="diagnosis">3. 假设×证据交叉矩阵</button>
+      <button class="lens-btn" data-view="transfer">4. 结构同构迁移实验室</button>
+      <button class="lens-btn" data-view="progress">5. 认知演化图谱与复习</button>
+      <a class="dock-back" href="./index.html">三方案总览 ↗</a>
+    </nav>
+  </div>
+
+  <main class="canvas-stage">
+    <div class="canvas-banner">
+      <div>
+        <strong>[MOCK DATA · 方案 C：探索式学习型]</strong>
+        把“知识点前置依赖、竞争性错误假设、正反证据演化和变式同构关系”可视化为可交互的科学取证画布。
+      </div>
+      <span class="chip indigo">启发式置信度声明：confidence_is_heuristic = true</span>
+    </div>
+
+    <div id="c-root"></div>
+  </main>
+
+  <script>
+    const state = {
+      view: 'home',
+      selectedTopic: 'py-for-loop',
+      timeSlice: 2, // 1: T1 初答 "3" | 2: T2 追问 "1、3" | 3: T3 练习 "6" | 4: T4 迁移验证
+      transferCompare: 'retry_trap' // 'retry_trap' | 'isomorphic_fresh'
+    };
+
+    const topicGraphData = {
+      'py-variable-assignment': {
+        title: '变量赋值与覆盖更新 (py-variable-assignment)',
+        status: 'stable（已验证掌握）',
+        chip: 'teal',
+        prereq: '无（根知识点）',
+        unlocks: 'py-range-function, py-for-loop, py-list-reference',
+        errorNodes: 'var_math_equality_confusion（已排除）',
+        evidenceSummary: '已通过独立迁移验证题 #att_var_t1，证据链完整。'
+      },
+      'py-range-function': {
+        title: 'range() 序列与左闭右开边界 (py-range-function)',
+        status: 'stable（已验证掌握）',
+        chip: 'teal',
+        prereq: 'py-variable-assignment',
+        unlocks: 'py-for-loop',
+        errorNodes: 'range_stop_inclusive（已在独立测试中排除）',
+        evidenceSummary: '单参数与双参数边界均通过验证，但向 for 循环组合迁移时仍需观察。'
+      },
+      'py-for-loop': {
+        title: 'for 循环与状态累加 (py-for-loop)',
+        status: 'diagnosing（2 个竞争假设待区分）',
+        chip: 'amber',
+        prereq: 'py-variable-assignment + py-range-function',
+        unlocks: '综合迭代算法任务',
+        errorNodes: 'H1: range_start_at_one (候选 38%) vs H2: loop_memorized_without_trace (待验 48%)',
+        evidenceSummary: '学习者初答 "3" 结果正确但缺失追踪过程；正通过追问 q_py_loop_followup_01 采集区分性证据。'
+      },
+      'py-if-elif-else': {
+        title: '条件分支互斥与短路执行 (py-if-elif-else)',
+        status: 'insufficient_evidence（证据不足）',
+        chip: 'amber',
+        prereq: 'py-variable-assignment',
+        unlocks: '循环内条件过滤',
+        errorNodes: 'elif_treated_as_independent_if（待验证）',
+        evidenceSummary: '会话已暂停，保留 1 条初步规则证据，不强行下结论。'
+      },
+      'py-list-reference': {
+        title: '列表引用与原地修改副作用 (py-list-reference)',
+        status: 'needs_practice（迁移失败待复习）',
+        chip: 'rose',
+        prereq: 'py-variable-assignment',
+        unlocks: '函数可变默认参数排错',
+        errorNodes: 'list_alias_treated_as_copy（已确认，练习后迁移未通过）',
+        evidenceSummary: '上次会话在迁移失败后结束（session=completed, mastery=needs_practice），已排入复习队列。'
+      }
+    };
+
+    function setView(v) {
+      state.view = v;
+      document.querySelectorAll('.lens-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.view === v);
+      });
+      render();
+    }
+
+    function renderHome() {
+      const cur = topicGraphData[state.selectedTopic];
+      return `
+        <div class="topology-layout">
+          <section class="node-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div>
+                <h2 style="margin:0;font-size:19px;">Python 基础 · 知识点依赖与错误假设拓扑图</h2>
+                <div style="font-size:13px;color:var(--ink-sub)">点击图谱中的任意知识点节点，右侧即时展开其前置依赖、竞争假设与证据状态。</div>
+              </div>
+              <span class="chip indigo">点击节点交互</span>
+            </div>
+
+            <!-- Interactive SVG Knowledge Dependency Graph -->
+            <svg viewBox="0 0 720 340" style="width:100%;height:auto;background:#F8FAFC;border:1px solid var(--line-soft);border-radius:10px;">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#94A3B8" />
+                </marker>
+              </defs>
+              <!-- Edges -->
+              <line x1="170" y1="170" x2="310" y2="85" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="170" y1="170" x2="310" y2="170" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="170" y1="170" x2="310" y2="260" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrow)" />
+              <line x1="450" y1="85" x2="540" y2="155" stroke="#4F46E5" stroke-width="2.5" stroke-dasharray="4 3" marker-end="url(#arrow)" />
+              <line x1="170" y1="170" x2="540" y2="185" stroke="#4F46E5" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arrow)" />
+
+              <!-- Node 1: py-variable-assignment -->
+              <g style="cursor:pointer" onclick="state.selectedTopic='py-variable-assignment';render()">
+                <rect x="25" y="138" width="145" height="64" rx="10" fill="${state.selectedTopic==='py-variable-assignment'?'#EEF2FF':'#FFFFFF'}" stroke="#0D9488" stroke-width="2.5"/>
+                <text x="97" y="165" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0F172A">变量赋值与更新</text>
+                <text x="97" y="186" text-anchor="middle" font-size="11" fill="#0D9488">✓ stable</text>
+              </g>
+
+              <!-- Node 2: py-range-function -->
+              <g style="cursor:pointer" onclick="state.selectedTopic='py-range-function';render()">
+                <rect x="315" y="52" width="140" height="64" rx="10" fill="${state.selectedTopic==='py-range-function'?'#EEF2FF':'#FFFFFF'}" stroke="#0D9488" stroke-width="2.5"/>
+                <text x="385" y="79" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0F172A">range() 左闭右开</text>
+                <text x="385" y="100" text-anchor="middle" font-size="11" fill="#0D9488">✓ stable</text>
+              </g>
+
+              <!-- Node 3: py-if-elif-else -->
+              <g style="cursor:pointer" onclick="state.selectedTopic='py-if-elif-else';render()">
+                <rect x="315" y="138" width="140" height="64" rx="10" fill="${state.selectedTopic==='py-if-elif-else'?'#EEF2FF':'#FFFFFF'}" stroke="#D97706" stroke-width="2"/>
+                <text x="385" y="165" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0F172A">条件分支互斥</text>
+                <text x="385" y="186" text-anchor="middle" font-size="11" fill="#D97706">? 证据不足</text>
+              </g>
+
+              <!-- Node 4: py-list-reference -->
+              <g style="cursor:pointer" onclick="state.selectedTopic='py-list-reference';render()">
+                <rect x="315" y="226" width="140" height="64" rx="10" fill="${state.selectedTopic==='py-list-reference'?'#EEF2FF':'#FFFFFF'}" stroke="#E11D48" stroke-width="2"/>
+                <text x="385" y="253" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0F172A">列表引用与别名</text>
+                <text x="385" y="274" text-anchor="middle" font-size="11" fill="#E11D48">↻ needs_practice</text>
+              </g>
+
+              <!-- Node 5: py-for-loop (Active Diagnostic Focus) -->
+              <g style="cursor:pointer" onclick="state.selectedTopic='py-for-loop';render()">
+                <rect x="540" y="132" width="155" height="76" rx="12" fill="${state.selectedTopic==='py-for-loop'?'#EEF2FF':'#FFFBEB'}" stroke="#4F46E5" stroke-width="3"/>
+                <text x="617" y="160" text-anchor="middle" font-size="13" font-weight="700" fill="#4F46E5">for 循环与状态累加</text>
+                <text x="617" y="180" text-anchor="middle" font-size="11" fill="#D97706">● 诊断中 · 2 竞争假设</text>
+                <text x="617" y="196" text-anchor="middle" font-size="10" fill="#64748B">[当前焦点会话]</text>
+              </g>
+            </svg>
+          </section>
+
+          <aside class="node-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span class="chip ${cur.chip}">${cur.status}</span>
+              <code style="font-size:12px;color:var(--ink-dim)">${state.selectedTopic}</code>
+            </div>
+            <h3 style="margin:0 0 12px;font-size:18px;">${cur.title}</h3>
+            <div style="display:grid;gap:10px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:12px;">
+              <div><strong>前置依赖：</strong><span style="color:var(--ink-sub)">${cur.prereq}</span></div>
+              <div><strong>后续关联：</strong><span style="color:var(--ink-sub)">${cur.unlocks}</span></div>
+              <div><strong>关联错误假设节点：</strong><div style="margin-top:4px;padding:8px 10px;background:var(--node-subtle);border-radius:6px;font-family:var(--font-mono);font-size:12px;">${cur.errorNodes}</div></div>
+              <div><strong>证据演化摘要：</strong><p style="margin:4px 0 0;color:var(--ink-sub)">${cur.evidenceSummary}</p></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+              <button class="btn primary" onclick="setView('diagnosis')">进入假设×证据交叉矩阵 →</button>
+              <button class="btn" onclick="setView('workspace')">进入思维追踪取证台</button>
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderWorkspace() {
+      return `
+        <div class="node-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div>
+              <h2 style="margin:0;font-size:20px;">思维追踪取证台 · 代码状态演化与心智模型对照</h2>
+              <div style="font-size:13px;color:var(--ink-sub)">不仅收集最终输出数字，更通过“每轮变量快照表”提取高区分度的认知证据。</div>
+            </div>
+            <span class="chip indigo">题目 ID: q_py_loop_initial_01 → q_py_loop_followup_01</span>
+          </div>
+
+          <div class="topology-layout">
+            <div style="background:#0F172A;color:#F8FAFC;padding:18px;border-radius:10px;font-family:var(--font-mono);font-size:13.5px;line-height:1.7;">
+              <div style="color:#94A3B8;font-size:12px;margin-bottom:8px;">// 目标观察代码：当把 print(total) 放入循环内部时</div>
+              <div>total = 0</div>
+              <div>for i in range(3):</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;total = total + i</div>
+              <div style="background:rgba(79,70,229,0.35);padding:2px 6px;border-left:3px solid #818CF8;">&nbsp;&nbsp;&nbsp;&nbsp;print(total)  # 探针位置：区分 H1 与 H2</div>
+            </div>
+
+            <div style="border:1px solid var(--line-soft);border-radius:10px;padding:16px;background:var(--node-subtle);">
+              <h3 style="margin:0 0 10px;font-size:15px;">学习者原始提交与追问对比</h3>
+              <div style="padding:10px;background:#FFFFFF;border:1px solid var(--line-soft);border-radius:8px;margin-bottom:10px;">
+                <div style="font-size:12px;color:var(--ink-dim)">1. 初始作答快照 (Attempt #att_01)</div>
+                <div style="font-family:var(--font-mono);font-weight:700;margin-top:4px;">"3" <span class="chip amber">证据不足：0+1+2 与 1+2 均得 3</span></div>
+              </div>
+              <div style="padding:10px;background:#FFFFFF;border:1px solid var(--line-soft);border-radius:8px;margin-bottom:14px;">
+                <div style="font-size:12px;color:var(--ink-dim)">2. 区分性追问回应 (Attempt #att_02)</div>
+                <div style="font-family:var(--font-mono);font-weight:700;margin-top:4px;">"依次打印 1、3" <span class="chip rose">命中 H1：误将 range(3) 算作 [1, 2]</span></div>
+              </div>
+              <button class="btn primary" onclick="setView('diagnosis')">在交叉矩阵中观察这条新证据如何改变假设 →</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDiagnosis() {
+      const t = state.timeSlice;
+      return `
+        <div class="node-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div>
+              <h2 style="margin:0;font-size:20px;">Agent 诊断中心 · 候选错误假设 × 证据链交叉验证矩阵</h2>
+              <div style="font-size:13px;color:var(--ink-sub)">拒绝黑盒单次结论：滑动上方时间轴（T1 → T4），观察每条新证据如何支持（+）、反驳（−）或保留不确定性（?）。</div>
+            </div>
+            <span class="chip indigo">决策引擎：DiagnosticAgentEngine (Mock Mode)</span>
+          </div>
+
+          <div class="time-slider-box">
+            <strong>时间轴演化回放（Time-Travel Evidence Replay）：</strong>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="t-btn ${t===1?'active':''}" onclick="state.timeSlice=1;render()">T1: 初答 "3"（证据不足并列期）</button>
+              <button class="t-btn ${t===2?'active':''}" onclick="state.timeSlice=2;render()">T2: 追问答 "1、3"（H2 排除 / H1 确诊）</button>
+              <button class="t-btn ${t===3?'active':''}" onclick="state.timeSlice=3;render()">T3: 针对性练习 "6"（H1 风险下降）</button>
+              <button class="t-btn ${t===4?'active':''}" onclick="state.timeSlice=4;render()">T4: 独立新迁移题通过（晋升 stable）</button>
+            </div>
+          </div>
+
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="width:24%">候选错误假设 (Competing Hypotheses)</th>
+                <th style="width:19%">E1: 初答 <code>"3"</code> (无过程)<br/><small>来源: initial_attempt / rule_check</small></th>
+                <th style="width:19%">E2: 追问答 <code>"依次打印 1、3"</code><br/><small>来源: followup_response</small></th>
+                <th style="width:19%">E3: 练习 <code>range(1,4) → "6"</code><br/><small>来源: practice_attempt</small></th>
+                <th style="width:19%">当前阶段状态 & 启发式权重</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>H1: <code>range_start_at_one</code></strong>
+                  <div style="font-size:12px;color:var(--ink-sub);margin-top:4px;">误以为 <code>range(3)</code> 从 1 开始生成 <code>[1, 2]</code>，1+2 碰巧等于 3</div>
+                </td>
+                <td class="cell-neu">[中立 NEUTRAL]<br/>1+2=3 与输出兼容，但缺乏直接过程证据</td>
+                <td class="${t>=2?'cell-sup':'cell-mis'}">
+                  ${t>=2 ? '[支持 SUPPORTS +]<br/>首轮输出 1 且仅两轮，直接证实 [1, 2] 模型' : '[缺失证据 MISSING]<br/>等待追问首轮打印值是 0 还是 1'}
+                </td>
+                <td class="${t>=3?'cell-con':'cell-neu'}">
+                  ${t>=3 ? '[反驳 CONTRADICTS −]<br/>纠偏后正确追踪显式边界 range(1,4)' : '尚未进入练习阶段'}
+                </td>
+                <td>
+                  ${
+                    t===1 ? '<span class="chip amber">candidate · 0.38</span>' :
+                    t===2 ? '<span class="chip rose">confirmed · 0.86</span>' :
+                    t===3 ? '<span class="chip indigo">lowered · 0.35</span>' :
+                            '<span class="chip teal">resolved · 0.10</span>'
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>H2: <code>loop_memorized_without_trace</code></strong>
+                  <div style="font-size:12px;color:var(--ink-sub);margin-top:4px;">只记住最终结果，未在脑中执行逐轮状态更新</div>
+                </td>
+                <td class="cell-sup">[支持 SUPPORTS +]<br/>初答仅单个数字 3，未写任何循环追踪</td>
+                <td class="${t>=2?'cell-con':'cell-mis'}">
+                  ${t>=2 ? '[反驳 CONTRADICTS −]<br/>能按轮次写出 1 → 3 的累加过程，非盲猜' : '[缺失证据 MISSING]<br/>需检验是否具备逐轮状态追踪能力'}
+                </td>
+                <td class="cell-neu">无新增直接冲突</td>
+                <td>
+                  ${
+                    t===1 ? '<span class="chip amber">insufficient_evidence · 0.48</span>' :
+                            '<span class="chip slate">lowered · 0.15</span>'
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>H3: <code>range_stop_inclusive</code></strong>
+                  <div style="font-size:12px;color:var(--ink-sub);margin-top:4px;">误以为 <code>range(3)</code> 包含终点 3（生成 0,1,2,3）</div>
+                </td>
+                <td class="cell-con">[反驳 CONTRADICTS −]<br/>若包含 3 则总和为 6，与初答 3 直接矛盾</td>
+                <td class="cell-neu">—</td>
+                <td class="cell-neu">—</td>
+                <td><span class="chip slate">ruled_out（已排除） · 0.05</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:18px;padding:14px 16px;background:var(--node-subtle);border:1px solid var(--line-soft);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <strong>Agent 在时间点 T${t} 的白名单工具决策：</strong>
+              <span style="color:var(--ink-sub)">
+                ${
+                  t===1 ? '由于 H1 与 H2 均未排除（INSUFFICIENT_EVIDENCE），调用 select_diagnostic_followup 派发区分性追问。' :
+                  t===2 ? '追问证据反驳 H2、确认 H1，调用 assign_targeted_practice 安排边界对比练习。' :
+                  t===3 ? '练习通过，调用 assign_transfer_verification 派发变式迁移验证题。' :
+                          '独立新迁移题首次验证通过，调用 update_knowledge_state 晋升为 stable。'
+                }
+              </span>
+            </div>
+            <button class="btn primary" onclick="setView('transfer')">前往迁移实验室验证同构题 →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTransfer() {
+      return `
+        <div class="node-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div>
+              <h2 style="margin:0;font-size:20px;">结构同构迁移实验室 · 表面情境变换与同题重试拦截</h2>
+              <div style="font-size:13px;color:var(--ink-sub)">迁移题保持底层概念同构（循环步长 + 双变量累加），但改变表面情境，且严禁同题重答直接晋升 <code>stable</code>。</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="t-btn ${state.transferCompare==='retry_trap'?'active':''}" onclick="state.transferCompare='retry_trap';render()">对比 1：同题重答拦截 (q_py_loop_transfer_01)</button>
+              <button class="t-btn ${state.transferCompare==='isomorphic_fresh'?'active':''}" onclick="state.transferCompare='isomorphic_fresh';render()">对比 2：独立新题同构验证 (q_py_loop_transfer_02)</button>
+            </div>
+          </div>
+
+          <div class="topology-layout">
+            <div style="border:1px solid var(--line-soft);border-radius:10px;padding:16px;">
+              <span class="chip amber">迁移题 #1 · 仓库盘点情境 (q_py_loop_transfer_01)</span>
+              <pre style="background:#0F172A;color:#F8FAFC;padding:14px;border-radius:8px;font-family:var(--font-mono);font-size:13px;margin:12px 0;">count = 0
+running_sum = 5
+for step in range(1, 7, 2):
+    count += 1
+    running_sum += step * 2
+print(count, running_sum)</pre>
+              <div style="padding:12px;background:var(--rose-soft);border:1px solid #FECDD3;border-radius:8px;font-size:13px;">
+                <strong>历史轨迹：</strong><br/>
+                1. 首次提交 <code>"3 15"</code> → 判定失败（<code>needs_practice</code>）<br/>
+                2. 再次提交同一题 <code>"3 17"</code> → <strong>被系统拦截（<code>transfer_retry_blocked</code>）</strong>：已暴露过的迁移题再次答对无法排除记忆效应，拒绝晋升 <code>stable</code>！
+              </div>
+            </div>
+
+            <div style="border:2px solid var(--teal);border-radius:10px;padding:16px;background:var(--teal-soft);">
+              <span class="chip teal">独立新迁移题 #2 · 温控传感器情境 (q_py_loop_transfer_02)</span>
+              <pre style="background:#0F172A;color:#F8FAFC;padding:14px;border-radius:8px;font-family:var(--font-mono);font-size:13px;margin:12px 0;">alerts = 0
+energy = 15
+for tick in range(2, 8, 2):
+    alerts += 1
+    energy += tick * 3
+print(alerts, energy)</pre>
+              <div style="padding:12px;background:#FFFFFF;border:1px solid #99F6E4;border-radius:8px;font-size:13px;">
+                <strong>独立迁移通过：</strong><br/>
+                首次接触该题即提交正确答案 <code>"3 60"</code>。<br/>
+                底层考查目标同为 <code>py-for-loop</code>，无历史失败记录污染 → <strong>合法更新 <code>KnowledgeState = stable</code></strong>。
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProgress() {
+      return `
+        <div class="node-card">
+          <h2 style="margin:0 0 8px;font-size:20px;">认知演化档案 · 会话状态与掌握状态正交矩阵</h2>
+          <p style="margin:0 0 16px;color:var(--ink-sub)">
+            严格区分会话生命周期（<code>active / diagnosing / transfer_checking / paused / completed</code>）与知识点掌握状态（<code>unstarted / diagnosing / needs_practice / insufficient_evidence / stable</code>）。
+          </p>
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>知识点 (Topic)</th>
+                <th>最近会话状态 (SessionStatus)</th>
+                <th>知识点掌握状态 (KnowledgeMasteryStatus)</th>
+                <th>是否掌握 (topic_mastered)</th>
+                <th>复习调度与证据说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>py-for-loop</code></strong><br/>for 循环与累加</td>
+                <td><span class="chip slate">completed（已正常结束）</span></td>
+                <td><span class="chip teal">stable（操作性掌握）</span></td>
+                <td><code>true</code></td>
+                <td>由独立新迁移题 <code>q_py_loop_transfer_02 (#att_06)</code> 验证通过</td>
+              </tr>
+              <tr>
+                <td><strong><code>py-list-reference</code></strong><br/>列表引用与别名</td>
+                <td><span class="chip slate">completed（已主动结束）</span></td>
+                <td><span class="chip rose">needs_practice（仍需练习）</span></td>
+                <td><code>false</code></td>
+                <td><strong>关键语义区分：</strong>会话虽已结束，但因迁移验证未通过，绝不伪造 <code>stable</code>；已生成待办复习 <code>ReviewItem #rev_02</code></td>
+              </tr>
+              <tr>
+                <td><strong><code>py-if-elif-else</code></strong><br/>条件分支互斥</td>
+                <td><span class="chip indigo">paused（已暂停）</span></td>
+                <td><span class="chip amber">insufficient_evidence（证据不足）</span></td>
+                <td><code>false</code></td>
+                <td>保留未决候选假设，恢复会话时直接回到 <code>diagnosing</code> 阶段</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function render() {
+      const root = document.getElementById('c-root');
+      if (state.view === 'home') root.innerHTML = renderHome();
+      else if (state.view === 'workspace') root.innerHTML = renderWorkspace();
+      else if (state.view === 'diagnosis') root.innerHTML = renderDiagnosis();
+      else if (state.view === 'transfer') root.innerHTML = renderTransfer();
+      else root.innerHTML = renderProgress();
+    }
+
+    document.querySelectorAll('.lens-btn').forEach(btn => {
+      btn.addEventListener('click', () => setView(btn.dataset.view));
+    });
+
+    render();
+  </script>
+</body>
+</html>

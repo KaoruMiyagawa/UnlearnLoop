@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VerbaTrail · Direction A: Naval & Gold Academic Prestige (Recommended)</title>
+  <style>
+    :root {
+      --navy-950: #081120;
+      --navy-900: #0C192E;
+      --navy-800: #152642;
+      --navy-700: #1F365C;
+      --mist-50: #F6F7FA;
+      --mist-100: #EEF1F6;
+      --mist-200: #E2E7F0;
+      --surface: #FFFFFF;
+      --ink-900: #0F172A;
+      --ink-700: #334155;
+      --ink-500: #64748B;
+      --ink-400: #94A3B8;
+      --gold-600: #B8860B;
+      --gold-500: #C89D3C;
+      --gold-100: #FBF6E9;
+      --gold-border: #EBD9B0;
+      --cobalt-600: #1D4ED8;
+      --cobalt-50: #EFF6FF;
+      --emerald-700: #047857;
+      --emerald-50: #ECFDF5;
+      --amber-700: #B45309;
+      --amber-50: #FFFBEB;
+      --rose-700: #BE123C;
+      --rose-50: #FFF1F2;
+      --radius-xl: 18px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-card: 0 2px 12px -2px rgba(12, 25, 46, 0.05), 0 1px 3px rgba(12, 25, 46, 0.03);
+      --shadow-elevated: 0 14px 34px -6px rgba(12, 25, 46, 0.12);
+      --font-serif: "Georgia", "Cambria", "Times New Roman", "Songti SC", serif;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--mist-50);
+      color: var(--ink-900);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Prestige Navigation Bar */
+    .top-bar {
+      background: var(--navy-900);
+      color: #F8FAFC;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .top-bar-inner {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-btn {
+      appearance: none;
+      background: none;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      cursor: pointer;
+      color: #FFFFFF;
+      text-align: left;
+    }
+
+    .brand-crest {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+      color: var(--navy-950);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+    }
+
+    .brand-name {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: #FFFFFF;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #D4AF37;
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(212, 175, 55, 0.08);
+    }
+
+    .primary-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+    }
+
+    .nav-item {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .nav-item:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-item.active {
+      color: #FFFFFF;
+      background: var(--navy-800);
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12.5px;
+    }
+
+    .proto-switch-link {
+      color: #CBD5E1;
+      text-decoration: none;
+      padding: 5px 11px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+
+    .proto-switch-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+    }
+
+    /* Main Container */
+    .page-shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 32px 28px 88px;
+    }
+
+    /* Band 8.0 Target Command Banner (Dashboard Top) */
+    .target-banner {
+      background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .track-pills {
+      display: inline-flex;
+      background: rgba(8, 17, 32, 0.55);
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 12px;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .track-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .track-btn.active {
+      background: #D4AF37;
+      color: var(--navy-950);
+    }
+
+    .track-btn.future {
+      opacity: 0.65;
+      cursor: default;
+    }
+
+    .band-score-cluster {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .overall-badge {
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+      text-align: center;
+      min-width: 132px;
+    }
+
+    .overall-badge .lbl {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #E2C675;
+      display: block;
+    }
+
+    .overall-badge .val {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.15;
+      margin-top: 2px;
+    }
+
+    .subscore-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(92px, 1fr));
+      gap: 10px;
+    }
+
+    .subscore-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+    }
+
+    .subscore-box .s-name {
+      font-size: 11.5px;
+      color: #94A3B8;
+    }
+
+    .subscore-box .s-nums {
+      margin-top: 3px;
+      font-weight: 600;
+      font-size: 14.5px;
+      color: #F8FAFC;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+
+    .subscore-box .s-target {
+      font-size: 12px;
+      color: #D4AF37;
+    }
+
+    /* Hero Card: Continue Today's Study */
+    .hero-study-card {
+      margin-top: 24px;
+      background: var(--surface);
+      border: 1px solid var(--mist-200);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      padding: 32px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.95fr);
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow-gold {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--gold-600);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: 25px;
+      font-weight: 700;
+      color: var(--ink-900);
+      margin: 8px 0 12px;
+      line-height: 1.3;
+    }
+
+    .triad-box {
+      background: var(--mist-50);
+      border-left: 3px solid var(--navy-800);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 14px 18px;
+      margin: 16px 0 22px;
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--ink-700);
+    }
+
+    .triad-box strong {
+      color: var(--ink-900);
+    }
+
+    .hero-right-panel {
+      background: var(--mist-50);
+      border: 1px solid var(--mist-200);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+    }
+
+    /* Buttons & Badges */
+    .btn-navy {
+      appearance: none;
+      border: none;
+      background: var(--navy-900);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-navy:hover {
+      background: var(--navy-700);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      appearance: none;
+      border: 1px solid var(--mist-200);
+      background: var(--surface);
+      color: var(--ink-700);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--ink-400);
+      color: var(--ink-900);
+      background: var(--mist-50);
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    .badge-pill.gold { background: var(--gold-100); color: var(--gold-600); border: 1px solid var(--gold-border); }
+    .badge-pill.emerald { background: var(--emerald-50); color: var(--emerald-700); border: 1px solid #A7F3D0; }
+    .badge-pill.amber { background: var(--amber-50); color: var(--amber-700); border: 1px solid #FDE68A; }
+    .badge-pill.cobalt { background: var(--cobalt-50); color: var(--cobalt-600); border: 1px solid #BFDBFE; }
+    .badge-pill.slate { background: var(--mist-100); color: var(--ink-700); border: 1px solid var(--mist-200); }
+
+    /* Four Skills Entry Grid */
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 34px 0 14px;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--ink-900);
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--mist-200);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .skill-card:hover {
+      border-color: var(--navy-700);
+      transform: translateY(-2px);
+    }
+
+    /* Secondary Gateways Bar */
+    .secondary-strip {
+      margin-top: 28px;
+      background: var(--surface);
+      border: 1px solid var(--mist-200);
+      border-radius: var(--radius-lg);
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .sec-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Reading Split Workbench */
+    .reading-workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.95fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .passage-sheet {
+      background: #FFFFFF;
+      border: 1px solid var(--mist-200);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      padding: 36px 40px;
+    }
+
+    .passage-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 8px 0 10px;
+      color: var(--ink-900);
+    }
+
+    .passage-lead {
+      font-size: 14px;
+      color: var(--ink-500);
+      font-style: italic;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--mist-200);
+    }
+
+    .passage-para {
+      font-family: var(--font-serif);
+      font-size: 16.5px;
+      line-height: 1.82;
+      color: #1E293B;
+      margin-bottom: 20px;
+    }
+
+    .para-letter {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy-800);
+      background: var(--mist-100);
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .evidence-highlight {
+      background: var(--gold-100);
+      border-bottom: 2px solid var(--gold-500);
+      padding: 1px 3px;
+      border-radius: 3px;
+      transition: background-color 0.25s ease;
+    }
+
+    .question-pane {
+      background: var(--surface);
+      border: 1px solid var(--mist-200);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+      position: sticky;
+      top: 84px;
+    }
+
+    .tfng-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .tfng-btn {
+      appearance: none;
+      border: 1px solid var(--mist-200);
+      background: var(--mist-50);
+      color: var(--ink-700);
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tfng-btn.selected {
+      background: var(--navy-900);
+      color: #FFFFFF;
+      border-color: var(--navy-900);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1024px) {
+      .hero-study-card,
+      .reading-workbench {
+        grid-template-columns: 1fr;
+      }
+      .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .question-pane {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .top-bar-inner,
+      .page-shell {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .subscore-grid,
+      .skills-grid,
+      .tfng-options {
+        grid-template-columns: 1fr;
+      }
+      .passage-sheet {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-group">
+        <button type="button" class="brand-btn" onclick="switchView('dashboard')">
+          <span class="brand-crest">V</span>
+          <span class="brand-name">VerbaTrail</span>
+        </button>
+        <span class="brand-tag">Band 8.0 Scholar</span>
+      </div>
+
+      <nav class="primary-nav" aria-label="Primary Navigation">
+        <button type="button" class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">Dashboard</button>
+        <button type="button" class="nav-item" data-view="reading" onclick="switchView('reading')">Reading Studio</button>
+        <button type="button" class="nav-item" data-view="review" onclick="switchView('review')">Memory Review</button>
+        <button type="button" class="nav-item" data-view="profile" onclick="switchView('profile')">Band 8 Dossier</button>
+      </nav>
+
+      <div class="header-meta">
+        <a class="proto-switch-link" href="./index.html">← All 3 Directions</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell" id="vt-stage"></main>
+
+  <script>
+    const state = {
+      view: 'dashboard',
+      examTrack: 'Academic', // 'Academic' | 'General Training'
+      tfngChoice: 'FALSE',
+      rationaleChoice: 'no_comparison',
+      readingSubmitted: false,
+      readingEvidenceExpanded: false,
+      reviewVerified: false,
+      reviewAnswer: 'mitigate'
+    };
+
+    function switchView(v) {
+      state.view = v;
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === v);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      render();
+    }
+
+    function renderDashboard() {
+      return `
+        <!-- 1. IELTS Band 8.0 Target & Track Banner -->
+        <section class="target-banner" aria-label="IELTS Target Overview">
+          <div>
+            <div class="track-pills" role="group" aria-label="IELTS Module Selection">
+              <button type="button" class="track-btn ${state.examTrack === 'Academic' ? 'active' : ''}" onclick="state.examTrack='Academic';render();">
+                IELTS Academic
+              </button>
+              <button type="button" class="track-btn ${state.examTrack === 'General Training' ? 'active' : ''}" onclick="state.examTrack='General Training';render();">
+                General Training
+              </button>
+              <span class="track-btn future" title="Architecture ready for UKVI & Life Skills">UKVI · Life Skills (Ready)</span>
+            </div>
+            <h1 style="font-family:var(--font-serif);font-size:26px;margin:0 0 6px;font-weight:700;">
+              Road to Overall Band 8.0 · ${state.examTrack} Module
+            </h1>
+            <p style="margin:0;color:#CBD5E1;font-size:14px;">
+              Precision diagnostic training focused on eliminating Band 7.0→8.0 cognitive and lexical bottlenecks.
+            </p>
+          </div>
+
+          <div class="band-score-cluster">
+            <div class="overall-badge">
+              <span class="lbl">Target Overall</span>
+              <div class="val">8.0</div>
+              <span style="font-size:11.5px;color:#CBD5E1;">Current Est. 7.5</span>
+            </div>
+
+            <div class="subscore-grid">
+              <div class="subscore-box">
+                <div class="s-name">Listening</div>
+                <div class="s-nums"><span>8.0</span><span class="s-target">→ 8.5</span></div>
+              </div>
+              <div class="subscore-box">
+                <div class="s-name">Reading</div>
+                <div class="s-nums"><span>7.5</span><span class="s-target">→ 8.5</span></div>
+              </div>
+              <div class="subscore-box">
+                <div class="s-name">Writing</div>
+                <div class="s-nums"><span>7.0</span><span class="s-target">→ 7.5</span></div>
+              </div>
+              <div class="subscore-box">
+                <div class="s-name">Speaking</div>
+                <div class="s-nums"><span>7.0</span><span class="s-target">→ 7.5</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Visual Center: Continue Today's Study -->
+        <section class="hero-study-card" aria-labelledby="hero-study-heading">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span class="eyebrow-gold">● Primary Daily Focus · 12 Mins</span>
+              <span class="badge-pill slate">${state.examTrack} Reading · Passage 3</span>
+            </div>
+
+            <h2 id="hero-study-heading" class="hero-title">
+              Eliminating Over-Inference in “FALSE vs. NOT GIVEN” Claims
+            </h2>
+
+            <div class="triad-box">
+              <div><strong>What to do now:</strong> Complete 1 high-density Academic Passage excerpt (Paragraphs A–D) and 2 linked claim verifications.</div>
+              <div><strong>Why this task was selected:</strong> In your last session, you marked an unmentioned comparison as <code>FALSE</code>. Mastering this single distinction bridges Reading 7.5 to 8.5.</div>
+              <div><strong>What happens next:</strong> Immediate textual evidence mapping, followed by 1 spaced transfer check.</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <button type="button" class="btn-navy" onclick="switchView('reading')">
+                Continue Today’s Study →
+              </button>
+              <button type="button" class="btn-outline" onclick="switchView('review')">
+                2 Due Memory Reviews (4 min)
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-right-panel">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-500);margin-bottom:10px;">
+              Active Diagnostic Hypothesis
+            </div>
+            <div style="font-weight:650;font-size:15px;color:var(--ink-900);margin-bottom:6px;">
+              Scope Trap: Treating “Absent Comparison” as Contradiction
+            </div>
+            <p style="font-size:13.5px;color:var(--ink-700);margin:0 0 14px;">
+              When a passage states a phenomenon occurs frequently, test-takers aiming for Band 8 often assume a comparative claim (“more frequently than X”) is contradicted rather than simply unstated.
+            </p>
+            <div style="padding-top:12px;border-top:1px solid var(--mist-200);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--ink-500);">
+              <span>Target Skill: <strong>Academic Reading 8.5</strong></span>
+              <span class="badge-pill gold">1 Verification Left</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Four Core IELTS Modules -->
+        <div class="section-head">
+          <h2 class="section-title">Four-Skill Mastery Studios</h2>
+          <span style="font-size:13px;color:var(--ink-500);">Structured around official IELTS assessment criteria</span>
+        </div>
+
+        <div class="skills-grid">
+          <button type="button" class="skill-card" onclick="switchView('reading')">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="badge-pill gold">Priority Focus</span>
+                <span style="font-size:12.5px;font-weight:700;color:var(--ink-500);">7.5 → 8.5</span>
+              </div>
+              <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--ink-900);">Reading</div>
+              <p style="font-size:13.5px;color:var(--ink-700);margin:6px 0 16px;">
+                Passage 3 argumentation, T/F/NG logic boundaries & heading synthesis.
+              </p>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy-800);">Enter Reading Studio →</div>
+          </button>
+
+          <button type="button" class="skill-card" onclick="switchView('profile')">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="badge-pill amber">Task 2 Cohesion</span>
+                <span style="font-size:12.5px;font-weight:700;color:var(--ink-500);">7.0 → 7.5</span>
+              </div>
+              <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--ink-900);">Writing</div>
+              <p style="font-size:13.5px;color:var(--ink-700);margin:6px 0 16px;">
+                Academic hedging, concession paragraphs & C1 lexical collocations.
+              </p>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy-800);">View Writing Diagnostics →</div>
+          </button>
+
+          <button type="button" class="skill-card" onclick="switchView('profile')">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="badge-pill emerald">On Track</span>
+                <span style="font-size:12.5px;font-weight:700;color:var(--ink-500);">8.0 → 8.5</span>
+              </div>
+              <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--ink-900);">Listening</div>
+              <p style="font-size:13.5px;color:var(--ink-700);margin:6px 0 16px;">
+                Part 4 academic lecture signpost tracking & distractor cancellation.
+              </p>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy-800);">Inspect Listening Log →</div>
+          </button>
+
+          <button type="button" class="skill-card" onclick="switchView('profile')">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span class="badge-pill cobalt">Part 3 Depth</span>
+                <span style="font-size:12.5px;font-weight:700;color:var(--ink-500);">7.0 → 7.5</span>
+              </div>
+              <div style="font-family:var(--font-serif);font-size:18px;font-weight:700;color:var(--ink-900);">Speaking</div>
+              <p style="font-size:13.5px;color:var(--ink-700);margin:6px 0 16px;">
+                Speculative framing, idiomatic precision & discourse markers.
+              </p>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy-800);">Open Speaking Brief →</div>
+          </button>
+        </div>
+
+        <!-- 4. Quiet Secondary Gateways -->
+        <section class="secondary-strip" aria-label="Foundational & Analytical Tools">
+          <div>
+            <strong style="font-size:14px;color:var(--ink-900);">Foundations & Verification Archive</strong>
+            <span style="font-size:13px;color:var(--ink-500);margin-left:8px;">
+              Supporting tools kept calm so your daily focus stays undivided.
+            </span>
+          </div>
+          <div class="sec-links">
+            <button type="button" class="btn-outline" onclick="switchView('review')">Vocabulary & Collocations</button>
+            <button type="button" class="btn-outline" onclick="switchView('review')">C1 Grammar Structures</button>
+            <button type="button" class="btn-outline" onclick="switchView('review')">Spaced Review (2 Due)</button>
+            <button type="button" class="btn-outline" onclick="switchView('profile')">Timed Mock Tests</button>
+            <button type="button" class="btn-outline" onclick="switchView('profile')">Learning Profile</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderReading() {
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+          <div>
+            <span class="eyebrow-gold">${state.examTrack} Reading · Passage 3 Diagnostic Workbench</span>
+            <h1 style="font-family:var(--font-serif);font-size:22px;margin:4px 0 0;">
+              Section 3: Predictive Models in Paleoclimatology
+            </h1>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="badge-pill slate">Target Pace: 6 min</span>
+            <button type="button" class="btn-outline" onclick="switchView('dashboard')">← Back to Dashboard</button>
+          </div>
+        </div>
+
+        <div class="reading-workbench">
+          <!-- Left Column: Immersive Academic Passage -->
+          <article class="passage-sheet" aria-label="Reading Passage">
+            <span class="badge-pill gold">Authentic Band 8.5 Register · C1/C2 Academic Prose</span>
+            <h2 class="passage-title">The Epistemology of Proxy Reconstruction in Climate Modeling</h2>
+            <div class="passage-lead">
+              How paleoclimatologists reconcile high-resolution ice-core records with long-term orbital simulations.
+            </div>
+
+            <p class="passage-para">
+              <span class="para-letter">A</span>
+              For decades, numerical general circulation models (GCMs) have served as the cornerstone of climate projection. Yet when researchers attempt to hindcast pre-industrial temperature anomalies across millennial timescales, purely mechanistic equations encounter boundary-condition drift. Consequently, empirical proxy archives—ranging from sub-polar ice cores to pelagic sediment layers—are indispensable for anchoring theoretical trajectories.
+            </p>
+
+            <p class="passage-para">
+              <span class="para-letter">B</span>
+              A recurring methodological debate centres on how tightly proxy data should constrain simulation parameters. Early assimilation protocols treated isotopic fluctuations in Greenland ice cores as direct linear thermometers. <span class="${state.readingSubmitted ? 'evidence-highlight' : ''}">Contemporary syntheses, however, demonstrate that winter precipitation biases can skew isotopic ratios by up to four degrees Celsius, prompting modellers to weight multi-proxy ensembles rather than relying on any single cryospheric archive.</span> Crucially, while ensemble weighting substantially narrows regional variance across the North Atlantic, researchers have yet to establish whether it yields superior predictive skill in tropical monsoon basins compared with unadjusted dynamical runs.
+            </p>
+
+            <p class="passage-para">
+              <span class="para-letter">C</span>
+              This epistemic caution has reshaped peer-review standards across earth-system science. Rather than rewarding models that produce the smoothest retrospective curve, contemporary evaluation frameworks penalise overfitting—the artificial tuning of aerosol or cloud-feedback coefficients merely to replicate historical spikes.
+            </p>
+          </article>
+
+          <!-- Right Column: Precision IELTS Question & Post-Submission Feedback -->
+          <aside class="question-pane" aria-label="IELTS Question and Diagnostic Feedback">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span class="badge-pill cobalt">Questions 27–28 · TRUE / FALSE / NOT GIVEN</span>
+              <span style="font-size:12.5px;color:var(--ink-500);">Paragraph [B] Focus</span>
+            </div>
+
+            <div style="padding:14px 16px;background:var(--mist-50);border-radius:var(--radius-md);font-size:14.5px;color:var(--ink-900);font-weight:600;margin-bottom:16px;">
+              27. Multi-proxy ensemble weighting has been proven to produce more accurate forecasts than unadjusted dynamical models in tropical monsoon regions.
+            </div>
+
+            <div style="font-size:13px;font-weight:600;color:var(--ink-700);">1. Select your IELTS classification:</div>
+            <div class="tfng-options" role="radiogroup" aria-label="True False Not Given Selection">
+              ${['TRUE', 'FALSE', 'NOT GIVEN'].map(opt => `
+                <button
+                  type="button"
+                  class="tfng-btn ${state.tfngChoice === opt ? 'selected' : ''}"
+                  onclick="state.tfngChoice='${opt}';render();"
+                >${opt}</button>
+              `).join('')}
+            </div>
+
+            <div style="font-size:13px;font-weight:600;color:var(--ink-700);margin-top:16px;">
+              2. Diagnostic Trace (Why did you choose <code>${state.tfngChoice}</code>?):
+            </div>
+            <div style="display:grid;gap:8px;margin:10px 0 20px;">
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--mist-200);border-radius:var(--radius-sm);font-size:13.5px;cursor:pointer;">
+                <input type="radio" name="rat" ${state.rationaleChoice === 'contradicts' ? 'checked' : ''} onchange="state.rationaleChoice='contradicts';render();" />
+                <span>Paragraph B states that researchers rejected multi-proxy weighting in tropical basins.</span>
+              </label>
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--mist-200);border-radius:var(--radius-sm);font-size:13.5px;cursor:pointer;">
+                <input type="radio" name="rat" ${state.rationaleChoice === 'no_comparison' ? 'checked' : ''} onchange="state.rationaleChoice='no_comparison';render();" />
+                <span>Paragraph B explicitly notes researchers “have yet to establish” whether it outperforms unadjusted runs in tropical basins.</span>
+              </label>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" class="btn-navy" style="width:100%;justify-content:center;" onclick="state.readingSubmitted=true;render();">
+                ${state.readingSubmitted ? 'Update Verification & Inspect Feedback' : 'Submit Answer & Verify Textual Evidence →'}
+              </button>
+            </div>
+
+            ${
+              state.readingSubmitted
+                ? `
+                <div style="margin-top:22px;padding-top:20px;border-top:1px solid var(--mist-200);">
+                  ${
+                    state.tfngChoice === 'NOT GIVEN'
+                      ? `
+                      <div style="padding:16px;background:var(--emerald-50);border:1px solid #A7F3D0;border-radius:var(--radius-md);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                          <strong style="color:var(--emerald-700);font-size:14.5px;">✓ Precision Match · NOT GIVEN Confirmed</strong>
+                          <span class="badge-pill emerald">Band 8.5 Logic</span>
+                        </div>
+                        <p style="font-size:13.5px;color:var(--ink-700);margin:8px 0 0;">
+                          You resisted the Band 7 trap. Because Paragraph B states researchers <em>“have yet to establish whether it yields superior predictive skill”</em>, the claim is empirically unresolved in the text—making it <strong>NOT GIVEN</strong> rather than FALSE.
+                        </p>
+                      </div>
+                      `
+                      : `
+                      <div style="padding:16px;background:var(--amber-50);border:1px solid #FDE68A;border-radius:var(--radius-md);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                          <strong style="color:var(--amber-700);font-size:14.5px;">Diagnostic Insight · Why “${state.tfngChoice}” is a Band 7 Trap</strong>
+                          <span class="badge-pill amber">Correct: NOT GIVEN</span>
+                        </div>
+                        <p style="font-size:13.5px;color:var(--ink-700);margin:8px 0 10px;">
+                          Look at the highlighted sentence in <strong>Paragraph [B]</strong>: the text states researchers <em>“have yet to establish”</em> whether ensemble weighting is superior in tropical monsoon basins. An unproven comparison in academic prose is <strong>NOT GIVEN</strong>, whereas <strong>FALSE</strong> requires proof of the opposite (that it performs worse or equally).
+                        </p>
+                        <button type="button" class="btn-outline" style="font-size:12.5px;padding:6px 12px;" onclick="state.tfngChoice='NOT GIVEN';render();">
+                          Switch to NOT GIVEN to verify mastery
+                        </button>
+                      </div>
+                      `
+                  }
+
+                  <button
+                    type="button"
+                    style="margin-top:12px;background:none;border:none;color:var(--ink-500);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;"
+                    onclick="state.readingEvidenceExpanded = !state.readingEvidenceExpanded; render();"
+                  >
+                    ${state.readingEvidenceExpanded ? 'Hide Competing Error Hypotheses ▲' : 'Inspect Competing Error Hypotheses & Next Schedule ▼'}
+                  </button>
+
+                  ${
+                    state.readingEvidenceExpanded
+                      ? `
+                      <div style="margin-top:10px;padding:14px;background:var(--mist-50);border-radius:var(--radius-md);font-size:13px;color:var(--ink-700);display:grid;gap:8px;">
+                        <div><strong>Hypothesis H1 (Epistemic Verb Trap):</strong> Treating “have yet to establish” as a negative refutation. <em>(Heuristic working weight, not a statistical probability)</em></div>
+                        <div><strong>Next Scheduled Action:</strong> Added to your <strong>Memory Review</strong> queue (+4 Days interval) with a fresh passage context.</div>
+                      </div>
+                      `
+                      : ''
+                  }
+                </div>
+                `
+                : ''
+            }
+          </aside>
+        </div>
+      `;
+    }
+
+    function renderReview() {
+      return `
+        <div style="max-width:860px;margin:0 auto;">
+          <span class="eyebrow-gold">Long-Term Retention & Transfer Verification</span>
+          <h1 style="font-family:var(--font-serif);font-size:26px;margin:6px 0 8px;">
+            Spaced Memory Verification Studio
+          </h1>
+          <p style="color:var(--ink-700);margin:0 0 24px;font-size:15px;">
+            True Band 8.0 mastery requires proving your understanding in a fresh linguistic context days after initial correction.
+          </p>
+
+          <!-- Primary Active Verification Card -->
+          <section style="background:var(--surface);border:1px solid var(--mist-200);border-radius:var(--radius-xl);box-shadow:var(--shadow-card);padding:32px;margin-bottom:28px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span class="badge-pill gold">Due Today · Interval Check #2</span>
+                <span style="font-size:13px;color:var(--ink-500);">Writing Task 2 & Academic Reading Register</span>
+              </div>
+              <span style="font-size:12.5px;color:var(--ink-500);">Previous Interval: 3 Days ago → Next: <strong>+14 Days</strong></span>
+            </div>
+
+            <h2 style="font-family:var(--font-serif);font-size:20px;margin:0 0 10px;">
+              C1 Hedging & Causal Verb Precision: “Mitigate” vs. “Eradicate”
+            </h2>
+
+            <div class="triad-box">
+              <div><strong>Why you are reviewing this:</strong> 3 days ago in Writing Task 2, an absolute verb (<code>eliminate</code>) weakened your concession argument. Band 8.0 Task Response requires calibrated hedging.</div>
+              <div><strong>Fresh Context Verification:</strong> Complete the sentence below with the precise C1 verb that matches partial risk reduction.</div>
+            </div>
+
+            <div style="padding:18px 20px;background:var(--navy-900);color:#F8FAFC;border-radius:var(--radius-md);font-family:var(--font-serif);font-size:16.5px;line-height:1.75;margin-bottom:18px;">
+              “While congestion pricing cannot entirely abolish urban vehicular emissions, empirical trials in Stockholm indicate that tiered tariffs significantly <u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> peak-hour particulate concentrations.”
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+              ${[
+                { word: 'mitigate', note: 'alleviate / reduce severity (Band 8 Calibrated)' },
+                { word: 'eradicate', note: 'destroy completely (Over-claim trap)' },
+                { word: 'proliferate', note: 'multiply rapidly (Semantic mismatch)' }
+              ].map(item => `
+                <button
+                  type="button"
+                  class="btn-outline"
+                  style="${state.reviewAnswer === item.word ? 'border-color:var(--navy-900);background:var(--navy-900);color:#FFF;' : ''}"
+                  onclick="state.reviewAnswer='${item.word}';render();"
+                >
+                  <strong>${item.word}</strong> <span style="opacity:0.75;font-weight:400;font-size:12px;">· ${item.note}</span>
+                </button>
+              `).join('')}
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+              <button type="button" class="btn-navy" onclick="state.reviewVerified=true;render();">
+                Verify Long-Term Retention →
+              </button>
+              <span style="font-size:13px;color:var(--ink-500);">
+                Passing promotes this concept to <strong>Stable (+14 Days)</strong>
+              </span>
+            </div>
+
+            ${
+              state.reviewVerified
+                ? `
+                <div style="margin-top:20px;padding:16px 18px;border-radius:var(--radius-md);background:${state.reviewAnswer === 'mitigate' ? 'var(--emerald-50)' : 'var(--amber-50)'};border:1px solid ${state.reviewAnswer === 'mitigate' ? '#A7F3D0' : '#FDE68A'};">
+                  ${
+                    state.reviewAnswer === 'mitigate'
+                      ? `<strong style="color:var(--emerald-700);">✓ Retention Verified · Promoted to 14-Day Cycle</strong>
+                         <p style="margin:6px 0 0;font-size:13.5px;color:var(--ink-700);">You accurately paired the concession clause (“cannot entirely abolish”) with the calibrated verb <code>mitigate</code>. Next verification scheduled for <strong>Nov 23</strong>.</p>`
+                      : `<strong style="color:var(--amber-700);">Scope Mismatch Detected</strong>
+                         <p style="margin:6px 0 0;font-size:13.5px;color:var(--ink-700);">Notice the opening concession: <em>“cannot entirely abolish”</em>. Choosing <code>${state.reviewAnswer}</code> contradicts the hedged scope. Select <code>mitigate</code> to align with Band 8 coherence.</p>`
+                  }
+                </div>
+                `
+                : ''
+            }
+          </section>
+
+          <!-- Upcoming Spaced Review Horizon -->
+          <section style="background:var(--surface);border:1px solid var(--mist-200);border-radius:var(--radius-lg);padding:22px 26px;">
+            <h3 style="font-family:var(--font-serif);font-size:17px;margin:0 0 14px;">Upcoming Retention Schedule</h3>
+            <div style="display:grid;gap:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--mist-100);gap:12px;flex-wrap:wrap;">
+                <div>
+                  <strong style="font-size:14.5px;">Reading T/F/NG: Unresolved Epistemic Comparisons</strong>
+                  <div style="font-size:13px;color:var(--ink-500);">Fresh Passage 3 transfer check · Triggered by today’s session</div>
+                </div>
+                <span class="badge-pill amber">Scheduled · Tomorrow</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--mist-100);gap:12px;flex-wrap:wrap;">
+                <div>
+                  <strong style="font-size:14.5px;">Listening Part 4: Concession Signposts (“Notwithstanding”)</strong>
+                  <div style="font-size:13px;color:var(--ink-500);">2 consecutive fresh-context passes recorded</div>
+                </div>
+                <span class="badge-pill slate">In 6 Days · Expanding Cycle</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <strong style="font-size:14.5px;">Writing Task 1: Passive Process Sequencing</strong>
+                  <div style="font-size:13px;color:var(--ink-500);">Verified across 3 independent diagram tasks</div>
+                </div>
+                <span class="badge-pill emerald">In 21 Days · Band 8 Stable</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function renderProfile() {
+      return `
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:24px;">
+            <div>
+              <span class="eyebrow-gold">Executive Scholar Portfolio · ${state.examTrack}</span>
+              <h1 style="font-family:var(--font-serif);font-size:26px;margin:6px 0 4px;">
+                Band 8.0 Mastery & Evidence Dossier
+              </h1>
+              <p style="margin:0;color:var(--ink-700);font-size:14.5px;">
+                A longitudinal record of resolved cognitive bottlenecks, verified transfer evidence, and four-skill progression.
+              </p>
+            </div>
+            <span class="badge-pill gold">Heuristic Diagnostic Judgments · Non-Probabilistic</span>
+          </div>
+
+          <!-- Four-Skill Progression Cards -->
+          <div class="skills-grid" style="margin-bottom:28px;">
+            <div class="skill-card" style="cursor:default;">
+              <div style="font-size:12px;color:var(--ink-500);font-weight:600;">LISTENING</div>
+              <div style="font-family:var(--font-serif);font-size:26px;font-weight:700;margin:4px 0;">8.0 <span style="font-size:14px;color:var(--gold-600);">/ 8.5 Goal</span></div>
+              <div style="font-size:13px;color:var(--emerald-700);font-weight:600;">✓ Part 4 Signpost Tracking Stable</div>
+            </div>
+            <div class="skill-card" style="cursor:default;">
+              <div style="font-size:12px;color:var(--ink-500);font-weight:600;">READING</div>
+              <div style="font-family:var(--font-serif);font-size:26px;font-weight:700;margin:4px 0;">7.5 <span style="font-size:14px;color:var(--gold-600);">/ 8.5 Goal</span></div>
+              <div style="font-size:13px;color:var(--amber-700);font-weight:600;">● Calibrating T/F/NG Scope Traps</div>
+            </div>
+            <div class="skill-card" style="cursor:default;">
+              <div style="font-size:12px;color:var(--ink-500);font-weight:600;">WRITING</div>
+              <div style="font-family:var(--font-serif);font-size:26px;font-weight:700;margin:4px 0;">7.0 <span style="font-size:14px;color:var(--gold-600);">/ 7.5 Goal</span></div>
+              <div style="font-size:13px;color:var(--emerald-700);font-weight:600;">✓ Hedging Verbs Promoted Today</div>
+            </div>
+            <div class="skill-card" style="cursor:default;">
+              <div style="font-size:12px;color:var(--ink-500);font-weight:600;">SPEAKING</div>
+              <div style="font-family:var(--font-serif);font-size:26px;font-weight:700;margin:4px 0;">7.0 <span style="font-size:14px;color:var(--gold-600);">/ 7.5 Goal</span></div>
+              <div style="font-size:13px;color:var(--ink-500);font-weight:600;">Next: Part 3 Abstract Speculation</div>
+            </div>
+          </div>
+
+          <!-- Evidence & Error Evolution Ledger -->
+          <section style="background:var(--surface);border:1px solid var(--mist-200);border-radius:var(--radius-xl);box-shadow:var(--shadow-card);padding:30px;">
+            <h2 style="font-family:var(--font-serif);font-size:20px;margin:0 0 18px;">
+              Cognitive Bottleneck Resolution & Evidence Trail
+            </h2>
+
+            <div style="display:grid;gap:16px;">
+              <div style="padding:20px;border:1px solid var(--mist-200);border-radius:var(--radius-lg);background:var(--mist-50);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                  <div>
+                    <span class="badge-pill emerald">Resolved to Operational Stability</span>
+                    <h3 style="font-size:16.5px;margin:8px 0 4px;">Writing Task 2 · Over-Claiming vs. Academic Hedging</h3>
+                  </div>
+                  <span style="font-size:12.5px;color:var(--ink-500);">Verified across 3 independent prompts</span>
+                </div>
+                <p style="font-size:14px;color:var(--ink-700);margin:8px 0 0;">
+                  <strong>Evolution:</strong> Transitioned from categorical assertions (<em>“will abolish”</em>) to qualified C1 modal/lexical hedging (<em>“tends to mitigate peak concentrations”</em>).
+                </p>
+              </div>
+
+              <div style="padding:20px;border:1px solid var(--mist-200);border-radius:var(--radius-lg);background:var(--surface);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                  <div>
+                    <span class="badge-pill amber">Active Calibration · 1 Transfer Check Remaining</span>
+                    <h3 style="font-size:16.5px;margin:8px 0 4px;">Academic Reading · Unstated Comparisons in T/F/NG</h3>
+                  </div>
+                  <button type="button" class="btn-outline" style="padding:6px 12px;font-size:12.5px;" onclick="switchView('reading')">
+                    Open Passage Evidence →
+                  </button>
+                </div>
+                <p style="font-size:14px;color:var(--ink-700);margin:8px 0 0;">
+                  <strong>Current Evidence:</strong> Correctly identified <em>“have yet to establish”</em> in Paleoclimatology Passage [B]. Requires 1 unassisted pass in tomorrow’s new passage to reach Band 8.5 stability.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function render() {
+      const root = document.getElementById('vt-stage');
+      if (state.view === 'dashboard') root.innerHTML = renderDashboard();
+      else if (state.view === 'reading') root.innerHTML = renderReading();
+      else if (state.view === 'review') root.innerHTML = renderReview();
+      else root.innerHTML = renderProfile();
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -55,8 +55,10 @@ def get_health(
     persistence_state: Literal["configured", "unconfigured"] = (
         "configured" if bool(settings.database_url.strip()) else "unconfigured"
     )
+    requires_api_key = settings.model_provider not in ("ollama", "fake")
     remote_ready = bool(
-        settings.allow_remote_model_calls and settings.model_api_key.strip()
+        settings.allow_remote_model_calls
+        and (not requires_api_key or settings.model_api_key.strip())
     )
 
     return HealthResponse(

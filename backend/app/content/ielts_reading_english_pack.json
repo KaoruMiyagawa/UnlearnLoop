@@ -1,0 +1,336 @@
+{
+  "pack_id": "verbatrail-original-english-reading-v1",
+  "domain_code": "ielts_academic",
+  "topics": [
+    {
+      "id": "ielts-acad-reading-english",
+      "slug": "ielts-acad-reading-english",
+      "domain_code": "ielts_academic",
+      "title": "Academic Reading · English practice",
+      "summary": "原创英语阅读材料；选择与文章证据相符的选项。",
+      "difficulty_level": 2,
+      "common_error_patterns": [
+        {
+          "error_code": "IELTS_READING_KEYWORD_MATCH",
+          "name": "关键词匹配偏差",
+          "description": "可能依据相同词语而忽略句意关系。"
+        },
+        {
+          "error_code": "IELTS_READING_INFERENCE",
+          "name": "推断范围偏差",
+          "description": "可能把文本没有支持的推论当作事实。"
+        }
+      ],
+      "materials": [
+        {
+          "id": "ielts-acad-english-mat-1",
+          "title": "Urban Wetlands",
+          "summary": "Original English reading passage",
+          "content_body": "City planners once regarded small wetlands as unused land. A three-year local study found that restored channels helped some neighbourhoods hold storm water for longer. The researchers stressed that results depended on connected waterways and regular maintenance; planting trees alone was not enough.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-mat-2",
+          "title": "A Garden Experiment",
+          "summary": "Original English reading passage",
+          "content_body": "Two neighbourhoods tested rain gardens. In the second year both plant cover and rainfall changed. Researchers therefore could not attribute the change in drainage to one factor.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-mat-3",
+          "title": "A Soil Trial",
+          "summary": "Original English reading passage",
+          "content_body": "Scientists compared two soils in a greenhouse. One soil held more water, but the plants also received different amounts of light. The team said a further controlled trial was needed.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-mat-4",
+          "title": "A Bus Lane Trial",
+          "summary": "Original English reading passage",
+          "content_body": "A council tested bus lanes on two roads. Average journey times fell on weekdays, especially at peak hours. The report contained no weekend data.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-mat-5",
+          "title": "A Museum Survey",
+          "summary": "Original English reading passage",
+          "content_body": "A museum surveyed visitors during summer. Most respondents liked the new exhibition. Since the survey excluded winter visitors, it could not describe their views.",
+          "content_format": "markdown",
+          "version": 1
+        }
+      ],
+      "questions": [
+        {
+          "id": "ielts-acad-english-initial",
+          "material_id": "ielts-acad-english-mat-1",
+          "question_role": "initial",
+          "question_type": "multiple_choice",
+          "prompt_text": "What conditions did the wetland study identify?",
+          "context_snippet": "A. More trees alone\nB. Connected waterways and maintenance\nC. Identical soil everywhere\nD. Development of all wetlands",
+          "standard_answer": "B",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "candidate_error_mappings": [
+              {
+                "answer": "A",
+                "error_code": "IELTS_READING_KEYWORD_MATCH",
+                "evidence_summary": "选项 A 将增加树木当作充分条件；原文指出单独种树并不足够。"
+              },
+              {
+                "answer": "A",
+                "error_code": "IELTS_READING_INFERENCE",
+                "evidence_summary": "选项 A 可能忽略原文对湿地效果的条件限制，需要更多证据区分原因。"
+              }
+            ]
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-diagnostic_followup",
+          "material_id": "ielts-acad-english-mat-2",
+          "question_role": "diagnostic_followup",
+          "question_type": "multiple_choice",
+          "prompt_text": "Why did the researchers avoid a single explanation?",
+          "context_snippet": "A. Both plant cover and rainfall changed\nB. No observations were made\nC. Only the soil changed\nD. Both sites had identical weather",
+          "standard_answer": "A",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "A"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-targeted_practice",
+          "material_id": "ielts-acad-english-mat-3",
+          "question_role": "targeted_practice",
+          "question_type": "multiple_choice",
+          "prompt_text": "What is a reasonable conclusion from the soil trial?",
+          "context_snippet": "A. Light had no possible effect\nB. Another controlled trial is needed\nC. Every soil holds the same water\nD. The results prove a single cause",
+          "standard_answer": "B",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-transfer_check",
+          "material_id": "ielts-acad-english-mat-4",
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "What can be concluded from the bus lane report?",
+          "context_snippet": "A. Weekend journeys also became faster\nB. Weekday average journeys became shorter\nC. All roads need bus lanes\nD. Peak times did not change",
+          "standard_answer": "B",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-acad-english-review",
+          "material_id": "ielts-acad-english-mat-5",
+          "question_role": "review",
+          "question_type": "multiple_choice",
+          "prompt_text": "Which group was not included in the museum survey?",
+          "context_snippet": "A. Winter visitors\nB. Summer visitors\nC. Exhibition visitors\nD. Survey respondents",
+          "standard_answer": "A",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "A"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        }
+      ]
+    },
+    {
+      "id": "ielts-gt-reading-english",
+      "slug": "ielts-gt-reading-english",
+      "domain_code": "ielts_general_training",
+      "title": "General Training Reading · English practice",
+      "summary": "原创英语阅读材料；选择与文章证据相符的选项。",
+      "difficulty_level": 2,
+      "common_error_patterns": [
+        {
+          "error_code": "IELTS_READING_KEYWORD_MATCH",
+          "name": "关键词匹配偏差",
+          "description": "可能依据相同词语而忽略句意关系。"
+        },
+        {
+          "error_code": "IELTS_READING_INFERENCE",
+          "name": "推断范围偏差",
+          "description": "可能把文本没有支持的推论当作事实。"
+        }
+      ],
+      "materials": [
+        {
+          "id": "ielts-gt-english-mat-1",
+          "title": "Library Notice",
+          "summary": "Original English reading passage",
+          "content_body": "For three Saturdays in June, Central Library will remain open until 8 p.m. Study rooms must be booked in advance. The book return box remains available after closing. The children’s area closes at 6 p.m.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-mat-2",
+          "title": "Volunteer Email",
+          "summary": "Original English reading passage",
+          "content_body": "The food distribution starts an hour earlier this week. Registered volunteers must reply by Thursday noon. Those who do not reply will not automatically receive a shift.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-mat-3",
+          "title": "Community Event",
+          "summary": "Original English reading passage",
+          "content_body": "New volunteers must attend a short briefing before their first shift. Returning volunteers may go directly to the reception desk.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-mat-4",
+          "title": "Evening Course",
+          "summary": "Original English reading passage",
+          "content_body": "The community centre’s photography course meets on Tuesdays. Participants can cancel for a refund before the first class. After the course starts, absent students can read handouts, but no replacement class is offered.",
+          "content_format": "markdown",
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-mat-5",
+          "title": "Sports Centre Notice",
+          "summary": "Original English reading passage",
+          "content_body": "The swimming pool closes on Friday for repairs. The gym remains open. Members may use the pool at the nearby East Centre during the closure.",
+          "content_format": "markdown",
+          "version": 1
+        }
+      ],
+      "questions": [
+        {
+          "id": "ielts-gt-english-initial",
+          "material_id": "ielts-gt-english-mat-1",
+          "question_role": "initial",
+          "question_type": "multiple_choice",
+          "prompt_text": "What needs to be booked in advance?",
+          "context_snippet": "A. The book return box\nB. A study room\nC. The library entrance\nD. The children’s area",
+          "standard_answer": "B",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "B"
+            ],
+            "candidate_error_mappings": [
+              {
+                "answer": "A",
+                "error_code": "IELTS_READING_KEYWORD_MATCH",
+                "evidence_summary": "选项 A 涉及还书箱，公告描述的是它在闭馆后的可用性。"
+              },
+              {
+                "answer": "A",
+                "error_code": "IELTS_READING_INFERENCE",
+                "evidence_summary": "选项 A 可能混淆公告中的用途和预约条件，需要更多证据区分原因。"
+              }
+            ]
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-diagnostic_followup",
+          "material_id": "ielts-gt-english-mat-2",
+          "question_role": "diagnostic_followup",
+          "question_type": "multiple_choice",
+          "prompt_text": "What happens if a registered volunteer does not reply?",
+          "context_snippet": "A. A shift is not assigned automatically\nB. A shift is guaranteed\nC. The event is cancelled\nD. The library closes",
+          "standard_answer": "A",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "A"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-targeted_practice",
+          "material_id": "ielts-gt-english-mat-3",
+          "question_role": "targeted_practice",
+          "question_type": "multiple_choice",
+          "prompt_text": "What must a new volunteer do before the first shift?",
+          "context_snippet": "A. Attend a briefing\nB. Skip reception forever\nC. Cancel the event\nD. Return a library book",
+          "standard_answer": "A",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "A"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-transfer_check",
+          "material_id": "ielts-gt-english-mat-4",
+          "question_role": "transfer_check",
+          "question_type": "multiple_choice",
+          "prompt_text": "When can a participant cancel for a refund?",
+          "context_snippet": "A. Before the first class\nB. After any missed class\nC. Only after the course ends\nD. After reading a handout",
+          "standard_answer": "A",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "A"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        },
+        {
+          "id": "ielts-gt-english-review",
+          "material_id": "ielts-gt-english-mat-5",
+          "question_role": "review",
+          "question_type": "multiple_choice",
+          "prompt_text": "Where can members swim during the closure?",
+          "context_snippet": "A. At the nearby East Centre\nB. In the closed pool\nC. In the gym\nD. At the library",
+          "standard_answer": "A",
+          "answer_explanation": "The answer is supported by the assigned passage.",
+          "evaluation_rubric": {
+            "accepted_answers": [
+              "A"
+            ],
+            "candidate_error_mappings": []
+          },
+          "difficulty": 2,
+          "version": 1
+        }
+      ]
+    }
+  ]
+}

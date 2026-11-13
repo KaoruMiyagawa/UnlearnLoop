@@ -1,104 +1,90 @@
-# UnlearnLoop 系统架构
+# VerbaTrail 目标架构
 
-> 本文保留原架构设计与目标，部分内容尚未实现；当前 main 的实现及边界见 [CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)。
+本文描述面向学习者中心语言学习系统的渐进式目标架构，不是当前功能清单。当前实现和质量边界见[CURRENT_ARCHITECTURE.md](CURRENT_ARCHITECTURE.md)；产品能力及优先级见[产品方向](../product/IELTS_PRODUCT_DIRECTION.md)和[路线图](../development/ROADMAP.md)。
 
-## 1. 目标与边界
+## 架构原则
 
-第一阶段采用单体仓库、前后端分离的模块化结构。FastAPI 提供版本化 HTTP API，React 负责工作空间界面，SQLite 保存本地学习记录，AI 通过后端模型服务调用。知识领域通过内容包、题型适配器和评估器扩展；引导式工作流、证据模型和诊断决策不绑定 Python。先不拆分微服务，避免核心决策流程未稳定时增加分布式成本。
+1. **先模块化单体，后按实际需要拆分。** 当前 React + FastAPI + SQLAlchemy 架构足以演进，不因愿景提前引入微服务。
+2. **学习者模型与活动内容分离。** 学习者的目标、能力证据、偏好和约束不绑定于 IELTS 某一种题型。
+3. **所有判断有来源。** 任务、作答、规则/模型/人工评价、诊断、迁移和复习都应带来源及版本。
+4. **未知是合法状态。** 不把缺失数据、规则启发式或单次正确答案换算成确定能力或统计置信度。
+5. **Agent 在策略和工具边界内运行。** Agent 可选择已允许的下一步学习活动，但不能越过内容、状态、身份和隐私规则。
+6. **语言扩展采用分层设计。** 通用学习与证据概念可复用；文字、语音、内容、课程和评价仍按语言及场景适配。当前未实现多语言教学。
 
-## 2. 模块与职责
+## 目标产品能力层
 
-### 前端
+```mermaid
+flowchart TB
+    GOAL[目标与学习者约束] --> LP[Learner Profile / 能力证据]
+    AS[Assessment / 初始与持续评估] --> LP
+    LP --> PLAN[Learning Planner]
+    PLAN --> AGENT[Adaptive Learning Agent]
+    AGENT --> INPUT[Language Input：阅读 · 听力 · 词汇 · 语法]
+    AGENT --> OUTPUT[Language Output：写作 · 口语 · 真实交流]
+    INPUT --> EVAL[评价与反馈]
+    OUTPUT --> EVAL
+    EVAL --> DNA[Error DNA：候选模式、支持与反证]
+    DNA --> PRACTICE[定向练习]
+    PRACTICE --> TRANSFER[新语境 Transfer]
+    TRANSFER --> MEMORY[Memory & Review]
+    MEMORY --> LP
+    LP --> PROGRESS[Progress & Goals]
+```
 
-- `app-shell`：导航、路由、全局错误边界和会话上下文。
-- `learning-workspace`：跨学科材料、问题、答案草稿和提交状态。
-- `diagnosis-workspace`：候选错误原因、证据、追问和时间线。
-- `review-workspace`：复习队列、历史详情和迁移验证。
-- `profile-workspace`：知识点状态、设置和数据控制。
-- `design-system`：颜色令牌、排版、按钮、表单、状态和布局组件。
+此图是目标能力关系。当前仅有部分 IELTS Reading 与受约束诊断/迁移/复习路径，尚无完整 Learner Profile、Assessment、Planner 或跨技能 Adaptive Agent。
 
-### 后端
+## 领域边界
 
-- `api`：请求校验、认证边界、响应模型和错误映射。
-- `application`：学习会话、诊断、干预、迁移验证、复习等用例编排。
-- `domain`：候选假设、证据、决策状态、学习状态和转移规则。
-- `evaluation`：按知识包选择文本、代码、公式或其他领域评估器，负责模型输出结构化和规则校验。
-- `decision`：选择诊断问题与下一步动作，输出理由和不确定性。
-- `model_provider`：DeepSeek/Ollama 适配器、超时、重试、限流和结构化输出。
-- `persistence`：SQLAlchemy 模型、仓储、事务和迁移。
-- `observability`：请求 ID、决策事件、模型调用元数据和脱敏日志。
+### Learner Profile 与能力证据（规划）
 
-应用层编排用例，领域层不直接依赖 FastAPI、HTTP 或具体 SDK；这样可用固定输入测试决策，也能替换存储和模型。
+保存学习目标、考试或语言场景、偏好、时间约束和不同能力维度的证据摘要。每条证据需记录来源 Attempt/活动、内容与评价版本、时间、状态及不确定性。派生能力结论应可重算；错误或失效证据应能撤销其派生影响而保留原始记录。
 
-## 3. 前后端交互与数据流
+### Assessment（规划）
 
-前端通过 JSON REST API 与后端交互，所有业务端点置于 `/api/v1`。创建会话后读取问题和状态；答案提交进入后端事务，保存原始答案和事件，再调用评估/模型服务，校验结构化结果，生成候选假设与下一步决策，最后返回状态。第一阶段优先同步请求，长耗时调用设置超时；真实延迟证明需要后再引入任务状态端点。
+管理初始及持续评估蓝图、任务选择、评价来源和覆盖范围。考试目标如 IELTS Band 与基础语言能力模型分开；未经校准的测试结果不能作为官方分数或 Band 预测。
 
-典型数据流：
+### Learning Planner 与 Adaptive Agent（规划，部分策略基础已存在）
 
-`学习材料/知识点 → 题目版本 → 学习者答案 → 评估结果 → 证据 → 候选错误假设 → 诊断问题选择 → 新证据 → 干预决策 → 迁移结果 → 知识状态/复习安排`。
+Planner 将目标、能力证据、可用时间和可用内容转成可解释的学习路线。Agent 在服务端状态机内选择下一项合法行动，并提供目标能力、选择依据、待收集证据及降级原因。Agent 工具只能访问授权范围内的学习数据和已发布内容。
 
-关键转移写入不可变领域事件或可重建记录。派生状态可以更新，但历史证据不覆盖；重复请求使用幂等键避免重复事件。
+### Language Input / Output（部分实现）
 
-## 4. 数据库实体与关联方向
+阅读、听力、词汇、语法构成理解输入；写作、口语和交流构成表达输出。每类活动定义自己的内容、答案结构、评价器和证据语义。当前 Reading 有版本化题组基础；其他模块需独立设计，不能假定任意文本题共用相同评分。
 
-- `User` 1—N `LearningSession`、`UserSetting`。
-- `KnowledgeTopic` 1—N `LearningMaterial`、`Question`、`KnowledgeState`。
-- `LearningMaterial` 1—N `Question`。
-- `LearningSession` 1—N `Attempt`、`DiagnosticCase`、`DecisionEvent`。
-- `Question` 1—N `Attempt`；`Attempt` 保存答案快照、评估结果和状态。
-- `DiagnosticCase` 1—N `Hypothesis`、`DiagnosticQuestion`、`Intervention`。
-- `Hypothesis` 1—N `EvidenceLink`；证据可指向作答、追问、模型评估或规则检查。
-- `ReviewItem` 关联 `KnowledgeTopic`、`Hypothesis` 或 `LearningSession`，保存复习原因、计划时间和结果。
-- `ModelCall` 关联上下文与 `DecisionEvent`，只保存提供商、模型、提示版本、耗时、状态和脱敏摘要。
+### Feedback 与 Error DNA（部分实现）
 
-关系方向以外键和显式关联表表达，不把完整模型原文作为唯一真相。原始答案与模型输出区分保存，并根据隐私设置支持删除或脱敏。
+保存客观观察与候选原因的区别，支持多种竞争假设及其支持、削弱、中性或不足证据。证据至少关联任务、Attempt、题项、版本和评价来源。只有达到明确证据门槛后才能改变工作状态；启发式权重不得作为真实统计概率展示。Error DNA 服务于整个学习循环，但不是唯一用户价值。
 
-## 5. API 设计原则与初始端点
+### Transfer、Memory & Review（部分实现）
 
-API 使用资源导向命名、明确 request/response schema、稳定错误码和统一关联 ID。写操作返回资源或任务状态；列表支持分页、筛选和稳定排序；时间使用带时区的 ISO 8601。API 不把模型原文格式暴露给前端，前端只依赖领域结果。
+Transfer 必须使用新材料和新语境，记录独立作答与评价。Review 按服务端排程派发独立任务，记录到期、结果和保持证据。一次迁移和一次复习不是永久掌握证明；题库耗尽或历史证据失效必须有显式状态与恢复流程。
 
-初始端点草案：
+### Progress & Goals（部分实现）
 
-- `GET /api/v1/topics`、`GET /api/v1/topics/{id}`
-- `POST /api/v1/sessions`、`GET /api/v1/sessions/{id}`
-- `POST /api/v1/sessions/{id}/attempts`
-- `GET /api/v1/diagnoses/{id}`、`POST /api/v1/diagnoses/{id}/responses`
-- `POST /api/v1/diagnoses/{id}/interventions/{action}`
-- `POST /api/v1/sessions/{id}/transfer-check`
-- `GET /api/v1/reviews`、`POST /api/v1/reviews/{id}/complete`
-- `GET /api/v1/profile/knowledge-states`
+展示用户设定目标与当前可验证证据的差距，并区分已测、未测、过期和待复核状态。不得仅根据题量、模型输出或练习正确率生成整体能力结论。
 
-错误响应至少包括 `code`、用户可读 `message`、`request_id` 和可选字段错误详情。模型超时、配额、无效结构化输出和服务不可用映射为不同的可测试错误。
+## 技术分层目标
 
-## 6. Agent 决策流程、工具调用与证据
+保持当前前后端分离模块化单体，逐步明确以下边界：
 
-Agent 不是自由聊天循环，而是受领域状态约束的决策器。诊断案例至少经历：`收集作答` → `初步评估` → `生成候选假设` → `需要区分证据` → `选择诊断问题` → `更新假设` → `选择干预` → `迁移验证` → `更新学习状态/安排复习`。模型失败可进入 `等待重试`，用户中断可进入 `已暂停`。
+- **Presentation：** React 工作区、可访问交互、主题令牌、API Client 和可恢复草稿。
+- **API：** FastAPI schema、认证与授权（当前未实现生产级身份体系）、版本化资源及错误语义。
+- **Application：** 会话、评估、计划、Agent 行动、迁移与复习用例编排。
+- **Domain：** 学习目标、能力证据、错误假设、内容约束和状态转换规则。
+- **Content / Evaluation：** 语言/技能内容包、题型 schema、私有答案键、评价规则版本与审校来源。
+- **Agent / Model Adapter：** 策略选择、受限工具、模型提供方适配、超时/拒答/schema 校验及来源记录。规则与模型决策必须可区分。
+- **Persistence：** SQLAlchemy 仓储及 Alembic 增量迁移；测试隔离数据库；历史证据不可静默覆盖。
+- **Observability / Governance：** 脱敏事件、可重放决策、数据保留与删除、成本和质量监控（需在产品化阶段建设）。
 
-每次决策输入包含知识点、题目、答案、已有假设、证据摘要、可用动作和策略版本；输出是 schema 约束 JSON，包含 `action`、`reason`、`target_hypotheses`、`confidence`、`required_evidence` 和 `next_state`。后端执行白名单工具，而不是让模型直接决定任意函数或 URL。
+## 安全、隐私与可靠性
 
-工具边界：读取题目/材料、读取历史证据、保存假设、生成诊断问题、保存答案、安排练习、安排复习、更新知识状态。每个工具校验输入、权限和当前状态，记录调用结果；工具失败不应被模型当作成功。
+- 身份验证和每个对象上的授权检查应先于多用户或云部署；当前 `learner_id` 不是认证凭证。
+- API 只返回学生必要字段；答案键、内部规则和提示不可泄露。
+- 写操作采用可重复验证的幂等键及服务端事务；并发派题/提交不能重复改变学习状态。
+- 会话与 Attempt 固定内容及规则版本；内容升级不改变既有作答含义。
+- 数据库迁移须向后兼容并在隔离 SQLite 验证；操作真实数据前先验证备份恢复。
+- 真实模型调用应显式配置、获得适当同意并受隐私、成本、时延、质量和内容安全约束。FakeModelProvider 只用于开发流程，不是模型质量验证。
 
-证据记录至少包含 `evidence_id`、来源类型、来源引用、摘要、时间、支持/反对关系、可靠性备注和产生它的决策事件。置信度是当前工作判断，不是统计保证；UI 和 API 标注“信息不足”与“模型推断”。
+## 递进实施
 
-区分度先采用可解释启发式：若追问能让候选假设产生不同预期答案、成本低且与知识点直接相关，则得分更高。模型可提出候选追问，但最终由 schema 和规则过滤后执行。所有决策应可用固定 fixture 重放。
-
-## 7. 模型服务抽象
-
-定义 `ModelProvider` 协议，例如 `generate_structured(request, schema, context) -> ModelResult`，业务层只依赖协议。`DeepSeekProvider` 负责 API 鉴权、请求格式、模型名、超时、重试和响应解析；未来 `OllamaProvider` 复用相同接口，差异限制在适配器配置。
-
-配置通过环境变量或本地配置注入：提供商、模型、基础 URL、超时、最大 token、温度、重试次数和是否允许远程发送答案。密钥只从环境或密钥管理服务读取，不写入数据库、前端包或普通日志。
-
-处理顺序为：请求校验 → 超时控制 → 有限重试（只对可重试错误）→ JSON/schema 校验 → 内容安全和业务边界校验 → 记录元数据 → 返回领域结果。失败时保留答案和已有证据，进入可重试状态，不生成看似正常的诊断结论。
-
-## 8. 安全、隐私与数据治理
-
-第一阶段默认本地单用户，但仍按用户边界设计查询。答案、材料和模型日志按最小必要原则保存；日志脱敏，禁止记录 API key；远程模型发送前明确配置和提示。未来多用户必须加入认证、授权、租户隔离、速率限制和审计。
-
-不执行未经安全评审的用户代码，不允许模型生成任意数据库查询、文件路径或网络请求。模型输出视为不可信输入，必须结构化校验、长度限制和渲染清洗。提供删除学习数据和清除模型调用摘要的路径。
-
-## 9. 可测试性与质量门槛
-
-领域决策使用纯函数或最小依赖服务，覆盖状态转移、置信度边界、证据更新、幂等和失败回退。后端用 pytest 做单元、API、数据库迁移和模型适配器 contract 测试；AI 调用使用 fixture、假 provider 和回放样本，不依赖真实网络。前端测试核心工作流、加载/错误/空状态、键盘操作和 API contract。
-
-CI 至少执行格式/规范检查、类型检查、pytest、前端测试和构建；任何测试失败或 schema 不一致都阻止合并。关键决策事件可导出为 fixture，支持回归测试和人工审阅。
+按[路线图](../development/ROADMAP.md)推进：先修复 Matching Headings Phase 6 历史证据有效性与状态重算；再建立共用能力模型和初始评估；然后规划个性化路线与 Agent 策略；之后逐步扩展听说读写、词汇语法、长期记忆和跨技能迁移；最后评估其他语言与更完整的智能教学能力。每一步都要先定义内容质量、证据语义、隐私与验收标准。

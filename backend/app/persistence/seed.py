@@ -1,4 +1,4 @@
-"""Idempotent content pack importer for UnlearnLoop Stage 2.
+"""Idempotent content pack importer for VerbaTrail Stage 2.
 
 Loads structured JSON learning content packs into the subject-agnostic schema
 without duplicating records or overwriting learner progress.
@@ -14,13 +14,16 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.domain.enums import QuestionRole, QuestionType
+from app.domain.exams import domain_for_variant
 from app.domain.exceptions import DomainRuleViolationError
 from app.persistence.models import (
     KnowledgeTopic,
     KnowledgeTopicDependency,
     LearningMaterial,
     Question,
+    ReadingGroupVersion,
 )
+from app.persistence.reading_groups import import_matching_headings
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 DEFAULT_PYTHON_PACK_PATH = BACKEND_DIR / "content" / "python_basics_pack.json"
@@ -57,6 +60,25 @@ def load_content_pack_file(path: Path | None = None) -> dict[str, Any]:
     with target_path.open("r", encoding="utf-8") as fp:
         data: dict[str, Any] = json.load(fp)
     return data
+
+
+def load_matching_headings_diagnostic_pack(session: Session) -> dict[str, Any]:
+    """Publish a new private-rule revision of the original initial groups."""
+    content_dir = BACKEND_DIR / "app" / "content"
+    pack = load_content_pack_file(content_dir / "ielts_matching_headings_pack.json")
+    additions = load_content_pack_file(content_dir / "ielts_matching_headings_diagnostics.json")
+    for topic in pack["topics"]:
+        tasks = additions["questions"][topic["id"]]
+        task_versions = {
+            task["id"]: import_matching_headings(session, **task["reading_group"]).id
+            for task in tasks
+        }
+        for question in topic["questions"]:
+            rules = question["reading_group"]["private_rules"]
+            rules["rules_version"] = "2"
+            rules["diagnostics"] = {**additions["initial"][question["id"]], "task_versions": task_versions}
+        topic["questions"].extend(tasks)
+    return pack
 
 
 def import_content_pack(
@@ -164,6 +186,22 @@ def import_content_pack(
                 validate_python_snippet_syntax(str(snippet), context_id=q_id)
 
             existing_q = session.get(Question, q_id)
+            group_version_id = None
+            if type_enum == QuestionType.MATCHING_HEADINGS:
+                group_data = q_item.get("reading_group")
+                if not group_data or domain_for_variant(group_data["exam_variant"]) != t_domain:
+                    raise DomainRuleViolationError("Matching Headings content must match its IELTS topic domain.")
+                diagnostics = group_data["private_rules"].get("diagnostics")
+                if diagnostics and diagnostics.get("role") != role_enum.value:
+                    raise DomainRuleViolationError("Matching Headings diagnostic content must match its question role.")
+                group = import_matching_headings(session, **group_data)
+                group_version_id = group.id
+                if existing_q and existing_q.reading_group_version_id:
+                    previous = session.get(ReadingGroupVersion, existing_q.reading_group_version_id)
+                    if previous.group_id != group.group_id or previous.exam_variant != group.exam_variant:
+                        raise DomainRuleViolationError("A published question cannot be reassigned to a different reading group.")
+            elif q_item.get("reading_group") or (existing_q and existing_q.reading_group_version_id):
+                raise DomainRuleViolationError("Reading group content requires its published question type.")
             if existing_q is None:
                 q_obj = Question(
                     id=q_id,
@@ -172,6 +210,7 @@ def import_content_pack(
                     parent_question_id=q_item.get("parent_question_id"),
                     question_role=role_enum.value,
                     question_type=type_enum.value,
+                    reading_group_version_id=group_version_id,
                     prompt_text=str(q_item["prompt_text"]),
                     context_snippet=str(snippet) if snippet is not None else None,
                     standard_answer=str(q_item["standard_answer"]),
@@ -204,6 +243,7 @@ def import_content_pack(
                 existing_q.parent_question_id = q_item.get("parent_question_id")
                 existing_q.question_role = role_enum.value
                 existing_q.question_type = type_enum.value
+                existing_q.reading_group_version_id = group_version_id
                 existing_q.prompt_text = new_prompt
                 existing_q.context_snippet = new_snippet
                 existing_q.standard_answer = new_std_answer

@@ -1,154 +1,141 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { WORKSPACE_NAV_ITEMS, WorkspaceId } from './navigation';
-import { StatusBadge } from '../design-system/StatusBadge';
+import { UiSimulationMode } from '../design-system/stage5WorkbenchModel';
+import { useTheme } from '../design-system/ThemeProvider';
 
 interface AppShellProps {
   activeWorkspace: WorkspaceId;
   onSelectWorkspace: (workspace: WorkspaceId) => void;
   backendConnected: boolean | null;
+  dataMode: 'demo' | 'real';
+  onChangeDataMode: (mode: 'demo' | 'real') => void;
+  hasDiagnosticCase?: boolean;
+  currentStage?: 1 | 2 | 3 | 4 | 5 | 6;
+  maxUnlockedStage?: 1 | 2 | 3 | 4 | 5 | 6;
+  onSelectStage?: (stage: 1 | 2 | 3 | 4 | 5 | 6) => void;
+  stageGuardAlert?: string | null;
+  onDismissGuardAlert?: () => void;
+  uiMode?: UiSimulationMode;
+  onChangeUiMode?: (mode: UiSimulationMode) => void;
+  onResetProgression?: () => void;
   children: React.ReactNode;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({
-  activeWorkspace,
-  onSelectWorkspace,
-  backendConnected,
-  children,
-}) => {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+const SIMULATION_MODES: readonly { id: UiSimulationMode; label: string }[] = [
+  { id: 'normal', label: '正常状态' },
+  { id: 'loading', label: '加载状态' },
+  { id: 'empty', label: '空状态' },
+  { id: 'error', label: '错误恢复' },
+];
 
-  const handleNavClick = (id: WorkspaceId) => {
-    onSelectWorkspace(id);
-    setMobileNavOpen(false);
-  };
+export const AppShell: React.FC<AppShellProps> = (props) => {
+  const { theme, toggleTheme } = useTheme();
+  const {
+    activeWorkspace,
+    onSelectWorkspace,
+    backendConnected,
+    dataMode,
+    onChangeDataMode,
+    uiMode = 'normal',
+    onChangeUiMode,
+    onResetProgression,
+    children,
+  } = props;
 
   return (
-    <div className="min-h-screen bg-surface-page text-text-primary">
-      {/* Top Brand Header */}
-      <header className="sticky top-0 z-20 border-b border-border-default bg-surface-raised">
-        <div className="mx-auto flex h-16 max-w-stage items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="grid h-8 w-8 place-items-center rounded-control bg-action-primary text-xs font-semibold text-white"
-            >
-              UL
-            </span>
-            <div>
-              <span className="text-base font-semibold tracking-tight text-text-primary">
-                UnlearnLoop
-              </span>
-              <span className="ml-2 hidden text-xs text-text-secondary sm:inline">
-                错误诊断优先的自适应学习系统 · Stage 1 基线
-              </span>
-            </div>
-          </div>
+    <div className="focus-app">
+      <header className="focus-top-nav">
+        <div className="focus-top-nav-inner">
+          <button
+            type="button"
+            className="focus-brand"
+            onClick={() => onSelectWorkspace('home')}
+            aria-label="VerbaTrail 首页"
+          >
+            <span className="focus-brand-mark" aria-hidden="true">V</span>
+            <span>VerbaTrail</span>
+          </button>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:block">
-              {backendConnected === null && (
-                <StatusBadge tone="primary" label="API 检查中" />
-              )}
-              {backendConnected === true && (
-                <StatusBadge tone="success" label="API 在线" />
-              )}
-              {backendConnected === false && (
-                <StatusBadge tone="error" label="API 离线" />
-              )}
-            </div>
+          <nav className="focus-nav-links" aria-label="主导航">
+            {WORKSPACE_NAV_ITEMS.map((item) => {
+              const active = item.id === activeWorkspace;
+              const labels: Record<string, string> = {
+                home: '首页',
+                learning: '学习',
+                diagnosis: '诊断洞察',
+                transfer: '迁移验证',
+                review: '复习',
+                profile: '学习档案',
+              };
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`focus-nav-tab${active ? ' active' : ''}`}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => onSelectWorkspace(item.id)}
+                >
+                  {labels[item.id] ?? item.label}
+                </button>
+              );
+            })}
+          </nav>
 
-            {/* Mobile expandable navigation toggle (DESIGN_SYSTEM.md 3.1) */}
-            <button
-              type="button"
-              aria-expanded={mobileNavOpen}
-              aria-controls="mobile-primary-nav"
-              onClick={() => setMobileNavOpen((prev) => !prev)}
-              className="h-10 rounded-control border border-border-default bg-surface-raised px-3 text-sm font-semibold text-text-primary hover:bg-surface-subtle focus:outline-none focus:ring-2 focus:ring-action-primary lg:hidden"
-            >
-              {mobileNavOpen ? '收起导航' : '展开导航'}
+          <div className="focus-nav-tools">
+            <button type="button" className="focus-theme-toggle" onClick={toggleTheme} aria-label={`切换至${theme === 'premium' ? '曜黑香槟金' : '深海蓝暖纸白'}主题`} aria-pressed={theme === 'noir'} title={`当前：${theme === 'premium' ? 'Premium Academic' : 'Noir & Champagne'}；切换主题`}>
+              <span aria-hidden="true">{theme === 'premium' ? '☾' : '☼'}</span><span>{theme === 'premium' ? '曜黑' : '暖白'}</span>
             </button>
+            <div className="focus-mode-switch" role="group" aria-label="数据模式">
+              <button
+                type="button"
+                aria-pressed={dataMode === 'real'}
+                className={dataMode === 'real' ? 'selected' : ''}
+                onClick={() => onChangeDataMode('real')}
+              >
+                真实
+              </button>
+              <button
+                type="button"
+                aria-pressed={dataMode === 'demo'}
+                className={dataMode === 'demo' ? 'selected' : ''}
+                onClick={() => onChangeDataMode('demo')}
+              >
+                演示
+              </button>
+            </div>
+            <span
+              className={`focus-health-dot ${backendConnected === true ? 'online' : backendConnected === false ? 'offline' : 'checking'}`}
+              role="status"
+              aria-label={backendConnected === true ? '后端健康检查在线' : backendConnected === false ? '后端不可用' : '正在检查后端'}
+              title={backendConnected === true ? '后端健康检查在线；这不代表 Agent 已运行' : backendConnected === false ? '后端健康检查失败' : '正在检查后端'}
+            />
           </div>
         </div>
 
-        {/* Mobile Expandable Navigation Drawer */}
-        {mobileNavOpen && (
-          <nav
-            id="mobile-primary-nav"
-            aria-label="移动端主导航"
-            className="border-t border-border-default bg-surface-raised px-4 py-3 lg:hidden"
-          >
-            <ul className="space-y-1">
-              {WORKSPACE_NAV_ITEMS.map((item) => {
-                const isActive = item.id === activeWorkspace;
-                return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      aria-current={isActive ? 'page' : undefined}
-                      onClick={() => handleNavClick(item.id)}
-                      className={`flex w-full items-center justify-between rounded-control px-3 py-2.5 text-left text-sm font-semibold transition ${
-                        isActive
-                          ? 'bg-blue-50 text-action-primary'
-                          : 'text-text-secondary hover:bg-surface-subtle hover:text-text-primary'
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      {isActive && (
-                        <span className="text-xs font-normal text-action-primary">
-                          当前工作空间
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+        {dataMode === 'demo' && onChangeUiMode && (
+          <details className="focus-demo-tools">
+            <summary>演示界面状态</summary>
+            <div className="focus-demo-tools-content">
+              {SIMULATION_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  className={uiMode === mode.id ? 'selected' : ''}
+                  aria-pressed={uiMode === mode.id}
+                  onClick={() => onChangeUiMode(mode.id)}
+                >
+                  {mode.label}
+                </button>
+              ))}
+              {onResetProgression && <button type="button" onClick={onResetProgression}>重置演示</button>}
+            </div>
+          </details>
         )}
       </header>
 
-      {/* Main Responsive Stage: Desktop left navigation + primary column (max 1200px) */}
-      <div className="mx-auto flex max-w-stage flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:py-8">
-        <aside className="hidden w-56 shrink-0 lg:block">
-          <nav
-            aria-label="桌面端主导航"
-            className="rounded-control border border-border-default bg-surface-raised p-3"
-          >
-            <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              工作空间导航
-            </p>
-            <ul className="space-y-1">
-              {WORKSPACE_NAV_ITEMS.map((item) => {
-                const isActive = item.id === activeWorkspace;
-                return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      aria-current={isActive ? 'page' : undefined}
-                      onClick={() => handleNavClick(item.id)}
-                      className={`flex w-full items-center justify-between rounded-control px-3 py-2.5 text-left text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-action-primary ${
-                        isActive
-                          ? 'bg-blue-50 text-action-primary'
-                          : 'text-text-secondary hover:bg-surface-subtle hover:text-text-primary'
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      {isActive && (
-                        <span
-                          aria-hidden="true"
-                          className="h-2 w-2 rounded-full bg-action-primary"
-                        />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-        </aside>
-
-        <main className="min-w-0 flex-1 space-y-6">{children}</main>
-      </div>
+      <main className={`focus-stage ${activeWorkspace === 'learning' || activeWorkspace === 'transfer' ? 'focus-stage-wide' : ''}`}>
+        {children}
+      </main>
     </div>
   );
 };

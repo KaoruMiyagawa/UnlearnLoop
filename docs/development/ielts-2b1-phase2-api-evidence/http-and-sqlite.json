@@ -1,0 +1,4772 @@
+{
+  "server": "Uvicorn + FastAPI on loopback",
+  "database": "isolated temporary SQLite, Alembic 0005",
+  "requests": {
+    "A_academic_correct": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_18dabe1cacb2",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_45f6ef4f63c7",
+        "response": {
+          "id": "sess_4d3d9aa44d3949f3",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:09.507740Z",
+          "updated_at": "2026-11-11T12:58:09.507743Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/questions/ielts-mh-academic-initial",
+        "request": null,
+        "status": 200,
+        "request_id": "req_91ecdf95df24",
+        "response": {
+          "id": "ielts-mh-academic-initial",
+          "topic_id": "ielts-mh-academic",
+          "material_id": null,
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "matching_headings",
+          "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+          "context_snippet": null,
+          "difficulty": 1,
+          "version": 1,
+          "group_version_id": null,
+          "group_display": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_4d3d9aa44d3949f3/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_4d3d9aa44d3949f3"
+        },
+        "status": 201,
+        "request_id": "req_cc8ab42f7056",
+        "response": {
+          "attempt_id": "att_66fdcecc9d924320",
+          "session_id": "sess_4d3d9aa44d3949f3",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/attempts/att_66fdcecc9d924320",
+        "request": null,
+        "status": 200,
+        "request_id": "req_bee0c6ce0cd6",
+        "response": {
+          "id": "att_66fdcecc9d924320",
+          "session_id": "sess_4d3d9aa44d3949f3",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "question_version": 1,
+          "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"i\",\"paragraph-c\":\"iv\"}",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          },
+          "is_correct": true,
+          "evaluation_status": "evaluated",
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "idempotency_key": "sess_4d3d9aa44d3949f3",
+          "diagnostic_case_id": null,
+          "evaluation_source": "rule_check",
+          "submitted_at": "2026-11-11T12:58:09.546777"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_4d3d9aa44d3949f3/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_f304beb74d78",
+        "response": [
+          {
+            "id": "att_66fdcecc9d924320",
+            "session_id": "sess_4d3d9aa44d3949f3",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"i\",\"paragraph-c\":\"iv\"}",
+            "structured_answer": {
+              "paragraph-a": "ii",
+              "paragraph-b": "i",
+              "paragraph-c": "iv"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": true,
+                "paragraph-c": true
+              },
+              "correct_count": 3,
+              "total_count": 3,
+              "outcome": "correct",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": true,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 3/3 项。",
+            "submitted_at": "2026-11-11T12:58:09.546777"
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_4d3d9aa44d3949f3",
+        "request": null,
+        "status": 200,
+        "request_id": "req_ac93a89bc2d6",
+        "response": {
+          "id": "sess_4d3d9aa44d3949f3",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": {
+            "attempt_id": "att_66fdcecc9d924320",
+            "session_id": "sess_4d3d9aa44d3949f3",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "is_correct": true,
+            "evaluation_summary": "标题匹配正确 3/3 项。",
+            "feedback_text": "标题匹配正确 3/3 项。",
+            "next_action": "reading_group_scored",
+            "next_question": null,
+            "diagnostic_case_id": null,
+            "knowledge_state_status": null,
+            "evaluation_source": "rule_check",
+            "mastery_note": null,
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": true,
+                "paragraph-c": true
+              },
+              "correct_count": 3,
+              "total_count": 3,
+              "outcome": "correct",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            }
+          },
+          "can_dispatch_transfer": false,
+          "attempts_count": 1,
+          "started_at": "2026-11-11T12:58:09.507740",
+          "updated_at": "2026-11-11T12:58:09.507743",
+          "completed_at": null
+        }
+      }
+    ],
+    "B_academic_partial": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_d60e29e53863",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_c800763b07ae",
+        "response": {
+          "id": "sess_78f9891a728a4468",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:09.609933Z",
+          "updated_at": "2026-11-11T12:58:09.609936Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/questions/ielts-mh-academic-initial",
+        "request": null,
+        "status": 200,
+        "request_id": "req_79c438a4bd90",
+        "response": {
+          "id": "ielts-mh-academic-initial",
+          "topic_id": "ielts-mh-academic",
+          "material_id": null,
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "matching_headings",
+          "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+          "context_snippet": null,
+          "difficulty": 1,
+          "version": 1,
+          "group_version_id": null,
+          "group_display": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_78f9891a728a4468/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "idempotency_key": "sess_78f9891a728a4468"
+        },
+        "status": 201,
+        "request_id": "req_b9a2ce5da558",
+        "response": {
+          "attempt_id": "att_220368622ed247b5",
+          "session_id": "sess_78f9891a728a4468",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "feedback_text": "标题匹配正确 1/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_0672c00543934b81",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/attempts/att_220368622ed247b5",
+        "request": null,
+        "status": 200,
+        "request_id": "req_8f6b8d09b495",
+        "response": {
+          "id": "att_220368622ed247b5",
+          "session_id": "sess_78f9891a728a4468",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "question_version": 1,
+          "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"v\"}",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          },
+          "is_correct": false,
+          "evaluation_status": "evaluated",
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "idempotency_key": "sess_78f9891a728a4468",
+          "diagnostic_case_id": "diag_0672c00543934b81",
+          "evaluation_source": "rule_check",
+          "submitted_at": "2026-11-11T12:58:09.638183"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_78f9891a728a4468/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_795cf4dfe6be",
+        "response": [
+          {
+            "id": "att_220368622ed247b5",
+            "session_id": "sess_78f9891a728a4468",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"v\"}",
+            "structured_answer": {
+              "paragraph-a": "ii",
+              "paragraph-b": "iii",
+              "paragraph-c": "v"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 1,
+              "total_count": 3,
+              "outcome": "partial",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": false,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 1/3 项。",
+            "submitted_at": "2026-11-11T12:58:09.638183"
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/diagnoses/diag_0672c00543934b81",
+        "request": null,
+        "status": 200,
+        "request_id": "req_9512fa2a051e",
+        "response": {
+          "id": "diag_0672c00543934b81",
+          "session_id": "sess_78f9891a728a4468",
+          "trigger_attempt_id": "att_220368622ed247b5",
+          "status": "insufficient_evidence",
+          "uncertainty_level": "medium",
+          "uncertainty_note": "逐项评分仅说明哪些匹配正确。当前没有可用于标题匹配的诊断协议。",
+          "followup_turn_count": 0,
+          "tokens_used": 0,
+          "model_provider_name": "fake",
+          "is_mock_provider": true,
+          "execution_mode": "mock",
+          "hypotheses": [],
+          "evidence_count": 0,
+          "created_at": "2026-11-11T12:58:09.642761",
+          "updated_at": "2026-11-11T12:58:09.645086"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/diagnoses/diag_0672c00543934b81/hypotheses",
+        "request": null,
+        "status": 200,
+        "request_id": "req_9cc56c8e8a4b",
+        "response": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/diagnoses/diag_0672c00543934b81/step",
+        "request": {},
+        "status": 400,
+        "request_id": "req_1196a7d45551",
+        "response": {
+          "code": "INVALID_SESSION_STATE",
+          "message": "Insufficient evidence: Matching Headings has no diagnostic protocol in this phase.",
+          "request_id": "req_1196a7d45551",
+          "details": {
+            "current_state": "insufficient_evidence"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_78f9891a728a4468",
+        "request": null,
+        "status": 200,
+        "request_id": "req_0b1900acabb3",
+        "response": {
+          "id": "sess_78f9891a728a4468",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "diagnosing",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": "diag_0672c00543934b81",
+          "latest_attempt_result": {
+            "attempt_id": "att_220368622ed247b5",
+            "session_id": "sess_78f9891a728a4468",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "is_correct": false,
+            "evaluation_summary": "标题匹配正确 1/3 项。",
+            "feedback_text": "标题匹配正确 1/3 项。",
+            "next_action": "insufficient_evidence",
+            "next_question": null,
+            "diagnostic_case_id": "diag_0672c00543934b81",
+            "knowledge_state_status": null,
+            "evaluation_source": "rule_check",
+            "mastery_note": null,
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 1,
+              "total_count": 3,
+              "outcome": "partial",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            }
+          },
+          "can_dispatch_transfer": false,
+          "attempts_count": 1,
+          "started_at": "2026-11-11T12:58:09.609933",
+          "updated_at": "2026-11-11T12:58:09.641789",
+          "completed_at": null
+        }
+      }
+    ],
+    "C_gt_correct": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "general_training"
+        },
+        "status": 200,
+        "request_id": "req_92af7fdf72de",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "general_training",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-general-training",
+          "exam_variant": "general_training",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_ed219ed452a2",
+        "response": {
+          "id": "sess_ee0fb403014240b3",
+          "topic_id": "ielts-mh-general-training",
+          "topic_title": "Matching Headings · The neighbourhood tool library",
+          "learner_id": "default_learner",
+          "exam_variant": "general_training",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-gt-initial",
+          "current_question": {
+            "id": "ielts-mh-gt-initial",
+            "topic_id": "ielts-mh-general-training",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "group_display": {
+              "id": "mh-tool-library",
+              "section_id": "general-training-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-tool-library-passage",
+                "content_version": "1",
+                "title": "A guide to borrowing from Cedar Lane Tool Library",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "Before your first loan, bring proof of your address to the library desk. A volunteer will create your membership and show you how to find an item in the catalogue. If you register during a busy Saturday session, you may need to wait until the next opening to collect anything. You can still browse that day and make a list of the tools you want."
+                  },
+                  {
+                    "id": "b",
+                    "text": "If another member has the tool you need, leave your name on its waiting list. We will send a message when it comes back. Please confirm that you still want it by the end of the next opening session, so that we can offer it to someone else if your plans have changed. There is no need to call every day to check whether the item is back."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Bring each item back to the desk, together with the parts listed on its label. Wait while a volunteer checks them, even if you are in a hurry. If something has broken during the loan, describe what happened and leave the tool with us. That lets us label it for inspection before the next member takes it home."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "How to collect an item without becoming a member"
+                },
+                {
+                  "id": "ii",
+                  "text": "Checking and reporting issues at the end of a loan"
+                },
+                {
+                  "id": "iii",
+                  "text": "What to do when the tool you want is on loan"
+                },
+                {
+                  "id": "iv",
+                  "text": "How volunteers repair damaged equipment"
+                },
+                {
+                  "id": "v",
+                  "text": "Getting set up to borrow for the first time"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:09.777061Z",
+          "updated_at": "2026-11-11T12:58:09.777064Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/questions/ielts-mh-gt-initial",
+        "request": null,
+        "status": 200,
+        "request_id": "req_cfe9031b5680",
+        "response": {
+          "id": "ielts-mh-gt-initial",
+          "topic_id": "ielts-mh-general-training",
+          "material_id": null,
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "matching_headings",
+          "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+          "context_snippet": null,
+          "difficulty": 1,
+          "version": 1,
+          "group_version_id": null,
+          "group_display": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_ee0fb403014240b3/attempts",
+        "request": {
+          "question_id": "ielts-mh-gt-initial",
+          "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+          "structured_answer": {
+            "paragraph-a": "v",
+            "paragraph-b": "iii",
+            "paragraph-c": "ii"
+          },
+          "idempotency_key": "sess_ee0fb403014240b3"
+        },
+        "status": 201,
+        "request_id": "req_808831ff490f",
+        "response": {
+          "attempt_id": "att_ede60a20c9f946fa",
+          "session_id": "sess_ee0fb403014240b3",
+          "question_id": "ielts-mh-gt-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/attempts/att_ede60a20c9f946fa",
+        "request": null,
+        "status": 200,
+        "request_id": "req_0053d0ca8394",
+        "response": {
+          "id": "att_ede60a20c9f946fa",
+          "session_id": "sess_ee0fb403014240b3",
+          "question_id": "ielts-mh-gt-initial",
+          "question_role": "initial",
+          "question_version": 1,
+          "submitted_answer": "{\"paragraph-a\":\"v\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"ii\"}",
+          "structured_answer": {
+            "paragraph-a": "v",
+            "paragraph-b": "iii",
+            "paragraph-c": "ii"
+          },
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+            "evaluation_source": "rule_check"
+          },
+          "is_correct": true,
+          "evaluation_status": "evaluated",
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "idempotency_key": "sess_ee0fb403014240b3",
+          "diagnostic_case_id": null,
+          "evaluation_source": "rule_check",
+          "submitted_at": "2026-11-11T12:58:09.819917"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_ee0fb403014240b3/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_d528f69628c1",
+        "response": [
+          {
+            "id": "att_ede60a20c9f946fa",
+            "session_id": "sess_ee0fb403014240b3",
+            "question_id": "ielts-mh-gt-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"v\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"ii\"}",
+            "structured_answer": {
+              "paragraph-a": "v",
+              "paragraph-b": "iii",
+              "paragraph-c": "ii"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": true,
+                "paragraph-c": true
+              },
+              "correct_count": 3,
+              "total_count": 3,
+              "outcome": "correct",
+              "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": true,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 3/3 项。",
+            "submitted_at": "2026-11-11T12:58:09.819917"
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_ee0fb403014240b3",
+        "request": null,
+        "status": 200,
+        "request_id": "req_1017e2856c5c",
+        "response": {
+          "id": "sess_ee0fb403014240b3",
+          "topic_id": "ielts-mh-general-training",
+          "topic_title": "Matching Headings · The neighbourhood tool library",
+          "learner_id": "default_learner",
+          "exam_variant": "general_training",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-gt-initial",
+          "current_question": {
+            "id": "ielts-mh-gt-initial",
+            "topic_id": "ielts-mh-general-training",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "group_display": {
+              "id": "mh-tool-library",
+              "section_id": "general-training-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-tool-library-passage",
+                "content_version": "1",
+                "title": "A guide to borrowing from Cedar Lane Tool Library",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "Before your first loan, bring proof of your address to the library desk. A volunteer will create your membership and show you how to find an item in the catalogue. If you register during a busy Saturday session, you may need to wait until the next opening to collect anything. You can still browse that day and make a list of the tools you want."
+                  },
+                  {
+                    "id": "b",
+                    "text": "If another member has the tool you need, leave your name on its waiting list. We will send a message when it comes back. Please confirm that you still want it by the end of the next opening session, so that we can offer it to someone else if your plans have changed. There is no need to call every day to check whether the item is back."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Bring each item back to the desk, together with the parts listed on its label. Wait while a volunteer checks them, even if you are in a hurry. If something has broken during the loan, describe what happened and leave the tool with us. That lets us label it for inspection before the next member takes it home."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "How to collect an item without becoming a member"
+                },
+                {
+                  "id": "ii",
+                  "text": "Checking and reporting issues at the end of a loan"
+                },
+                {
+                  "id": "iii",
+                  "text": "What to do when the tool you want is on loan"
+                },
+                {
+                  "id": "iv",
+                  "text": "How volunteers repair damaged equipment"
+                },
+                {
+                  "id": "v",
+                  "text": "Getting set up to borrow for the first time"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": {
+            "attempt_id": "att_ede60a20c9f946fa",
+            "session_id": "sess_ee0fb403014240b3",
+            "question_id": "ielts-mh-gt-initial",
+            "question_role": "initial",
+            "is_correct": true,
+            "evaluation_summary": "标题匹配正确 3/3 项。",
+            "feedback_text": "标题匹配正确 3/3 项。",
+            "next_action": "reading_group_scored",
+            "next_question": null,
+            "diagnostic_case_id": null,
+            "knowledge_state_status": null,
+            "evaluation_source": "rule_check",
+            "mastery_note": null,
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": true,
+                "paragraph-c": true
+              },
+              "correct_count": 3,
+              "total_count": 3,
+              "outcome": "correct",
+              "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+              "evaluation_source": "rule_check"
+            }
+          },
+          "can_dispatch_transfer": false,
+          "attempts_count": 1,
+          "started_at": "2026-11-11T12:58:09.777061",
+          "updated_at": "2026-11-11T12:58:09.777064",
+          "completed_at": null
+        }
+      }
+    ],
+    "D_gt_incorrect": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "general_training"
+        },
+        "status": 200,
+        "request_id": "req_46228cd7f2dd",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "general_training",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-general-training",
+          "exam_variant": "general_training",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_d326b9a77c05",
+        "response": {
+          "id": "sess_00408c7be1504fb5",
+          "topic_id": "ielts-mh-general-training",
+          "topic_title": "Matching Headings · The neighbourhood tool library",
+          "learner_id": "default_learner",
+          "exam_variant": "general_training",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-gt-initial",
+          "current_question": {
+            "id": "ielts-mh-gt-initial",
+            "topic_id": "ielts-mh-general-training",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "group_display": {
+              "id": "mh-tool-library",
+              "section_id": "general-training-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-tool-library-passage",
+                "content_version": "1",
+                "title": "A guide to borrowing from Cedar Lane Tool Library",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "Before your first loan, bring proof of your address to the library desk. A volunteer will create your membership and show you how to find an item in the catalogue. If you register during a busy Saturday session, you may need to wait until the next opening to collect anything. You can still browse that day and make a list of the tools you want."
+                  },
+                  {
+                    "id": "b",
+                    "text": "If another member has the tool you need, leave your name on its waiting list. We will send a message when it comes back. Please confirm that you still want it by the end of the next opening session, so that we can offer it to someone else if your plans have changed. There is no need to call every day to check whether the item is back."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Bring each item back to the desk, together with the parts listed on its label. Wait while a volunteer checks them, even if you are in a hurry. If something has broken during the loan, describe what happened and leave the tool with us. That lets us label it for inspection before the next member takes it home."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "How to collect an item without becoming a member"
+                },
+                {
+                  "id": "ii",
+                  "text": "Checking and reporting issues at the end of a loan"
+                },
+                {
+                  "id": "iii",
+                  "text": "What to do when the tool you want is on loan"
+                },
+                {
+                  "id": "iv",
+                  "text": "How volunteers repair damaged equipment"
+                },
+                {
+                  "id": "v",
+                  "text": "Getting set up to borrow for the first time"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:09.874261Z",
+          "updated_at": "2026-11-11T12:58:09.874264Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/questions/ielts-mh-gt-initial",
+        "request": null,
+        "status": 200,
+        "request_id": "req_3c0b6bd32cf0",
+        "response": {
+          "id": "ielts-mh-gt-initial",
+          "topic_id": "ielts-mh-general-training",
+          "material_id": null,
+          "parent_question_id": null,
+          "question_role": "initial",
+          "question_type": "matching_headings",
+          "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+          "context_snippet": null,
+          "difficulty": 1,
+          "version": 1,
+          "group_version_id": null,
+          "group_display": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_00408c7be1504fb5/attempts",
+        "request": {
+          "question_id": "ielts-mh-gt-initial",
+          "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+          "structured_answer": {
+            "paragraph-a": "i",
+            "paragraph-b": "iv",
+            "paragraph-c": "iii"
+          },
+          "idempotency_key": "sess_00408c7be1504fb5"
+        },
+        "status": 201,
+        "request_id": "req_faec0b54e7cf",
+        "response": {
+          "attempt_id": "att_d89ffd18716b465b",
+          "session_id": "sess_00408c7be1504fb5",
+          "question_id": "ielts-mh-gt-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 0/3 项。",
+          "feedback_text": "标题匹配正确 0/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_ee139b9499914344",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": false,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 0,
+            "total_count": 3,
+            "outcome": "incorrect",
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/attempts/att_d89ffd18716b465b",
+        "request": null,
+        "status": 200,
+        "request_id": "req_916af992e98b",
+        "response": {
+          "id": "att_d89ffd18716b465b",
+          "session_id": "sess_00408c7be1504fb5",
+          "question_id": "ielts-mh-gt-initial",
+          "question_role": "initial",
+          "question_version": 1,
+          "submitted_answer": "{\"paragraph-a\":\"i\",\"paragraph-b\":\"iv\",\"paragraph-c\":\"iii\"}",
+          "structured_answer": {
+            "paragraph-a": "i",
+            "paragraph-b": "iv",
+            "paragraph-c": "iii"
+          },
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": false,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 0,
+            "total_count": 3,
+            "outcome": "incorrect",
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+            "evaluation_source": "rule_check"
+          },
+          "is_correct": false,
+          "evaluation_status": "evaluated",
+          "evaluation_summary": "标题匹配正确 0/3 项。",
+          "idempotency_key": "sess_00408c7be1504fb5",
+          "diagnostic_case_id": "diag_ee139b9499914344",
+          "evaluation_source": "rule_check",
+          "submitted_at": "2026-11-11T12:58:09.914614"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_00408c7be1504fb5/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_23b2cd1f9231",
+        "response": [
+          {
+            "id": "att_d89ffd18716b465b",
+            "session_id": "sess_00408c7be1504fb5",
+            "question_id": "ielts-mh-gt-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"i\",\"paragraph-b\":\"iv\",\"paragraph-c\":\"iii\"}",
+            "structured_answer": {
+              "paragraph-a": "i",
+              "paragraph-b": "iv",
+              "paragraph-c": "iii"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": false,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 0,
+              "total_count": 3,
+              "outcome": "incorrect",
+              "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": false,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 0/3 项。",
+            "submitted_at": "2026-11-11T12:58:09.914614"
+          }
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/diagnoses/diag_ee139b9499914344",
+        "request": null,
+        "status": 200,
+        "request_id": "req_8a20f26cfad8",
+        "response": {
+          "id": "diag_ee139b9499914344",
+          "session_id": "sess_00408c7be1504fb5",
+          "trigger_attempt_id": "att_d89ffd18716b465b",
+          "status": "insufficient_evidence",
+          "uncertainty_level": "medium",
+          "uncertainty_note": "逐项评分仅说明哪些匹配正确。当前没有可用于标题匹配的诊断协议。",
+          "followup_turn_count": 0,
+          "tokens_used": 0,
+          "model_provider_name": "fake",
+          "is_mock_provider": true,
+          "execution_mode": "mock",
+          "hypotheses": [],
+          "evidence_count": 0,
+          "created_at": "2026-11-11T12:58:09.918802",
+          "updated_at": "2026-11-11T12:58:09.920980"
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/diagnoses/diag_ee139b9499914344/hypotheses",
+        "request": null,
+        "status": 200,
+        "request_id": "req_585e0d144edb",
+        "response": []
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/diagnoses/diag_ee139b9499914344/step",
+        "request": {},
+        "status": 400,
+        "request_id": "req_937512dc5ae6",
+        "response": {
+          "code": "INVALID_SESSION_STATE",
+          "message": "Insufficient evidence: Matching Headings has no diagnostic protocol in this phase.",
+          "request_id": "req_937512dc5ae6",
+          "details": {
+            "current_state": "insufficient_evidence"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_00408c7be1504fb5",
+        "request": null,
+        "status": 200,
+        "request_id": "req_32c247528932",
+        "response": {
+          "id": "sess_00408c7be1504fb5",
+          "topic_id": "ielts-mh-general-training",
+          "topic_title": "Matching Headings · The neighbourhood tool library",
+          "learner_id": "default_learner",
+          "exam_variant": "general_training",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "diagnosing",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-gt-initial",
+          "current_question": {
+            "id": "ielts-mh-gt-initial",
+            "topic_id": "ielts-mh-general-training",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+            "group_display": {
+              "id": "mh-tool-library",
+              "section_id": "general-training-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-tool-library-passage",
+                "content_version": "1",
+                "title": "A guide to borrowing from Cedar Lane Tool Library",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "Before your first loan, bring proof of your address to the library desk. A volunteer will create your membership and show you how to find an item in the catalogue. If you register during a busy Saturday session, you may need to wait until the next opening to collect anything. You can still browse that day and make a list of the tools you want."
+                  },
+                  {
+                    "id": "b",
+                    "text": "If another member has the tool you need, leave your name on its waiting list. We will send a message when it comes back. Please confirm that you still want it by the end of the next opening session, so that we can offer it to someone else if your plans have changed. There is no need to call every day to check whether the item is back."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Bring each item back to the desk, together with the parts listed on its label. Wait while a volunteer checks them, even if you are in a hurry. If something has broken during the loan, describe what happened and leave the tool with us. That lets us label it for inspection before the next member takes it home."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "How to collect an item without becoming a member"
+                },
+                {
+                  "id": "ii",
+                  "text": "Checking and reporting issues at the end of a loan"
+                },
+                {
+                  "id": "iii",
+                  "text": "What to do when the tool you want is on loan"
+                },
+                {
+                  "id": "iv",
+                  "text": "How volunteers repair damaged equipment"
+                },
+                {
+                  "id": "v",
+                  "text": "Getting set up to borrow for the first time"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": "diag_ee139b9499914344",
+          "latest_attempt_result": {
+            "attempt_id": "att_d89ffd18716b465b",
+            "session_id": "sess_00408c7be1504fb5",
+            "question_id": "ielts-mh-gt-initial",
+            "question_role": "initial",
+            "is_correct": false,
+            "evaluation_summary": "标题匹配正确 0/3 项。",
+            "feedback_text": "标题匹配正确 0/3 项。",
+            "next_action": "insufficient_evidence",
+            "next_question": null,
+            "diagnostic_case_id": "diag_ee139b9499914344",
+            "knowledge_state_status": null,
+            "evaluation_source": "rule_check",
+            "mastery_note": null,
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": false,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 0,
+              "total_count": 3,
+              "outcome": "incorrect",
+              "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+              "evaluation_source": "rule_check"
+            }
+          },
+          "can_dispatch_transfer": false,
+          "attempts_count": 1,
+          "started_at": "2026-11-11T12:58:09.874261",
+          "updated_at": "2026-11-11T12:58:09.918329",
+          "completed_at": null
+        }
+      }
+    ],
+    "E_invalid": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_70104549b632",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_1420c205a3b2",
+        "response": {
+          "id": "sess_d37becb3ad874440",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.012306Z",
+          "updated_at": "2026-11-11T12:58:10.012309Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "wrong",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440"
+        },
+        "status": 400,
+        "request_id": "req_09ad1b3995a7",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "The submitted reading group version does not match the assigned version.",
+          "request_id": "req_09ad1b3995a7"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii"
+          },
+          "idempotency_key": "sess_d37becb3ad874440"
+        },
+        "status": 400,
+        "request_id": "req_f9c98f70c801",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "submission must contain one valid option per item",
+          "request_id": "req_f9c98f70c801"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "unknown": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440"
+        },
+        "status": 400,
+        "request_id": "req_e42bf24a5eff",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "submission must contain one valid option per item",
+          "request_id": "req_e42bf24a5eff"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "unknown",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440"
+        },
+        "status": 400,
+        "request_id": "req_fad7ee16515e",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "submission must contain one valid option per item",
+          "request_id": "req_fad7ee16515e"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "i",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440"
+        },
+        "status": 400,
+        "request_id": "req_9ae14cb67d7e",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "submission violates the no-reuse rule",
+          "request_id": "req_9ae14cb67d7e"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-gt-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440"
+        },
+        "status": 400,
+        "request_id": "req_00d35c8f526e",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "Submit structured answers only to the assigned Matching Headings initial question.",
+          "request_id": "req_00d35c8f526e"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440",
+          "submitted_answer": "ii"
+        },
+        "status": 422,
+        "request_id": "req_4f1dc47be4c4",
+        "response": {
+          "code": "VALIDATION_ERROR",
+          "message": "请求参数校验失败",
+          "request_id": "req_4f1dc47be4c4",
+          "details": [
+            {
+              "type": "value_error",
+              "loc": [
+                "body"
+              ],
+              "msg": "Value error, Provide exactly one of submitted_answer and structured_answer.",
+              "input": {
+                "question_id": "ielts-mh-academic-initial",
+                "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+                "structured_answer": {
+                  "paragraph-a": "ii",
+                  "paragraph-b": "i",
+                  "paragraph-c": "iv"
+                },
+                "idempotency_key": "sess_d37becb3ad874440",
+                "submitted_answer": "ii"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_d37becb3ad874440",
+          "answer_key": {}
+        },
+        "status": 422,
+        "request_id": "req_da938fffa8ba",
+        "response": {
+          "code": "VALIDATION_ERROR",
+          "message": "请求参数校验失败",
+          "request_id": "req_da938fffa8ba",
+          "details": [
+            {
+              "type": "extra_forbidden",
+              "loc": [
+                "body",
+                "answer_key"
+              ],
+              "msg": "Extra inputs are not permitted",
+              "input": {}
+            }
+          ]
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_2de92f98b727",
+        "response": []
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_d37becb3ad874440",
+        "request": null,
+        "status": 200,
+        "request_id": "req_7e03c91672e1",
+        "response": {
+          "id": "sess_d37becb3ad874440",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.012306",
+          "updated_at": "2026-11-11T12:58:10.012309",
+          "completed_at": null
+        }
+      }
+    ],
+    "F_replay": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_d694cbfc43b7",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_b4f91ac5b557",
+        "response": {
+          "id": "sess_4830b413a8f247d2",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.131367Z",
+          "updated_at": "2026-11-11T12:58:10.131369Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_4830b413a8f247d2/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_4830b413a8f247d2"
+        },
+        "status": 201,
+        "request_id": "req_a6f6f50316c1",
+        "response": {
+          "attempt_id": "att_2ba442970a1d4825",
+          "session_id": "sess_4830b413a8f247d2",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_4830b413a8f247d2/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-c": "iv",
+            "paragraph-b": "i",
+            "paragraph-a": "ii"
+          },
+          "idempotency_key": "sess_4830b413a8f247d2"
+        },
+        "status": 201,
+        "request_id": "req_46900734458f",
+        "response": {
+          "attempt_id": "att_2ba442970a1d4825",
+          "session_id": "sess_4830b413a8f247d2",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_4830b413a8f247d2/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "idempotency_key": "sess_4830b413a8f247d2"
+        },
+        "status": 409,
+        "request_id": "req_09d22ac9ce3e",
+        "response": {
+          "code": "IDEMPOTENCY_CONFLICT",
+          "message": "Idempotency key 'sess_4830b413a8f247d2' conflict: Key belongs to a different answer intent.",
+          "request_id": "req_09d22ac9ce3e",
+          "details": {
+            "idempotency_key": "sess_4830b413a8f247d2",
+            "reason": "Key belongs to a different answer intent."
+          }
+        }
+      }
+    ],
+    "F_discarded_response": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_037d8bfef004",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_9dd3954941e9",
+        "response": {
+          "id": "sess_4742594818644559",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.210131Z",
+          "updated_at": "2026-11-11T12:58:10.210133Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_4742594818644559/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_4742594818644559"
+        },
+        "status": 201,
+        "request_id": "req_f4cbd33c9f3e",
+        "response_body_read": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_4742594818644559/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_4742594818644559"
+        },
+        "status": 201,
+        "request_id": "req_62f336491c35",
+        "response": {
+          "attempt_id": "att_563a5a798e1d437d",
+          "session_id": "sess_4742594818644559",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      }
+    ],
+    "F_concurrent_same_key": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_02a1b48a2cc1",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_946cf8bc0a8c",
+        "response": {
+          "id": "sess_6270a5d418b94f51",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.328614Z",
+          "updated_at": "2026-11-11T12:58:10.328616Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_6270a5d418b94f51/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "idempotency_key": "sess_6270a5d418b94f51"
+        },
+        "status": 201,
+        "request_id": "req_702357456206",
+        "response": {
+          "attempt_id": "att_e312e7c4a6c449c5",
+          "session_id": "sess_6270a5d418b94f51",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "feedback_text": "标题匹配正确 1/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_e9c90485ffa54f9e",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_6270a5d418b94f51/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "idempotency_key": "sess_6270a5d418b94f51"
+        },
+        "status": 201,
+        "request_id": "req_165bbc5b170d",
+        "response": {
+          "attempt_id": "att_e312e7c4a6c449c5",
+          "session_id": "sess_6270a5d418b94f51",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "feedback_text": "标题匹配正确 1/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_e9c90485ffa54f9e",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_6270a5d418b94f51/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_453796342aad",
+        "response": [
+          {
+            "id": "att_e312e7c4a6c449c5",
+            "session_id": "sess_6270a5d418b94f51",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"v\"}",
+            "structured_answer": {
+              "paragraph-a": "ii",
+              "paragraph-b": "iii",
+              "paragraph-c": "v"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 1,
+              "total_count": 3,
+              "outcome": "partial",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": false,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 1/3 项。",
+            "submitted_at": "2026-11-11T12:58:10.359466"
+          }
+        ]
+      }
+    ],
+    "F_concurrent_different_keys": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_d1cd70824eca",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_11e9c59415fa",
+        "response": {
+          "id": "sess_951577450ece4e90",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.403338Z",
+          "updated_at": "2026-11-11T12:58:10.403339Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_951577450ece4e90/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "idempotency_key": "sess_951577450ece4e90"
+        },
+        "status": 201,
+        "request_id": "req_e8af1ee18198",
+        "response": {
+          "attempt_id": "att_902c156b986e4846",
+          "session_id": "sess_951577450ece4e90",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "feedback_text": "标题匹配正确 1/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_d79163d8a55d482c",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_951577450ece4e90/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          },
+          "idempotency_key": "sess_951577450ece4e90-different"
+        },
+        "status": 409,
+        "request_id": "req_2d5a0202624e",
+        "response": {
+          "code": "GROUP_ALREADY_SUBMITTED",
+          "message": "This reading group has already been submitted.",
+          "request_id": "req_2d5a0202624e",
+          "details": {}
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_951577450ece4e90/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_fe2f037086e9",
+        "response": [
+          {
+            "id": "att_902c156b986e4846",
+            "session_id": "sess_951577450ece4e90",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"v\"}",
+            "structured_answer": {
+              "paragraph-a": "ii",
+              "paragraph-b": "iii",
+              "paragraph-c": "v"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 1,
+              "total_count": 3,
+              "outcome": "partial",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": false,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 1/3 项。",
+            "submitted_at": "2026-11-11T12:58:10.420133"
+          }
+        ]
+      }
+    ],
+    "F_concurrent_no_keys": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_9fab39bf4560",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_3835bc1322f6",
+        "response": {
+          "id": "sess_e1af4c6ca55e4d0e",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.460928Z",
+          "updated_at": "2026-11-11T12:58:10.460930Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_e1af4c6ca55e4d0e/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          }
+        },
+        "status": 201,
+        "request_id": "req_12a33354aeb8",
+        "response": {
+          "attempt_id": "att_474417835dc541d4",
+          "session_id": "sess_e1af4c6ca55e4d0e",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "feedback_text": "标题匹配正确 1/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_413f0f2c813d4aa0",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_e1af4c6ca55e4d0e/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "iii",
+            "paragraph-c": "v"
+          }
+        },
+        "status": 201,
+        "request_id": "req_b41fc9ecdf86",
+        "response": {
+          "attempt_id": "att_474417835dc541d4",
+          "session_id": "sess_e1af4c6ca55e4d0e",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "标题匹配正确 1/3 项。",
+          "feedback_text": "标题匹配正确 1/3 项。",
+          "next_action": "insufficient_evidence",
+          "next_question": null,
+          "diagnostic_case_id": "diag_413f0f2c813d4aa0",
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": false,
+              "paragraph-c": false
+            },
+            "correct_count": 1,
+            "total_count": 3,
+            "outcome": "partial",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_e1af4c6ca55e4d0e/attempts",
+        "request": null,
+        "status": 200,
+        "request_id": "req_1fce4a9c7762",
+        "response": [
+          {
+            "id": "att_474417835dc541d4",
+            "session_id": "sess_e1af4c6ca55e4d0e",
+            "question_id": "ielts-mh-academic-initial",
+            "question_role": "initial",
+            "submitted_answer": "{\"paragraph-a\":\"ii\",\"paragraph-b\":\"iii\",\"paragraph-c\":\"v\"}",
+            "structured_answer": {
+              "paragraph-a": "ii",
+              "paragraph-b": "iii",
+              "paragraph-c": "v"
+            },
+            "group_evaluation": {
+              "correct_by_item": {
+                "paragraph-a": true,
+                "paragraph-b": false,
+                "paragraph-c": false
+              },
+              "correct_count": 1,
+              "total_count": 3,
+              "outcome": "partial",
+              "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+              "content_version": "1",
+              "display_schema_version": "1",
+              "evaluation_rule_version": "1",
+              "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+              "evaluation_source": "rule_check"
+            },
+            "is_correct": false,
+            "evaluation_status": "evaluated",
+            "evaluation_summary": "标题匹配正确 1/3 项。",
+            "submitted_at": "2026-11-11T12:58:10.497480"
+          }
+        ]
+      }
+    ],
+    "G_version_update": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_01d2dd0f4d56",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_b769203afa40",
+        "response": {
+          "id": "sess_f3014f4ff265428f",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.547432Z",
+          "updated_at": "2026-11-11T12:58:10.547434Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_959400ec5eb0",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-mh-academic",
+          "exam_variant": "academic",
+          "question_type": "matching_headings"
+        },
+        "status": 201,
+        "request_id": "req_ef5bdbfdf12f",
+        "response": {
+          "id": "sess_24421bef7baf4c83",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_b625b38fc8082eb8fa9280e28c11b4ca",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "2",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "vi",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.614284Z",
+          "updated_at": "2026-11-11T12:58:10.614287Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/sessions/sess_f3014f4ff265428f",
+        "request": null,
+        "status": 200,
+        "request_id": "req_6c5ac17618ca",
+        "response": {
+          "id": "sess_f3014f4ff265428f",
+          "topic_id": "ielts-mh-academic",
+          "topic_title": "Matching Headings · Measuring street heat",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-mh-academic-initial",
+          "current_question": {
+            "id": "ielts-mh-academic-initial",
+            "topic_id": "ielts-mh-academic",
+            "material_id": null,
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "matching_headings",
+            "prompt_text": "Choose the heading that best summarises each paragraph. Use each heading at most once. Two headings are unused.",
+            "context_snippet": null,
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "group_display": {
+              "id": "mh-street-heat",
+              "section_id": "academic-reading",
+              "display_schema_version": "1",
+              "question_type": "matching_headings",
+              "passage": {
+                "id": "mh-street-heat-passage",
+                "content_version": "1",
+                "title": "Measuring heat at street level",
+                "paragraphs": [
+                  {
+                    "id": "a",
+                    "text": "A weather station gives a useful record of conditions at one location. In a city, however, pedestrians may pass from a shaded courtyard to a broad avenue in under a minute. The two spaces receive different amounts of sunlight and have different surfaces, even when the station reports a single temperature for the area. Researchers therefore need measurements from the routes people actually walk if they want to describe exposure at street level."
+                  },
+                  {
+                    "id": "b",
+                    "text": "A portable sensor makes those routes accessible, but a survey can easily confuse place with time. If the first street is measured just after sunrise and the last in late morning, the later street may appear warmer because the whole district has warmed. One way to reduce this bias is to repeat the walk in reverse order and compare the readings against a fixed reference sensor operating throughout both walks."
+                  },
+                  {
+                    "id": "c",
+                    "text": "Even a careful map of outdoor heat cannot identify everyone who needs help during a hot spell. A cool-looking street might serve residents whose upper-floor rooms retain heat overnight. Conversely, a hot square may be crossed quickly by people with access to cooler buildings. Street data can guide where to look more closely, while interviews and indoor measurements address questions that the street survey cannot answer."
+                  }
+                ]
+              },
+              "options": [
+                {
+                  "id": "i",
+                  "text": "Separating changes over time from differences between streets"
+                },
+                {
+                  "id": "ii",
+                  "text": "Why one local reading can conceal differences along a route"
+                },
+                {
+                  "id": "iii",
+                  "text": "Designing a cheaper portable instrument"
+                },
+                {
+                  "id": "iv",
+                  "text": "What outdoor measurements cannot tell us about people's needs"
+                },
+                {
+                  "id": "v",
+                  "text": "A comparison of temperatures on different floors"
+                }
+              ],
+              "items": [
+                {
+                  "id": "paragraph-a",
+                  "paragraph_id": "a"
+                },
+                {
+                  "id": "paragraph-b",
+                  "paragraph_id": "b"
+                },
+                {
+                  "id": "paragraph-c",
+                  "paragraph_id": "c"
+                }
+              ],
+              "allow_reuse": false
+            }
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.547432",
+          "updated_at": "2026-11-11T12:58:10.547434",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_f3014f4ff265428f/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_b625b38fc8082eb8fa9280e28c11b4ca",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_f3014f4ff265428f"
+        },
+        "status": 400,
+        "request_id": "req_b9cabfbe6f7f",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "The submitted reading group version does not match the assigned version.",
+          "request_id": "req_b9cabfbe6f7f"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_f3014f4ff265428f/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "i",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_f3014f4ff265428f"
+        },
+        "status": 201,
+        "request_id": "req_3875e353bb3e",
+        "response": {
+          "attempt_id": "att_263bbe8cf69f406e",
+          "session_id": "sess_f3014f4ff265428f",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+            "content_version": "1",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "1",
+            "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+            "evaluation_source": "rule_check"
+          }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_24421bef7baf4c83/attempts",
+        "request": {
+          "question_id": "ielts-mh-academic-initial",
+          "group_version_id": "rg_b625b38fc8082eb8fa9280e28c11b4ca",
+          "structured_answer": {
+            "paragraph-a": "ii",
+            "paragraph-b": "vi",
+            "paragraph-c": "iv"
+          },
+          "idempotency_key": "sess_24421bef7baf4c83"
+        },
+        "status": 201,
+        "request_id": "req_a6858dab68c9",
+        "response": {
+          "attempt_id": "att_4fe48673a2bf402b",
+          "session_id": "sess_24421bef7baf4c83",
+          "question_id": "ielts-mh-academic-initial",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "标题匹配正确 3/3 项。",
+          "feedback_text": "标题匹配正确 3/3 项。",
+          "next_action": "reading_group_scored",
+          "next_question": null,
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": {
+            "correct_by_item": {
+              "paragraph-a": true,
+              "paragraph-b": true,
+              "paragraph-c": true
+            },
+            "correct_count": 3,
+            "total_count": 3,
+            "outcome": "correct",
+            "group_version_id": "rg_b625b38fc8082eb8fa9280e28c11b4ca",
+            "content_version": "2",
+            "display_schema_version": "1",
+            "evaluation_rule_version": "2",
+            "rule_version_id": "rr_cd7f3a96dd6e4dc16c279412c73b8846",
+            "evaluation_source": "rule_check"
+          }
+        }
+      }
+    ],
+    "H_legacy": [
+      {
+        "method": "PUT",
+        "path": "/api/v1/profile/exam-preparation",
+        "request": {
+          "exam_variant": "academic"
+        },
+        "status": 200,
+        "request_id": "req_c649acb520a5",
+        "response": {
+          "learner_id": "default_learner",
+          "selection_persisted": true,
+          "exam_variant": "academic",
+          "selection_status": "available",
+          "goal_type": "band",
+          "target_overall_band": 8.0,
+          "target_skill_bands": {
+            "listening": 8.0,
+            "reading": 8.0,
+            "writing": 8.0,
+            "speaking": 8.0
+          },
+          "target_outcome": null,
+          "exam_date": null,
+          "actual_level_status": "not_assessed",
+          "current_skill_bands": {
+            "listening": null,
+            "reading": null,
+            "writing": null,
+            "speaking": null
+          },
+          "spec_version": "ielts-spec-catalog-2026-03"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "topic_py_var_assign"
+        },
+        "status": 201,
+        "request_id": "req_2e02bd328c29",
+        "response": {
+          "id": "sess_a3a5e7ccb8154c89",
+          "topic_id": "topic_py_var_assign",
+          "topic_title": "变量赋值与引用绑定",
+          "learner_id": "default_learner",
+          "exam_variant": null,
+          "exam_spec_version": null,
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "q_py_var_initial_01",
+          "current_question": {
+            "id": "q_py_var_initial_01",
+            "topic_id": "topic_py_var_assign",
+            "material_id": "mat_py_var_assign_01",
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "code_trace",
+            "prompt_text": "阅读下方 Python 3 代码，写出最后一行 `print(a, b)` 的输出结果，并简述为什么 `b` 是这个值。",
+            "context_snippet": "a = 10\nb = a + 5\na = 20\nprint(a, b)",
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.705153Z",
+          "updated_at": "2026-11-11T12:58:10.705156Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_a3a5e7ccb8154c89/attempts",
+        "request": {
+          "question_id": "q_py_var_initial_01",
+          "group_version_id": "unassigned",
+          "structured_answer": {
+            "paragraph-a": "i"
+          },
+          "idempotency_key": "sess_a3a5e7ccb8154c89"
+        },
+        "status": 400,
+        "request_id": "req_7d65eb52da2b",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "Submit structured answers only to the assigned Matching Headings initial question.",
+          "request_id": "req_7d65eb52da2b"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_a3a5e7ccb8154c89/attempts",
+        "request": {
+          "question_id": "q_py_var_initial_01",
+          "submitted_answer": "20 15 because b was calculated before a changed.",
+          "idempotency_key": "sess_a3a5e7ccb8154c89"
+        },
+        "status": 201,
+        "request_id": "req_c8f3001051ac",
+        "response": {
+          "attempt_id": "att_9060555894f34531",
+          "session_id": "sess_a3a5e7ccb8154c89",
+          "question_id": "q_py_var_initial_01",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "规则检查确认本次作答匹配标准答案及要求。",
+          "feedback_text": "回答正确！",
+          "next_action": "transfer_check",
+          "next_question": {
+            "id": "q_py_var_transfer_01",
+            "topic_id": "topic_py_var_assign",
+            "material_id": "mat_py_var_assign_01",
+            "parent_question_id": "q_py_var_initial_01",
+            "question_role": "transfer_check",
+            "question_type": "code_trace",
+            "prompt_text": "【迁移验证】在购物车折扣计算场景中，阅读下方代码并写出 `print(original_price, final_price)` 的输出结果。",
+            "context_snippet": "price = 100\ndiscount = 20\nfinal_price = price - discount\ndiscount = 50\noriginal_price = price\nprint(original_price, final_price)",
+            "difficulty": 2,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_a3a5e7ccb8154c89/attempts",
+        "request": {
+          "question_id": "q_py_var_initial_01",
+          "submitted_answer": "20 15 because b was calculated before a changed.",
+          "idempotency_key": "sess_a3a5e7ccb8154c89"
+        },
+        "status": 201,
+        "request_id": "req_6f5d8955c432",
+        "response": {
+          "attempt_id": "att_9060555894f34531",
+          "session_id": "sess_a3a5e7ccb8154c89",
+          "question_id": "q_py_var_initial_01",
+          "question_role": "initial",
+          "is_correct": true,
+          "evaluation_summary": "规则检查确认本次作答匹配标准答案及要求。",
+          "feedback_text": "回答正确！",
+          "next_action": "transfer_check",
+          "next_question": {
+            "id": "q_py_var_transfer_01",
+            "topic_id": "topic_py_var_assign",
+            "material_id": "mat_py_var_assign_01",
+            "parent_question_id": "q_py_var_initial_01",
+            "question_role": "transfer_check",
+            "question_type": "code_trace",
+            "prompt_text": "【迁移验证】在购物车折扣计算场景中，阅读下方代码并写出 `print(original_price, final_price)` 的输出结果。",
+            "context_snippet": "price = 100\ndiscount = 20\nfinal_price = price - discount\ndiscount = 50\noriginal_price = price\nprint(original_price, final_price)",
+            "difficulty": 2,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "diagnostic_case_id": null,
+          "knowledge_state_status": null,
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions",
+        "request": {
+          "topic_id": "ielts-tfng-acad-reading-english"
+        },
+        "status": 201,
+        "request_id": "req_b75b7f874144",
+        "response": {
+          "id": "sess_afd3239477324fcb",
+          "topic_id": "ielts-tfng-acad-reading-english",
+          "topic_title": "TFNG · evidence and logic",
+          "learner_id": "default_learner",
+          "exam_variant": "academic",
+          "exam_spec_version": "ielts-spec-catalog-2026-03",
+          "status": "active",
+          "knowledge_state_status": null,
+          "topic_mastered": false,
+          "current_question_id": "ielts-tfng-acad-initial",
+          "current_question": {
+            "id": "ielts-tfng-acad-initial",
+            "topic_id": "ielts-tfng-acad-reading-english",
+            "material_id": "ielts-tfng-acad-material-initial",
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "multiple_choice",
+            "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+            "context_snippet": "TRUE / FALSE / NOT GIVEN",
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "active_diagnostic_case_id": null,
+          "latest_attempt_result": null,
+          "can_dispatch_transfer": false,
+          "attempts_count": 0,
+          "started_at": "2026-11-11T12:58:10.767524Z",
+          "updated_at": "2026-11-11T12:58:10.767527Z",
+          "completed_at": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_afd3239477324fcb/attempts",
+        "request": {
+          "question_id": "ielts-tfng-acad-initial",
+          "group_version_id": "unassigned",
+          "structured_answer": {
+            "paragraph-a": "i"
+          },
+          "idempotency_key": "sess_afd3239477324fcb"
+        },
+        "status": 400,
+        "request_id": "req_36273340fa82",
+        "response": {
+          "code": "DOMAIN_RULE_VIOLATION",
+          "message": "Submit structured answers only to the assigned Matching Headings initial question.",
+          "request_id": "req_36273340fa82"
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_afd3239477324fcb/attempts",
+        "request": {
+          "question_id": "ielts-tfng-acad-initial",
+          "submitted_answer": "FALSE",
+          "idempotency_key": "sess_afd3239477324fcb"
+        },
+        "status": 201,
+        "request_id": "req_9440a98cb49a",
+        "response": {
+          "attempt_id": "att_03726f1f23ba4893",
+          "session_id": "sess_afd3239477324fcb",
+          "question_id": "ielts-tfng-acad-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+          "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+          "next_action": "diagnose",
+          "next_question": {
+            "id": "ielts-tfng-acad-initial",
+            "topic_id": "ielts-tfng-acad-reading-english",
+            "material_id": "ielts-tfng-acad-material-initial",
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "multiple_choice",
+            "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+            "context_snippet": "TRUE / FALSE / NOT GIVEN",
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "diagnostic_case_id": "diag_8fe440e4205449a2",
+          "knowledge_state_status": "needs_diagnosis",
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/sessions/sess_afd3239477324fcb/attempts",
+        "request": {
+          "question_id": "ielts-tfng-acad-initial",
+          "submitted_answer": "FALSE",
+          "idempotency_key": "sess_afd3239477324fcb"
+        },
+        "status": 201,
+        "request_id": "req_cb2653b3bb7e",
+        "response": {
+          "attempt_id": "att_03726f1f23ba4893",
+          "session_id": "sess_afd3239477324fcb",
+          "question_id": "ielts-tfng-acad-initial",
+          "question_role": "initial",
+          "is_correct": false,
+          "evaluation_summary": "答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+          "feedback_text": "回答与预期不符。答案与本题设定的证据不符；仅凭这一题不足以确定错误原因。",
+          "next_action": "diagnose",
+          "next_question": {
+            "id": "ielts-tfng-acad-initial",
+            "topic_id": "ielts-tfng-acad-reading-english",
+            "material_id": "ielts-tfng-acad-material-initial",
+            "parent_question_id": null,
+            "question_role": "initial",
+            "question_type": "multiple_choice",
+            "prompt_text": "The library opens at nine on Sundays. Choose TRUE, FALSE or NOT GIVEN.",
+            "context_snippet": "TRUE / FALSE / NOT GIVEN",
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "diagnostic_case_id": "diag_8fe440e4205449a2",
+          "knowledge_state_status": "needs_diagnosis",
+          "evaluation_source": "rule_check",
+          "mastery_note": null,
+          "group_evaluation": null
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/diagnoses/diag_8fe440e4205449a2/step",
+        "request": {},
+        "status": 200,
+        "request_id": "req_fb8d3c420a3b",
+        "response": {
+          "session_id": "sess_afd3239477324fcb",
+          "diagnostic_case_id": "diag_8fe440e4205449a2",
+          "case_status": "question_selected",
+          "executed_tool": "select_diagnostic_followup",
+          "decision_reason": "TFNG v1：先用新短文定位任务检验定位能力，避免把 TFNG 逻辑错误与定位错误混在一起。",
+          "selected_intervention": "ask_followup",
+          "selected_question_id": "ielts-tfng-acad-locate",
+          "next_question": {
+            "id": "ielts-tfng-acad-locate",
+            "topic_id": "ielts-tfng-acad-reading-english",
+            "material_id": "ielts-tfng-acad-material-locate",
+            "parent_question_id": null,
+            "question_role": "diagnostic_followup",
+            "question_type": "multiple_choice",
+            "prompt_text": "Which sentence gives the rule about bags?",
+            "context_snippet": "A. Sentence 1\nB. Sentence 2\nC. Sentence 3",
+            "difficulty": 1,
+            "version": 1,
+            "group_version_id": null,
+            "group_display": null
+          },
+          "explanation_text": null,
+          "uncertainty_level": "insufficient_evidence",
+          "uncertainty_note": "微任务证据有限，原因尚未确认。",
+          "confidence_is_heuristic": true,
+          "followup_turns_used": 1,
+          "max_followup_turns": 2,
+          "tokens_used_in_case": 0,
+          "session_token_budget": 4096,
+          "model_provider_name": "rules:tfng-v1",
+          "is_mock_provider": false,
+          "execution_mode": "rules",
+          "degraded_mode": false,
+          "degradation_reason": null,
+          "knowledge_state_status": "needs_diagnosis",
+          "hypotheses": [
+            {
+              "id": "hyp_10a0ce3aff8440f4",
+              "error_code": "true_false_not_given",
+              "name": "未提及与否定的逻辑混淆",
+              "heuristic_confidence": 0.35,
+              "confidence_is_heuristic": true,
+              "status": "candidate",
+              "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+              "evidence_count": 1,
+              "evidence_links": [
+                {
+                  "id": "evi_0ac8626063d1450d",
+                  "source_type": "rule_check",
+                  "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_03726f1f23ba4893",
+                  "relation": "supports",
+                  "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+                }
+              ]
+            },
+            {
+              "id": "hyp_217fb150e7d048a2",
+              "error_code": "passage_location",
+              "name": "相关原文定位困难",
+              "heuristic_confidence": 0.35,
+              "confidence_is_heuristic": true,
+              "status": "candidate",
+              "missing_evidence_desc": "需要另一道区分性问题验证；当前权重是启发式提示。",
+              "evidence_count": 1,
+              "evidence_links": [
+                {
+                  "id": "evi_b6aa013c11ce453d",
+                  "source_type": "rule_check",
+                  "source_ref": "reading-error-dna-v1:ielts-tfng-acad-initial:v1:att_03726f1f23ba4893",
+                  "relation": "supports",
+                  "summary": "本次作答“FALSE”。该选择与候选原因相容，但单题无法区分原因。"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "database_evidence": [
+    {
+      "scenario": "A_academic_correct",
+      "session_id": "sess_4d3d9aa44d3949f3",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 0,
+      "attempt_id": "att_66fdcecc9d924320",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "i",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "B_academic_partial",
+      "session_id": "sess_78f9891a728a4468",
+      "session_status": "diagnosing",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 1,
+      "attempt_id": "att_220368622ed247b5",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "v"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": false
+        },
+        "correct_count": 1,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "C_gt_correct",
+      "session_id": "sess_ee0fb403014240b3",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 0,
+      "attempt_id": "att_ede60a20c9f946fa",
+      "structured_answer_json": {
+        "paragraph-a": "v",
+        "paragraph-b": "iii",
+        "paragraph-c": "ii"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "D_gt_incorrect",
+      "session_id": "sess_00408c7be1504fb5",
+      "session_status": "diagnosing",
+      "pinned_group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 1,
+      "attempt_id": "att_d89ffd18716b465b",
+      "structured_answer_json": {
+        "paragraph-a": "i",
+        "paragraph-b": "iv",
+        "paragraph-c": "iii"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": false,
+          "paragraph-b": false,
+          "paragraph-c": false
+        },
+        "correct_count": 0,
+        "total_count": 3,
+        "outcome": "incorrect",
+        "group_version_id": "rg_4bb77aaca6bc384a7f2ec53396361eea",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_09f6138a9cd486b2abdb26bbed4ccb90",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "E_invalid",
+      "session_id": "sess_d37becb3ad874440",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 0,
+      "result_event_count": 0,
+      "diagnostic_case_count": 0
+    },
+    {
+      "scenario": "F_replay",
+      "session_id": "sess_4830b413a8f247d2",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 0,
+      "attempt_id": "att_2ba442970a1d4825",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "i",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "F_discarded_response",
+      "session_id": "sess_4742594818644559",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 0,
+      "attempt_id": "att_563a5a798e1d437d",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "i",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "F_concurrent_same_key",
+      "session_id": "sess_6270a5d418b94f51",
+      "session_status": "diagnosing",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 1,
+      "attempt_id": "att_e312e7c4a6c449c5",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "v"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": false
+        },
+        "correct_count": 1,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "F_concurrent_different_keys",
+      "session_id": "sess_951577450ece4e90",
+      "session_status": "diagnosing",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 1,
+      "attempt_id": "att_902c156b986e4846",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "v"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": false
+        },
+        "correct_count": 1,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "F_concurrent_no_keys",
+      "session_id": "sess_e1af4c6ca55e4d0e",
+      "session_status": "diagnosing",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 1,
+      "attempt_id": "att_474417835dc541d4",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "iii",
+        "paragraph-c": "v"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": false,
+          "paragraph-c": false
+        },
+        "correct_count": 1,
+        "total_count": 3,
+        "outcome": "partial",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "G_version_update",
+      "session_id": "sess_f3014f4ff265428f",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 0,
+      "attempt_id": "att_263bbe8cf69f406e",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "i",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_0a3d073897e794b8c4497f93ddb2f3f0",
+        "content_version": "1",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "1",
+        "rule_version_id": "rr_1faf14240f0a66d0e6bcacd1bc4a3173",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "1",
+      "evaluation_rule_version": "1"
+    },
+    {
+      "scenario": "G_version_update",
+      "session_id": "sess_24421bef7baf4c83",
+      "session_status": "active",
+      "pinned_group_version_id": "rg_b625b38fc8082eb8fa9280e28c11b4ca",
+      "attempt_count": 1,
+      "result_event_count": 1,
+      "diagnostic_case_count": 0,
+      "attempt_id": "att_4fe48673a2bf402b",
+      "structured_answer_json": {
+        "paragraph-a": "ii",
+        "paragraph-b": "vi",
+        "paragraph-c": "iv"
+      },
+      "item_evaluation_json": {
+        "correct_by_item": {
+          "paragraph-a": true,
+          "paragraph-b": true,
+          "paragraph-c": true
+        },
+        "correct_count": 3,
+        "total_count": 3,
+        "outcome": "correct",
+        "group_version_id": "rg_b625b38fc8082eb8fa9280e28c11b4ca",
+        "content_version": "2",
+        "display_schema_version": "1",
+        "evaluation_rule_version": "2",
+        "rule_version_id": "rr_cd7f3a96dd6e4dc16c279412c73b8846",
+        "evaluation_source": "rule_check"
+      },
+      "snapshot_passage_content_version": "2",
+      "evaluation_rule_version": "2"
+    }
+  ],
+  "matching_headings_knowledge_state_count": 0,
+  "matching_headings_review_count": 0
+}

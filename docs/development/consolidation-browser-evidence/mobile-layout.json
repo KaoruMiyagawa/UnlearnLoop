@@ -1,0 +1,6 @@
+{
+  "homePremium": "{\"viewport\":390,\"documentWidth\":390,\"theme\":\"premium\"}",
+  "homeNoir": "{\"viewport\":390,\"documentWidth\":390,\"theme\":\"noir\"}",
+  "readingNoir": "{\"viewport\":390,\"documentWidth\":390,\"theme\":\"noir\",\"passage\":true}",
+  "readingPremium": "{\"viewport\":390,\"documentWidth\":390,\"theme\":\"premium\",\"passage\":true}"
+}

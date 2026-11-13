@@ -114,6 +114,7 @@ class DiagnosticStepResult(BaseModel):
     executed_tool: str
     selected_intervention: str | None = None
     selected_question_id: str | None = None
+    selected_group_version_id: str | None = None
     explanation_text: str | None = None
     uncertainty_level: UncertaintyLevel
     uncertainty_note: str | None = None

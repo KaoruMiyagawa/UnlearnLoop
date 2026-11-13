@@ -29,12 +29,14 @@ from app.domain.enums import (
     EvidenceSourceType,
     HypothesisStatus,
     InterventionAction,
+    KnowledgeMasteryStatus,
     QuestionRole,
+    QuestionType,
     SessionStatus,
     UncertaintyLevel,
 )
 from app.domain.exceptions import DomainRuleViolationError
-from app.persistence.models import Attempt, DiagnosticCase, Hypothesis, LearningSession
+from app.persistence.models import Attempt, DecisionEvent, DiagnosticCase, Hypothesis, LearningSession, Question, ReadingGroupVersion
 from app.persistence.repositories import LearningRepository
 
 
@@ -60,6 +62,42 @@ class AgentToolExecutor:
 
     def __init__(self, repo: LearningRepository) -> None:
         self.repo = repo
+
+    def dispatch_reading_group(
+        self, *, session: LearningSession, case: DiagnosticCase, attempt: Attempt,
+        question: Question, group: ReadingGroupVersion, expected_version: str,
+        targets: list[str], reason: str, uncertainty_note: str,
+    ) -> DecisionEvent:
+        """Dispatch the exact question selected by an audited rule protocol."""
+        if (
+            case.session_id != session.id or attempt.session_id != session.id
+            or question.topic_id != session.topic_id
+            or question.question_type != QuestionType.MATCHING_HEADINGS.value
+            or group.question_type != question.question_type
+            or group.exam_variant != session.exam_variant
+            or question.reading_group_version_id != group.id or expected_version != group.id
+            or question.question_role not in {QuestionRole.DIAGNOSTIC_FOLLOWUP.value, QuestionRole.TARGETED_PRACTICE.value}
+        ):
+            raise IllegalAgentToolCallError("The reading-group dispatch does not match the fixed rule protocol.")
+        session.current_question_id = question.id
+        if question.question_role == QuestionRole.DIAGNOSTIC_FOLLOWUP.value:
+            case.current_followup_question_id = question.id
+            status = DiagnosticCaseStatus.QUESTION_SELECTED
+            action = AgentToolName.SELECT_DIAGNOSTIC_FOLLOWUP
+            intervention = InterventionAction.ASK_FOLLOWUP
+        else:
+            self.repo.transition_session_status(session, SessionStatus.INTERVENING)
+            status = DiagnosticCaseStatus.INTERVENTION_SELECTED
+            action = AgentToolName.ASSIGN_TARGETED_PRACTICE
+            intervention = InterventionAction.TARGETED_PRACTICE
+        return self.repo.transition_diagnostic_case(
+            case, status, action=action.value, reason=reason,
+            uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE,
+            uncertainty_note=uncertainty_note, selected_intervention=intervention,
+            payload_json={"selected_question_id": question.id, "group_version_id": group.id,
+                          "trigger_attempt_id": case.trigger_attempt_id, "decision_input_attempt_id": attempt.id,
+                          "target_error_codes": targets},
+        )
 
     # ------------------------------------------------------------------
     # Tool 1: read_material_and_question (Read-Only Context Tool)
@@ -375,10 +413,33 @@ class AgentToolExecutor:
             practice_qs = self.repo.list_questions_for_topic(
                 learning_session.topic_id, role=QuestionRole.TARGETED_PRACTICE
             )
+            answered_ids = {attempt.question_id for attempt in self.repo.list_attempts_for_session(learning_session.id)}
+            practice_qs = [question for question in practice_qs if question.id not in answered_ids]
+            tfng = (diag_case.trigger_attempt.question_snapshot_json or {}).get("diagnostic_protocol") == "tfng-v1"
+            if tfng:
+                # Never silently choose the first practice in this diagnostic protocol.
+                supported = {h.error_code for h in diag_case.hypotheses if h.status == "supported"}
+                practice_qs = [q for q in practice_qs
+                               if q.id == args.practice_question_id
+                               and set((q.evaluation_rubric or {}).get("target_error_codes", []))
+                               and set(q.evaluation_rubric["target_error_codes"]) <= supported
+                               and set(q.evaluation_rubric["target_error_codes"]) == set(args.target_error_codes)]
             if not practice_qs:
-                raise DomainRuleViolationError(
-                    f"No targeted_practice questions available for topic {learning_session.topic_id}."
+                reason = args.practice_reason + " 没有可用且匹配诊断的未作答训练；保留不确定性。"
+                learning_session.current_question_id = None
+                evt = self.repo.transition_diagnostic_case(
+                    diag_case, DiagnosticCaseStatus.INSUFFICIENT_EVIDENCE,
+                    action="practice_questions_exhausted", reason=reason,
+                    uncertainty_level=UncertaintyLevel.INSUFFICIENT_EVIDENCE, uncertainty_note=reason,
                 )
+                self.repo.update_knowledge_state(
+                    session_id=learning_session.id, topic_id=learning_session.topic_id,
+                    learner_id=learning_session.learner_id, target_status=KnowledgeMasteryStatus.NEEDS_PRACTICE,
+                    reason=reason,
+                )
+                return {"executed_tool": "practice_questions_exhausted", "selected_intervention": None,
+                        "selected_question_id": None, "explanation_text": reason,
+                        "decision_event_id": evt.id, "knowledge_state_status": "needs_practice"}
             valid_ids = {q.id for q in practice_qs}
             chosen_practice_id = (
                 args.practice_question_id
@@ -421,30 +482,8 @@ class AgentToolExecutor:
                     f"Invalid arguments for {tool_enum.value}: {exc.errors()}"
                 ) from exc
 
-            transfer_qs = self.repo.list_questions_for_topic(
-                learning_session.topic_id, role=QuestionRole.TRANSFER_CHECK
-            )
-            if not transfer_qs:
-                raise DomainRuleViolationError(
-                    f"No transfer_check questions available for topic {learning_session.topic_id}."
-                )
-
-            # Query all transfer questions already attempted by this learner for this topic
-            attempted_transfer_q_ids = set(
-                self.repo.session.scalars(
-                    select(Attempt.question_id)
-                    .join(LearningSession, Attempt.session_id == LearningSession.id)
-                    .where(
-                        LearningSession.learner_id == learning_session.learner_id,
-                        Attempt.attempt_role == QuestionRole.TRANSFER_CHECK.value,
-                    )
-                ).all()
-            )
-
-            # Prioritize independent, unattempted (fresh) transfer verification questions
-            fresh_transfer_qs = [
-                q for q in transfer_qs if q.id not in attempted_transfer_q_ids
-            ]
+            self.repo.validate_transfer_readiness(learning_session, agent_selected=True)
+            fresh_transfer_qs = self.repo.fresh_transfer_questions(learning_session)
 
             if not fresh_transfer_qs:
                 # Safe degradation: do not loop the same failed transfer question or grant false mastery
@@ -469,7 +508,6 @@ class AgentToolExecutor:
                     payload_json={
                         "degraded_mode": True,
                         "degradation_reason": degrade_msg,
-                        "attempted_transfer_q_ids": list(attempted_transfer_q_ids),
                     },
                 )
                 return {
