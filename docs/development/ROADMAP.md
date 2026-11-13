@@ -1,28 +1,26 @@
 # VerbaTrail 产品与研发路线图
 
-更新日期：2026-11-12。本路线图表达研发优先级，不表示对应能力已经实现或已排定发布日期。当前产品方向见[产品方向](../product/IELTS_PRODUCT_DIRECTION.md)，当前能力边界见[PRD](../product/PRD.md)和[当前架构](../architecture/CURRENT_ARCHITECTURE.md)。
+更新日期：2026-11-13。本路线图表达研发优先级。[产品方向](../product/IELTS_PRODUCT_DIRECTION.md) · [PRD](../product/PRD.md) · [当前架构](../architecture/CURRENT_ARCHITECTURE.md)
 
 ## 当前质量基线
 
 IELTS Reading 已有 Academic / General Training 的部分 TFNG 与 Matching Headings 流程，以及诊断、定向训练、独立迁移、首轮延迟复习、学习记录和双主题前端。
 
-**IELTS-2B.1 Phase 6 综合验收为 FAIL。** 早期 Matching Headings 迁移/复习内容存在评分答案依据不可靠的问题。新内容已更正，并阻止受影响旧版本继续产生新的验证证据；但既有 Attempt、ReviewItem 和派生学习状态尚无可信度标记、状态重算及面向用户的恢复路径。该问题是下一步 P0，详见[Phase 6 报告](IELTS_2B1_FINAL_ACCEPTANCE.md)。不得在处理完成前把 Reading 闭环描述成整体验收通过。
+**IELTS-2B.1 Phase 6.2 最终工程验收为 PASS WITH LIMITATIONS。** 证据有效性登记、状态协调与重新验证已通过隔离复验。实际部署库仍需逐库审查，正式内容与生产发布仍需独立验收。原 Phase 6 FAIL 作为历史记录保留。[最终复验](IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 ## 优先级
 
-### P0 — 修复 Phase 6 历史证据可信度阻断
+### P0 — Learn V1.1 四项技能入口
 
-- 为受影响的旧题组版本、迁移/复习 Attempt 和派生状态建立可追溯有效性标记。
-- 保留不可变原始作答与旧结果；实现有审计依据的重算、隔离或撤销派生学习状态流程。
-- 为学习历史、知识状态、ReviewItem 和前端提供一致的有效性语义及用户恢复路径。
-- 验收：旧错误答案不会继续被当作有效迁移或保持证据；重算可重复、可审计；新版本正常流保持；历史资料可读；数据库升级有隔离验证。
+- 顶层产品结构为 Learn / Discover / Adapt。Discover 规划合法外部资源，Adapt 规划个性化决策。
+- Learn 提供 Listening / Speaking / Reading / Writing。Reading 复用真实工作区，其他三项提供规划详情。
+- 验收覆盖双主题、桌面与手机视口、键盘与触控，以及 Reading 的实际会话和首轮复习回归。
 
-### P1 — 完成本轮产品定位与文档同步
+### P1 — 跟进 Phase 6.2 复验限制
 
-- 更新中英文 README、产品方向、PRD、架构说明和路线图，采用学习者中心的语言学习定位。
-- 明确 IELTS Overall 8.0 是首个目标场景；Error DNA 是反馈能力之一。
-- 保留 Phase 6 FAIL、未实现能力及本地单用户安全边界。
-- 验收：中英文功能状态一致，链接有效，目标架构与真实实现明确分层，历史验收不被改写。
+- 对实际部署库进行只读影响扫描，核查来源不明的历史版本与记录。
+- 对修订版 Reading 材料、标题和答案依据进行独立编辑审校。
+- 继续验证多轮间隔复习及生产发布条件。
 
 ### P2 — 统一语言能力模型与初始评估
 

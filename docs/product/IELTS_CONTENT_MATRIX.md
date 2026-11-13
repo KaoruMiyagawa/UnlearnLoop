@@ -1,6 +1,6 @@
 # IELTS 内容与功能覆盖矩阵
 
-> 本文是 IELTS 考试版本和题型的内容设计矩阵，不是 VerbaTrail 的总体产品路线图。矩阵中的题型描述与“计划中”状态用于追踪 IELTS 专项覆盖；当前产品研发优先级以 [`docs/development/ROADMAP.md`](../development/ROADMAP.md) 为准，IELTS-2B.1 Phase 6 的历史证据阻断见 [`IELTS_2B1_FINAL_ACCEPTANCE.md`](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)。
+> 本文追踪 Learn 的 IELTS 考试版本和题型覆盖。IELTS-2B.1 最终工程验收为 **PASS WITH LIMITATIONS**。 [研发路线图](../development/ROADMAP.md) · [Phase 6.2 复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md)
 
 状态口径：**可运行**表示本仓库当前存在服务端数据/功能；**计划中**表示不可作为真实功能入口。当前目录版本为 `ielts-spec-catalog-2026-03`，是应用侧复核快照标记，不是 IELTS 官方版本编号。
 

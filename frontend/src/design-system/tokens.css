@@ -133,11 +133,8 @@ code {
   display: flex;
   align-items: center;
   gap: 3px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  flex-wrap: wrap;
 }
-
-.focus-nav-links::-webkit-scrollbar { display: none; }
 
 .focus-nav-tab {
   flex: 0 0 auto;
@@ -609,47 +606,6 @@ code {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
-.ielts-home { width: min(100% - 40px, 960px); margin: 42px auto 96px; color: var(--text-primary); }
-.ielts-home h1 { max-width: 760px; margin: 8px 0 14px; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; letter-spacing: -.045em; font-weight: 650; }
-.ielts-home h2 { margin: 4px 0 0; font-size: 21px; letter-spacing: -.02em; }
-.ielts-home .eyebrow { margin: 0; color: var(--text-secondary); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
-.home-intro { max-width: 650px; color: var(--text-secondary); line-height: 1.7; }
-.exam-goal { margin-top: 40px; padding: 25px 0; border-block: 1px solid var(--border-default); }
-.exam-choice-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-top: 18px; }
-.exam-choice { text-align: left; border: 1px solid var(--border-default); border-radius: 14px; background: white; padding: 16px; font-weight: 650; cursor: pointer; color: var(--text-primary); }
-.exam-choice span { display: block; margin-top: 7px; color: var(--text-secondary); font-size: 13px; font-weight: 400; }
-.exam-choice.selected { border-color: var(--action-primary); box-shadow: 0 0 0 1px var(--action-primary); }
-.goal-line { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; margin-top: 18px; color: var(--text-secondary); font-size: 14px; }
-.goal-line label { color: var(--text-primary); }
-.goal-line select { margin-left: 8px; border: 1px solid var(--border-default); border-radius: 8px; background: white; padding: 6px 8px; }
-.skill-section { margin-top: 42px; }
-.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 18px; }
-.text-link { border: 0; background: none; color: var(--action-primary); cursor: pointer; }
-.skill-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px; background: var(--border-default); border: 1px solid var(--border-default); border-radius: 16px; overflow: hidden; }
-.skill-entry { position: relative; display: grid; grid-template-columns: 36px 1fr 30px; align-items: center; gap: 8px; min-height: 92px; text-align: left; border: 0; background: #fff; padding: 16px; color: var(--text-primary); }
-.skill-entry.ready { cursor: pointer; }
-.skill-entry.ready:hover { background: #f8faf8; }
-.skill-entry.planned { color: var(--text-secondary); }
-.skill-number { grid-row: span 2; font-size: 12px; color: var(--text-secondary); }
-.skill-entry strong { font-size: 16px; }
-.skill-entry > span:nth-of-type(2) { color: var(--text-secondary); font-size: 12px; }
-.skill-entry b { grid-column: 3; grid-row: 1 / span 2; justify-self: end; color: var(--action-primary); font-size: 20px; }
-.secondary-links { display: flex; gap: 12px; margin: 25px 0 48px; }
-.secondary-links button { background: none; border: 0; border-bottom: 1px solid var(--border-default); padding: 9px 0; color: var(--text-secondary); cursor: pointer; }
-.planned-exams { border-top: 1px solid var(--border-default); padding-top: 20px; }
-.planned-exams h2 { font-size: 16px; }
-.planned-exams p { max-width: 720px; color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
-.planned-exams div { display: flex; flex-wrap: wrap; gap: 8px; }
-.planned-exams span { border-radius: 99px; background: #f2f3f1; color: var(--text-secondary); padding: 6px 10px; font-size: 12px; }
-.planned-practice { margin-top: 34px; }
-.planned-practice h2 { margin-bottom: 12px; font-size: 16px; }
-.planned-practice div { display: flex; flex-wrap: wrap; gap: 10px; }
-.planned-practice button { display: flex; gap: 12px; align-items: center; border: 1px solid var(--border-default); border-radius: 10px; background: #fff; padding: 10px 13px; color: var(--text-secondary); }
-.planned-practice button span { font-size: 11px; }
-.home-error { color: #a33; }
-.focus-brand small { font-size: 10px; color: var(--text-secondary); font-weight: 400; }
-@media(max-width: 640px) { .ielts-home { width: min(100% - 28px, 960px); margin-top: 24px; } .exam-choice-row,.skill-grid { grid-template-columns: 1fr; } .section-heading { align-items: start; flex-direction: column; } .goal-line { gap: 12px 18px; } .secondary-links { flex-direction: column; align-items: flex-start; } }
-
 /* VerbaTrail editorial themes: one component system, two token sets. */
 :root,
 html[data-theme="premium"] {
@@ -710,39 +666,78 @@ body { font-family: "Inter", "Segoe UI Variable", "PingFang SC", "Microsoft YaHe
 .focus-question-card { min-width: 0; position: sticky; top: 96px; max-height: calc(100vh - 114px); overflow: auto; }
 .focus-question-card .focus-code { white-space: pre-wrap; overflow-wrap: anywhere; }
 html[data-theme="noir"] .focus-learning-materials { color-scheme: light; }
-.ielts-home { width: min(100%, 1290px); margin: 0 auto; }
-.ielts-home > h1 { max-width: 800px; color: var(--focus-ink); font: 500 clamp(38px, 5vw, 66px)/1.12 var(--vt-serif); letter-spacing: -.045em; }
-.ielts-home .home-intro { color: var(--focus-secondary); max-width: 620px; line-height: 1.9; }
-.verbatrail-home-hero { min-height: 330px; margin: 32px 0 42px; padding: clamp(28px, 4vw, 52px); display: flex; justify-content: space-between; align-items: center; gap: 28px; position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, var(--vt-gold) 35%, transparent); border-radius: 18px; background: linear-gradient(116deg,#162D3C,#1A3948 58%,#244959); color: #F9F6ED; }
+.learn-page { width: min(100%, 1100px); margin: 0 auto; }
+.verbatrail-home-hero { margin-bottom: clamp(16px, 2vw, 28px); padding: clamp(20px, 4vw, 50px); position: relative; overflow: clip; border: 1px solid color-mix(in srgb, var(--vt-gold) 35%, transparent); border-radius: var(--focus-radius-lg); background: linear-gradient(116deg,#162D3C,#1A3948 58%,#244959); color: #F9F6ED; }
 .verbatrail-home-hero:after { content: ""; position: absolute; width: 390px; height: 390px; right: 7%; top: 50%; transform: translateY(-50%); border: 1px solid rgba(231,220,190,.22); border-radius: 50%; box-shadow: 0 0 0 34px rgba(231,220,190,.04), 0 0 0 70px rgba(231,220,190,.035); pointer-events: none; }
 html[data-theme="noir"] .verbatrail-home-hero { border-color: rgba(214,194,149,.52); background: linear-gradient(118deg,#171716,#24211C 58%,#30291F); }
 html[data-theme="noir"] .verbatrail-home-hero:after { border-color: rgba(214,194,149,.28); box-shadow: 0 0 0 34px rgba(214,194,149,.055), 0 0 0 70px rgba(214,194,149,.035); }
 .verbatrail-home-hero > div { position: relative; z-index: 1; }
-.verbatrail-home-hero .eyebrow { color: #B9C9C7; letter-spacing: .2em; }
-.verbatrail-home-hero h2 { margin: 18px 0; font: 500 clamp(34px, 4vw, 54px)/1.12 var(--vt-serif); letter-spacing: -.04em; }
-.verbatrail-home-hero h2 em { color: #D6C295; }
-.verbatrail-home-hero p:not(.eyebrow) { max-width: 460px; color: #D0D9D4; line-height: 1.8; }
-.verbatrail-hero-action { border: 0; border-radius: 7px; padding: 12px 16px; background: #F1EADB; color: #203A45; font-weight: 700; cursor: pointer; }
-.verbatrail-band-mark { width: 190px; height: 190px; flex: 0 0 auto; border: 1px solid rgba(231,220,190,.34); border-radius: 50%; display: grid; place-content: center; text-align: center; }
-.verbatrail-band-mark strong { font: 500 66px/1 var(--vt-serif); color: #F1EADB; }
-.verbatrail-band-mark span { margin-top: 12px; color: #D6C295; font-size: 9px; letter-spacing: .22em; }
-.exam-goal, .skill-entry, .planned-practice button { border-color: var(--focus-line) !important; background: var(--focus-surface) !important; color: var(--focus-ink) !important; }
-.exam-goal h2, .exam-goal .goal-line label { color: var(--focus-ink); }
-.exam-choice { background: var(--focus-surface) !important; color: var(--focus-ink) !important; }
-.exam-choice span, .goal-hint, .goal-line, .goal-line > span { color: var(--focus-secondary) !important; }
-.goal-line select { background: var(--focus-surface) !important; color: var(--focus-ink) !important; border-color: var(--focus-line) !important; }
-.planned-exams span { background: var(--focus-subtle); color: var(--focus-secondary); }
-.exam-choice.selected { border-color: var(--vt-gold) !important; box-shadow: inset 0 0 0 1px var(--vt-gold); }
-.skill-entry strong, .section-heading h2 { color: var(--focus-ink); }
-.skill-entry > span, .skill-entry b { color: var(--focus-secondary); }
+.verbatrail-home-hero .focus-eyebrow { color: #D6C295; letter-spacing: .19em; }
+.verbatrail-home-hero h1 { width: fit-content; margin: 4px 0 9px; font: 500 clamp(30px, 4.4vw, 60px)/1.18 var(--vt-serif); letter-spacing: -.045em; }
+.verbatrail-home-hero p:last-child { margin: 0; color: #E1E4DC; font-size: clamp(13px, 1.2vw, 16px); }
+.learn-skill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 1.35vw, 18px); }
+.learn-skill-card { display: block; margin: 0; padding: clamp(15px, 2vw, 26px); }
+a.learn-skill-card:hover { border-color: var(--vt-gold); background: var(--focus-subtle); }
+.learn-skill-card.implemented { border-color: color-mix(in srgb, var(--vt-gold) 72%, var(--focus-line)); }
+.learn-skill-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 8px; }
+.learn-skill-heading .focus-state-tag { grid-area: 1 / 2; justify-self: end; }
+.exam-goal-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.learn-skill-localized { grid-area: 1 / 1; color: var(--focus-secondary); font-size: 13px; }
+.learn-status-implemented { border-color: transparent; background: var(--focus-green-soft); color: var(--focus-green); }
+.learn-skill-card h2 { grid-column: 1 / -1; margin: 0; font: 500 clamp(26px, 3vw, 40px)/1.14 var(--vt-serif); letter-spacing: -.035em; }
+.learn-skill-card p { margin: 5px 0 0; color: var(--focus-secondary); font-size: 14px; }
+.learn-skill-action { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--focus-blue); font-size: 13px; font-weight: 650; }
+.learn-skill-page { width: min(100%, 720px); }
+.learn-back-link { min-height: 44px; margin: 0 0 12px -12px; }
+.learn-skill-page h1 { width: fit-content; margin-top: 8px; font-size: clamp(34px, 5vw, 56px); }
+[data-workspace-heading]:focus-visible { outline: none !important; }
+.learn-capability-list { margin: 18px 0 0; padding-left: 1.25em; color: var(--focus-secondary); list-style: disc; }
+.learn-capability-list li + li { margin-top: 7px; }
+.exam-goal { margin-top: 28px; padding: 18px 0; border-top: 1px solid var(--focus-line); }
+.exam-goal h2 { margin: 0; font: 500 23px/1.3 var(--vt-serif); }
+.exam-choice-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.exam-choice { min-height: 44px; padding: 10px 14px; border: 1px solid var(--focus-line); border-radius: var(--focus-radius-md); background: var(--focus-surface); color: var(--focus-ink); text-align: left; cursor: pointer; }
+.exam-choice.selected { border-color: var(--vt-gold); box-shadow: inset 0 0 0 1px var(--vt-gold); }
+.exam-choice span { display: block; color: var(--focus-secondary); font-size: 13px; }
+.exam-goal-details { margin-top: 14px; }
+.goal-hint, .goal-line { color: var(--focus-secondary); font-size: 14px; }
+.goal-hint { margin: 6px 0 0; }
+.goal-line { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 12px; }
+.goal-line select, .goal-line input { min-height: 44px; margin-left: 8px; padding: 6px 8px; border-width: 1px; border-radius: var(--focus-radius-sm); }
+.home-error { color: var(--focus-red); }
+.focus-product-nav { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 22px); }
+.focus-product-planned { display: flex; align-items: center; gap: 5px; color: var(--focus-secondary); font-size: 13px; }
+.focus-product-planned small { font-size: 11px; }
+.focus-product-nav + .focus-nav-links { border-left: 1px solid var(--focus-line); padding-left: clamp(8px, 1.5vw, 20px); }
 .focus-review-row, .focus-timeline-item, .focus-profile-facts > div { border-color: var(--focus-line); }
 .focus-review-row p, .focus-review-previous, .focus-profile-facts dd { color: var(--focus-secondary); }
 @media (max-width: 900px) { .verbatrail-reading-layout { grid-template-columns: 1fr; } .focus-question-card { position: static; max-height: none; } .focus-learning-materials { max-height: 55vh; } }
-@media (max-width: 700px) { .focus-top-nav-inner { flex-wrap: wrap; padding: 10px 14px; gap: 8px; } .focus-brand { margin-right: auto; } .focus-nav-tools { gap: 6px; } .focus-stage { padding: 26px 14px 72px; } .verbatrail-home-hero { min-height: 280px; margin: 22px 0 30px; padding: 24px; } .verbatrail-band-mark { width: 108px; height: 108px; } .verbatrail-band-mark strong { font-size: 40px; } .verbatrail-home-hero:after { right: -100px; } }
-@media (max-width: 420px) { .focus-top-nav-inner { padding-inline: 10px; } .focus-nav-links { order: 3; flex-basis: 100%; } .focus-nav-tab { padding: 7px 9px; font-size: 12px; } .focus-health-dot { display: none; } .focus-theme-toggle { min-height: 34px; padding-inline: 8px; } .verbatrail-home-hero { align-items: flex-start; } .verbatrail-band-mark { position: absolute !important; right: 18px; bottom: 18px; opacity: .8; } }
-
-@media (max-width: 540px) {
-  .focus-nav-links { order: 3; flex-basis: 100%; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; margin: 0; overflow: visible; }
-  .focus-nav-tab { min-height: 44px; min-width: 0; padding: 5px 2px; border-radius: 8px; white-space: normal; }
-  .focus-theme-toggle { min-height: 44px; }
+@media (max-width: 1000px) {
+  .focus-top-nav-inner { flex-wrap: wrap; padding-block: 8px; gap: 4px 12px; }
+  .focus-nav-links { order: 3; flex-basis: 100%; }
+  .focus-product-nav + .focus-nav-links { border-left: 0; border-top: 1px solid var(--focus-line); padding-left: 0; }
+  .focus-brand { margin-right: auto; }
+}
+@media (max-width: 700px) {
+  .focus-top-nav-inner { padding: 6px 14px 4px; }
+  .focus-nav-tools { gap: 6px; }
+  .focus-stage { padding: 20px 14px 72px; }
+  .verbatrail-home-hero:after { right: -100px; }
+}
+@media (max-width: 600px) {
+  .focus-app { --focus-mobile-anchor-offset: 11rem; }
+  .focus-product-nav { order: 2; flex-basis: 100%; justify-content: space-between; }
+  .focus-nav-tools { order: 1; }
+  .focus-nav-links { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 2px; margin: 0; }
+  .focus-nav-tab { min-height: 44px; min-width: 0; padding: 5px 2px; border-radius: 8px; white-space: normal; font-size: 13px; }
+  .focus-product-nav .focus-nav-tab { min-width: 68px; }
+  .focus-brand, .focus-theme-toggle, .focus-mode-switch button { min-height: 44px; }
+  .focus-mode-switch button { min-width: 44px; }
+  .focus-health-dot { display: none; }
+  .learn-skill-grid { grid-template-columns: minmax(0, 1fr); }
+  .learn-skill-heading { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .learn-skill-card h2 { grid-area: 1 / 1; }
+  .learn-skill-localized { grid-area: 1 / 2; }
+  .learn-skill-heading .focus-state-tag { grid-area: 1 / 3; }
+  .learn-skill-action { margin-top: 7px; }
 }

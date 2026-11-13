@@ -1,5 +1,5 @@
-import React from 'react';
-import { WORKSPACE_NAV_ITEMS, WorkspaceId } from './navigation';
+import React, { useEffect, useRef } from 'react';
+import { isLearnWorkspace, WORKSPACE_SHORTCUTS, type WorkspaceId } from './navigation';
 import { UiSimulationMode } from '../design-system/stage5WorkbenchModel';
 import { useTheme } from '../design-system/ThemeProvider';
 
@@ -41,6 +41,16 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
     onResetProgression,
     children,
   } = props;
+  const main = useRef<HTMLElement>(null);
+  const previousWorkspace = useRef(activeWorkspace);
+
+  useEffect(() => {
+    const previous = previousWorkspace.current;
+    previousWorkspace.current = activeWorkspace;
+    if (previous === activeWorkspace || !isLearnWorkspace(activeWorkspace)) return;
+    if (activeWorkspace === 'learning' && !isLearnWorkspace(previous)) return;
+    main.current?.querySelector<HTMLElement>('[data-workspace-heading]')?.focus({ preventScroll: true });
+  }, [activeWorkspace]);
 
   return (
     <div className="focus-app">
@@ -50,23 +60,28 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
             type="button"
             className="focus-brand"
             onClick={() => onSelectWorkspace('home')}
-            aria-label="VerbaTrail 首页"
+            aria-label="VerbaTrail · Learn"
           >
             <span className="focus-brand-mark" aria-hidden="true">V</span>
             <span>VerbaTrail</span>
           </button>
 
-          <nav className="focus-nav-links" aria-label="主导航">
-            {WORKSPACE_NAV_ITEMS.map((item) => {
+          <nav className="focus-product-nav" aria-label="产品导航">
+            <button
+              type="button"
+              className={`focus-nav-tab${isLearnWorkspace(activeWorkspace) ? ' active' : ''}`}
+              aria-current={activeWorkspace === 'home' ? 'page' : isLearnWorkspace(activeWorkspace) ? 'true' : undefined}
+              onClick={() => onSelectWorkspace('home')}
+            >
+              <span lang="en">Learn</span>
+            </button>
+            <span className="focus-product-planned"><span lang="en">Discover</span><small>规划中</small></span>
+            <span className="focus-product-planned"><span lang="en">Adapt</span><small>规划中</small></span>
+          </nav>
+
+          <nav className="focus-nav-links" aria-label="学习工具">
+            {WORKSPACE_SHORTCUTS.map((item) => {
               const active = item.id === activeWorkspace;
-              const labels: Record<string, string> = {
-                home: '首页',
-                learning: '学习',
-                diagnosis: '诊断洞察',
-                transfer: '迁移验证',
-                review: '复习',
-                profile: '学习档案',
-              };
               return (
                 <button
                   key={item.id}
@@ -75,7 +90,7 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
                   aria-current={active ? 'page' : undefined}
                   onClick={() => onSelectWorkspace(item.id)}
                 >
-                  {labels[item.id] ?? item.label}
+                  {item.label}
                 </button>
               );
             })}
@@ -133,7 +148,7 @@ export const AppShell: React.FC<AppShellProps> = (props) => {
         )}
       </header>
 
-      <main className={`focus-stage ${activeWorkspace === 'learning' || activeWorkspace === 'transfer' ? 'focus-stage-wide' : ''}`}>
+      <main ref={main} className={`focus-stage ${activeWorkspace === 'learning' || activeWorkspace === 'transfer' ? 'focus-stage-wide' : ''}`}>
         {children}
       </main>
     </div>

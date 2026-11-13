@@ -71,7 +71,7 @@ const layout = async (width, height) => {
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('.error-dna-grid')).gridTemplateColumns.split(' ').length`), width < 500 ? 1 : 2);
   if (width < 500) {
     const targets = await evaluate(`[...document.querySelectorAll('.focus-nav-links button')].map(button => { const { left, right, height } = button.getBoundingClientRect(); return { left, right, height }; })`);
-    assert.equal(targets.length, 6);
+    assert.equal(targets.length, 5);
     targets.forEach((target, i) => {
       assert.ok(target.height >= 44 && target.left >= 0 && target.right <= width);
       if (i > 0) assert.ok(target.left >= targets[i - 1].right, 'navigation targets do not overlap');
@@ -156,7 +156,7 @@ const reviewInBrowser = async (session, answer, expected, showDue = false) => {
     const reviews = await request('/reviews?status=completed');
     return reviews.some(item => item.session_id === session.id && item.attempt_id);
   }, 'completed review persisted');
-  await press('学习');
+  await press('阅读');
   await wait(() => shown(expected), expected);
 };
 
@@ -221,7 +221,7 @@ try {
   await layout(390, 844);
   await tapNavigation('诊断洞察');
   await wait(() => evaluate(`location.pathname === '/diagnosis'`), 'mobile diagnosis navigation');
-  await tapNavigation('学习');
+  await tapNavigation('阅读');
   await wait(() => evaluate(`location.pathname === '/learning'`), 'mobile reading navigation');
   await diagnoseInBrowser(general, 'gt', 'location', true);
   await waitQuestion(general.id, 'ielts-tfng-gt-transfer-location');

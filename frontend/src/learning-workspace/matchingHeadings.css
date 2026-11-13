@@ -1,5 +1,5 @@
 .mh-question { min-width: 0; margin-block: 1rem; }
-.mh-question, .mh-answer, .mh-result, .mh-paragraph { scroll-margin-top: 8rem; }
+.mh-question, .mh-answer, .mh-result, .mh-paragraph { scroll-margin-top: var(--focus-mobile-anchor-offset, 8rem); }
 .mh-header { margin-bottom: 1rem; }
 .mh-header h2, .mh-answer h3, .mh-passage h3 { margin: 0 0 .65rem; }
 .mh-header p, .mh-answer p { margin: 0 0 .75rem; }

@@ -3,8 +3,9 @@ import { ApiClientError } from './api/client';
 import { fetchBackendHealth } from './api/health';
 import { AppShell } from './app-shell/AppShell';
 import {
+  isLearnWorkspace,
   resolveWorkspaceFromPath,
-  WORKSPACE_NAV_ITEMS,
+  WORKSPACE_PATHS,
   WorkspaceId,
 } from './app-shell/navigation';
 import {
@@ -26,7 +27,8 @@ import { FocusReviewWorkspace } from './review-workspace/FocusReviewWorkspace';
 import { FocusProfileWorkspace } from './profile-workspace/FocusProfileWorkspace';
 import { ProfileWorkspacePlaceholder } from './profile-workspace/ProfileWorkspacePlaceholder';
 import { ReviewWorkspacePlaceholder } from './review-workspace/ReviewWorkspacePlaceholder';
-import { IeltsHome } from './home/IeltsHome';
+import { LearnHome, PlannedSkillPage } from './learn/LearnHome';
+import { plannedSkills } from './learn/skills';
 
 export const App: React.FC = () => {
   const [dataMode, setDataMode] = useState<'demo' | 'real'>('real');
@@ -97,9 +99,12 @@ export const App: React.FC = () => {
   }, []);
 
   const navigateWorkspace = (workspace: WorkspaceId) => {
-    const navItem = WORKSPACE_NAV_ITEMS.find((item) => item.id === workspace);
-    if (navItem && window.location.pathname !== navItem.path) {
-      window.history.pushState({}, '', navItem.path);
+    const path = WORKSPACE_PATHS[workspace];
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+      if ((isLearnWorkspace(activeWorkspace) && activeWorkspace !== 'learning') || (isLearnWorkspace(workspace) && workspace !== 'learning')) {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
     }
     setActiveWorkspace(workspace);
   };
@@ -161,6 +166,7 @@ export const App: React.FC = () => {
 
   const currentSnapshot = INITIAL_LOOP_STAGE_SNAPSHOTS[currentStage];
   const isMastered = maxUnlockedStage >= 6 || currentStage === 6;
+  const plannedSkill = plannedSkills.find(skill => skill.workspace === activeWorkspace);
 
   return (
     <AppShell
@@ -179,12 +185,14 @@ export const App: React.FC = () => {
       onChangeUiMode={dataMode === 'demo' ? setUiMode : undefined}
       onResetProgression={dataMode === 'demo' ? handleResetToStageOne : undefined}
     >
-      {dataMode === 'real' ? activeWorkspace === 'review' ? (
+      {plannedSkill ? (
+        <PlannedSkillPage skill={plannedSkill} onNavigate={navigateWorkspace} />
+      ) : dataMode === 'real' ? activeWorkspace === 'review' ? (
         <FocusReviewWorkspace onNavigateWorkspace={navigateWorkspace} />
       ) : activeWorkspace === 'profile' ? (
         <FocusProfileWorkspace onNavigateWorkspace={navigateWorkspace} />
       ) : activeWorkspace === 'home' ? (
-        <IeltsHome onNavigate={navigateWorkspace} />
+        <LearnHome onNavigate={navigateWorkspace} />
       ) : (
         <RealLearningWorkspace
           workspace={activeWorkspace}

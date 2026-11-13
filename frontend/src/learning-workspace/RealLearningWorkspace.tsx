@@ -596,19 +596,19 @@ export const RealLearningWorkspace: React.FC<RealLearningWorkspaceProps> = ({ wo
     return (
       <div className="focus-learning-page focus-reading-page">
         <main>
-          <header className="focus-page-header"><div className="focus-eyebrow">{activeQuestion?.question_role === 'transfer_check' ? '独立迁移' : '阅读学习'}</div><h1 className="focus-page-title">{activeQuestion?.question_role === 'transfer_check' ? '换个场景，试着运用。' : '专注理解当前问题。'}</h1><p className="focus-page-subtitle">题目与下一步均由当前服务端会话决定。</p></header>
+          <header className="focus-page-header"><div className="focus-eyebrow">{activeQuestion?.question_role === 'transfer_check' ? '独立迁移' : '阅读学习'}</div><h1 className="focus-page-title" data-workspace-heading tabIndex={-1}>{activeQuestion?.question_role === 'transfer_check' ? '换个场景，试着运用。' : '专注理解当前问题。'}</h1><p className="focus-page-subtitle">题目与下一步均由当前服务端会话决定。</p></header>
           {!session && !didRecoverPointer && <p role="status">正在恢复学习会话…</p>}
           {!session && didRecoverPointer && sessionLoadError === null && <section className="wb-card"><div className="wb-card-body">
             <h2>选择阅读任务</h2>
-            {examProfileError && <p role="alert">无法读取考试模式，请检查后端连接并返回首页重试。</p>}
+            {examProfileError && <p role="alert">无法读取考试类型，请检查后端连接并返回 Learn 重试。</p>}
             <ResourceNotice state={topicsResource.state} emptyMessage="当前考试模式暂无阅读任务。" onRetry={() => void topicsResource.retry()} />
             {examProfile?.selection_persisted && topicsResource.state.status === 'success'
               && topicsResource.state.data.length > 0 && !selectableTopics.length && <p>当前考试模式暂无阅读任务。</p>}
             {topicsResource.state.status === 'success' && selectableTopics.map(topic => <button key={topic.id} type="button" className={`wb-topic-option ${selectedTopicId === topic.id ? 'selected' : ''}`} onClick={() => setSelectedTopicId(topic.id)}><strong>{topic.title}</strong><span>{topic.summary}</span></button>)}
             {selectedTopic && <button type="button" className="wb-btn primary" disabled={operation.kind === 'loading' || !examProfile?.selection_persisted} onClick={() => void createLearningSession()}>开始阅读</button>}
             <details className="focus-disclosure"><summary>恢复历史会话</summary><div className="focus-disclosure-content"><ResourceNotice state={sessionsResource.state} emptyMessage="尚无历史会话。" onRetry={() => void sessionsResource.retry()} />{sessionsResource.state.status === 'success' && sessionsResource.state.data.map(item => <div className="wb-session-row" key={item.id}><span>{item.topic_title} · {item.exam_variant ?? '原有学习'} · {item.status}</span><button className="wb-btn sm" onClick={() => void restoreSelectedSession(item)}>打开会话</button></div>)}</div></details>
-            {!examProfileError && examProfile && !examProfile.selection_persisted && <p>请先在首页保存考试模式。</p>}
-            <button className="wb-btn" onClick={() => onNavigateWorkspace('home')}>返回首页</button>
+            {!examProfileError && examProfile && !examProfile.selection_persisted && <p>请先在 Learn 保存考试类型。</p>}
+            <button className="wb-btn" onClick={() => onNavigateWorkspace('home')}>返回 Learn</button>
           </div></section>}
           {session && <>
             <div className="focus-session-meta"><span>{session.topic_title}</span><span>{session.exam_variant ?? '原有学习'}</span><span className="focus-meta-separator">·</span><StateBadge label="学习状态" value={knowledgeStatusLabel(session.knowledge_state_status)} /><a className="error-dna-jump" href="#error-dna">查看 Error DNA</a><button type="button" className="wb-btn sm" disabled={Boolean(draft.trim()) || operation.kind === 'loading'} onClick={() => { setSession(null); setSelectedTopicId(''); setAttempts([]); setAttemptResult(null); window.sessionStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY); }}>选择其他阅读任务</button></div>

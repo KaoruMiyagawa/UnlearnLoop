@@ -1,12 +1,16 @@
 # VerbaTrail 产品需求概要
 
-状态：当前产品范围摘要，更新于 2026-11-12。以本文件和[产品方向](IELTS_PRODUCT_DIRECTION.md)描述目标，以代码、测试及[IELTS-2B.1 Phase 6 最终验收](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)判断当前 Matching Headings 阶段状态。文件名沿用 IELTS 初期目录，产品范围现已扩展为语言学习系统。
+当前产品范围摘要，更新于 2026-11-13。Matching Headings 的工程验收及限制以 [IELTS-2B.1 Phase 6.2 最终复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md)为准。
 
 ## 产品定位
 
 VerbaTrail 是以学习者为中心、由自适应学习 Agent 驱动的语言学习系统。它长期希望帮助学习者建立理解、沟通和真实运用语言的能力。**IELTS Overall Band 8.0 是首个目标场景，不是成绩预测或保证。**
 
-学习过程的目标是让学习者档案、能力证据、评估、学习规划、语言输入与输出、Agent 决策、反馈/Error DNA、迁移和复习形成连贯系统。当前只交付其中一部分 IELTS Reading 能力，不能将目标架构当作已完成产品。
+## 产品信息架构
+
+VerbaTrail 的顶层入口为 **Learn（学习） / Discover（发现） / Adapt（自适应）**。Learn 包含 **Listening（听力） / Speaking（口语） / Reading（阅读） / Writing（写作）** 四个一级板块。Discover 负责有合法来源的外部学习资源，Adapt 负责个性化规划与决策，两者当前均为规划中。
+
+词汇、语法、Error DNA、迁移、复习、学习历史与能力评估是跨技能共享能力。技能入口复用共享的学习者目标、能力证据和学习历史服务。
 
 ## 用户价值
 
@@ -20,16 +24,18 @@ VerbaTrail 是以学习者为中心、由自适应学习 Agent 驱动的语言�
 
 | 范围 | 状态 |
 | --- | --- |
+| Learn V1.1 | 四项技能入口。Reading 进入原有真实工作区，Listening、Speaking、Writing 进入规划详情。 |
 | Academic / General Training 阅读 | 部分实现。当前有原创材料、TFNG 与 Matching Headings 等有限流程，不代表完整阅读题型覆盖。 |
 | 结构化题组与作答 | Matching Headings 题组版本、会话固定版本、结构化答案及逐项评分已有实现。 |
 | 错误反馈与专项练习 | 部分阅读路径具有竞争性候选假设、证据、追问和定向训练；不能据此推断所有错误或技能均可诊断。 |
-| 独立迁移与 ReviewItem | 首轮服务端迁移及延迟复习流程已有实现。**IELTS-2B.1 Phase 6 综合验收为 FAIL**：早期迁移/复习版本存在错误答案依据，历史证据尚无有效性标签及状态重算机制。 |
-| 学习历史、档案和主题 | 基础服务端学习记录及 Premium Academic / Noir & Champagne 单应用主题已有实现；历史状态仍受 Phase 6 阻断影响。 |
-| 听力、写作、口语、词汇、语法、模考 | 尚未实现为完整学习模块。 |
+| 独立迁移与 ReviewItem | 首轮服务端迁移及延迟复习流程已有实现。历史证据有效性标记和状态协调已通过隔离复验。 |
+| 学习历史、档案和主题 | 服务端学习记录、历史证据状态及 Premium Academic / Noir & Champagne 双主题已接入。 |
+| 听力、口语、写作 | 仅规划详情。音频练习、录音转写、写作任务及评价均待实现。 |
+| 词汇、语法、模考 | 课程和完整模考流程待实现。 |
 | 统一能力模型、初始评估和个性化周/月计划 | 尚未实现。 |
 | 多语言教学和生产级账号体系 | 尚未实现。 |
 
-Phase 6 的详情、证据、限制及未完成修复见 [`IELTS_2B1_FINAL_ACCEPTANCE.md`](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)。测试通过不改变该报告的 FAIL 结论。
+IELTS-2B.1 最终工程验收为 **PASS WITH LIMITATIONS**，范围为本地隔离复验。原 Phase 6 **FAIL** 保留为历史记录。[最终复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
 ## 目标体验流程
 
@@ -65,6 +71,6 @@ flowchart LR
 
 ## 路线图
 
-以[开发路线图](../development/ROADMAP.md)为准：先处理 Phase 6 历史证据可信度和状态重算，再建立统一能力模型与初始评估，继而构建个性化计划和 Agent 策略，逐步扩展听说读写、词汇语法、真实运用、长期记忆及其他语言。
+Learn V1.1 建立四项技能入口。后续将建设统一能力模型与初始评估，并逐步扩展个性化计划、技能练习、词汇语法、长期复习和其他语言。[开发路线图](../development/ROADMAP.md)
 
 旧版 UnlearnLoop MVP 需求作为历史资料保留于 [`docs/archive/legacy/UNLEARNLOOP_PRD.md`](../archive/legacy/UNLEARNLOOP_PRD.md)。
