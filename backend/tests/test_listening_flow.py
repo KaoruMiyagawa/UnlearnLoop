@@ -31,20 +31,25 @@ def test_listening_session_scores_persists_and_replays(session_factory: sessionm
         assert session["lesson"]["content_version"] == "listening-study-group-v1"
         answers = {q["id"]: ("Room 24" if q["number"] == 1 else q["options"][0]) for q in session["lesson"]["questions"]}
         payload = {"answers": answers, "idempotency_key": f"listen-{session['session_id']}"}
-        submitted = http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", json=payload)
+        assert http.get(f"/api/v1/listening/sessions/{session['session_id']}", params={"learner_id": "test-learner"}).status_code == 200
+        assert http.get(f"/api/v1/listening/sessions/{session['session_id']}", params={"learner_id": "other"}).status_code == 404
+        assert http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", params={"learner_id": "other"}, json=payload).status_code == 404
+        submitted = http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", params={"learner_id": "test-learner"}, json=payload)
         assert submitted.status_code == 200
         result = submitted.json()
         assert result["score"] == 4
         assert result["results"][0]["question"]["start_seconds"] == 9.24
         assert "correct_answer" not in http.get("/api/v1/listening/lesson").json()["questions"][0]
-        replay = http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", json=payload)
+        replay = http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", params={"learner_id": "test-learner"}, json=payload)
         assert replay.status_code == 200
         assert replay.json()["score"] == 4
+        assert http.get(f"/api/v1/listening/sessions/{session['session_id']}", params={"learner_id": "other"}).status_code == 404
+        assert http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", params={"learner_id": "other"}, json=payload).status_code == 404
         changed_answers = {**answers, "listening-study-group-v1-q1": "Room 12"}
         conflict = http.post(f"/api/v1/listening/sessions/{session['session_id']}/submit",
-                             json={"answers": changed_answers, "idempotency_key": payload["idempotency_key"]})
+                             params={"learner_id": "test-learner"}, json={"answers": changed_answers, "idempotency_key": payload["idempotency_key"]})
         assert conflict.status_code == 409
-        restored = http.get(f"/api/v1/listening/sessions/{session['session_id']}").json()
+        restored = http.get(f"/api/v1/listening/sessions/{session['session_id']}", params={"learner_id": "test-learner"}).json()
         assert restored["status"] == "completed"
         assert len(http.get("/api/v1/listening/history?learner_id=test-learner").json()) == 1
 

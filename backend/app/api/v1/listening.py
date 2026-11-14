@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -85,16 +85,16 @@ def start_session(payload: StartRequest, db: Session = Depends(get_db)) -> dict[
     return _view(db, session)
 
 @router.get("/sessions/{session_id}")
-def get_session(session_id: str, db: Session = Depends(get_db)) -> dict[str, Any]:
+def get_session(session_id: str, learner_id: str = Query(default="default_learner", min_length=1, max_length=64), db: Session = Depends(get_db)) -> dict[str, Any]:
     session = db.get(LearningSession, session_id)
-    if session is None or session.exam_spec_version != CONTENT_VERSION or session.topic_id != TOPIC_ID:
+    if session is None or session.learner_id != learner_id or session.exam_spec_version != CONTENT_VERSION or session.topic_id != TOPIC_ID:
         raise HTTPException(404, "Listening session was not found.")
     return _view(db, session)
 
 @router.post("/sessions/{session_id}/submit")
-def submit_session(session_id: str, payload: SubmitRequest, db: Session = Depends(get_db)) -> dict[str, Any]:
+def submit_session(session_id: str, payload: SubmitRequest, learner_id: str = Query(default="default_learner", min_length=1, max_length=64), db: Session = Depends(get_db)) -> dict[str, Any]:
     session = db.get(LearningSession, session_id)
-    if session is None or session.exam_spec_version != CONTENT_VERSION or session.topic_id != TOPIC_ID:
+    if session is None or session.learner_id != learner_id or session.exam_spec_version != CONTENT_VERSION or session.topic_id != TOPIC_ID:
         raise HTTPException(404, "Listening session was not found.")
     if payload.idempotency_key != f"listen-{session_id}":
         raise HTTPException(422, "The idempotency key does not match this listening session.")

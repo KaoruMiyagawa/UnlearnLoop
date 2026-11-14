@@ -19,7 +19,7 @@ def test_listening_writing_speaking_and_goal(client, migrated_engine):
     learner = 'projection-user'
     session = client.post('/api/v1/listening/sessions', json={'learner_id': learner}).json()
     answers = {q['id']: q['options'][0] for q in session['lesson']['questions']}
-    assert client.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", json={'answers': answers, 'idempotency_key': f"listen-{session['session_id']}"}).status_code == 200
+    assert client.post(f"/api/v1/listening/sessions/{session['session_id']}/submit", params={'learner_id': learner}, json={'answers': answers, 'idempotency_key': f"listen-{session['session_id']}"}).status_code == 200
     writing = client.post('/api/v1/writing/sessions', json={'learner_id': learner}).json()
     sid = writing['session_id']
     assert client.put(f'/api/v1/writing/sessions/{sid}/draft', params={'learner_id': learner}, json={'body': 'Two words', 'version': 0}).status_code == 200
