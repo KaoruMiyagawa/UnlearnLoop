@@ -1,0 +1,15 @@
+{
+  "statuses": {
+    "prompts": 200,
+    "create": 200,
+    "retry": 200,
+    "conflict": 409,
+    "other_learner": 200,
+    "other_delete": 404,
+    "history": 200,
+    "delete": 200,
+    "deleted_history": 200
+  },
+  "migration": "0008 to 0009",
+  "audio_uploaded": false
+}

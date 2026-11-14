@@ -31,6 +31,7 @@ import { LearnHome, PlannedSkillPage } from './learn/LearnHome';
 import { plannedSkills } from './learn/skills';
 import { ListeningWorkspace } from './learn/ListeningWorkspace';
 import { WritingWorkspace } from './learn/WritingWorkspace';
+import { SpeakingWorkspace } from './learn/SpeakingWorkspace';
 
 export const App: React.FC = () => {
   const [dataMode, setDataMode] = useState<'demo' | 'real'>('real');
@@ -187,7 +188,9 @@ export const App: React.FC = () => {
       onChangeUiMode={dataMode === 'demo' ? setUiMode : undefined}
       onResetProgression={dataMode === 'demo' ? handleResetToStageOne : undefined}
     >
-      {activeWorkspace === 'writing' ? (
+      {activeWorkspace === 'speaking' ? (
+        <SpeakingWorkspace onNavigate={navigateWorkspace} />
+      ) : activeWorkspace === 'writing' ? (
         <WritingWorkspace onNavigate={navigateWorkspace} />
       ) : plannedSkill ? (
         <PlannedSkillPage skill={plannedSkill} onNavigate={navigateWorkspace} />

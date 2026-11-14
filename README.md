@@ -8,7 +8,7 @@
 
 [English](README_EN.md) · [Learn / IELTS 开发基线](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows 快速启动](docs/development/QUICKSTART.md) · [当前架构](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [产品方向](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [研发路线图](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
 
-> **当前状态：** VerbaTrail 的顶层产品结构为 Learn / Discover / Adapt。Learn 提供 Listening / Speaking / Reading / Writing 四项技能。Reading 保留现有 Academic / General Training 流程，Listening 和 Writing 各有一套有限原创练习，Speaking 仍为规划页。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**；原 Phase 6 **FAIL** 保留为历史记录。
+> **当前状态：** VerbaTrail 的顶层产品结构为 Learn / Discover / Adapt。Learn 提供 Listening / Speaking / Reading / Writing 四项技能。Reading 保留现有 Academic / General Training 流程，Listening 和 Writing 各有一套有限原创练习，Speaking 提供三道原创 Part 1 问题及本地录音练习。IELTS-2B.1 Phase 6.2 最终工程验收为 **PASS WITH LIMITATIONS**；原 Phase 6 **FAIL** 保留为历史记录。
 
 ## 产品愿景
 
@@ -42,10 +42,10 @@ flowchart LR
 | 学习历史与档案 | 展示服务端会话、知识状态、迁移与复习记录，以及历史证据有效性和重新验证入口。 |
 | 双主题界面 | **已实现：** 一套 React 应用支持 Premium Academic 与 Noir & Champagne。 |
 | IELTS Writing | **首个有限闭环已实现：** 原创 Task 2 题目、实时字数、草稿自动保存与恢复、不可变提交、基础文本检测、版本比较与共享学习历史。写作语义质量和 IELTS Band 尚未评估。见 [Learn V1.3 验收记录](docs/development/writing-v1.3-evidence/README.md)。 |
-| Speaking | **规划中：** 口语录音、转写与表达反馈。 |
+| IELTS Speaking | **有限练习已实现：** 三道原创 Part 1 问题、浏览器本地录音及回放、自查、版本比较和共享历史元数据。无自动转写、AI 语音评价或 IELTS 口语分数。实体麦克风尚未验收。见 [Speaking 验收记录](docs/development/speaking-v1.4-evidence/README.md)。 |
 | Vocabulary、Grammar、理解与表达训练 | **规划中：** 尚无统一跨技能能力模型和完整训练体系。 |
 | 学习者模型、个性化计划与自适应 Agent | **规划中：** 目前没有完整的初始能力评估或跨技能学习计划。 |
-| IELTS 模考、UKVI、Life Skills、其他语言 | **尚未实现：** 当前练习覆盖部分 IELTS Reading，以及各一套原创 Listening 和 Writing Task 2 题目。 |
+| IELTS 模考、UKVI、Life Skills、其他语言 | **尚未实现：** 当前练习覆盖部分 Reading、一套 Listening、一套 Writing Task 2 和三道 Speaking Part 1 问题。 |
 | 真实模型教学质量、官方评分、Band 预测 | **未验证 / 未实现：** 不承诺真实 AI 个性化效果、官方分数或 IELTS 8.0 结果。 |
 
 ### 主题与实际界面

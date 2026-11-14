@@ -287,7 +287,7 @@ const verifyLearn = async () => {
   }))`);
   assert.deepEqual(cards, [
     { skill: 'Listening', route: '/learn/listening', status: '可练习' },
-    { skill: 'Speaking', route: '/learn/speaking', status: '规划中' },
+    { skill: 'Speaking', route: '/learn/speaking', status: '可练习' },
     { skill: 'Reading', route: '/learning', status: '可练习' },
     { skill: 'Writing', route: '/learn/writing', status: '可练习' },
   ]);
@@ -342,9 +342,8 @@ const verifyLearn = async () => {
   await touch('.learn-skill-card[href="/learn/speaking"]');
   await text('Speaking · 口语');
   await send('Page.reload');
-  await text('录音与转写');
-  await text('表达反馈与 AI 口语评价');
-  assert.equal(await evaluate("document.querySelector('main').querySelectorAll('audio, video, button, input').length"), 0);
+  await text('What part of your daily routine');
+  await text('开始录音');
   await theme('noir');
   await capture('learn-speaking-mobile', 'body', 390, 844);
   await touch('.learn-back-link');

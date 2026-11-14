@@ -417,6 +417,24 @@ def _protect_writing_revision(*_args: Any) -> None:
     raise ImmutableRecordError("Writing submissions are immutable.")
 
 
+class SpeakingPractice(Base):
+    """Metadata for a locally stored recording; never stores audio bytes."""
+
+    __tablename__ = "speaking_practices"
+
+    recording_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    session_id: Mapped[str] = mapped_column(ForeignKey("learning_sessions.id"), nullable=False, index=True)
+    prompt_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    prompt_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    prompt_text: Mapped[str] = mapped_column(Text, nullable=False)
+    duration_seconds: Mapped[float] = mapped_column(Float, nullable=False)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    self_check: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    evaluation_status: Mapped[str] = mapped_column(String(32), nullable=False, default="not_assessed")
+    evidence_type: Mapped[str] = mapped_column(String(32), nullable=False, default="practice_only")
+
+
 class ExamPreparationProfile(Base):
     """Persisted exam choice and targets; assessed ability remains absent until evidence exists."""
 

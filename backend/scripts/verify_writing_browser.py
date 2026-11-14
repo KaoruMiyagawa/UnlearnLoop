@@ -63,7 +63,7 @@ def verify_http(api, db_url):
             ), {"id": sid}).all()
             assert versions == [(1, essay), (2, payload["body"])]
             head = conn.scalar(text("SELECT version_num FROM alembic_version"))
-            assert head == "0008_writing_revisions"
+            assert head == "0009_speaking_practice"
     finally:
         engine.dispose()
     return {"http_statuses": evidence, "database_head": head, "revision_count": len(versions),

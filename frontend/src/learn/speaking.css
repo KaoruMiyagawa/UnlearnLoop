@@ -1,0 +1,8 @@
+.speaking-page { max-width: 58rem; margin-inline: auto; }
+.speaking-card { padding: clamp(18px, 3vw, 30px); display: grid; gap: 12px; min-width: 0; }
+.speaking-card h2, .speaking-card h3 { color: var(--focus-ink); }
+.speaking-card select { min-height: 44px; max-width: 100%; border: 1px solid var(--focus-line); border-radius: 8px; }
+.speaking-card button { min-height: 44px; }
+.speaking-card audio { width: min(100%, 32rem); }
+.speaking-check { display: flex; align-items: center; min-height: 44px; gap: 8px; }
+.speaking-recording { border-top: 1px solid var(--focus-line); padding-top: 14px; min-width: 0; overflow-wrap: anywhere; }

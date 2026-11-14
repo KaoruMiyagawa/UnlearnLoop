@@ -42,11 +42,10 @@ export const SKILLS = {
     label: 'Speaking',
     localizedLabel: '口语',
     description: '围绕熟悉与陌生话题，组织清楚连贯的表达。',
-    availability: 'planned',
+    availability: 'implemented',
     workspace: 'speaking',
     examVariants,
-    availableCapabilities: [],
-    plannedCapabilities: ['IELTS Speaking Part 1 / 2 / 3', '口语模拟练习', '录音与转写', '表达反馈与 AI 口语评价'],
+    availableCapabilities: ['原创 Part 1 问题', '本地录音与回放', '自主检查', '版本比较', '共享学习历史'],
   },
   reading: {
     id: 'reading',

@@ -12,7 +12,7 @@ Learn 提供四项技能入口。当前可练习的范围包括部分 IELTS Read
 
 ## 产品关系
 
-- **Learn（学习）** 提供 Listening（听力）、Speaking（口语）、Reading（阅读）、Writing（写作）四个一级板块。Reading 接入现有练习，Listening 和 Writing 各支持一套原创练习，Speaking 保留规划详情页。
+- **Learn（学习）** 提供 Listening（听力）、Speaking（口语）、Reading（阅读）、Writing（写作）四个一级板块。Reading 接入现有练习，Listening 和 Writing 各支持一套原创练习，Speaking 支持三道原创 Part 1 练习与本地录音。
 - **Discover（发现）** 将为学习活动提供有明确来源和许可的外部资源，当前为规划中。
 - **Adapt（自适应）** 将利用学习者目标、能力证据和学习历史做个性化规划与决策，当前为规划中。
 
@@ -43,7 +43,7 @@ flowchart LR
 | Assessment | 初始水平评估及持续能力评估 | 当前水平仍可为待评估；完整基线评估未实现 |
 | Learning Planner | 把目标、能力证据和可用时间组织成可解释的学习路线 | 未实现统一个性化计划 |
 | Language Input | 阅读、听力、词汇、语法与理解 | 部分 IELTS Reading 已实现；有限原创 Listening 练习已实现；完整听力、词汇和语法体系未实现 |
-| Language Output | 写作、口语和真实交流表达 | Writing 支持一套原创 Task 2 题目，可保存草稿、提交、修订和比较。自动反馈限于可观察的文本指标。口语与交流练习仍为规划。 |
+| Language Output | 写作、口语和真实交流表达 | Writing 支持一套原创 Task 2 题目，反馈限于可观察文本指标。Speaking 支持三道原创 Part 1 问题、浏览器本地录音和自主检查。 |
 | Adaptive Agent | 基于状态与证据选择下一项合适活动，并能解释依据和不确定性 | 已有受约束的后端诊断/派题流程；未有经过验证的跨技能自适应教学 Agent |
 | Error DNA | 整理错误观察、候选原因、支持/反证与后续验证 | 已在部分 TFNG 与 Matching Headings 流程中实现；质量边界见 Phase 6 验收 |
 | Memory & Review | 复习排程、到期任务、延迟证据与长期记忆追踪 | ReviewItem 与首轮延迟复习路径已有实现，历史证据有效性协调已在隔离库复验，多轮保持待验证 |
@@ -65,7 +65,7 @@ flowchart LR
 - Academic 与 General Training 是当前可用考试模式，但阅读内容规模有限。
 - TFNG 与 Matching Headings 有部分服务端流程；Matching Headings 有原创题组、结构化作答、逐项评价、诊断、训练、独立迁移和首轮延迟复习实现。
 - **IELTS-2B.1 Phase 6.2 最终工程验收为 PASS WITH LIMITATIONS。** 证据有效性登记、状态协调及重新验证已通过隔离复验，正式库尚未执行协调，独立内容审校和生产发布评估仍待完成。原 Phase 6 FAIL 记录继续保留。[Phase 6.2 复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)
-- Listening 有一套有限原创合成音频练习。Writing 有一套原创 Task 2 练习，作文的论证、语言质量与 Band 尚未评估。Speaking 仍为规划页。完整 IELTS 考试、完整 Reading 题型、词汇语法课程、模考、UKVI、Life Skills 和多语言教学尚未实现。
+- Listening 有一套有限原创合成音频练习。Writing 有一套原创 Task 2 练习。Speaking 支持三道原创 Part 1 问题及本地录音。口语没有自动转写、AI 评价或 Band 分数，实体麦克风尚未验收。完整 IELTS 考试、完整 Reading 题型、词汇语法课程、模考、UKVI、Life Skills 和多语言教学尚未实现。
 - FakeModelProvider 与规则诊断只支持隔离开发和流程验证，不能证明真实模型或产品级个性化有效。
 
 ## 规划原则

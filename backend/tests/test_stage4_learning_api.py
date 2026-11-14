@@ -1121,7 +1121,7 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
     paths = schema["paths"]
 
     # The skill-specific routes are public alongside shared APIs.
-    assert len(paths) == 38
+    assert len(paths) == 41
     assert "POST" in {method.upper() for method in paths["/api/v1/profile/evidence-revalidation"]}
     assert {
         "/api/v1/listening/lesson", "/api/v1/listening/sessions",
@@ -1130,6 +1130,8 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
         "/api/v1/writing/sessions", "/api/v1/writing/sessions/{session_id}/draft",
         "/api/v1/writing/sessions/{session_id}/revisions",
         "/api/v1/writing/sessions/{session_id}/revisions/{revision_id}",
+        "/api/v1/speaking/prompts", "/api/v1/speaking/practices",
+        "/api/v1/speaking/practices/{recording_id}",
     } <= set(paths)
 
     public_operations = [
@@ -1138,11 +1140,11 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
         for method in methods
         if method.lower() in {"get", "post", "put", "patch", "delete"}
     ]
-    assert len(public_operations) == 41
+    assert len(public_operations) == 45
     stage4_public_operations = [
         op for op in public_operations if op[1] != "/api/v1/health"
     ]
-    assert len(stage4_public_operations) == 40
+    assert len(stage4_public_operations) == 44
 
     # Hidden alias GET /api/v1/dashboard/summary is functional (200) but excluded from OpenAPI schema
     assert "/api/v1/dashboard/summary" not in paths

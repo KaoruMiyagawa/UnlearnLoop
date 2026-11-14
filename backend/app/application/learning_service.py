@@ -82,7 +82,7 @@ from app.persistence.models import (
     EvidenceValidityEvent,
 )
 from app.persistence.repositories import LearningRepository
-from app.persistence.models import WritingRevision, utc_now
+from app.persistence.models import SpeakingPractice, WritingRevision, utc_now
 
 
 class LearningAppService:
@@ -2338,6 +2338,23 @@ class LearningAppService:
                 session_id=session_id,
             )
 
+        speaking = self.db.execute(
+            select(SpeakingPractice.recording_id, SpeakingPractice.completed_at,
+                   LearningSession.id, KnowledgeTopic.id, KnowledgeTopic.title)
+            .select_from(SpeakingPractice)
+            .join(LearningSession, SpeakingPractice.session_id == LearningSession.id)
+            .join(KnowledgeTopic, LearningSession.topic_id == KnowledgeTopic.id)
+            .where(LearningSession.learner_id == learner_id)
+            .order_by(SpeakingPractice.completed_at.desc()).limit(limit)
+        )
+        for recording_id, completed_at, session_id, topic_id, topic_title in speaking:
+            add_event(
+                event_id=f"speaking:{recording_id}", kind="speaking_practice",
+                occurred_at=completed_at, topic_id=topic_id, topic_title=topic_title,
+                title="口语练习", summary="练习元数据已保存，可在口语工作区查看本地录音状态。",
+                evidence_summary="仅练习元数据，水平、迁移及长期保持均未评估。",
+                session_id=session_id,
+            )
         return sorted(events, key=lambda item: item.occurred_at, reverse=True)[:max(1, min(limit, 200))]
 
     def get_dashboard_summary(

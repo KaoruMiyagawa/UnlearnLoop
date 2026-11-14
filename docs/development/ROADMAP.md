@@ -13,7 +13,7 @@ IELTS Reading 已有 Academic / General Training 的部分 TFNG 与 Matching Hea
 ### P0 — Learn 四项技能入口与首个真实练习
 
 - 顶层产品结构为 Learn / Discover / Adapt。Discover 规划合法外部资源，Adapt 规划个性化决策。
-- Learn 提供 Listening / Speaking / Reading / Writing。Reading 复用真实工作区，Listening 和 Writing 各有一套有限原创练习，Speaking 提供规划详情。
+- Learn 提供 Listening / Speaking / Reading / Writing。Reading 复用真实工作区，Listening 和 Writing 各有一套有限原创练习，Speaking 支持三道原创 Part 1 问题及浏览器本地录音。
 - 验收覆盖双主题、桌面与手机视口、键盘与触控，以及 Reading 的实际会话和首轮复习回归。
 
 ### P1 — 跟进 Phase 6.2 复验限制
@@ -39,7 +39,7 @@ IELTS Reading 已有 Academic / General Training 的部分 TFNG 与 Matching Hea
 ### P4 — 逐步扩展 Listening、Writing、Speaking
 
 - 在内容版权、个人数据、录音/媒体处理、人工校准和评估标准明确后分技能建设。
-- 听力第一套有限原创练习已交付，包含合成音频、服务端评分、复盘时间锚点和共享学习历史。Writing 已交付一套原创 Task 2 练习，包含草稿恢复、基础文本检测和修订版本。后续写作语义反馈需要单独验证。口语计划建立同意流程、录音与轮次证据。
+- 听力第一套有限原创练习已交付，包含合成音频、服务端评分、复盘时间锚点和共享学习历史。Writing 已交付一套原创 Task 2 练习。Speaking 已支持用户主动授权后录音、回放、自查和本地版本比较，服务端仅保存元数据。实体麦克风验收、转写及可信语音评价有待后续工作。
 - 验收：每项评价有可核查证据或明确弃评；AI 结果标为非官方；隐私与恢复流程通过专项验证。
 
 ### P5 — 词汇、语法、表达与真实语言运用
