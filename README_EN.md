@@ -8,7 +8,7 @@ An adaptive language learning system designed to help learners build understandi
 
 [简体中文](README.md) · [Learn / IELTS development baseline](https://github.com/KaoruMiyagawa/VerbaTrail/tree/feat/ielts-2b-reading-question-groups) · [Windows quick start](docs/development/QUICKSTART.md) · [Current architecture](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/architecture/CURRENT_ARCHITECTURE.md) · [Product direction](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/product/IELTS_PRODUCT_DIRECTION.md) · [Roadmap](https://github.com/KaoruMiyagawa/VerbaTrail/blob/feat/ielts-2b-reading-question-groups/docs/development/ROADMAP.md)
 
-> **Current status:** VerbaTrail has three product areas: Learn / Discover / Adapt. Learn has Listening, Speaking, Reading, and Writing sections. Reading retains the existing Academic and General Training flows. Listening now has one limited original synthetic-audio exercise; Speaking and Writing remain planned. The IELTS-2B.1 Phase 6.2 engineering result is **PASS WITH LIMITATIONS**. The original Phase 6 **FAIL** remains in the historical report.
+> **Current status:** VerbaTrail has three product areas: Learn / Discover / Adapt. Learn has Listening, Speaking, Reading, and Writing sections. Reading retains the existing Academic and General Training flows. Listening and Writing each have one limited original exercise. Speaking remains planned. The IELTS-2B.1 Phase 6.2 engineering result is **PASS WITH LIMITATIONS**. The original Phase 6 **FAIL** remains in the historical report.
 
 ## Product vision
 
@@ -41,10 +41,11 @@ flowchart LR
 | Transfer and review | Matching Headings independent transfer and first delayed review use server records. Historical evidence labeling and state reconciliation passed isolated retesting. |
 | Learning history and profile | Displays server-side sessions, knowledge states, transfer, review, historical evidence validity, and revalidation when available. |
 | Dual-theme interface | **Implemented:** one React app supports Premium Academic and Noir & Champagne. |
-| Speaking and Writing | **Planned:** speaking recording/transcription and feedback, and writing drafts and feedback, remain unimplemented. |
+| IELTS Writing | **First limited loop implemented.** One original Task 2 prompt, live word count, draft autosave and recovery, immutable submissions, basic text metrics, revision comparison, and shared history. Semantic quality and IELTS Band remain unassessed. See the [Learn V1.3 acceptance evidence](docs/development/writing-v1.3-evidence/README.md). |
+| Speaking | **Planned.** Recording, transcription, and feedback on spoken responses. |
 | Vocabulary, Grammar, comprehension and expression practice | **Planned:** there is no unified cross-skill ability model or complete training system yet. |
 | Learner model, personalized plan, adaptive Agent | **Planned:** a complete initial ability assessment and cross-skill plan do not exist yet. |
-| IELTS mock tests, UKVI, Life Skills, other languages | **Not implemented:** future directions; the current product covers limited English IELTS Reading and one original Listening exercise. |
+| IELTS mock tests, UKVI, Life Skills, other languages | **Not implemented.** Current practice covers selected IELTS Reading workflows and one original exercise each for Listening and Writing Task 2. |
 | Real-model teaching quality, official scoring, band prediction | **Unvalidated / not implemented:** no claim of real AI personalization, official scores, or an IELTS 8.0 outcome. |
 
 ### Themes and product captures

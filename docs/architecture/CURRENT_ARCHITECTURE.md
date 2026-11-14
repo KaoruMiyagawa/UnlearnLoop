@@ -8,7 +8,7 @@
 - **HTTP/API：** FastAPI 提供版本化 `/api/v1` 接口。API schemas 对学生可见数据建模，题组展示内容与私有答案键/评分规则分离。
 - **应用服务：** 应用层编排考试配置、内容/题目选择、学习会话、提交、诊断、专项训练、Matching Headings 迁移与复习。
 - **领域与评价：** 领域规则验证学习状态转换、Matching Headings 题组及逐项评价。规则协议和 FakeModelProvider 支持流程执行与测试，不构成真实模型个性化质量证据。
-- **持久化** SQLAlchemy 仓储保存内容版本、Question、LearningSession、Attempt、诊断假设、KnowledgeState、ReviewItem 与证据有效性事件。Alembic 当前单一 head 为 `0007_evidence_validity_events`。测试和浏览器流程使用隔离 SQLite。
+- **持久化** SQLAlchemy 仓储保存内容版本、Question、LearningSession、Attempt、诊断假设、KnowledgeState、ReviewItem、证据有效性事件和 Writing 草稿与提交。Alembic 当前单一 head 为 `0008_writing_revisions`。测试和浏览器流程使用隔离 SQLite。
 
 ```mermaid
 flowchart LR
@@ -20,12 +20,12 @@ flowchart LR
     AGENT --> PROVIDER[FakeModelProvider / Provider 接口]
     APP --> REPO[SQLAlchemy 仓储]
     REPO --> DB[(SQLite)]
-    DB --> MIG[Alembic 0001–0007]
+    DB --> MIG[Alembic 0001–0008]
 ```
 
 ## 当前 IELTS 实现范围
 
-产品导航呈现 Learn / Discover / Adapt。Learn 首页 `/` 提供 Listening、Speaking、Reading、Writing 四个入口。Reading 使用既有 `/learning` 工作区，`/learn/reading` 可直接访问同一工作区。Listening 位于 `/learn/listening`，含一套约 64 秒原创合成音频、5 道客观题、服务端规则评分、提交后解释及音频时间锚点；Listening Attempt 存入既有共享 LearningSession/Attempt 历史。Speaking 与 Writing 仍为规划页。Discover 和 Adapt 显示规划状态。诊断、迁移、复习与学习档案保留原路由。
+产品导航呈现 Learn / Discover / Adapt。Learn 首页 `/` 提供 Listening、Speaking、Reading、Writing 四个入口。Reading 使用既有 `/learning` 工作区，`/learn/reading` 可直接访问同一工作区。Listening 位于 `/learn/listening`，含一套约 64 秒原创合成音频、5 道客观题、服务端规则评分、提交后解释及音频时间锚点。Listening Attempt 存入既有共享 LearningSession/Attempt 历史。Writing 位于 `/learn/writing`，支持一套原创 Task 2 题目、草稿和不可变提交。Speaking、Discover 和 Adapt 显示规划状态。诊断、迁移、复习与学习档案保留原路由。
 
 `frontend/src/learn/skills.ts` 定义类型化技能目录和能力状态。`implemented` 表示已有学习流程，`planned` 表示可浏览规划，`unavailable` 表示无可用入口。目录由前端静态维护。考试目标、题目派发、作答、诊断、复习和学习历史继续以共享 API 为准。
 
@@ -33,7 +33,7 @@ Academic 与 General Training 有有限的 Reading 流程，包括 TFNG 及 Matc
 
 **IELTS-2B.1 Phase 6.2 最终工程验收为 PASS WITH LIMITATIONS。** 旧版证据有效性标记、派生状态协调与用户重新验证已在隔离 SQLite 复验。正式库的协调和生产发布评估仍有待执行。原 Phase 6 FAIL 作为历史记录保留。[最终复验](../development/IELTS_2B1_PHASE6_2_ACCEPTANCE.md) · [原 Phase 6 报告](../development/IELTS_2B1_FINAL_ACCEPTANCE.md)
 
-完整 IELTS Reading 题型覆盖、完整 IELTS Listening 考试、Writing、Speaking、完整词汇/语法课程、模考、统一能力评估、个性化学习计划、多语言教学均未实现。Listening 仅交付有限原创试用练习，不提供官方 Band 分数；一次练习结果不代表长期能力，也不会产生迁移或保持证据。目标架构中的 Learner Model 和跨技能 Adaptive Agent 也还未完整落地。
+完整 IELTS 考试、Writing Task 1、Speaking、完整词汇与语法课程、模考、统一能力评估、个性化学习计划和多语言教学均未实现。Listening 和 Writing 各覆盖一套原创任务。Writing 的文本检测仅描述字数、段落块和修订变化，语义质量尚未评估。目标架构中的 Learner Model 和跨技能 Adaptive Agent 尚待实现。
 
 ## 证据与数据流
 
@@ -54,4 +54,4 @@ Matching Headings 当前典型流程：
 
 ## 与目标架构的差距
 
-当前系统是模块化单体：React + FastAPI + SQLAlchemy/SQLite。后续可在不提前拆微服务的前提下，逐步引入统一 Learner Profile/能力证据、Assessment、Learning Planner 和跨技能 Agent 策略。Listening、Writing、Speaking 需各自建立内容模型、证据与评价协议；其他语言扩展应将通用学习模型与语言特定内容/评价规则分层。上述均为规划，不代表现有可用功能。
+当前系统是模块化单体：React + FastAPI + SQLAlchemy/SQLite。后续可逐步引入统一 Learner Profile/能力证据、Assessment、Learning Planner 和跨技能 Agent 策略。Writing 版本通过 `LearningSession` 关联共享历史，仅公开版本摘要。正文由写作 API 按 `learner_id` 筛选读取，当前本地开发身份边界仍适用。

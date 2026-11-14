@@ -302,6 +302,36 @@ def test_concurrent_review_answers_cannot_create_two_attempts_or_advance_twice(
         )) == 1
 
 
+def test_completed_review_replays_same_late_request_without_an_idempotency_key(
+    test_settings: Settings,
+    session_factory: sessionmaker[Session],
+    monkeypatch,
+) -> None:
+    base = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    patch_clock(monkeypatch, [base + timedelta(days=2)])
+    client = make_seeded_client(session_factory, test_settings)
+    learner = "learner_late_review_retry"
+    review_id = create_due_review(session_factory, learner, base)
+    review = client.post(f"/api/v1/reviews/{review_id}/start?learner_id={learner}").json()
+    payload = {"question_id": review["question_id"], "submitted_answer": "3 12"}
+    url = f"/api/v1/sessions/{review['review_session_id']}/attempts"
+
+    first = client.post(url, json=payload)
+    late_retry = client.post(url, json=payload)
+
+    assert first.status_code == late_retry.status_code == 201
+    assert first.json() == late_retry.json()
+    with session_factory() as db:
+        assert db.scalar(select(func.count()).select_from(Attempt).where(
+            Attempt.session_id == review["review_session_id"],
+            Attempt.attempt_role == QuestionRole.REVIEW.value,
+        )) == 1
+        assert db.scalar(select(func.count()).select_from(DecisionEvent).where(
+            DecisionEvent.session_id == review["review_session_id"],
+            DecisionEvent.action == "verify_delayed_retention",
+        )) == 1
+
+
 def test_profile_history_is_learner_scoped_and_never_returns_raw_answer_or_event_payload(
     test_settings: Settings,
     session_factory: sessionmaker[Session],

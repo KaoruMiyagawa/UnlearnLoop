@@ -220,7 +220,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "code": "VALIDATION_ERROR",
                 "message": "请求参数校验失败",
                 "request_id": request_id,
-                "details": jsonable_encoder([{key: value for key, value in error.items() if key != "ctx"} for error in exc.errors()]),
+                "details": jsonable_encoder([
+                    {key: value for key, value in error.items() if key not in {"ctx", "input"}}
+                    for error in exc.errors()
+                ]),
             },
         )
 

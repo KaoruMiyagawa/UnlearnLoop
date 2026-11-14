@@ -1,0 +1,89 @@
+.writing-page {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.writing-page .focus-card {
+  min-width: 0;
+  padding: clamp(16px, 3vw, 30px);
+}
+
+.writing-page h2,
+.writing-page h3,
+.writing-toolbar label {
+  color: var(--focus-ink);
+  font-weight: 650;
+}
+
+.writing-task p,
+.writing-history p {
+  max-width: 72ch;
+  overflow-wrap: anywhere;
+}
+
+.writing-task p[lang="en"] {
+  font-family: var(--vt-serif);
+  font-size: 1.15rem;
+  line-height: 1.55;
+}
+
+.writing-editor,
+.writing-history {
+  display: grid;
+  gap: 14px;
+}
+
+.writing-toolbar,
+.writing-selects {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.writing-toolbar span {
+  color: var(--focus-muted);
+  font-size: .875rem;
+  overflow-wrap: anywhere;
+}
+
+.writing-editor textarea {
+  min-height: 20rem;
+  padding: 16px;
+  font-size: 1rem;
+  line-height: 1.65;
+  resize: vertical;
+}
+
+.writing-selects label {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.writing-selects select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--focus-line);
+  border-radius: 8px;
+}
+
+.writing-page button {
+  min-height: 42px;
+}
+
+.writing-diff pre {
+  padding: 14px;
+  max-height: 30rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  background: var(--focus-subtle);
+  border: 1px solid var(--focus-line);
+  border-radius: 8px;
+}
+
+.writing-line.added { background: color-mix(in srgb, #368769 25%, transparent); }
+.writing-line.removed { background: color-mix(in srgb, #ba5555 25%, transparent); }

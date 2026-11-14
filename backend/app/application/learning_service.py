@@ -82,7 +82,7 @@ from app.persistence.models import (
     EvidenceValidityEvent,
 )
 from app.persistence.repositories import LearningRepository
-from app.persistence.models import utc_now
+from app.persistence.models import WritingRevision, utc_now
 
 
 class LearningAppService:
@@ -852,6 +852,18 @@ class LearningAppService:
                 if stored is not None:
                     return stored
                 return self._build_attempt_result(sess, existing_attempt, question)
+
+        # A legacy review request without a key can arrive just after the
+        # matching answer completed the session instead of racing the insert.
+        if not idempotency_key and question.question_role == QuestionRole.REVIEW.value and sess.status == SessionStatus.COMPLETED.value:
+            prior_review = self.db.scalar(select(Attempt).where(
+                Attempt.session_id == session_id, Attempt.question_id == question_id,
+                Attempt.attempt_role == QuestionRole.REVIEW.value, Attempt.group_version_id.is_(None),
+            ))
+            if prior_review is not None and prior_review.submitted_answer == submitted_answer:
+                stored = self._stored_attempt_result(session_id, prior_review.id)
+                if stored is not None:
+                    return stored
 
         # 2. Session active status check
         if sess.status in (SessionStatus.PAUSED.value, SessionStatus.COMPLETED.value):
@@ -2305,6 +2317,25 @@ class LearningAppService:
                 session_id=session.id,
                 evidence_validity_status=validity_status,
                 evidence_validity_reason=validity_reason,
+            )
+
+        writing = self.db.execute(
+            select(WritingRevision.id, WritingRevision.number, WritingRevision.submitted_at,
+                   LearningSession.id, KnowledgeTopic.id, KnowledgeTopic.title)
+            .select_from(WritingRevision)
+            .join(LearningSession, WritingRevision.session_id == LearningSession.id)
+            .join(KnowledgeTopic, LearningSession.topic_id == KnowledgeTopic.id)
+            .where(LearningSession.learner_id == learner_id)
+            .order_by(WritingRevision.submitted_at.desc(), WritingRevision.number.desc())
+            .limit(limit)
+        )
+        for revision_id, number, submitted_at, session_id, topic_id, topic_title in writing:
+            add_event(
+                event_id=f"writing:{revision_id}", kind="writing_submission",
+                occurred_at=submitted_at, topic_id=topic_id, topic_title=topic_title,
+                title=f"写作提交 · 第 {number} 版", summary="已保存正文和基础文本检测结果。",
+                evidence_summary="仅记录写作提交与文本检测，语义质量和水平尚未评估。",
+                session_id=session_id,
             )
 
         return sorted(events, key=lambda item: item.occurred_at, reverse=True)[:max(1, min(limit, 200))]

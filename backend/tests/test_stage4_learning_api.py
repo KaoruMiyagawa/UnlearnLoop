@@ -1120,27 +1120,29 @@ def test_openapi_schema_endpoint_inventory(seeded_client: TestClient) -> None:
     schema = openapi_resp.json()
     paths = schema["paths"]
 
-    # Listening's versioned lesson/session/history routes are public alongside shared APIs.
-    assert len(paths) == 34
+    # The skill-specific routes are public alongside shared APIs.
+    assert len(paths) == 38
     assert "POST" in {method.upper() for method in paths["/api/v1/profile/evidence-revalidation"]}
     assert {
         "/api/v1/listening/lesson", "/api/v1/listening/sessions",
         "/api/v1/listening/sessions/{session_id}", "/api/v1/listening/sessions/{session_id}/submit",
         "/api/v1/listening/history",
+        "/api/v1/writing/sessions", "/api/v1/writing/sessions/{session_id}/draft",
+        "/api/v1/writing/sessions/{session_id}/revisions",
+        "/api/v1/writing/sessions/{session_id}/revisions/{revision_id}",
     } <= set(paths)
 
-    # Five Listening operations are added to the pre-existing API surface.
     public_operations = [
         (method.upper(), path)
         for path, methods in paths.items()
         for method in methods
         if method.lower() in {"get", "post", "put", "patch", "delete"}
     ]
-    assert len(public_operations) == 37
+    assert len(public_operations) == 41
     stage4_public_operations = [
         op for op in public_operations if op[1] != "/api/v1/health"
     ]
-    assert len(stage4_public_operations) == 36
+    assert len(stage4_public_operations) == 40
 
     # Hidden alias GET /api/v1/dashboard/summary is functional (200) but excluded from OpenAPI schema
     assert "/api/v1/dashboard/summary" not in paths

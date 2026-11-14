@@ -144,6 +144,8 @@ export const FocusProfileWorkspace: React.FC<{
           {allEvents.map((event) => <li className="focus-timeline-item" key={event.id}>
             <span className="focus-timeline-dot" aria-hidden="true" />
             <div className="focus-timeline-main"><div className="focus-timeline-heading"><strong>{event.title}</strong><time dateTime={event.occurred_at}>{formatDate(event.occurred_at)}</time></div><div className="focus-timeline-topic">{event.topic_title}</div><p>{event.summary}</p>{event.evidence_validity_status && event.evidence_validity_status !== 'eligible' && <div className="focus-notice warning">证据状态：{evidenceValidityLabel(event.evidence_validity_status)}。{learnerEvidenceValidityReason(event.evidence_validity_status, event.evidence_validity_reason)}</div>}<details className="focus-disclosure"><summary>查看证据摘要</summary><div className="focus-disclosure-content">{event.evidence_summary}</div></details></div>
+            {event.kind === 'writing_submission' && <button className="focus-button-quiet"
+              onClick={() => onNavigateWorkspace('writing')}>打开写作工作区</button>}
           </li>)}
         </ol>}
       </section>

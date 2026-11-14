@@ -289,7 +289,7 @@ const verifyLearn = async () => {
     { skill: 'Listening', route: '/learn/listening', status: '可练习' },
     { skill: 'Speaking', route: '/learn/speaking', status: '规划中' },
     { skill: 'Reading', route: '/learning', status: '可练习' },
-    { skill: 'Writing', route: '/learn/writing', status: '规划中' },
+    { skill: 'Writing', route: '/learn/writing', status: '可练习' },
   ]);
   for (const name of ['premium', 'noir']) {
     await theme(name);
@@ -326,7 +326,7 @@ const verifyLearn = async () => {
   await text('Writing · 写作');
   assert.equal(await evaluate("document.activeElement.tagName"), 'H1');
   assert.equal(await evaluate("location.pathname"), '/learn/writing');
-  await text('结构、语言与任务完成度反馈');
+  await text('Shared spaces for neighbourhoods');
   await capture('learn-writing-desktop', 'body');
   await evaluate('history.back()');
   await text('IELTS 学习中心');

@@ -379,6 +379,44 @@ class LearningSession(Base):
     )
 
 
+class WritingDraft(Base):
+    """The editable text and pinned task for a shared learning session."""
+
+    __tablename__ = "writing_drafts"
+
+    session_id: Mapped[str] = mapped_column(ForeignKey("learning_sessions.id"), primary_key=True)
+    task_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+class WritingRevision(Base):
+    """An immutable submission and its reproducible text metrics."""
+
+    __tablename__ = "writing_revisions"
+    __table_args__ = (
+        UniqueConstraint("session_id", "number", name="uq_writing_revision_number"),
+        UniqueConstraint("session_id", "idempotency_key", name="uq_writing_revision_key"),
+    )
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("writing"))
+    session_id: Mapped[str] = mapped_column(ForeignKey("writing_drafts.session_id"), nullable=False)
+    number: Mapped[int] = mapped_column(Integer, nullable=False)
+    source_revision_id: Mapped[str | None] = mapped_column(ForeignKey("writing_revisions.id"))
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    base_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(100), nullable=False)
+    feedback: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+@event.listens_for(WritingRevision, "before_update")
+@event.listens_for(WritingRevision, "before_delete")
+def _protect_writing_revision(*_args: Any) -> None:
+    raise ImmutableRecordError("Writing submissions are immutable.")
+
+
 class ExamPreparationProfile(Base):
     """Persisted exam choice and targets; assessed ability remains absent until evidence exists."""
 

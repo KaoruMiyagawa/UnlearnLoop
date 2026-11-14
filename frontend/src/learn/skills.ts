@@ -62,12 +62,11 @@ export const SKILLS = {
     id: 'writing',
     label: 'Writing',
     localizedLabel: '写作',
-    description: '按考试类型练习写作任务，从草稿到修改。',
-    availability: 'planned',
+    description: '完成一套原创 Task 2 练习，从草稿到修订。',
+    availability: 'implemented',
     workspace: 'writing',
     examVariants,
-    availableCapabilities: [],
-    plannedCapabilities: ['Academic / General Training 对应写作任务', 'Writing Task 1 / 2', '草稿与修改', '结构、语言与任务完成度反馈'],
+    availableCapabilities: ['原创 Task 2 题目', '草稿自动保存', '基础文本检测', '提交版本比较', '共享学习历史'],
   },
 } as const satisfies { [Id in SkillId]: SkillDefinition & { id: Id } };
 

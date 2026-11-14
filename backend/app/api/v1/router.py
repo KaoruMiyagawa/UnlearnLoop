@@ -10,6 +10,7 @@ from app.api.v1.profile import router as profile_router
 from app.api.v1.reviews import router as reviews_router
 from app.api.v1.sessions import router as sessions_router
 from app.api.v1.topics import router as topics_router
+from app.api.v1.writing import router as writing_router
 
 api_v1_router = APIRouter()
 api_v1_router.include_router(health_router)
@@ -20,3 +21,4 @@ api_v1_router.include_router(reviews_router)
 api_v1_router.include_router(profile_router)
 api_v1_router.include_router(exams_router)
 api_v1_router.include_router(listening_router)
+api_v1_router.include_router(writing_router)
