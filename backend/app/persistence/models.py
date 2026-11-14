@@ -1149,3 +1149,39 @@ def _prevent_evidence_validity_event_mutation(
     _mapper: Any, _connection: Any, _target: EvidenceValidityEvent
 ) -> None:
     raise ImmutableRecordError("Evidence validity audit events are append-only.")
+
+class AssessmentRun(Base):
+    """A learner's assessment workflow; evidence remains in the learning records."""
+    __tablename__ = "assessment_runs"
+    __table_args__ = (
+        UniqueConstraint("learner_id", "idempotency_key", name="uq_assessment_run_learner_key"),
+        CheckConstraint("status IN ('in_progress', 'completed')", name="ck_assessment_run_status"),
+    )
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("asr"))
+    learner_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    assessment_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default="in_progress")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now, onupdate=utc_now)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    tasks: Mapped[list["AssessmentTask"]] = relationship(back_populates="run", cascade="all, delete-orphan")
+
+
+class AssessmentTask(Base):
+    """Workflow state and future reference to a real learning record."""
+    __tablename__ = "assessment_tasks"
+    __table_args__ = (
+        UniqueConstraint("run_id", "skill_id", name="uq_assessment_task_run_skill"),
+        CheckConstraint("skill_id IN ('listening', 'speaking', 'reading', 'writing')", name="ck_assessment_task_skill"),
+        CheckConstraint("status IN ('not_started', 'in_progress', 'skipped', 'completed')", name="ck_assessment_task_status"),
+        CheckConstraint("status != 'completed' OR (evidence_source IS NOT NULL AND evidence_reference IS NOT NULL)", name="ck_assessment_task_completed_evidence"),
+        CheckConstraint("(evidence_source IS NULL AND evidence_reference IS NULL) OR (evidence_source IS NOT NULL AND evidence_reference IS NOT NULL)", name="ck_assessment_task_evidence_pair"),
+    )
+    id: Mapped[str] = mapped_column(String(64), primary_key=True, default=lambda: new_id("ast"))
+    run_id: Mapped[str] = mapped_column(ForeignKey("assessment_runs.id", ondelete="CASCADE"), nullable=False, index=True)
+    skill_id: Mapped[str] = mapped_column(String(24), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), nullable=False, default="not_started")
+    evidence_source: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    evidence_reference: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    run: Mapped["AssessmentRun"] = relationship(back_populates="tasks")
