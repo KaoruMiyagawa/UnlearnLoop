@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import { LearnerOverview } from './LearnerOverview';
 import { listKnowledgeStates, listLearningHistory, startEvidenceRevalidation } from '../api/profile';
 import { listReviews } from '../api/reviews';
 import type { KnowledgeState, LearningHistoryEvent, ReviewItem } from '../api/types';
@@ -103,6 +104,8 @@ export const FocusProfileWorkspace: React.FC<{
         <p className="focus-page-subtitle">当前迁移通过与长期保持是不同证据。一次延迟复习通过，也不能证明永久掌握。</p>
       </header>
       {revalidationNotice && <div className="focus-notice neutral" role="status">{revalidationNotice}</div>}
+
+      <LearnerOverview />
 
       <section className="focus-page-section" aria-labelledby="knowledge-record-title">
         <div className="focus-review-section-heading"><div><h2 id="knowledge-record-title">知识点进展</h2><p>状态、保持记录和复习安排来自服务端。</p></div></div>

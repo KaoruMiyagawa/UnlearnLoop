@@ -1,0 +1,68 @@
+[
+  {
+    "requestId": "27400.69",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/history?learner_id=default_learner",
+    "status": 200
+  },
+  {
+    "requestId": "27400.71",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/history?learner_id=default_learner",
+    "status": 200
+  },
+  {
+    "requestId": "5745C479276FDC8594543D13C8A21FB2",
+    "method": "OPTIONS",
+    "url": "http://127.0.0.1:5020/api/v1/listening/sessions",
+    "status": 200
+  },
+  {
+    "requestId": "27400.74",
+    "method": "POST",
+    "url": "http://127.0.0.1:5020/api/v1/listening/sessions",
+    "status": 201
+  },
+  {
+    "requestId": "27400.149",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/history?learner_id=default_learner",
+    "status": 200
+  },
+  {
+    "requestId": "27400.150",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/sessions/sess_092292cd14bf4077",
+    "status": 200
+  },
+  {
+    "requestId": "27400.152",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/history?learner_id=default_learner",
+    "status": 200
+  },
+  {
+    "requestId": "27400.153",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/sessions/sess_092292cd14bf4077",
+    "status": 200
+  },
+  {
+    "requestId": "44D58224BEA85E5C5341CD7DD9F405DB",
+    "method": "OPTIONS",
+    "url": "http://127.0.0.1:5020/api/v1/listening/sessions/sess_092292cd14bf4077/submit",
+    "status": 200
+  },
+  {
+    "requestId": "27400.161",
+    "method": "POST",
+    "url": "http://127.0.0.1:5020/api/v1/listening/sessions/sess_092292cd14bf4077/submit",
+    "status": 200
+  },
+  {
+    "requestId": "27400.162",
+    "method": "GET",
+    "url": "http://127.0.0.1:5020/api/v1/listening/history?learner_id=default_learner",
+    "status": 200
+  }
+]

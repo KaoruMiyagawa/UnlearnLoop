@@ -13,7 +13,10 @@ from app.api.v1.topics import router as topics_router
 from app.api.v1.writing import router as writing_router
 from app.api.v1.speaking import router as speaking_router
 
+from app.api.v1.learner_model import router as learner_model_router
+
 api_v1_router = APIRouter()
+api_v1_router.include_router(learner_model_router)
 api_v1_router.include_router(health_router)
 api_v1_router.include_router(topics_router)
 api_v1_router.include_router(sessions_router)

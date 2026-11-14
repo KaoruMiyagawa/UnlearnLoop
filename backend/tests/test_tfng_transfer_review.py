@@ -115,6 +115,10 @@ def test_tfng_transfer_review_http(live_tfng_client, session_factory, monkeypatc
         assert replay['attempt_id'] == result['attempt_id']
         review=call('get', f"/api/v1/reviews/{review['id']}")
         assert review['retention_verified'] == (outcome=='pass')
+        model = call('get', '/api/v1/learner-model')
+        reading = next(item for item in model['skills'] if item['skill_id'] == 'reading')
+        assert 'independent_transfer' in reading['evidence_levels']
+        assert ('delayed_review' in reading['evidence_levels']) == (outcome == 'pass')
         assert result['next_action'] == ('delayed_retention_verified' if outcome=='pass' else 'review_failed_needs_diagnosis')
         if outcome == 'review_fail':
             assert result['knowledge_state_status'] == 'needs_practice'

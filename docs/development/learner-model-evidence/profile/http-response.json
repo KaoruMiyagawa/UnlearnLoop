@@ -1,0 +1,147 @@
+{
+  "contract_version": "1.0",
+  "learner_id": "default_learner",
+  "language_code": "en",
+  "skills": [
+    {
+      "skill_id": "listening",
+      "assessment_status": "observed",
+      "has_learning_record": true,
+      "evidence_levels": [
+        "practice_activity",
+        "practice_performance"
+      ],
+      "evidence": [
+        {
+          "learner_id": "default_learner",
+          "language_code": "en",
+          "skill_id": "listening",
+          "competency_id": "ielts-listening-study-group",
+          "assessment_status": "not_assessed",
+          "evidence_type": "practice_performance",
+          "evidence_source": "attempt",
+          "evidence_reference": "att_f3fec9b68c27473e",
+          "evidence_validity": "eligible",
+          "evaluation_method": "rule_check",
+          "evaluation_rule_version": "listening-exact-choice-v1",
+          "content_version": "listening-study-group-v1",
+          "observed_at": "2026-11-14T07:52:23.837555Z",
+          "observation": "错误",
+          "limitations": [
+            "仅反映具体练习的客观作答，不能推断整体听力水平或 IELTS 分数。"
+          ]
+        },
+        {
+          "learner_id": "default_learner",
+          "language_code": "en",
+          "skill_id": "listening",
+          "competency_id": "ielts-listening-study-group",
+          "assessment_status": "not_assessed",
+          "evidence_type": "practice_performance",
+          "evidence_source": "attempt",
+          "evidence_reference": "att_172d7215b83c4fbe",
+          "evidence_validity": "eligible",
+          "evaluation_method": "rule_check",
+          "evaluation_rule_version": "listening-exact-choice-v1",
+          "content_version": "listening-study-group-v1",
+          "observed_at": "2026-11-14T07:52:23.837564Z",
+          "observation": "错误",
+          "limitations": [
+            "仅反映具体练习的客观作答，不能推断整体听力水平或 IELTS 分数。"
+          ]
+        },
+        {
+          "learner_id": "default_learner",
+          "language_code": "en",
+          "skill_id": "listening",
+          "competency_id": "ielts-listening-study-group",
+          "assessment_status": "observed",
+          "evidence_type": "practice_performance",
+          "evidence_source": "attempt",
+          "evidence_reference": "att_dc4b5e36e40d4501",
+          "evidence_validity": "eligible",
+          "evaluation_method": "rule_check",
+          "evaluation_rule_version": "listening-exact-choice-v1",
+          "content_version": "listening-study-group-v1",
+          "observed_at": "2026-11-14T07:52:23.837570Z",
+          "observation": "正确",
+          "limitations": [
+            "仅反映具体练习的客观作答，不能推断整体听力水平或 IELTS 分数。"
+          ]
+        },
+        {
+          "learner_id": "default_learner",
+          "language_code": "en",
+          "skill_id": "listening",
+          "competency_id": "ielts-listening-study-group",
+          "assessment_status": "observed",
+          "evidence_type": "practice_performance",
+          "evidence_source": "attempt",
+          "evidence_reference": "att_9bd7a0049a084a8e",
+          "evidence_validity": "eligible",
+          "evaluation_method": "rule_check",
+          "evaluation_rule_version": "listening-exact-choice-v1",
+          "content_version": "listening-study-group-v1",
+          "observed_at": "2026-11-14T07:52:23.837574Z",
+          "observation": "正确",
+          "limitations": [
+            "仅反映具体练习的客观作答，不能推断整体听力水平或 IELTS 分数。"
+          ]
+        },
+        {
+          "learner_id": "default_learner",
+          "language_code": "en",
+          "skill_id": "listening",
+          "competency_id": "ielts-listening-study-group",
+          "assessment_status": "observed",
+          "evidence_type": "practice_performance",
+          "evidence_source": "attempt",
+          "evidence_reference": "att_2a8d197f1c9d479b",
+          "evidence_validity": "eligible",
+          "evaluation_method": "rule_check",
+          "evaluation_rule_version": "listening-exact-choice-v1",
+          "content_version": "listening-study-group-v1",
+          "observed_at": "2026-11-14T07:52:23.837579Z",
+          "observation": "正确",
+          "limitations": [
+            "仅反映具体练习的客观作答，不能推断整体听力水平或 IELTS 分数。"
+          ]
+        }
+      ],
+      "limitations": [
+        "仅反映具体练习的客观作答，不能推断整体听力水平或 IELTS 分数。"
+      ]
+    },
+    {
+      "skill_id": "speaking",
+      "assessment_status": "not_assessed",
+      "has_learning_record": false,
+      "evidence_levels": [],
+      "evidence": [],
+      "limitations": [
+        "自查由学习者提供，并非系统语音检测；口语水平未评估。"
+      ]
+    },
+    {
+      "skill_id": "reading",
+      "assessment_status": "not_assessed",
+      "has_learning_record": false,
+      "evidence_levels": [],
+      "evidence": [],
+      "limitations": [
+        "作答、独立迁移及延迟复习只反映相应题目，不代表整体阅读水平或永久掌握。"
+      ]
+    },
+    {
+      "skill_id": "writing",
+      "assessment_status": "not_assessed",
+      "has_learning_record": false,
+      "evidence_levels": [],
+      "evidence": [],
+      "limitations": [
+        "字数和修订行为不评价写作语义质量；写作水平未评估。"
+      ]
+    }
+  ],
+  "learning_goal": null
+}

@@ -1,0 +1,35 @@
+{
+  "browser": "Headless Chrome with simulated microphone; physical hardware not tested",
+  "recording_count": 2,
+  "recorded_blob_sizes": [
+    14584,
+    12652
+  ],
+  "playback_seconds": [
+    0.136519,
+    0.428489
+  ],
+  "refresh": true,
+  "retry_after_network_failure": true,
+  "deletion_and_missing_audio": true,
+  "permission_denied": true,
+  "device_missing": true,
+  "device_disconnected": true,
+  "empty_recording_rejected": true,
+  "indexeddb_failure_and_retry": true,
+  "themes": [
+    "premium",
+    "noir"
+  ],
+  "viewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "runtime_exceptions": []
+}

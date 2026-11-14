@@ -1,0 +1,36 @@
+{
+  "browser": "Headless Chrome",
+  "viewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "themes": [
+    "premium",
+    "noir"
+  ],
+  "keyboard": true,
+  "automatic_save": true,
+  "reload": true,
+  "save_failure_recovery": true,
+  "dropped_committed_response_replayed": true,
+  "revision_comparison": true,
+  "literal_html": true,
+  "shared_history": true,
+  "runtime_exceptions": [],
+  "screenshots": [
+    "writing-premium-1440.png",
+    "comparison-premium-1440.png",
+    "writing-premium-390.png",
+    "comparison-premium-390.png",
+    "writing-noir-1440.png",
+    "comparison-noir-1440.png",
+    "writing-noir-390.png",
+    "comparison-noir-390.png"
+  ]
+}

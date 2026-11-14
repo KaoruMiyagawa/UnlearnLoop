@@ -1,0 +1,19 @@
+{
+  "http_statuses": {
+    "open": 200,
+    "save": 200,
+    "reopen": 200,
+    "stale_save": 409,
+    "submit": 200,
+    "retry": 200,
+    "revise": 200,
+    "old_revision": 200,
+    "other_learner": 404,
+    "shared_history": 200
+  },
+  "database_head": "0009_speaking_practice",
+  "revision_count": 2,
+  "related_choice_attempts": 0,
+  "old_text_preserved": true,
+  "rule_version": "writing-text-metrics-v1"
+}
